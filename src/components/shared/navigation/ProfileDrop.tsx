@@ -33,6 +33,7 @@ interface ProfileDropProps {
   user?: UserProfile;
   onSignOut?: () => void;
   className?: string;
+  isMobile?: boolean;
 }
 
 const ProfileDrop: React.FC<ProfileDropProps> = ({
@@ -42,6 +43,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     initials: "JD",
   },
   onSignOut,
+  isMobile,
   className = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -99,82 +101,109 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <Button
-        ref={buttonRef}
-        onClick={toggleDropdown}
-        variant="ghost"
-        size="sm"
-        className={`group relative flex items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 ring-blue-500/20 transition-all duration-200 ${
-          isOpen ? "bg-gray-100/80 focus:ring-2 focus:ring-blue-500/70" : ""
-        }`}
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-        aria-label="User menu"
-      >
-        <div className="relative">
-          {user.avatar ? (
-            <Image
-              src={user.avatar}
-              alt={user.name}
-              className="h-6 w-6 rounded-full border-2 border-white object-cover shadow-sm"
-              width={25}
-              height={25}
-              priority
-            />
-          ) : (
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-sm">
-              {user.initials}
-            </div>
-          )}
-          <div className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-green-500 shadow-sm"></div>
-        </div>
-        <ChevronDown
-          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          } group-hover:text-gray-700`}
-        />
-      </Button>
+      {!isMobile ? (
+        <Button
+          ref={buttonRef}
+          onClick={toggleDropdown}
+          variant="ghost"
+          size="sm"
+          className={`group relative flex items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 ring-blue-500/20 transition-all duration-200 ${
+            isOpen ? "bg-gray-100/80 focus:ring-2 focus:ring-blue-500/70" : ""
+          }`}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          aria-label="User menu"
+        >
+          <div className="relative">
+            {user.avatar ? (
+              <Image
+                src={user.avatar}
+                alt={user.name}
+                className="h-6 w-6 rounded-full border-2 border-white object-cover shadow-sm"
+                width={25}
+                height={25}
+                priority
+              />
+            ) : (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-sm">
+                {user.initials}
+              </div>
+            )}
+            <div className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-green-500 shadow-sm"></div>
+          </div>
+          <ChevronDown
+            className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            } group-hover:text-gray-700`}
+          />
+        </Button>
+      ) : (
+        <button
+          ref={buttonRef}
+          onClick={toggleDropdown}
+          className={`text-muted-foreground hover:text-foreground flex flex-col items-center rounded-lg p-1 text-xs font-medium transition-colors`}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          aria-label="User menu"
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1 * 0.05 }}
+            className="flex flex-col items-center sm:gap-1 sm:p-2"
+          >
+            <User className="h-5 w-5" />
+            <span className="text-[10px] sm:text-xs">Profile</span>
+          </motion.div>
+        </button>
+      )}
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            initial={{ opacity: 0, scale: 0.95, y: -12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            exit={{ opacity: 0, scale: 0.95, y: -12 }}
             transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 30,
-              duration: 0.2,
+              duration: 0.28,
+              ease: [0.22, 1, 0.36, 1],
             }}
-            className="bg-background absolute top-full right-0 z-50 mt-8 w-72 overflow-hidden rounded-2xl border drop-shadow-2xl"
+            className={`z-50 overflow-hidden rounded-2xl border bg-white drop-shadow-2xl ${
+              isMobile
+                ? "absolute right-0 bottom-full mb-4 h-fit min-h-[65vh] w-full max-w-[82.5vw] min-w-[84vw]"
+                : "absolute top-full right-0 mt-8 w-72"
+            }`}
             role="menu"
             aria-orientation="vertical"
           >
             <div className="border-b border-gray-100/80 p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-start">
                 <div className="relative">
                   {user.avatar ? (
                     <Image
                       src={user.avatar}
                       alt={user.name}
-                      className="h-12 w-12 rounded-full border-2 border-white object-cover shadow-sm"
+                      className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-sm sm:h-12 sm:w-12"
                       width={48}
                       height={48}
                       priority
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-lg font-semibold text-white shadow-sm">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-lg font-semibold text-white shadow-sm sm:h-12 sm:w-12">
                       {user.initials}
                     </div>
                   )}
                   {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-green-500 shadow-sm"></div> */}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-gray-900">
+                  <p className="truncate text-center font-semibold text-gray-900 sm:text-start">
                     {user.name}
                   </p>
-                  <p className="truncate text-sm text-gray-600">{user.email}</p>
+                  <p className="truncate text-center text-sm text-gray-600 sm:text-start">
+                    {user.email}
+                  </p>
                   {/* <div className="mt-1 flex items-center gap-1">
                     <div className="h-2 w-2 rounded-full bg-green-500"></div>
                     <span className="text-xs font-medium text-green-600">

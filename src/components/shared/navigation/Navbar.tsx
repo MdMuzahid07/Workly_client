@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
@@ -86,35 +85,34 @@ const Navbar = () => {
         transition={{ type: "spring", stiffness: 100, damping: 15 }}
       >
         <div className="flex items-center justify-around px-3 sm:py-1">
-          {[...navLinks, { name: "Profile", href: "/profile", icon: User }].map(
-            (item, i) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex flex-col items-center rounded-lg p-1 text-xs font-medium transition-colors ${
-                  isActive(item.href)
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+          {[...navLinks].map((item, i) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex flex-col items-center rounded-lg p-1 text-xs font-medium transition-colors ${
+                isActive(item.href)
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="flex flex-col items-center sm:gap-1 sm:p-2"
               >
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="flex flex-col items-center sm:gap-1 sm:p-2"
-                >
-                  <item.icon
-                    className={`sm-3.5 w-3.5 sm:h-5 sm:w-5 ${
-                      isActive(item.href) ? "fill-primary/20" : ""
-                    }`}
-                  />
-                  <span className="text-[10px] sm:text-xs">{item.name}</span>
-                </motion.a>
-              </Link>
-            ),
-          )}
+                <item.icon
+                  className={`sm-3.5 w-3.5 sm:h-5 sm:w-5 ${
+                    isActive(item.href) ? "fill-primary/20" : ""
+                  }`}
+                />
+                <span className="text-[10px] sm:text-xs">{item.name}</span>
+              </motion.a>
+            </Link>
+          ))}
+          <ProfileDrop isMobile={true} />
         </div>
       </motion.nav>
     </>
