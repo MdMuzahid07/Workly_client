@@ -1,8 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
+import { LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
+import { Button } from "../../ui/button";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
@@ -19,7 +21,7 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className="border-border bg-background/30 fixed top-0 right-0 left-0 z-50 hidden border-b backdrop-blur md:flex"
+        className="border-border fixed top-0 right-0 left-0 z-50 hidden border-b bg-gray-100/50 backdrop-blur md:flex"
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
@@ -72,7 +74,14 @@ const Navbar = () => {
 
           {/* desktop actions */}
           <div className="hidden gap-2 md:flex">
-            <ProfileDrop />
+            {/* <ProfileDrop /> */}
+            <Button
+              className="rounded-lg bg-green-400 text-lg font-medium"
+              size={"sm"}
+            >
+              Sign In
+              <LogIn className="size-[20px]" />
+            </Button>
           </div>
         </div>
       </motion.nav>
@@ -95,7 +104,7 @@ const Navbar = () => {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <motion.a
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: 10 }}
@@ -109,7 +118,7 @@ const Navbar = () => {
                   }`}
                 />
                 <span className="text-[10px] sm:text-xs">{item.name}</span>
-              </motion.a>
+              </motion.div>
             </Link>
           ))}
           <ProfileDrop isMobile={true} />
