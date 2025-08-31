@@ -1,6 +1,6 @@
 export default function page() {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-7xl">
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab consequuntur
       reprehenderit inventore aspernatur modi cumque mollitia temporibus. Ex
       dicta quasi, totam ut voluptates sed pariatur explicabo eius asperiores

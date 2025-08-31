@@ -1,10 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
+import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -73,9 +73,7 @@ const Navbar = () => {
 
           {/* desktop actions */}
           <div className="hidden gap-2 md:flex">
-            <Button variant={"ghost"} size="sm" className="cursor-pointer">
-              <User className="size-[20px]" />
-            </Button>
+            <ProfileDrop />
           </div>
         </div>
       </motion.nav>
