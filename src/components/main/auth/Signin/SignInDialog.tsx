@@ -3,7 +3,14 @@
 import type React from "react";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, LogIn } from "lucide-react";
@@ -28,6 +35,15 @@ export function SignInDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="rounded-3xl border-gray-200 bg-green-50 shadow-xl sm:max-w-[425px]">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+            Welcome Back
+          </DialogTitle>
+          <DialogDescription className="text-center text-gray-600">
+            Sign in to your Workly_job account to continue your career journey.
+          </DialogDescription>
+        </DialogHeader>
+
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
