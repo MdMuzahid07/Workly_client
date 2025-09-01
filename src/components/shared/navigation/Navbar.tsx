@@ -4,7 +4,6 @@ import { LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
-import { Button } from "../../ui/button";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
@@ -75,13 +74,13 @@ const Navbar = () => {
           {/* desktop actions */}
           <div className="hidden gap-2 md:flex">
             {/* <ProfileDrop /> */}
-            <Button
-              className="rounded-lg bg-green-400 text-lg font-medium"
-              size={"sm"}
+            <Link
+              href="/login"
+              className="flex items-center gap-2 rounded-lg bg-green-400 px-3 py-1 text-lg font-medium text-white"
             >
               Sign In
               <LogIn className="size-[20px]" />
-            </Button>
+            </Link>
           </div>
         </div>
       </motion.nav>
