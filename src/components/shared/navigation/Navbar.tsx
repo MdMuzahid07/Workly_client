@@ -1,9 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
-import { LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
+import { SignInDialog } from "../../main/auth/Signin/SignInDialog";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
@@ -74,13 +74,8 @@ const Navbar = () => {
           {/* desktop actions */}
           <div className="hidden gap-2 md:flex">
             {/* <ProfileDrop /> */}
-            <Link
-              href="/login"
-              className="flex items-center gap-2 rounded-lg bg-green-400 px-3 py-1 text-lg font-medium text-white"
-            >
-              Sign In
-              <LogIn className="size-[20px]" />
-            </Link>
+
+            <SignInDialog />
           </div>
         </div>
       </motion.nav>
