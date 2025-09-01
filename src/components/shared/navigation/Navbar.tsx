@@ -21,7 +21,7 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className="border-border fixed top-0 right-0 left-0 z-50 hidden border-b bg-gray-100/50 backdrop-blur md:flex"
+        className="border-border fixed top-0 right-0 left-0 z-[999999] hidden border-b bg-gray-100/50 backdrop-blur md:flex"
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
@@ -88,7 +88,7 @@ const Navbar = () => {
 
       {/* mobile nav */}
       <motion.nav
-        className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-50 rounded-2xl border backdrop-blur-xs md:hidden"
+        className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-[9999999] rounded-2xl border backdrop-blur-xs md:hidden"
         initial={{ y: 80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 15 }}
