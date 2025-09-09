@@ -3,11 +3,13 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
-import { SignInDialog } from "../../main/auth/Signin/SignInDialog";
+import { Button } from "@/components/ui/button";
+import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { openAuth } = useAuthDialog();
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -74,8 +76,12 @@ const Navbar = () => {
           {/* desktop actions */}
           <div className="hidden gap-2 md:flex">
             {/* <ProfileDrop /> */}
-
-            <SignInDialog />
+            <Button
+              className="flex cursor-pointer items-center gap-2 rounded-lg bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
+              onClick={() => openAuth("signIn")}
+            >
+              Sign In
+            </Button>
           </div>
         </div>
       </motion.nav>

@@ -1,54 +1,56 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import type React from "react";
-
+import { useSearchParams, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckCircle, Eye, EyeOff, Shield } from "lucide-react";
-import { useState } from "react";
 
-const ResetPasswordDialog = () => {
+export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+
+  const token = useMemo(() => searchParams.get("token") ?? "", [searchParams]);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
   });
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
-    }
-    console.log(formData);
-    setIsSubmitted(true);
-  };
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const [error, setError] = useState<string | null>(null);
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const handleSubmit = async (e: React.FormEvent) => {};
+
+  const handleInputChange = (
+    field: "password" | "confirmPassword",
+    value: string,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="flex cursor-pointer items-center gap-2 rounded-lg bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200">
-          Reset Password
-          <Shield className="size-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="rounded-3xl border-gray-200 bg-green-50 shadow-xl sm:max-w-[425px]">
-        <DialogHeader className="space-y-3">
+    <main className="flex min-h-[calc(100dvh-64px)] items-center justify-center bg-green-50 px-4 py-10">
+      <div className="w-full max-w-[425px] rounded-3xl border border-gray-200 bg-gray-50 p-6">
+        <div className="space-y-3">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             {isSubmitted ? (
               <CheckCircle className="h-6 w-6 text-green-600" />
@@ -56,18 +58,24 @@ const ResetPasswordDialog = () => {
               <Shield className="h-6 w-6 text-green-600" />
             )}
           </div>
-          <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+          <h1 className="text-center text-2xl font-bold text-gray-900">
             {isSubmitted ? "Password Updated!" : "Create New Password"}
-          </DialogTitle>
-          <DialogDescription className="text-center text-gray-600">
+          </h1>
+          <p className="text-center text-gray-600">
             {isSubmitted
               ? "Your password has been successfully updated. You can now sign in with your new password."
               : "Enter your new password below. Make sure it's strong and secure."}
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
 
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label
@@ -93,7 +101,7 @@ const ResetPasswordDialog = () => {
                     variant="ghost"
                     size="sm"
                     className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((v) => !v)}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-gray-500" />
@@ -128,7 +136,7 @@ const ResetPasswordDialog = () => {
                     variant="ghost"
                     size="sm"
                     className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onClick={() => setShowConfirmPassword((v) => !v)}
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="h-4 w-4 text-gray-500" />
@@ -149,9 +157,10 @@ const ResetPasswordDialog = () => {
 
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              disabled={submitting}
+              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200 disabled:opacity-70"
             >
-              Update Password
+              {submitting ? "Updating..." : "Update Password"}
             </Button>
           </form>
         ) : (
@@ -161,14 +170,15 @@ const ResetPasswordDialog = () => {
                 Your password has been successfully updated!
               </p>
             </div>
-            <Button className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200">
+            <Button
+              onClick={() => router.push("/?auth=signin")}
+              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+            >
               Continue to Sign In
             </Button>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </main>
   );
-};
-
-export default ResetPasswordDialog;
+}
