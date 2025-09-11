@@ -1,7 +1,10 @@
+import AuthDialogProvider from "@/components/main/auth/AuthDialogProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import persistor, { store } from "../redux/store";
 import "./globals.css";
-import AuthDialogProvider from "@/components/main/auth/AuthDialogProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthDialogProvider>{children}</AuthDialogProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}></PersistGate>
+          <AuthDialogProvider>{children}</AuthDialogProvider>
+        </Provider>
       </body>
     </html>
   );
