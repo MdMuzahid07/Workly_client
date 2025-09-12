@@ -1,9 +1,9 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
-import { Button } from "@/components/ui/button";
 import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ProfileDrop from "./ProfileDrop";
 
@@ -22,7 +22,7 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className="border-border fixed top-0 right-0 left-0 z-[999999] hidden border-b bg-gray-100/50 backdrop-blur md:flex"
+        className="border-border fixed top-0 right-0 left-0 z-[999999] hidden border-b bg-white/90 backdrop-blur md:flex"
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}

@@ -1,5 +1,6 @@
 "use client";
 
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   createContext,
   useContext,
@@ -7,10 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SignInView } from "./Signin/SignInView";
-import { SignUpView } from "./signup/SignUpView";
 import { ForgetPasswordView } from "./forget-password/ForgetPasswordView";
+import SignUpView from "./signup/SignUpView";
 
 export type AuthView = "signIn" | "signUp" | "forgot";
 
