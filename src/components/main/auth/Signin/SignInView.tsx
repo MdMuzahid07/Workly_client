@@ -1,27 +1,33 @@
 "use client";
 
-import type React from "react";
 import { Button } from "@/components/ui/button";
 import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import WkForm from "../../../form/WkForm";
+import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
 
-export function SignInView() {
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
+const SignInView = () => {
   const { switchView } = useAuthDialog();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ email, password });
+  const defaultValues: SignInFormData = {
+    email: "",
+    password: "",
+  };
+
+  const handleSubmit = (data: SignInFormData) => {
+    console.log(data);
   };
 
   return (
@@ -35,48 +41,30 @@ export function SignInView() {
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-sm font-medium text-gray-700"
-            >
-              Email Address
-            </Label>
-            <Input
-              id="email"
+      <WkForm defaultValues={defaultValues} onSubmit={handleSubmit}>
+        <div className="mt-6 space-y-6">
+          <div className="space-y-4">
+            <WKInput
+              name="email"
+              label="Email Address"
               type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border-gray-300 bg-white transition-all duration-200 focus:outline-none active:border-green-400"
               required
+              className="rounded-lg border-gray-300 bg-white transition-all duration-200 focus:outline-none active:border-green-400"
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="password"
-              className="text-sm font-medium text-gray-700"
-            >
-              Password
-            </Label>
             <div className="relative">
-              <Input
-                id="password"
+              <WKInput
+                name="password"
+                label="Password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="rounded-lg border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
                 required
+                className="rounded-lg border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                className="absolute top-6.5 right-0 cursor-pointer hover:bg-transparent"
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
@@ -87,28 +75,28 @@ export function SignInView() {
               </Button>
             </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <Button
-            type="submit"
-            className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
-          >
-            Sign In
-          </Button>
-
-          <div className="text-center">
+          <div className="space-y-4">
             <Button
-              type="button"
-              variant="link"
-              className="cursor-pointer text-sm text-gray-500 transition-colors duration-200 hover:text-green-400"
-              onClick={() => switchView("forgot")}
+              type="submit"
+              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
-              Forgot your password?
+              Sign In
             </Button>
+
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                className="cursor-pointer text-sm text-gray-500 transition-colors duration-200 hover:text-green-400"
+                onClick={() => switchView("forgot")}
+              >
+                Forgot your password?
+              </Button>
+            </div>
           </div>
         </div>
-      </form>
+      </WkForm>
 
       <div className="mt-6 border-t border-gray-200 pt-6">
         <p className="text-center text-sm text-gray-600">
@@ -124,4 +112,6 @@ export function SignInView() {
       </div>
     </>
   );
-}
+};
+
+export default SignInView;

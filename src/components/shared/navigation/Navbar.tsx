@@ -45,7 +45,7 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`relative flex items-center gap-2 text-lg font-medium transition-colors ${
+                className={`relative flex items-center gap-2 text-lg font-semibold transition-colors ${
                   isActive(item.href)
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"

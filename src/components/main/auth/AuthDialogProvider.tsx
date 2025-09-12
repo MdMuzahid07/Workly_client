@@ -8,8 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { SignInView } from "./Signin/SignInView";
-import { ForgetPasswordView } from "./forget-password/ForgetPasswordView";
+import ForgetPasswordView from "./forget-password/ForgetPasswordView";
+import SignInView from "./Signin/SignInView";
 import SignUpView from "./signup/SignUpView";
 
 export type AuthView = "signIn" | "signUp" | "forgot";

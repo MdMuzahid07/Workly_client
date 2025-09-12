@@ -6,20 +6,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { useState } from "react";
+import WkForm from "../../../form/WkForm";
+import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
 
-export function ForgetPasswordView() {
+interface ForgetPasswordFormData {
+  email: string;
+}
+
+const ForgetPasswordView = () => {
   const { switchView } = useAuthDialog();
-  const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ email });
+  const defaultValues: ForgetPasswordFormData = { email: "" };
+
+  const handleSubmit = (data: ForgetPasswordFormData) => {
+    console.log(data);
     setIsSubmitted(true);
   };
 
@@ -40,41 +44,31 @@ export function ForgetPasswordView() {
       </DialogHeader>
 
       {!isSubmitted ? (
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-sm font-medium text-gray-700"
-            >
-              Email Address
-            </Label>
-            <div className="relative">
-              <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                id="email"
+        <WkForm defaultValues={defaultValues} onSubmit={handleSubmit}>
+          <div className="mt-6 space-y-6">
+            <div className="space-y-2">
+              <WKInput
+                name="email"
+                label="Email Address"
                 type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-lg border-gray-300 bg-white pl-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
                 required
+                className="rounded-lg border-gray-300 bg-white pl-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
               />
             </div>
-          </div>
 
-          <Button
-            type="submit"
-            className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
-          >
-            Send Reset Link
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+            >
+              Send Reset Link
+            </Button>
+          </div>
+        </WkForm>
       ) : (
         <div className="mt-6 space-y-4">
           <div className="rounded-lg bg-green-100 p-4 text-center">
             <p className="text-sm text-green-800">
-              Password reset instructions have been sent to{" "}
-              <span className="font-medium">{email}</span>
+              Password reset instructions have been sent to your email.
             </p>
           </div>
           <Button
@@ -101,4 +95,6 @@ export function ForgetPasswordView() {
       </div>
     </>
   );
-}
+};
+
+export default ForgetPasswordView;
