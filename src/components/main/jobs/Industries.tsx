@@ -103,7 +103,7 @@ const Industries = () => {
           <SwiperSlide key={category.id} className="!w-auto">
             <Button
               variant="outline"
-              className="hover:bg-primary group bg-background h-auto rounded-lg px-6 py-2 whitespace-nowrap text-black transition-colors hover:text-white"
+              className="hover:bg-primary group bg-background h-auto rounded-full px-6 py-2 whitespace-nowrap text-black transition-colors hover:text-white"
             >
               {category.title}
               <p className="group:hover:text-white ml-2 text-xs text-black">
