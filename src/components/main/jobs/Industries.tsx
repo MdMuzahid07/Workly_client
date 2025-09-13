@@ -1,59 +1,129 @@
+"use client";
+import { Navigation } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+// import Swiper and modules styles
+import {
+  Award,
+  ChevronLeft,
+  ChevronRight,
+  Code,
+  Globe,
+  Heart,
+  Star,
+  TrendingUp,
+  Users,
+  Zap,
+} from "lucide-react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Button } from "../../ui/button";
+
+const jobCategories = [
+  {
+    id: 1,
+    title: "Technology",
+    icon: Code,
+    count: "2,847 jobs",
+    color: "bg-blue-500",
+    description: "Software, AI, Data Science",
+  },
+  {
+    id: 2,
+    title: "Healthcare",
+    icon: Heart,
+    count: "1,923 jobs",
+    color: "bg-red-500",
+    description: "Medical, Nursing, Research",
+  },
+  {
+    id: 3,
+    title: "Finance",
+    icon: TrendingUp,
+    count: "1,456 jobs",
+    color: "bg-green-500",
+    description: "Banking, Investment, Accounting",
+  },
+  {
+    id: 4,
+    title: "Marketing",
+    icon: Zap,
+    count: "987 jobs",
+    color: "bg-purple-500",
+    description: "Digital, Content, SEO",
+  },
+  {
+    id: 5,
+    title: "Design",
+    icon: Star,
+    count: "743 jobs",
+    color: "bg-pink-500",
+    description: "UI/UX, Graphic, Product",
+  },
+  {
+    id: 6,
+    title: "Sales",
+    icon: Users,
+    count: "1,234 jobs",
+    color: "bg-orange-500",
+    description: "B2B, Retail, Account Management",
+  },
+  {
+    id: 7,
+    title: "Education",
+    icon: Award,
+    count: "654 jobs",
+    color: "bg-indigo-500",
+    description: "Teaching, Training, Research",
+  },
+  {
+    id: 8,
+    title: "Remote",
+    icon: Globe,
+    count: "3,421 jobs",
+    color: "bg-teal-500",
+    description: "Work from anywhere",
+  },
+];
+
 const Industries = () => {
   return (
-    <div className="mx-auto max-w-7xl">
-      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quo natus fuga
-      nulla incidunt magnam tempore modi officia, doloribus impedit earum nam
-      atque voluptatibus! Soluta aut fugiat nulla illum vel deserunt itaque
-      dolore. Placeat mollitia blanditiis corrupti quos autem consectetur
-      itaque. Facere voluptatibus ipsum iste saepe vel illum perferendis rem
-      reprehenderit odit, quod eius obcaecati quaerat, eos nisi aliquid. Nemo
-      consequatur corporis nam aperiam aliquid repudiandae, neque voluptates
-      ipsum dicta necessitatibus? Placeat ipsam, sit doloremque necessitatibus
-      id beatae culpa illo debitis aut a expedita eaque, hic minus autem
-      accusamus rem explicabo sapiente voluptates at commodi! Assumenda
-      doloribus eveniet sequi cum provident! Suscipit, magnam. Nulla incidunt
-      architecto velit sequi mollitia animi, est soluta non inventore libero,
-      recusandae aut doloribus aspernatur! Corrupti sunt architecto saepe non
-      eligendi ex blanditiis quae eaque! Ipsa sapiente ullam, quam labore veniam
-      alias optio magni sit nemo consequuntur obcaecati, magnam odio molestias!
-      Harum animi soluta, nisi quaerat recusandae dolorem quod, in, tempora quos
-      dolorum explicabo est repellendus atque odio fuga eaque? Numquam velit ab
-      esse deleniti, soluta enim sequi recusandae magnam distinctio asperiores
-      voluptate eveniet repudiandae quaerat dicta beatae excepturi. Atque velit
-      facere aperiam repellendus recusandae ea aspernatur nihil, ab consequuntur
-      sed, impedit iste. Repellat cupiditate est quasi, sequi veniam vero
-      molestias eum, unde nostrum quos quia ab odio vel, ea esse eligendi sunt
-      officiis minus? Ad beatae dolore laudantium laborum eveniet, maxime
-      reprehenderit. Qui ducimus, perferendis architecto eos vitae explicabo
-      voluptatem illum nam quibusdam! Veritatis, possimus illum at, cupiditate
-      praesentium ad dicta est sit provident distinctio mollitia. Fuga totam
-      rerum ullam pariatur repudiandae fugiat eligendi, dignissimos id earum,
-      illo facere et ea laboriosam explicabo deleniti? Non harum enim quos.
-      Tempore, iusto nobis! Asperiores quasi ullam officia, necessitatibus harum
-      sint nam vero minima dolor, doloribus obcaecati pariatur sed iste incidunt
-      nobis soluta optio a ad quia, quod debitis. At, quia exercitationem nobis
-      architecto quidem ea dolore ab obcaecati, quaerat tempora ex soluta
-      adipisci accusantium ipsa modi aspernatur. Nam similique vel aliquid enim
-      officiis ratione nemo eius esse veritatis. Soluta officia sunt iste, ad
-      perspiciatis veniam, amet nemo quas repellat consectetur eius dolorum
-      illum! Sunt aperiam necessitatibus commodi provident, quibusdam doloremque
-      ex error minima. Quam nobis soluta odio cumque, perferendis, libero fugit
-      totam aperiam explicabo vitae cum harum quaerat sequi asperiores, tempore
-      quisquam quo natus. Minima exercitationem voluptatibus repellendus
-      inventore accusamus dolor sapiente, doloribus labore atque, earum cum
-      voluptatem asperiores quae autem consequatur magnam ratione cupiditate
-      totam dolorem fugit modi minus, nostrum officia. Impedit quaerat excepturi
-      consequuntur exercitationem? Ad quod facere cupiditate non est! Voluptates
-      doloribus ipsa sint facere enim id accusantium delectus officia eligendi
-      ut magni beatae, vel minima incidunt dolor quo nobis. Dolore quod cumque
-      magnam accusamus velit praesentium! Assumenda nam nesciunt reprehenderit
-      sequi maiores possimus sint aut corrupti, enim sapiente minima?
-      Perspiciatis, aliquid. Possimus magnam consequatur nisi autem sequi
-      repellat obcaecati! Accusantium similique eveniet nulla perferendis
-      explicabo, consectetur vitae deserunt eos voluptas harum. Voluptatibus
-      voluptatum nostrum natus velit culpa vel accusamus labore consectetur fuga
-      praesentium laboriosam quibusdam aliquam, ea, officia quia eaque dolorum
-      quaerat facilis unde! s
+    <div className="mx-auto mt-4 max-w-7xl p-4 md:mt-7 xl:p-0">
+      <Swiper
+        modules={[Navigation]}
+        spaceBetween={12}
+        slidesPerView="auto"
+        navigation={{
+          prevEl: ".swiper-button-prev-2",
+          nextEl: ".swiper-button-next-2",
+        }}
+        className="category-slider-2 flex w-full justify-center"
+      >
+        {jobCategories.map((category) => (
+          <SwiperSlide key={category.id} className="!w-auto">
+            <Button
+              variant="outline"
+              className="hover:bg-primary group bg-background h-auto rounded-lg px-6 py-2 whitespace-nowrap text-black transition-colors hover:text-white"
+            >
+              {category.title}
+              <p className="group:hover:text-white ml-2 text-xs text-black">
+                {category.count.split(" ")[0]}
+              </p>
+            </Button>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      <div className="mt-4 flex items-center justify-between">
+        <Button variant="ghost" size="sm" className="swiper-button-prev-2">
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Previous
+        </Button>
+        <Button variant="ghost" size="sm" className="swiper-button-next-2">
+          Next
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
