@@ -1,5 +1,11 @@
+import NotificationView from "../../../view/notification/NotificationView";
+
 const page = () => {
-  return <div>page</div>;
+  return (
+    <>
+      <NotificationView />
+    </>
+  );
 };
 
 export default page;
