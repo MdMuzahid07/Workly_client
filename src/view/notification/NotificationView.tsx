@@ -189,12 +189,16 @@ const NotificationView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24">
+    <div className="min-h-screen bg-gray-50 md:pt-24">
       <div className="container mx-auto px-4 py-6">
         <div className="mx-auto max-w-6xl">
           {/* Filter Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="mb-6 overflow-x-auto"
+          >
+            <TabsList className="grid w-full min-w-[400px] grid-cols-4 lg:w-auto lg:grid-cols-4">
               <TabsTrigger value="all" className="text-sm">
                 All ({notifications.length})
               </TabsTrigger>
