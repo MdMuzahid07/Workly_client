@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Archive,
+  ArrowLeft,
   Info,
   MoreVertical,
   Phone,
@@ -46,14 +47,15 @@ interface Conversation {
   isOnline: boolean;
   messages: Message[];
 }
+
 const MessageView = () => {
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showMobileChat, setShowMobileChat] = useState(false);
 
-  // Mock data - replace with actual API calls
   const conversations: Conversation[] = [
     {
       id: "1",
@@ -144,18 +146,69 @@ const MessageView = () => {
 
   const handleSendMessage = () => {
     if (newMessage.trim() && selectedConversation) {
-      // Handle sending message - integrate with your API
       console.log("Sending message:", newMessage);
       setNewMessage("");
     }
   };
 
+  const handleConversationSelect = (conversationId: string) => {
+    setSelectedConversation(conversationId);
+    setShowMobileChat(true);
+  };
+
+  const handleBackToConversations = () => {
+    setShowMobileChat(false);
+    setSelectedConversation(null);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-24">
+    <div className="bg-background min-h-screen md:pt-14">
+      {/* Header */}
+      <div className="border-border bg-card sticky top-0 z-50 flex w-full justify-start border-b md:hidden">
+        <div className="max-w-6xl p-4">
+          {showMobileChat && selectedConversation && currentConversation ? (
+            <div className="flex items-center space-x-3 lg:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackToConversations}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={
+                    currentConversation.participantAvatar || "/placeholder.svg"
+                  }
+                />
+                <AvatarFallback>
+                  {currentConversation.participantName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-foreground text-lg font-semibold">
+                  {currentConversation.participantName}
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  {currentConversation.participantRole}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <h1 className="text-foreground text-2xl font-bold">Messages</h1>
+          )}
+        </div>
+      </div>
+
       <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="grid h-[calc(100vh-200px)] grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Conversations Sidebar */}
-          <div className="lg:col-span-5 xl:col-span-4">
+          <div
+            className={`lg:col-span-4 xl:col-span-3 ${showMobileChat ? "hidden lg:block" : "block"}`}
+          >
             <Card className="h-full">
               <CardHeader className="pb-3">
                 <div className="relative">
@@ -179,7 +232,9 @@ const MessageView = () => {
                             ? "bg-primary/10 border-primary border-r-2"
                             : ""
                         }`}
-                        onClick={() => setSelectedConversation(conversation.id)}
+                        onClick={() =>
+                          handleConversationSelect(conversation.id)
+                        }
                       >
                         <div className="flex items-start space-x-3">
                           <div className="relative">
@@ -237,11 +292,13 @@ const MessageView = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="lg:col-span-7 xl:col-span-8">
+          <div
+            className={`lg:col-span-8 xl:col-span-9 ${!showMobileChat && selectedConversation ? "hidden lg:block" : showMobileChat || !selectedConversation ? "block" : "hidden lg:block"}`}
+          >
             {selectedConversation && currentConversation ? (
               <Card className="flex h-full flex-col">
                 {/* Chat Header */}
-                <CardHeader className="border-border border-b pb-3">
+                <CardHeader className="border-border hidden border-b pb-3 lg:block">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="relative">
@@ -309,7 +366,7 @@ const MessageView = () => {
 
                 {/* Messages */}
                 <CardContent className="flex-1 p-0">
-                  <ScrollArea className="h-[calc(100vh-400px)] p-4">
+                  <ScrollArea className="h-[calc(100vh-280px)] p-4 lg:h-[calc(100vh-400px)]">
                     <div className="space-y-4">
                       {currentConversation.messages.map((message) => (
                         <div
@@ -317,13 +374,13 @@ const MessageView = () => {
                           className={`flex ${message.senderId === "current-user" ? "justify-end" : "justify-start"}`}
                         >
                           <div
-                            className={`flex max-w-[70%] items-start space-x-2 ${
+                            className={`flex max-w-[85%] items-start space-x-2 sm:max-w-[70%] ${
                               message.senderId === "current-user"
                                 ? "flex-row-reverse space-x-reverse"
                                 : ""
                             }`}
                           >
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-8 w-8 flex-shrink-0">
                               <AvatarImage
                                 src={message.senderAvatar || "/placeholder.svg"}
                               />
@@ -341,7 +398,9 @@ const MessageView = () => {
                                   : "bg-muted text-foreground"
                               }`}
                             >
-                              <p className="text-sm">{message.content}</p>
+                              <p className="text-sm break-words">
+                                {message.content}
+                              </p>
                               <p
                                 className={`mt-1 text-xs ${
                                   message.senderId === "current-user"
