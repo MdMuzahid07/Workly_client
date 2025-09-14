@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
 import WkForm from "../../../form/WkForm";
 import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
@@ -21,6 +22,7 @@ interface SignUpFormData {
 
 const SignUpView = () => {
   const { switchView } = useAuthDialog();
+  const [registerUser] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -31,12 +33,20 @@ const SignUpView = () => {
     confirmPassword: "",
   };
 
-  const handleSubmit = (data: SignUpFormData) => {
+  const handleSubmit = async (data: SignUpFormData) => {
     if (data.password !== data.confirmPassword) {
       alert("Passwords don't match!");
       return;
     }
-    console.log(data);
+
+    const result = await registerUser({
+      fullName: data.name,
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    });
+
+    console.log(result, "from sing register");
   };
 
   return (
