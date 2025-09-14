@@ -162,7 +162,7 @@ const MessageView = () => {
   };
 
   return (
-    <div className="bg-background min-h-screen md:pt-14">
+    <div className="min-h-screen bg-white md:bg-gray-50 md:pt-20">
       {/* Header */}
       <div className="border-border bg-card sticky top-0 z-50 flex w-full justify-start border-b md:hidden">
         <div className="max-w-6xl p-4">

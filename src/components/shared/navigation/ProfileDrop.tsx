@@ -107,7 +107,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           onClick={toggleDropdown}
           variant="ghost"
           size="sm"
-          className={`group relative flex items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 ring-green-400/30 transition-all duration-200 ${
+          className={`group relative flex cursor-pointer items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 ring-green-400/30 transition-all duration-200 ${
             isOpen ? "bg-gray-100/80 focus:ring-2 focus:ring-green-400/70" : ""
           }`}
           aria-expanded={isOpen}
