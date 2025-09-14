@@ -84,7 +84,7 @@ const getNotificationColor = (type: Notification["type"]) => {
 const NotificationView = () => {
   const [activeTab, setActiveTab] = useState("all");
 
-  // Mock data - replace with actual API calls
+  // fake data
   const notifications: Notification[] = [
     {
       id: "1",
@@ -199,16 +199,19 @@ const NotificationView = () => {
             className="mb-6 overflow-x-auto"
           >
             <TabsList className="grid w-full min-w-[400px] grid-cols-4 lg:w-auto lg:grid-cols-4">
-              <TabsTrigger value="all" className="text-sm">
+              <TabsTrigger value="all" className="cursor-pointer text-sm">
                 All ({notifications.length})
               </TabsTrigger>
-              <TabsTrigger value="unread" className="text-sm">
+              <TabsTrigger value="unread" className="cursor-pointer text-sm">
                 Unread ({unreadCount})
               </TabsTrigger>
-              <TabsTrigger value="applications" className="text-sm">
+              <TabsTrigger
+                value="applications"
+                className="cursor-pointer text-sm"
+              >
                 Applications
               </TabsTrigger>
-              <TabsTrigger value="messages" className="text-sm">
+              <TabsTrigger value="messages" className="cursor-pointer text-sm">
                 Messages
               </TabsTrigger>
             </TabsList>

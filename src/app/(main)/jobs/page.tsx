@@ -142,7 +142,7 @@ const jobs = [
 
 const Page = () => {
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 pb-12">
       <Searchbar />
       <Industries />
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 pt-5">

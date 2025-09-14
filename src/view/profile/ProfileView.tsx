@@ -22,8 +22,8 @@ import EditProfileDialog from "../../components/main/profile/EditProfileDialog";
 import JobPreference from "../../components/main/profile/JobPreference";
 import SkillsAndExpertise from "../../components/main/profile/SkillsAndExpertise";
 
-// Mock user data based on your schema
-const mockUser = {
+// fake user data based on your schema
+const fakeUser = {
   id: "1",
   email: "john.doe@example.com",
   fullName: "John Doe",
@@ -59,7 +59,7 @@ const mockUser = {
 
 const ProfileView = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [user, setUser] = useState(mockUser);
+  const [user, setUser] = useState(fakeUser);
 
   return (
     <div className="min-h-screen bg-gray-50">

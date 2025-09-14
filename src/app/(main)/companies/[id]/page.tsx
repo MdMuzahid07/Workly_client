@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-// Mock data for company details
+// fake data for company details
 const companyData = {
   id: "1",
   name: "TechFlow Inc.",

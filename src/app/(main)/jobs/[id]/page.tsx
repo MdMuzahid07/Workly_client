@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 
-// Mock data for different job examples
+// fake data for different job examples
 const jobExamples = {
   "1": {
     id: "1",
