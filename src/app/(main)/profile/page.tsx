@@ -1,5 +1,7 @@
+import ProfileView from "../../../view/profile/ProfileView";
+
 const page = () => {
-  return <div>page</div>;
+  return <ProfileView />;
 };
 
 export default page;

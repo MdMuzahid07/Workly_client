@@ -98,7 +98,7 @@ const page = () => {
     <div className="min-h-screen bg-gray-50">
       <Searchbar />
       {/* Filters */}
-      <div className="mx-auto max-w-7xl rounded-xl bg-white px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl rounded-lg bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6 overflow-x-auto">
           <div className="flex items-center gap-2 text-gray-700">
             <Filter className="h-4 w-4" />
