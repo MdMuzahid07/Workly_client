@@ -36,7 +36,7 @@ const JobCard = ({
 }: JobCardProps) => {
   return (
     <Card
-      className={`w-full rounded-2xl border-0 bg-gray-50 shadow-none drop-shadow-none transition-all duration-200 hover:bg-gray-100`}
+      className={`w-full rounded-2xl border-0 bg-white shadow-none drop-shadow-none transition-all duration-200`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">

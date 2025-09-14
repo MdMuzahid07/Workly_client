@@ -142,10 +142,10 @@ const jobs = [
 
 const Page = () => {
   return (
-    <>
+    <div className="bg-gray-50">
       <Searchbar />
       <Industries />
-      <div className="mx-auto mt-5 grid max-w-7xl grid-cols-12 gap-4">
+      <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 pt-5">
         <div className="col-span-4">
           <div className="sticky top-24 hidden md:flex">
             {
@@ -169,7 +169,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
