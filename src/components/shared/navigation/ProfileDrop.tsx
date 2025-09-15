@@ -85,6 +85,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     { icon: Briefcase, label: "My Jobs", href: "/my-jobs", badge: 3 },
     { icon: Heart, label: "Saved Jobs", href: "/saved", badge: 12 },
     { icon: FileText, label: "My Resume", href: "/resume" },
+    { icon: FileText, label: "Company Dashboard", href: "/dashboard" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
