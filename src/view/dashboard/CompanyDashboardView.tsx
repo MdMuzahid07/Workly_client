@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const CompanyDashboard = () => {
+const CompanyDashboardView = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   // fake data
@@ -457,4 +457,4 @@ const CompanyDashboard = () => {
   );
 };
 
-export default CompanyDashboard;
+export default CompanyDashboardView;
