@@ -2,9 +2,9 @@ import CompanySetting from "../../../../../components/dashboard/company/CompanyS
 
 const page = () => {
   return (
-    <div>
+    <>
       <CompanySetting />
-    </div>
+    </>
   );
 };
 
