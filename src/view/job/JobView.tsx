@@ -6,7 +6,7 @@ import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
-import SidebarFilter from "../../components/main/jobs/SidebarFilter";
+import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
 
 // fake data
 const jobs = [

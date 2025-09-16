@@ -3,22 +3,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@radix-ui/react-checkbox";
-import {
-  Clock,
-  DollarSign,
-  Filter,
-  MapPin,
-  Search,
-  Tag,
-  X,
-} from "lucide-react";
+import { Clock, Filter, Tag, X } from "lucide-react";
 import { useState } from "react";
+import BudgetRange from "./BudgetRange";
+import ExperienceLevel from "./ExperienceLevel";
+import FilterSearch from "./FilterSearch";
+import JobType from "./JobType";
+import LocationWise from "./LocationWise";
 
 interface FilterState {
   search: string;
@@ -130,130 +125,27 @@ const SidebarFilter = ({
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Search */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2 text-sm font-medium">
-              <Search className="h-4 w-4" />
-              Search Jobs
-            </Label>
-            <Input
-              placeholder="Search by title, company, or keywords..."
-              value={filters.search}
-              onChange={(e) => updateFilters({ search: e.target.value })}
-              className="w-full rounded-full"
-            />
-          </div>
+          <FilterSearch updateFilters={updateFilters} filters={filters} />
 
           <Separator />
 
-          {/* Location */}
-          <div className="space-y-3">
-            <Label className="flex items-center gap-2 text-sm font-medium">
-              <MapPin className="h-4 w-4" />
-              Location
-            </Label>
-            <RadioGroup
-              value={filters.location}
-              onValueChange={(value) => updateFilters({ location: value })}
-            >
-              {locationOptions.map((location) => (
-                <div key={location} className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value={location}
-                    id={`location-${location}`}
-                  />
-                  <Label
-                    htmlFor={`location-${location}`}
-                    className="cursor-pointer text-sm"
-                  >
-                    {location}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          <LocationWise
+            updateFilters={updateFilters}
+            filters={filters}
+            locationOptions={locationOptions}
+          />
 
           <Separator />
 
-          {/* Budget Range */}
-          <div className="space-y-3">
-            <Label className="flex items-center gap-2 text-sm font-medium">
-              <DollarSign className="h-4 w-4" />
-              Budget Range
-            </Label>
-            <div className="px-2">
-              <Slider
-                value={filters.budgetRange}
-                onValueChange={(value) =>
-                  updateFilters({ budgetRange: value as [number, number] })
-                }
-                max={10000}
-                min={0}
-                step={100}
-                className="w-full"
-              />
-              <div className="text-muted-foreground mt-2 flex justify-between text-xs">
-                <span>${filters.budgetRange[0]}</span>
-                <span>${filters.budgetRange[1]}</span>
-              </div>
-            </div>
-          </div>
+          <BudgetRange updateFilters={updateFilters} filters={filters} />
 
           <Separator />
 
-          {/* Job Type */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Job Type</Label>
-            <RadioGroup
-              value={filters.jobType}
-              onValueChange={(value) => updateFilters({ jobType: value })}
-            >
-              {["Fixed Price", "Hourly", "Contract", "Full-time"].map(
-                (type) => (
-                  <div key={type} className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value={type.toLowerCase()}
-                      id={`type-${type}`}
-                    />
-                    <Label
-                      htmlFor={`type-${type}`}
-                      className="cursor-pointer text-sm"
-                    >
-                      {type}
-                    </Label>
-                  </div>
-                ),
-              )}
-            </RadioGroup>
-          </div>
+          <JobType updateFilters={updateFilters} filters={filters} />
 
           <Separator />
 
-          {/* Experience Level */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Experience Level</Label>
-            <RadioGroup
-              value={filters.experienceLevel}
-              onValueChange={(value) =>
-                updateFilters({ experienceLevel: value })
-              }
-            >
-              {["Entry Level", "Intermediate", "Expert"].map((level) => (
-                <div key={level} className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value={level.toLowerCase()}
-                    id={`exp-${level}`}
-                  />
-                  <Label
-                    htmlFor={`exp-${level}`}
-                    className="cursor-pointer text-sm"
-                  >
-                    {level}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          <ExperienceLevel updateFilters={updateFilters} filters={filters} />
 
           <Separator />
 

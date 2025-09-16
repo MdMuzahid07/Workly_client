@@ -11,7 +11,7 @@ import {
 import { Filter } from "lucide-react";
 import { useState } from "react";
 import { ScrollArea } from "../../ui/scroll-area";
-import SidebarFilter from "./SidebarFilter";
+import SidebarFilter from "./filter/SidebarFilter";
 
 interface FilterState {
   search: string;
