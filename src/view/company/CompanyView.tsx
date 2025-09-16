@@ -2,8 +2,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Filter, Globe, MapPin, Users } from "lucide-react";
+import { Globe, MapPin, Users } from "lucide-react";
 import Image from "next/image";
+import CompanyFilter from "../../components/main/company/CompanyFilter";
 import Searchbar from "../../components/main/jobs/Searchbar";
 
 //fake data
@@ -98,41 +99,7 @@ const CompanyView = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Searchbar />
-      {/* Filters */}
-      <div className="mx-auto max-w-7xl rounded-lg bg-white px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-6 overflow-x-auto">
-          <div className="flex items-center gap-2 text-gray-700">
-            <Filter className="h-4 w-4" />
-            <span className="font-medium">Filters</span>
-          </div>
-          <div className="flex gap-3">
-            <Badge
-              variant="outline"
-              className="cursor-pointer hover:bg-gray-50"
-            >
-              Technology
-            </Badge>
-            <Badge
-              variant="outline"
-              className="cursor-pointer hover:bg-gray-50"
-            >
-              Startup
-            </Badge>
-            <Badge
-              variant="outline"
-              className="cursor-pointer hover:bg-gray-50"
-            >
-              Remote
-            </Badge>
-            <Badge
-              variant="outline"
-              className="cursor-pointer hover:bg-gray-50"
-            >
-              100+ employees
-            </Badge>
-          </div>
-        </div>
-      </div>
+      <CompanyFilter />
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl py-8">
@@ -220,7 +187,6 @@ const CompanyView = () => {
           ))}
         </div>
 
-        {/* Load More */}
         <div className="mt-12 text-center">
           <Button variant="outline" className="bg-transparent px-8">
             Load More Companies
