@@ -191,7 +191,7 @@ const NotificationView = () => {
   return (
     <div className="min-h-screen bg-gray-50 md:pt-24">
       <div className="container mx-auto px-4 py-6">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           {/* Filter Tabs */}
           <Tabs
             value={activeTab}

@@ -203,7 +203,7 @@ const MessageView = () => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-6">
+      <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="grid h-[calc(100vh-200px)] grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Conversations Sidebar */}
           <div
