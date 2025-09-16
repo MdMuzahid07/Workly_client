@@ -2,6 +2,7 @@ import AuthDialogProvider from "@/components/main/auth/AuthDialogProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ReduxProvider from "../provider/ReduxProvider";
+import ThemeProvider from "../provider/ThemeProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,9 +30,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReduxProvider>
-          <AuthDialogProvider>{children}</AuthDialogProvider>
-        </ReduxProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          // enableSystem
+          // disableTransitionOnChange
+        >
+          <ReduxProvider>
+            <AuthDialogProvider>{children}</AuthDialogProvider>
+          </ReduxProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
