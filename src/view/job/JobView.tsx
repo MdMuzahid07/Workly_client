@@ -162,7 +162,7 @@ const JobView = () => {
           </div>
         </div>
         <div className="col-span-12 md:col-span-8">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:gap-4">
             {jobs.map((job, index) => (
               //@ts-ignore
               <JobCard key={index} {...job} />

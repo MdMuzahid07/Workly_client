@@ -36,9 +36,9 @@ const JobCard = ({
 }: JobCardProps) => {
   return (
     <Card
-      className={`w-full rounded-2xl border-0 bg-white shadow-none drop-shadow-none transition-all duration-200`}
+      className={`w-full rounded-2xl border-0 bg-gray-50 shadow-none drop-shadow-none transition-all duration-200 sm:bg-white`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="px-0 pb-3 md:px-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex items-center gap-2">
@@ -79,7 +79,7 @@ const JobCard = ({
         </div>
       </CardHeader>
 
-      <CardContent className="pb-4">
+      <CardContent className="px-0 md:px-4 md:pb-4">
         <div className="mb-4 flex items-center gap-2">
           <DollarSign className="text-primary h-4 w-4" />
           <span className="text-foreground text-lg font-semibold">
@@ -107,7 +107,7 @@ const JobCard = ({
         </div>
       </CardContent>
 
-      <CardFooter className="border-border border-t pt-4">
+      <CardFooter className="border-border border-b px-0 pb-7 md:border-t md:border-b-0 md:px-4 md:pt-4 md:pb-0">
         <div className="flex w-full items-center justify-between gap-3">
           <div className="flex gap-2">
             <Button
