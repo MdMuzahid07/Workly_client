@@ -146,8 +146,8 @@ const JobView = () => {
     <div className="bg-gray-50 pb-12">
       <Searchbar />
       <Industries />
-      <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 pt-5">
-        <div className="col-span-4">
+      <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">
+        <div className="col-span-12 md:col-span-4">
           <div className="sticky top-24 hidden md:flex">
             {
               //@ts-ignore
@@ -161,7 +161,7 @@ const JobView = () => {
             }
           </div>
         </div>
-        <div className="col-span-8">
+        <div className="col-span-12 md:col-span-8">
           <div className="flex flex-col gap-4">
             {jobs.map((job, index) => (
               //@ts-ignore

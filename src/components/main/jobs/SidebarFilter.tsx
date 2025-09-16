@@ -111,7 +111,7 @@ const SidebarFilter = ({
 
   return (
     <div className={className}>
-      <Card className="h-fit">
+      <Card className="h-fit rounded-2xl">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg font-semibold">
@@ -140,7 +140,7 @@ const SidebarFilter = ({
               placeholder="Search by title, company, or keywords..."
               value={filters.search}
               onChange={(e) => updateFilters({ search: e.target.value })}
-              className="w-full"
+              className="w-full rounded-full"
             />
           </div>
 

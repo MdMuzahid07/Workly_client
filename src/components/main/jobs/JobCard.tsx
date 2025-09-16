@@ -43,12 +43,18 @@ const JobCard = ({
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex items-center gap-2">
               {isFeatured && (
-                <Badge variant="secondary" className="text-xs font-medium">
+                <Badge
+                  variant="secondary"
+                  className="rounded-full text-xs font-medium"
+                >
                   Featured
                 </Badge>
               )}
               {isUrgent && (
-                <Badge variant="destructive" className="text-xs font-medium">
+                <Badge
+                  variant="destructive"
+                  className="rounded-full text-xs font-medium"
+                >
                   Urgent
                 </Badge>
               )}
@@ -93,7 +99,7 @@ const JobCard = ({
             <Badge
               key={index}
               variant="outline"
-              className="bg-muted/50 hover:bg-muted text-xs font-normal"
+              className="bg-muted/50 hover:bg-muted rounded-full text-xs font-normal"
             >
               {skill}
             </Badge>
@@ -104,15 +110,26 @@ const JobCard = ({
       <CardFooter className="border-border border-t pt-4">
         <div className="flex w-full items-center justify-between gap-3">
           <div className="flex gap-2">
-            <Button size="sm" className="font-medium">
+            <Button
+              size="sm"
+              className="cursor-pointer rounded-full font-medium"
+            >
               Apply Now
             </Button>
-            <Button size="sm" variant="outline">
+            <Button
+              size="sm"
+              variant="outline"
+              className="cursor-pointer rounded-full"
+            >
               <ExternalLink className="mr-1 h-3 w-3" />
               View Details
             </Button>
           </div>
-          <Button size="sm" variant="ghost" className="p-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="cursor-pointer rounded-full p-2"
+          >
             <Heart className="h-4 w-4" />
             <span className="sr-only">Save job</span>
           </Button>

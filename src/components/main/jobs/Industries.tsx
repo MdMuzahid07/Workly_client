@@ -84,6 +84,30 @@ const jobCategories = [
     color: "bg-teal-500",
     description: "Work from anywhere",
   },
+  {
+    id: 6,
+    title: "Sales",
+    icon: Users,
+    count: "1,234 jobs",
+    color: "bg-orange-500",
+    description: "B2B, Retail, Account Management",
+  },
+  {
+    id: 7,
+    title: "Education",
+    icon: Award,
+    count: "654 jobs",
+    color: "bg-indigo-500",
+    description: "Teaching, Training, Research",
+  },
+  {
+    id: 8,
+    title: "Remote",
+    icon: Globe,
+    count: "3,421 jobs",
+    color: "bg-teal-500",
+    description: "Work from anywhere",
+  },
 ];
 
 const Industries = () => {
@@ -103,10 +127,10 @@ const Industries = () => {
           <SwiperSlide key={category.id} className="!w-auto">
             <Button
               variant="outline"
-              className="hover:bg-primary group bg-background h-auto rounded-full px-6 py-2 whitespace-nowrap text-black transition-colors hover:text-white"
+              className="hover:bg-primary group bg-background h-auto cursor-pointer rounded-full px-6 py-2 whitespace-nowrap text-black transition-colors hover:text-white"
             >
               {category.title}
-              <p className="group:hover:text-white ml-2 text-xs text-black">
+              <p className="ml-2 text-xs text-black group-hover:text-white">
                 {category.count.split(" ")[0]}
               </p>
             </Button>
@@ -115,11 +139,19 @@ const Industries = () => {
       </Swiper>
 
       <div className="mt-4 flex items-center justify-between">
-        <Button variant="ghost" size="sm" className="swiper-button-prev-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="swiper-button-prev-2 cursor-pointer"
+        >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Previous
         </Button>
-        <Button variant="ghost" size="sm" className="swiper-button-next-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="swiper-button-next-2 cursor-pointer"
+        >
           Next
           <ChevronRight className="ml-1 h-4 w-4" />
         </Button>
