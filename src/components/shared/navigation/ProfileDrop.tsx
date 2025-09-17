@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../ui/button";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -238,6 +239,8 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 </Link>
               ))}
             </div>
+
+            {isMobile ? <ThemeSwitcher isMobile={isMobile} /> : ""}
 
             <div className="border-t border-gray-100/80">
               <button

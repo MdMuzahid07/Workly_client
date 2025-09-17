@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import HoverHint from "./HoverHint";
 
-const ThemeSwitcher = () => {
+const ThemeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -42,29 +42,68 @@ const ThemeSwitcher = () => {
   };
 
   return (
-    <DropdownMenu>
-      <HoverHint hint="Change theme">
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            {getCurrentIcon()}
+    <>
+      {isMobile ? (
+        <div className="pb-3 pl-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (theme === "light") {
+                setTheme("dark");
+              } else if (theme === "dark") {
+                setTheme("system");
+              } else {
+                setTheme("light");
+              }
+            }}
+          >
+            {theme === "light" && (
+              <>
+                <Sun className="mr-2 h-4 w-4" />
+                <span>Light</span>
+              </>
+            )}
+            {theme === "dark" && (
+              <>
+                <Moon className="mr-2 h-4 w-4" />
+                <span>Dark</span>
+              </>
+            )}
+            {theme === "system" && (
+              <>
+                <Monitor className="mr-2 h-4 w-4" />
+                <span>System</span>
+              </>
+            )}
           </Button>
-        </DropdownMenuTrigger>
-      </HoverHint>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
-          <span>Light</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
-          <span>Dark</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="mr-2 h-4 w-4" />
-          <span>System</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </div>
+      ) : (
+        <DropdownMenu>
+          <HoverHint hint="Change theme">
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                {getCurrentIcon()}
+              </Button>
+            </DropdownMenuTrigger>
+          </HoverHint>
+          <DropdownMenuContent align={isMobile ? "start" : "end"}>
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>Light</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>Dark</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              <Monitor className="mr-2 h-4 w-4" />
+              <span>System</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </>
   );
 };
 
