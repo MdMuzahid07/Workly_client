@@ -101,7 +101,7 @@ const Navbar = () => {
       {/* mobile nav */}
       {user && user.email ? (
         <motion.nav
-          className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-[9999999] rounded-2xl border backdrop-blur-xs md:hidden"
+          className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-[9999999] rounded-full border backdrop-blur-xs md:hidden"
           initial={{ y: 80 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
