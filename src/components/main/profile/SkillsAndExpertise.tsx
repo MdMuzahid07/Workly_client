@@ -34,7 +34,7 @@ const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
           {skills.map((skill, index) => {
             const skillInfo = getSkillLevel(skill.experienceYears);
             return (
-              <div key={index} className="bg-muted/30 space-y-3 rounded-lg p-4">
+              <div key={index} className="bg-muted/40 space-y-3 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <span className="text-foreground text-sm font-medium sm:text-base">
