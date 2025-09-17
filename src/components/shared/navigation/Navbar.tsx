@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
 import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
+import ThemeSwitcher from "../ThemeSwitcher";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
@@ -81,7 +82,8 @@ const Navbar = () => {
             ""
           )}
           {/* desktop actions */}
-          <div className="hidden gap-2 md:flex">
+          <div className="hidden items-center gap-2 md:flex">
+            <ThemeSwitcher />
             {user && user.email ? (
               <ProfileDrop />
             ) : (
