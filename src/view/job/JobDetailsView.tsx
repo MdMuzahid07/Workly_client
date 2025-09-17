@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Bookmark,
   Building,
@@ -12,6 +11,7 @@ import {
   Share2,
   Users,
 } from "lucide-react";
+import JobDetailsSidebar from "../../components/main/jobs/jobDetails/JobDetailsSidebar";
 
 // fake data for different job examples
 const jobExamples = {
@@ -105,34 +105,7 @@ const JobDetailsView = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Workly_job</h1>
-            </div>
-            <nav className="hidden space-x-8 md:flex">
-              <a href="#" className="text-gray-900 hover:text-gray-700">
-                Jobs
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                Companies
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                Messages
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                Notifications
-              </a>
-            </nav>
-            <Button className="bg-green-500 text-white hover:bg-green-600">
-              Sign In
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
@@ -280,98 +253,7 @@ const JobDetailsView = ({ params }: { params: { id: string } }) => {
             </Card>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Apply Card */}
-            <Card>
-              <CardContent className="p-6">
-                <Button className="mb-4 w-full bg-green-500 text-white hover:bg-green-600">
-                  Apply Now
-                </Button>
-                <Button variant="outline" className="w-full bg-transparent">
-                  Save Job
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Company Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>About {job.company}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Industry</span>
-                  <span className="font-medium">{job.industry}</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Company Size</span>
-                  <span className="font-medium">{job.companySize}</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Job Type</span>
-                  <span className="font-medium">{job.type}</span>
-                </div>
-                <Button
-                  variant="outline"
-                  className="mt-4 w-full bg-transparent"
-                >
-                  View Company Profile
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Job Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Statistics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Applications</span>
-                  <span className="font-medium">23</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Views</span>
-                  <span className="font-medium">156</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Posted</span>
-                  <span className="font-medium">{job.postedTime}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Similar Jobs */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Similar Jobs</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border p-3">
-                  <h4 className="text-sm font-medium">Full Stack Developer</h4>
-                  <p className="text-xs text-gray-600">WebTech Inc • Remote</p>
-                  <p className="text-xs font-medium text-green-600">$30/hour</p>
-                </div>
-                <div className="rounded-lg border p-3">
-                  <h4 className="text-sm font-medium">React Developer</h4>
-                  <p className="text-xs text-gray-600">StartupXYZ • New York</p>
-                  <p className="text-xs font-medium text-green-600">
-                    $1500 fixed
-                  </p>
-                </div>
-                <div className="rounded-lg border p-3">
-                  <h4 className="text-sm font-medium">UI/UX Developer</h4>
-                  <p className="text-xs text-gray-600">DesignCorp • London</p>
-                  <p className="text-xs font-medium text-green-600">$28/hour</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <JobDetailsSidebar job={job} />
         </div>
       </div>
     </div>
