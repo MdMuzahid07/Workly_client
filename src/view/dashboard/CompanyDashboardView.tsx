@@ -392,7 +392,7 @@ const CompanyDashboardView = () => {
                   </p>
                   <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
                     <Button asChild className="w-full sm:w-auto">
-                      <a href="/company/employees">
+                      <a href="/dashboard/company/employees">
                         <Users className="mr-2 h-4 w-4" />
                         Manage Employees
                       </a>
@@ -431,7 +431,7 @@ const CompanyDashboardView = () => {
                   </p>
                   <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
                     <Button asChild className="w-full sm:w-auto">
-                      <a href="/company/profile">
+                      <a href="/dashboard/company/profile">
                         <Edit3 className="mr-2 h-4 w-4" />
                         Edit Profile
                       </a>
@@ -441,7 +441,7 @@ const CompanyDashboardView = () => {
                       asChild
                       className="w-full bg-transparent sm:w-auto"
                     >
-                      <a href="/company/settings">
+                      <a href="/dashboard/company/settings">
                         <Settings className="mr-2 h-4 w-4" />
                         Settings
                       </a>
