@@ -9,29 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Briefcase,
-  Building2,
-  Edit3,
-  Eye,
-  Menu,
-  Plus,
-  Settings,
-  TrendingUp,
-  UserPlus,
-  Users,
-} from "lucide-react";
-import { useState } from "react";
+import { Briefcase, Eye, TrendingUp, UserPlus, Users } from "lucide-react";
+import DashboardOverviewHeader from "../../components/dashboard/dashboard-nav/header/DashboardOverviewHeader";
 
 const CompanyDashboardView = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-
   // fake data
   const companyData = {
     name: "TechFlow Inc.",
-    logo: "/generic-company-logo.png",
+    logo: "https://mdmuzahid.vercel.app/assets/logo-DuOSblLl.png",
     industry: "Technology",
     location: "San Francisco, CA",
     website: "techflow.com",
@@ -96,362 +81,267 @@ const CompanyDashboardView = () => {
   ];
 
   return (
-    <div className="bg-background min-h-screen">
-      {/* Header */}
-      <header className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4 sm:px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex min-w-0 flex-1 items-center space-x-3 sm:space-x-4">
-              <Avatar className="h-10 w-10 flex-shrink-0 sm:h-12 sm:w-12">
-                <AvatarImage
-                  src={companyData.logo || "/placeholder.svg"}
-                  alt={companyData.name}
-                />
-                <AvatarFallback>TF</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-foreground truncate text-lg font-bold sm:text-xl lg:text-2xl">
-                  {companyData.name}
-                </h1>
-                <p className="text-muted-foreground truncate text-sm">
-                  {companyData.industry}
-                </p>
+    <div className="min-h-screen">
+      <DashboardOverviewHeader companyData={companyData} />
+      <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 sm:py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+          <Card className="bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-medium sm:text-sm">
+                Total Jobs
+              </CardTitle>
+              <Briefcase className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-primary text-xl font-bold sm:text-2xl">
+                {companyData.stats.totalJobs}
               </div>
-            </div>
+              <p className="text-muted-foreground text-xs">
+                +2 from last month
+              </p>
+            </CardContent>
+          </Card>
 
-            {/* Desktop buttons */}
-            <div className="hidden items-center space-x-3 sm:flex">
-              <Button variant="outline" size="sm">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Post Job
-              </Button>
-            </div>
+          <Card className="bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-medium sm:text-sm">
+                Active Jobs
+              </CardTitle>
+              <TrendingUp className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-primary text-xl font-bold sm:text-2xl">
+                {companyData.stats.activeJobs}
+              </div>
+              <p className="text-muted-foreground text-xs">Currently hiring</p>
+            </CardContent>
+          </Card>
 
-            {/* Mobile menu */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-transparent sm:hidden"
-                >
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[280px]">
-                <div className="mt-6 flex flex-col space-y-4">
-                  <Button
-                    variant="outline"
-                    className="justify-start bg-transparent"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </Button>
-                  <Button className="justify-start">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Post Job
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
+          <Card className="bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-medium sm:text-sm">
+                Applications
+              </CardTitle>
+              <Eye className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-primary text-xl font-bold sm:text-2xl">
+                {companyData.stats.totalApplications}
+              </div>
+              <p className="text-muted-foreground text-xs">+12 this week</p>
+            </CardContent>
+          </Card>
 
-      <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-6"
-        >
-          <div className="w-full overflow-x-auto">
-            <TabsList className="grid w-full min-w-[400px] grid-cols-4 sm:min-w-0">
-              <TabsTrigger value="overview" className="text-xs sm:text-sm">
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="jobs" className="text-xs sm:text-sm">
-                Jobs
-              </TabsTrigger>
-              <TabsTrigger value="employees" className="text-xs sm:text-sm">
+          <Card className="bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-medium sm:text-sm">
                 Employees
-              </TabsTrigger>
-              <TabsTrigger value="profile" className="text-xs sm:text-sm">
-                Profile
-              </TabsTrigger>
-            </TabsList>
-          </div>
+              </CardTitle>
+              <Users className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-primary text-xl font-bold sm:text-2xl">
+                {companyData.stats.totalEmployees}
+              </div>
+              <p className="text-muted-foreground text-xs">+5 this quarter</p>
+            </CardContent>
+          </Card>
+        </div>
 
-          <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium sm:text-sm">
-                    Total Jobs
-                  </CardTitle>
-                  <Briefcase className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-primary text-xl font-bold sm:text-2xl">
-                    {companyData.stats.totalJobs}
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <Card className="bg-white">
+            <CardHeader>
+              <CardTitle className="text-lg sm:text-xl">
+                Recent Job Postings
+              </CardTitle>
+              <CardDescription>
+                Latest job openings and their status
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentJobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="flex flex-col justify-between space-y-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:space-y-0"
+                >
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="truncate text-sm font-medium sm:text-base">
+                      {job.title}
+                    </p>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
+                      {job.applications} applications • {job.posted}
+                    </p>
                   </div>
-                  <p className="text-muted-foreground text-xs">
-                    +2 from last month
+                  <Badge
+                    variant={job.status === "Active" ? "default" : "secondary"}
+                    className="self-start sm:self-center"
+                  >
+                    {job.status}
+                  </Badge>
+                </div>
+              ))}
+              <Button variant="outline" className="w-full bg-transparent">
+                View All Jobs
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white">
+            <CardHeader>
+              <CardTitle className="text-lg sm:text-xl">
+                Recent Employees
+              </CardTitle>
+              <CardDescription>Newest team members</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentEmployees.map((employee) => (
+                <div
+                  key={employee.id}
+                  className="flex items-center space-x-3 rounded-lg border p-3"
+                >
+                  <Avatar className="h-8 w-8 flex-shrink-0 sm:h-10 sm:w-10">
+                    <AvatarImage
+                      src={employee.avatar || "/placeholder.svg"}
+                      alt={employee.name}
+                    />
+                    <AvatarFallback className="text-xs">
+                      {employee.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="truncate text-sm font-medium sm:text-base">
+                      {employee.name}
+                    </p>
+                    <p className="text-muted-foreground truncate text-xs sm:text-sm">
+                      {employee.role}
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground hidden text-xs sm:block">
+                    {new Date(employee.joined).toLocaleDateString()}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              ))}
+              <Button variant="outline" className="w-full bg-transparent">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Add Employee
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium sm:text-sm">
-                    Active Jobs
-                  </CardTitle>
-                  <TrendingUp className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-primary text-xl font-bold sm:text-2xl">
-                    {companyData.stats.activeJobs}
-                  </div>
-                  <p className="text-muted-foreground text-xs">
-                    Currently hiring
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium sm:text-sm">
-                    Applications
-                  </CardTitle>
-                  <Eye className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-primary text-xl font-bold sm:text-2xl">
-                    {companyData.stats.totalApplications}
-                  </div>
-                  <p className="text-muted-foreground text-xs">+12 this week</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium sm:text-sm">
-                    Employees
-                  </CardTitle>
-                  <Users className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-primary text-xl font-bold sm:text-2xl">
-                    {companyData.stats.totalEmployees}
-                  </div>
-                  <p className="text-muted-foreground text-xs">
-                    +5 this quarter
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {/* <TabsContent value="jobs">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg sm:text-xl">
-                    Recent Job Postings
+                    Job Management
                   </CardTitle>
                   <CardDescription>
-                    Latest job openings and their status
+                    Manage your job postings and applications
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentJobs.map((job) => (
-                    <div
-                      key={job.id}
-                      className="flex flex-col justify-between space-y-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:space-y-0"
-                    >
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate text-sm font-medium sm:text-base">
-                          {job.title}
-                        </p>
-                        <p className="text-muted-foreground text-xs sm:text-sm">
-                          {job.applications} applications • {job.posted}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={
-                          job.status === "Active" ? "default" : "secondary"
-                        }
-                        className="self-start sm:self-center"
-                      >
-                        {job.status}
-                      </Badge>
-                    </div>
-                  ))}
-                  <Button variant="outline" className="w-full bg-transparent">
-                    View All Jobs
-                  </Button>
+                <CardContent>
+                  <div className="py-8 text-center">
+                    <Briefcase className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
+                    <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
+                      Job Management
+                    </h3>
+                    <p className="text-muted-foreground mb-4 px-4 text-sm">
+                      Create and manage your job postings from here
+                    </p>
+                    <Button className="w-full sm:w-auto">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create New Job
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
+            </TabsContent>
 
+            <TabsContent value="employees">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg sm:text-xl">
-                    Recent Employees
+                    Employee Management
                   </CardTitle>
-                  <CardDescription>Newest team members</CardDescription>
+                  <CardDescription>
+                    Manage your team members and their roles
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentEmployees.map((employee) => (
-                    <div
-                      key={employee.id}
-                      className="flex items-center space-x-3 rounded-lg border p-3"
-                    >
-                      <Avatar className="h-8 w-8 flex-shrink-0 sm:h-10 sm:w-10">
-                        <AvatarImage
-                          src={employee.avatar || "/placeholder.svg"}
-                          alt={employee.name}
-                        />
-                        <AvatarFallback className="text-xs">
-                          {employee.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate text-sm font-medium sm:text-base">
-                          {employee.name}
-                        </p>
-                        <p className="text-muted-foreground truncate text-xs sm:text-sm">
-                          {employee.role}
-                        </p>
-                      </div>
-                      <p className="text-muted-foreground hidden text-xs sm:block">
-                        {new Date(employee.joined).toLocaleDateString()}
-                      </p>
+                <CardContent>
+                  <div className="py-8 text-center">
+                    <Users className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
+                    <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
+                      Employee Management
+                    </h3>
+                    <p className="text-muted-foreground mb-4 px-4 text-sm">
+                      Add and manage your team members
+                    </p>
+                    <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+                      <Button asChild className="w-full sm:w-auto">
+                        <a href="/dashboard/company/employees">
+                          <Users className="mr-2 h-4 w-4" />
+                          Manage Employees
+                        </a>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full bg-transparent sm:w-auto"
+                      >
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Add Employee
+                      </Button>
                     </div>
-                  ))}
-                  <Button variant="outline" className="w-full bg-transparent">
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Add Employee
-                  </Button>
+                  </div>
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="jobs">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Job Management
-                </CardTitle>
-                <CardDescription>
-                  Manage your job postings and applications
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <Briefcase className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
-                  <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
-                    Job Management
-                  </h3>
-                  <p className="text-muted-foreground mb-4 px-4 text-sm">
-                    Create and manage your job postings from here
-                  </p>
-                  <Button className="w-full sm:w-auto">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create New Job
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="employees">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Employee Management
-                </CardTitle>
-                <CardDescription>
-                  Manage your team members and their roles
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <Users className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
-                  <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
-                    Employee Management
-                  </h3>
-                  <p className="text-muted-foreground mb-4 px-4 text-sm">
-                    Add and manage your team members
-                  </p>
-                  <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-                    <Button asChild className="w-full sm:w-auto">
-                      <a href="/dashboard/company/employees">
-                        <Users className="mr-2 h-4 w-4" />
-                        Manage Employees
-                      </a>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full bg-transparent sm:w-auto"
-                    >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Add Employee
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Company Profile
-                </CardTitle>
-                <CardDescription>
-                  Update your company information and settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <Building2 className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
-                  <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
+            <TabsContent value="profile">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl">
                     Company Profile
-                  </h3>
-                  <p className="text-muted-foreground mb-4 px-4 text-sm">
-                    Manage your company profile and public information
-                  </p>
-                  <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-                    <Button asChild className="w-full sm:w-auto">
-                      <a href="/dashboard/company/profile">
-                        <Edit3 className="mr-2 h-4 w-4" />
-                        Edit Profile
-                      </a>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      asChild
-                      className="w-full bg-transparent sm:w-auto"
-                    >
-                      <a href="/dashboard/company/settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </a>
-                    </Button>
+                  </CardTitle>
+                  <CardDescription>
+                    Update your company information and settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="py-8 text-center">
+                    <Building2 className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
+                    <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
+                      Company Profile
+                    </h3>
+                    <p className="text-muted-foreground mb-4 px-4 text-sm">
+                      Manage your company profile and public information
+                    </p>
+                    <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+                      <Button asChild className="w-full sm:w-auto">
+                        <a href="/dashboard/company/profile">
+                          <Edit3 className="mr-2 h-4 w-4" />
+                          Edit Profile
+                        </a>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        asChild
+                        className="w-full bg-transparent sm:w-auto"
+                      >
+                        <a href="/dashboard/company/settings">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </a>
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </CardContent>
+              </Card>
+            </TabsContent> */}
       </div>
     </div>
   );
