@@ -28,11 +28,13 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
+import Link from "next/link";
 import React, { useState } from "react";
 
 interface SidebarItemProps {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
+  value: string;
   active?: boolean;
   hasDropdown?: boolean;
   badge?: string | number;
@@ -52,27 +54,36 @@ const DashboardSidebar = () => {
     {
       title: "Main",
       items: [
-        { icon: Home, label: "Overview", active: activeItem === "Overview" },
+        {
+          icon: Home,
+          label: "Overview",
+          value: "/dashboard",
+          active: activeItem === "Overview",
+        },
         {
           icon: Briefcase,
           label: "Jobs",
+          value: "/dashboard/jobs",
           active: activeItem === "Jobs",
           badge: "12",
         },
         {
           icon: Users,
           label: "Employees",
+          value: "/dashboard/company/employees",
           active: activeItem === "Employees",
           badge: "250",
         },
         {
           icon: FileText,
           label: "Applications",
+          value: "",
           active: activeItem === "Applications",
           badge: "156",
         },
         {
           icon: UserCheck,
+          value: "",
           label: "Hiring Pipeline",
           active: activeItem === "Hiring Pipeline",
         },
@@ -84,16 +95,19 @@ const DashboardSidebar = () => {
         {
           icon: BarChart3,
           label: "Analytics",
+          value: "",
           active: activeItem === "Analytics",
         },
         {
           icon: TrendingUp,
           label: "Reports",
+          value: "",
           active: activeItem === "Reports",
         },
         {
           icon: Calendar,
           label: "Schedule",
+          value: "",
           active: activeItem === "Schedule",
         },
       ],
@@ -101,11 +115,22 @@ const DashboardSidebar = () => {
     {
       title: "Management",
       items: [
-        { icon: Plus, label: "Post Job", active: activeItem === "Post Job" },
-        { icon: Tag, label: "Categories", active: activeItem === "Categories" },
+        {
+          icon: Plus,
+          label: "Post Job",
+          value: "",
+          active: activeItem === "Post Job",
+        },
+        {
+          icon: Tag,
+          label: "Categories",
+          value: "",
+          active: activeItem === "Categories",
+        },
         {
           icon: Building2,
           label: "Departments",
+          value: "",
           active: activeItem === "Departments",
         },
       ],
@@ -116,27 +141,35 @@ const DashboardSidebar = () => {
     {
       icon: Bell,
       label: "Notifications",
+      value: "",
       hasDropdown: true,
       active: activeItem === "Notifications",
       badge: "3",
     },
-    { icon: Settings, label: "Settings", active: activeItem === "Settings" },
+    {
+      icon: Settings,
+      label: "Settings",
+      value: "/dashboard/company/settings",
+      active: activeItem === "Settings",
+    },
   ];
 
   const SidebarItem: React.FC<SidebarItemProps> = ({
     icon: Icon,
     label,
+    value,
     active = false,
     hasDropdown = false,
     badge,
     onClick,
   }) => (
-    <Button
-      variant="ghost"
+    <Link
+      href={value}
       className={cn(
         "h-auto w-full justify-start gap-3 px-3 py-2.5 font-normal",
         active && "bg-gray-100 font-medium text-gray-900 hover:bg-gray-100",
         !active && "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+        "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
       )}
       onClick={() => {
         setActiveItem(label);
@@ -156,7 +189,7 @@ const DashboardSidebar = () => {
         )}
         {hasDropdown && <ChevronDown className="h-4 w-4 text-gray-400" />}
       </div>
-    </Button>
+    </Link>
   );
 
   const SidebarContent = () => (
