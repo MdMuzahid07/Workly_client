@@ -1,20 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import type React from "react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -50,11 +39,11 @@ import {
   Search,
   Trash2,
   UserCheck,
-  UserPlus,
   Users,
   UserX,
 } from "lucide-react";
 import { useState } from "react";
+import DashboardEmployeeManagementHeader from "../../components/dashboard/dashboard-nav/header/DashboardEmployeeManagementHeader";
 
 interface Employee {
   id: string;
@@ -223,42 +212,11 @@ export function EmployeeManagementView() {
   };
 
   return (
-    <div className="bg-background min-h-screen">
-      {/* Header */}
-      <div className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6">
-          <div className="flex flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
-            <div>
-              <h1 className="text-foreground text-xl font-bold sm:text-2xl">
-                Employee Management
-              </h1>
-              <p className="text-muted-foreground text-sm">
-                Manage your team members and their information
-              </p>
-            </div>
-            <Dialog
-              open={isAddEmployeeOpen}
-              onOpenChange={setIsAddEmployeeOpen}
-            >
-              <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto">
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Add Employee
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="mx-4 max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Add New Employee</DialogTitle>
-                  <DialogDescription>
-                    Add a new team member to your company
-                  </DialogDescription>
-                </DialogHeader>
-                <AddEmployeeForm onClose={() => setIsAddEmployeeOpen(false)} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen">
+      <DashboardEmployeeManagementHeader
+        isAddEmployeeOpen={isAddEmployeeOpen}
+        setIsAddEmployeeOpen={setIsAddEmployeeOpen}
+      />
 
       <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
         {/* Stats Cards */}
@@ -637,191 +595,6 @@ export function EmployeeManagementView() {
         </Tabs>
       </div>
     </div>
-  );
-}
-
-function AddEmployeeForm({ onClose }: { onClose: () => void }) {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    role: "",
-    department: "",
-    location: "",
-    joinDate: new Date().toISOString().split("T")[0],
-  });
-
-  const departments = [
-    "Engineering",
-    "Design",
-    "Product",
-    "Marketing",
-    "Sales",
-    "HR",
-  ];
-  const roles = [
-    "Frontend Developer",
-    "Backend Developer",
-    "Full Stack Developer",
-    "Engineering Manager",
-    "UX Designer",
-    "UI Designer",
-    "Design Director",
-    "Product Manager",
-    "Marketing Manager",
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In real app, this would make an API call
-    console.log("Adding employee:", formData);
-    onClose();
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-h-[70vh] space-y-4 overflow-y-auto sm:space-y-6"
-    >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="fullName" className="text-sm font-medium">
-            Full Name *
-          </Label>
-          <Input
-            id="fullName"
-            value={formData.fullName}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, fullName: e.target.value }))
-            }
-            required
-            className="h-10 sm:h-11"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium">
-            Email *
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, email: e.target.value }))
-            }
-            required
-            className="h-10 sm:h-11"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-sm font-medium">
-            Phone
-          </Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, phone: e.target.value }))
-            }
-            className="h-10 sm:h-11"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="location" className="text-sm font-medium">
-            Location
-          </Label>
-          <Input
-            id="location"
-            value={formData.location}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, location: e.target.value }))
-            }
-            placeholder="e.g., San Francisco, CA"
-            className="h-10 sm:h-11"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="department" className="text-sm font-medium">
-            Department *
-          </Label>
-          <Select
-            value={formData.department}
-            onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, department: value }))
-            }
-          >
-            <SelectTrigger className="h-10 sm:h-11">
-              <SelectValue placeholder="Select department" />
-            </SelectTrigger>
-            <SelectContent>
-              {departments.map((dept) => (
-                <SelectItem key={dept} value={dept}>
-                  {dept}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="role" className="text-sm font-medium">
-            Role *
-          </Label>
-          <Select
-            value={formData.role}
-            onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, role: value }))
-            }
-          >
-            <SelectTrigger className="h-10 sm:h-11">
-              <SelectValue placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-              {roles.map((role) => (
-                <SelectItem key={role} value={role}>
-                  {role}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="joinDate" className="text-sm font-medium">
-          Join Date
-        </Label>
-        <Input
-          id="joinDate"
-          type="date"
-          value={formData.joinDate}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, joinDate: e.target.value }))
-          }
-          className="h-10 sm:h-11"
-        />
-      </div>
-
-      <div className="flex flex-col justify-end space-y-3 pt-4 sm:flex-row sm:space-y-0 sm:space-x-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onClose}
-          className="w-full bg-transparent sm:w-auto"
-        >
-          Cancel
-        </Button>
-        <Button type="submit" className="w-full sm:w-auto">
-          Add Employee
-        </Button>
-      </div>
-    </form>
   );
 }
 

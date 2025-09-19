@@ -119,7 +119,7 @@ const CompanyCreationView = () => {
   };
 
   return (
-    <div className="bg-background min-h-screen py-4 sm:py-8">
+    <div className="min-h-screen py-4 sm:py-8">
       <div className="container mx-auto max-w-4xl px-4 sm:px-6">
         <div className="mb-6 text-center sm:mb-8">
           <h1 className="text-foreground mb-2 text-2xl font-bold sm:text-3xl">
