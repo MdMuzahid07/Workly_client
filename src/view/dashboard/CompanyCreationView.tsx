@@ -38,7 +38,7 @@ interface CompanyFormData {
   coverUrl: string;
 }
 
-const CreateCompanyForm = () => {
+const CompanyCreationView = () => {
   const [formData, setFormData] = useState<CompanyFormData>({
     name: "",
     slug: "",
@@ -560,4 +560,4 @@ const CreateCompanyForm = () => {
   );
 };
 
-export default CreateCompanyForm;
+export default CompanyCreationView;

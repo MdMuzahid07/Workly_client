@@ -85,7 +85,7 @@ interface CompanySettings {
   };
 }
 
-const CompanySetting = () => {
+const CompanySettingView = () => {
   const [activeTab, setActiveTab] = useState("general");
   const [isSaving, setIsSaving] = useState(false);
   const [isAddSocialOpen, setIsAddSocialOpen] = useState(false);
@@ -705,13 +705,13 @@ const CompanySetting = () => {
   );
 };
 
-function AddSocialLinkForm({
+const AddSocialLinkForm = ({
   onAdd,
   availablePlatforms,
 }: {
   onAdd: (platform: string, url: string) => void;
   availablePlatforms: { name: string; icon: React.ReactNode }[];
-}) {
+}) => {
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [url, setUrl] = useState("");
 
@@ -776,6 +776,6 @@ function AddSocialLinkForm({
       </div>
     </form>
   );
-}
+};
 
-export default CompanySetting;
+export default CompanySettingView;

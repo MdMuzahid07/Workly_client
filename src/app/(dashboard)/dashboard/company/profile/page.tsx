@@ -1,9 +1,9 @@
-import ManageCompanyProfile from "../../../../../components/dashboard/company/ManageCompanyProfile";
+import ManageCompanyProfileView from "../../../../../view/dashboard/ManageCompanyProfileView";
 
 const page = () => {
   return (
     <>
-      <ManageCompanyProfile />
+      <ManageCompanyProfileView />
     </>
   );
 };

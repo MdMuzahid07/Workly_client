@@ -1,9 +1,9 @@
-import CreateCompanyForm from "../../../../../components/dashboard/company/CreateCompanyForm";
+import CompanyCreationView from "../../../../../view/dashboard/CompanyCreationView";
 
 const page = () => {
   return (
     <>
-      <CreateCompanyForm />
+      <CompanyCreationView />
     </>
   );
 };

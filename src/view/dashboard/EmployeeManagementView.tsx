@@ -72,7 +72,7 @@ interface Employee {
   skills: string[];
 }
 
-export function EmployeeManagement() {
+export function EmployeeManagementView() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
@@ -825,4 +825,4 @@ function AddEmployeeForm({ onClose }: { onClose: () => void }) {
   );
 }
 
-export default EmployeeManagement;
+export default EmployeeManagementView;

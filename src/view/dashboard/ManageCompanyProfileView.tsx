@@ -69,7 +69,7 @@ interface CompanyProfile {
   };
 }
 
-const ManageCompanyProfile = () => {
+const ManageCompanyProfileView = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -745,4 +745,4 @@ const ManageCompanyProfile = () => {
   );
 };
 
-export default ManageCompanyProfile;
+export default ManageCompanyProfileView;

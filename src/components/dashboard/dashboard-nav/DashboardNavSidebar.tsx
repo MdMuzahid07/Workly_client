@@ -160,7 +160,7 @@ const DashboardSidebar = () => {
   );
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col">
+    <div className="bg flex h-full flex-col">
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-sm font-bold text-white">

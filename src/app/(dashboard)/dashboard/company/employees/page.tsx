@@ -1,9 +1,9 @@
-import EmployeeManagement from "../../../../../components/dashboard/company/EmployeeManagement";
+import EmployeeManagementView from "../../../../../view/dashboard/EmployeeManagementView";
 
 const page = () => {
   return (
     <>
-      <EmployeeManagement />
+      <EmployeeManagementView />
     </>
   );
 };

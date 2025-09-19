@@ -1,9 +1,9 @@
-import CompanySetting from "../../../../../components/dashboard/company/CompanySetting";
+import CompanySettingView from "../../../../../view/dashboard/CompanySettingView";
 
 const page = () => {
   return (
     <>
-      <CompanySetting />
+      <CompanySettingView />
     </>
   );
 };
