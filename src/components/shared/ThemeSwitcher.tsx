@@ -11,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react";
-import HoverHint from "./HoverHint";
 
 const ThemeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
   const { setTheme, theme } = useTheme();
@@ -80,14 +79,15 @@ const ThemeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
         </div>
       ) : (
         <DropdownMenu>
-          <HoverHint hint="Change theme">
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                {getCurrentIcon()}
-              </Button>
-            </DropdownMenuTrigger>
-          </HoverHint>
-          <DropdownMenuContent align={isMobile ? "start" : "end"}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              {getCurrentIcon()}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className={isMobile ? "" : "mt-4"}
+            align={isMobile ? "start" : "end"}
+          >
             <DropdownMenuItem onClick={() => setTheme("light")}>
               <Sun className="mr-2 h-4 w-4" />
               <span>Light</span>
