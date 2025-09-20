@@ -52,13 +52,13 @@ const ForgetPasswordView = () => {
                 label="Email Address"
                 type="email"
                 required
-                className="rounded-lg border-gray-300 bg-white pl-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="rounded-full border-gray-300 bg-white pl-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
               Send Reset Link
             </Button>
@@ -66,7 +66,7 @@ const ForgetPasswordView = () => {
         </WkForm>
       ) : (
         <div className="mt-6 space-y-4">
-          <div className="rounded-lg bg-green-100 p-4 text-center">
+          <div className="rounded-full bg-green-100 p-4 text-center">
             <p className="text-sm text-green-800">
               Password reset instructions have been sent to your email.
             </p>
@@ -74,7 +74,7 @@ const ForgetPasswordView = () => {
           <Button
             onClick={() => setIsSubmitted(false)}
             variant="outline"
-            className="w-full cursor-pointer rounded-lg border-gray-300 py-3 font-semibold text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+            className="w-full cursor-pointer rounded-full border-gray-300 py-3 font-semibold text-gray-700 transition-colors duration-200 hover:bg-gray-50"
           >
             Send Another Email
           </Button>

@@ -49,7 +49,7 @@ const SignInView = () => {
               label="Email Address"
               type="email"
               required
-              className="rounded-lg border-gray-300 bg-white transition-all duration-200 focus:outline-none active:border-green-400"
+              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:outline-none active:border-green-400"
             />
 
             <div className="relative">
@@ -58,7 +58,7 @@ const SignInView = () => {
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="rounded-lg border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
               />
               <Button
                 type="button"
@@ -79,7 +79,7 @@ const SignInView = () => {
           <div className="space-y-4">
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
               Sign In
             </Button>

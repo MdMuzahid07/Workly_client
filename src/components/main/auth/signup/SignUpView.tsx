@@ -18,6 +18,7 @@ interface SignUpFormData {
   email: string;
   password: string;
   confirmPassword: string;
+  role: "employer" | "jobseeker";
 }
 
 const SignUpView = () => {
@@ -25,12 +26,16 @@ const SignUpView = () => {
   const [registerUser] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"employer" | "jobseeker">(
+    "jobseeker",
+  );
 
   const defaultValues: SignUpFormData = {
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "jobseeker",
   };
 
   const handleSubmit = async (data: SignUpFormData) => {
@@ -44,9 +49,10 @@ const SignUpView = () => {
       email: data.email,
       password: data.password,
       confirmPassword: data.confirmPassword,
+      role: selectedRole,
     });
 
-    console.log(result, "from sing register");
+    console.log(result, "from sign register");
   };
 
   return (
@@ -68,7 +74,7 @@ const SignUpView = () => {
               label="Full Name"
               type="text"
               required
-              className="rounded-lg border-gray-300 bg-white transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
             />
 
             <WKInput
@@ -76,7 +82,7 @@ const SignUpView = () => {
               label="Email Address"
               type="email"
               required
-              className="rounded-lg border-gray-300 bg-white transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
             />
 
             <div className="relative">
@@ -85,7 +91,7 @@ const SignUpView = () => {
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="rounded-lg border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
               />
               <Button
                 type="button"
@@ -108,7 +114,7 @@ const SignUpView = () => {
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 required
-                className="rounded-lg border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
               />
               <Button
                 type="button"
@@ -124,12 +130,40 @@ const SignUpView = () => {
                 )}
               </Button>
             </div>
+
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant={selectedRole === "employer" ? "default" : "outline"}
+                className={`flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 hover:bg-green-500 ${
+                  selectedRole === "employer"
+                    ? "border-green-400 bg-green-400 text-white"
+                    : "border-slate-300 text-green-400"
+                }`}
+                onClick={() => setSelectedRole("employer")}
+              >
+                Employer
+              </Button>
+
+              <Button
+                type="button"
+                variant={selectedRole === "jobseeker" ? "default" : "outline"}
+                className={`flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 hover:bg-green-500 ${
+                  selectedRole === "jobseeker"
+                    ? "border-green-400 bg-green-400 text-white"
+                    : "border-slate-300 text-green-400"
+                }`}
+                onClick={() => setSelectedRole("jobseeker")}
+              >
+                Job Seeker
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-4">
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
               Create Account
             </Button>

@@ -12,6 +12,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
   const user = { email: "mdmuzahid.dev@gmail.com" };
+  // const user = false;
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -32,13 +33,7 @@ const Navbar = () => {
         <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6">
           {/* brand name */}
           <Link href="/" className="text-foreground text-xl font-bold">
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-block"
-            >
-              Workly_job
-            </motion.span>
+            Workly_job
           </Link>
           {/* nav links  */}
           {user && user.email ? (
@@ -88,7 +83,7 @@ const Navbar = () => {
               <ProfileDrop />
             ) : (
               <Button
-                className="flex cursor-pointer items-center gap-2 rounded-lg bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
+                className="flex cursor-pointer items-center gap-2 rounded-full bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
                 onClick={() => openAuth("signIn")}
               >
                 Sign In
