@@ -14,8 +14,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../ui/card";
-import { Input } from "../../../ui/input";
+} from "../../ui/card";
+import { Input } from "../../ui/input";
 
 const CompanyProfileDetailsTab = ({
   updateField,

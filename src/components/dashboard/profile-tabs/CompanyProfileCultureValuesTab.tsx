@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Award, X } from "lucide-react";
-import { Badge } from "../../../ui/badge";
-import { Button } from "../../../ui/button";
+import { Badge } from "../../ui/badge";
+import { Button } from "../../ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../ui/card";
-import { Input } from "../../../ui/input";
+} from "../../ui/card";
+import { Input } from "../../ui/input";
 
 const CompanyProfileCultureValuesTab = ({
   currentProfile,

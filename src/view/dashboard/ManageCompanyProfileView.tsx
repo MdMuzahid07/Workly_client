@@ -2,11 +2,11 @@
 "use client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import CompanyProfileCultureValuesTab from "../../components/dashboard/company-settings/profile-tabs/CompanyProfileCultureValuesTab";
-import CompanyProfileDetailsTab from "../../components/dashboard/company-settings/profile-tabs/CompanyProfileDetailsTab";
-import CompanyProfileMediaTabs from "../../components/dashboard/company-settings/profile-tabs/CompanyProfileMediaTabs";
-import CompanyProfileOverviewTab from "../../components/dashboard/company-settings/profile-tabs/CompanyProfileOverviewTab";
 import DashboardCompanyProfileHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanyProfileHeader";
+import CompanyProfileCultureValuesTab from "../../components/dashboard/profile-tabs/CompanyProfileCultureValuesTab";
+import CompanyProfileDetailsTab from "../../components/dashboard/profile-tabs/CompanyProfileDetailsTab";
+import CompanyProfileMediaTabs from "../../components/dashboard/profile-tabs/CompanyProfileMediaTabs";
+import CompanyProfileOverviewTab from "../../components/dashboard/profile-tabs/CompanyProfileOverviewTab";
 
 export interface CompanyProfile {
   id: string;

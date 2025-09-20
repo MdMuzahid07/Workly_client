@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Building2, Eye, Users } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
-import { Textarea } from "../../../ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import { Textarea } from "../../ui/textarea";
 
 const CompanyProfileOverviewTab = ({
   currentProfile,

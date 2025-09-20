@@ -3,14 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Label } from "@radix-ui/react-label";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Upload } from "lucide-react";
-import { Button } from "../../../ui/button";
+import { Button } from "../../ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../ui/card";
+} from "../../ui/card";
 
 const CompanyProfileMediaTabs = ({
   isEditing,
