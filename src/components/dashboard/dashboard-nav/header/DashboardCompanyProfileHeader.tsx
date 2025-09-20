@@ -20,7 +20,7 @@ const DashboardCompanyProfileHeader = ({
   handleSave: () => void;
 }) => {
   return (
-    <header className="border-b bg-green-50">
+    <header className="bg-card border-b">
       <div className="container mx-auto px-6 py-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
