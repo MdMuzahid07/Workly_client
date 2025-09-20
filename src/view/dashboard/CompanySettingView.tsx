@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Settings } from "lucide-react";
 import { useState } from "react";
 import BillingSettingTab from "../../components/dashboard/company-settings/settings-tabs/BillingSettingTab";
 import JobPostingManagementTab from "../../components/dashboard/company-settings/settings-tabs/JobPostingManagementTab";
 import NotificationSettingTab from "../../components/dashboard/company-settings/settings-tabs/NotificationSettingTab";
 import PrivacySettingTab from "../../components/dashboard/company-settings/settings-tabs/PrivacySettingTab";
 import SocialLinkSettingTab from "../../components/dashboard/company-settings/settings-tabs/SocialLinkSettingTab";
+import DashboardCompanySettingsHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanySettingsHeader";
 
 interface CompanySettings {
   notifications: {
@@ -88,31 +87,11 @@ const CompanySettingsView = () => {
   };
 
   return (
-    <div className="bg-background min-h-screen">
-      {/* Header - Mobile Responsive */}
-      <div className="bg-card border-b">
-        <div className="container mx-auto px-4 py-6 sm:px-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-foreground flex items-center text-xl font-bold sm:text-2xl">
-                <Settings className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
-                Company Settings
-              </h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                Manage your company preferences and configurations
-              </p>
-            </div>
-            <Button
-              onClick={handleSaveSettings}
-              disabled={isSaving}
-              className="w-full sm:w-auto"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <DashboardCompanySettingsHeader
+        handleSaveSettings={handleSaveSettings}
+        isSaving={isSaving}
+      />
 
       <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
         <Tabs
@@ -120,7 +99,6 @@ const CompanySettingsView = () => {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          {/* Mobile optimized tabs */}
           <div className="w-full overflow-x-auto">
             <TabsList className="grid w-full min-w-[600px] grid-cols-5 sm:min-w-0">
               <TabsTrigger value="general" className="text-xs sm:text-sm">
