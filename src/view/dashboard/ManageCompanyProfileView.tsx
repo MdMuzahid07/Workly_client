@@ -22,21 +22,11 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Award,
-  Building2,
-  Calendar,
-  Edit3,
-  Eye,
-  Save,
-  Shield,
-  Upload,
-  Users,
-  X,
-} from "lucide-react";
+import { Award, Building2, Eye, Upload, Users, X } from "lucide-react";
 import { useState } from "react";
+import DashboardCompanyProfileHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanyProfileHeader";
 
-interface CompanyProfile {
+export interface CompanyProfile {
   id: string;
   name: string;
   slug: string;
@@ -186,78 +176,14 @@ const ManageCompanyProfileView = () => {
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
-      <div className="bg-card border-b">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage
-                  src={currentProfile.logoUrl || "/placeholder.svg"}
-                  alt={currentProfile.name}
-                />
-                <AvatarFallback className="text-lg">
-                  {currentProfile.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <h1 className="text-foreground text-2xl font-bold">
-                    {currentProfile.name}
-                  </h1>
-                  {currentProfile.isVerified && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-primary/10 text-primary"
-                    >
-                      <Shield className="mr-1 h-3 w-3" />
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-muted-foreground">
-                  {currentProfile.industry} • {currentProfile.location}
-                </p>
-                <div className="text-muted-foreground flex items-center space-x-4 text-sm">
-                  <span className="flex items-center">
-                    <Users className="mr-1 h-4 w-4" />
-                    {currentProfile.stats.totalEmployees} employees
-                  </span>
-                  <span className="flex items-center">
-                    <Calendar className="mr-1 h-4 w-4" />
-                    Founded {currentProfile.founded}
-                  </span>
-                  <span className="flex items-center">
-                    <Eye className="mr-1 h-4 w-4" />
-                    {currentProfile.stats.profileViews} profile views
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              {!isEditing ? (
-                <Button onClick={() => setIsEditing(true)}>
-                  <Edit3 className="mr-2 h-4 w-4" />
-                  Edit Profile
-                </Button>
-              ) : (
-                <div className="flex space-x-2">
-                  <Button variant="outline" onClick={handleCancel}>
-                    <X className="mr-2 h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSave} disabled={isSaving}>
-                    <Save className="mr-2 h-4 w-4" />
-                    {isSaving ? "Saving..." : "Save Changes"}
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <DashboardCompanyProfileHeader
+        setIsEditing={setIsEditing}
+        isEditing={isEditing}
+        isSaving={isSaving}
+        handleSave={handleSave}
+        handleCancel={handleCancel}
+        currentProfile={currentProfile}
+      />
 
       <div className="container mx-auto px-6 py-8">
         <Tabs
