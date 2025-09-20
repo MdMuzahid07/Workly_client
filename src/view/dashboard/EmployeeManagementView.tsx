@@ -11,14 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -36,7 +28,6 @@ import {
   MapPin,
   MoreHorizontal,
   Phone,
-  Search,
   Trash2,
   UserCheck,
   Users,
@@ -44,6 +35,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import DashboardEmployeeManagementHeader from "../../components/dashboard/dashboard-nav/header/DashboardEmployeeManagementHeader";
+import EmployeeFiltersAndSearch from "../../components/dashboard/employee/EmployeeFiltersAndSearch";
+import EmployeeStatusCards from "../../components/dashboard/employee/EmployeeStatusCards";
 
 interface Employee {
   id: string;
@@ -150,6 +143,7 @@ export function EmployeeManagementView() {
     "Sales",
     "HR",
   ];
+
   const roles = [
     "Frontend Developer",
     "Backend Developer",
@@ -219,104 +213,15 @@ export function EmployeeManagementView() {
       />
 
       <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        {/* Stats Cards */}
-        <div className="mb-6 grid grid-cols-2 gap-3 sm:mb-8 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium sm:text-sm">
-                    Total Employees
-                  </p>
-                  <p className="text-primary text-xl font-bold sm:text-2xl">
-                    {employees.length}
-                  </p>
-                </div>
-                <Users className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium sm:text-sm">
-                    Active
-                  </p>
-                  <p className="text-xl font-bold text-green-600 sm:text-2xl">
-                    {employees.filter((e) => e.status === "active").length}
-                  </p>
-                </div>
-                <UserCheck className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium sm:text-sm">
-                    Pending
-                  </p>
-                  <p className="text-xl font-bold text-yellow-600 sm:text-2xl">
-                    {employees.filter((e) => e.status === "pending").length}
-                  </p>
-                </div>
-                <UserX className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium sm:text-sm">
-                    Departments
-                  </p>
-                  <p className="text-primary text-xl font-bold sm:text-2xl">
-                    {departments.length}
-                  </p>
-                </div>
-                <Users className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <EmployeeStatusCards employees={employees} departments={departments} />
 
-        {/* Filters and Search */}
-        <Card className="mb-6">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-                  <Input
-                    placeholder="Search employees by name, email, or role..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-10 pl-10 sm:h-11"
-                  />
-                </div>
-              </div>
-              <Select
-                value={selectedDepartment}
-                onValueChange={setSelectedDepartment}
-              >
-                <SelectTrigger className="h-10 w-full sm:h-11 sm:w-48">
-                  <SelectValue placeholder="All Departments" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+        <EmployeeFiltersAndSearch
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedDepartment={selectedDepartment}
+          setSelectedDepartment={setSelectedDepartment}
+          departments={departments}
+        />
 
         {/* Employee Tabs */}
         <Tabs
