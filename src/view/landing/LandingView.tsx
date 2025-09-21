@@ -75,7 +75,7 @@ const LandingView = () => {
             {features.map((feature, index) => (
               <div key={index} className="group cursor-pointer text-center">
                 <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-50 transition-transform duration-300 group-hover:scale-110 group-hover:bg-green-400">
-                  <feature.icon className="text-accent-foreground h-10 w-10" />
+                  <feature.icon className="text-foreground h-10 w-10" />
                 </div>
                 <h3 className="text-foreground mb-2 text-lg font-bold text-balance">
                   {feature.title}
