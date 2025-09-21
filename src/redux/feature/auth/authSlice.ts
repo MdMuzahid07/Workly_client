@@ -1,40 +1,66 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export type TUser = {
-  email: string;
-  password: string;
-  role: string;
+export enum UserRole {
+  JOB_SEEKER,
+  EMPLOYER,
+}
+
+export interface IUser {
   id: string;
-  iat: number;
-  exp: number;
-};
+  email: string;
+  fullName: string;
+  phone?: string;
+  role: UserRole;
+  isVerified: boolean;
+  isActive: boolean;
+  profileId?: string;
+  companyId?: string;
+  lastLogin?: Date;
+}
 
-type tAuthState = {
-  user: null | TUser;
-  token: null | string;
-};
+// interface IAuthState {
+//   user: IUser | null;
+//   accessToken: string | null;
+//   refreshToken: string | null;
+//   isLoading: boolean;
+//   isVerified: boolean;
+// }
 
-const initialState: tAuthState = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const initialState: any = {
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
+  isLoading: false,
+  isVerified: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      const { user, token } = action.payload;
+    setCredentials: (state, action) => {
+      const { user, accessToken, refreshToken } = action.payload;
       state.user = user;
-      state.token = token;
+      state.accessToken = accessToken;
+      state.refreshToken = refreshToken;
+      state.isVerified = user?.isVerified || false;
+    },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    updateUser: (state, action) => {
+      state.user = { ...state.user, ...action.payload };
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.isVerified = false;
     },
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
-
+export const { setCredentials, setLoading, updateUser, logout } =
+  authSlice.actions;
 export default authSlice.reducer;

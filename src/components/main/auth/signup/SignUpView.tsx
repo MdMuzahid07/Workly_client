@@ -8,13 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
+import { setCredentials } from "../../../../redux/feature/auth/authSlice";
+import { useAppDispatch } from "../../../../redux/hooks";
 import WkForm from "../../../form/WkForm";
 import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
 
 interface SignUpFormData {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -23,6 +26,7 @@ interface SignUpFormData {
 
 const SignUpView = () => {
   const { switchView } = useAuthDialog();
+  const dispatch = useAppDispatch();
   const [registerUser] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,7 +35,7 @@ const SignUpView = () => {
   );
 
   const defaultValues: SignUpFormData = {
-    name: "",
+    fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -39,20 +43,45 @@ const SignUpView = () => {
   };
 
   const handleSubmit = async (data: SignUpFormData) => {
-    if (data.password !== data.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
+    try {
+      if (data.password !== data.confirmPassword) {
+        toast.error("Passwords don't match!");
+        return;
+      }
+
+      const response = await registerUser({
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        role: selectedRole,
+      }).unwrap();
+
+      console.log(response, "response==========>");
+
+      if (
+        response?.accessToken &&
+        response?.safeUser &&
+        response?.refreshToken
+      ) {
+        localStorage.setItem("accessToken", response.accessToken);
+
+        dispatch(
+          setCredentials({
+            user: response.safeUser,
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+          }),
+        );
+
+        toast.success("Registration successful!");
+        switchView("signIn");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Registration failed");
+      console.error("Registration error:", error);
     }
-
-    const result = await registerUser({
-      fullName: data.name,
-      email: data.email,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
-      role: selectedRole,
-    });
-
-    console.log(result, "from sign register");
   };
 
   return (
@@ -70,7 +99,7 @@ const SignUpView = () => {
         <div className="mt-6 space-y-6">
           <div className="space-y-4">
             <WKInput
-              name="name"
+              name="fullName"
               label="Full Name"
               type="text"
               required

@@ -31,11 +31,9 @@ const Navbar = () => {
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
       >
         <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6">
-          {/* brand name */}
           <Link href="/" className="text-foreground text-xl font-bold">
             Workly_job
           </Link>
-          {/* nav links  */}
           {user && user.email ? (
             <div className="hidden items-center gap-8 md:flex">
               {navLinks.map((item, i) => (
@@ -76,7 +74,6 @@ const Navbar = () => {
           ) : (
             ""
           )}
-          {/* desktop actions */}
           <div className="hidden items-center gap-2 md:flex">
             <ThemeSwitcher />
             {user && user.email ? (

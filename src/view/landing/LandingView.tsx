@@ -20,7 +20,7 @@ const World = dynamic(
 const LandingView = () => {
   return (
     <>
-      <div className="relative mb-10 flex h-screen w-full flex-row items-center justify-center bg-green-50 pt-30 sm:mb-0 md:h-auto dark:bg-black">
+      <div className="relative mb-10 flex h-screen w-full flex-row items-center justify-center bg-green-50 pt-48 sm:mb-0 md:h-auto md:pt-30 dark:bg-black">
         <div className="relative z-50 mx-auto h-full min-h-screen w-full max-w-5xl overflow-hidden px-4 sm:h-[65rem]">
           <motion.div
             initial={{

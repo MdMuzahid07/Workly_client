@@ -1,6 +1,7 @@
 import AuthDialogProvider from "@/components/main/auth/AuthDialogProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
 import "./globals.css";
@@ -40,6 +41,7 @@ export default function RootLayout({
             <AuthDialogProvider>{children}</AuthDialogProvider>
           </ReduxProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

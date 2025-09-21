@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout, setUser } from "../feature/auth/authSlice";
+import { logout, setCredentials } from "../feature/auth/authSlice";
 import { RootState } from "../store";
 
 const baseQuery = fetchBaseQuery({
@@ -10,7 +10,7 @@ const baseQuery = fetchBaseQuery({
   // in prepareHeaders we get two parameters (header,api), we get the getState() from the api
   prepareHeaders: (headers, { getState }) => {
     // getting the token from the redux state
-    const token = (getState() as RootState).auth.token;
+    const token = (getState() as RootState).auth.accessToken;
 
     // if token find we are setting it to header, by headers.set() , in this method we have to pass
     // two arguments, one is "authorization", second is token, if backend receiving bearer then with bearer
@@ -48,9 +48,9 @@ const baseQueryWithRefreshToken = async (
       const user = (api.getState() as RootState).auth.user;
 
       await api.dispatch(
-        setUser({
+        setCredentials({
           user,
-          token: data?.data?.accessToken,
+          accessToken: data?.data?.accessToken,
         }),
       );
 
