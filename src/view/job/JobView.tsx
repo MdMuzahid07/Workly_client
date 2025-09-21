@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-
 "use client";
 import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
