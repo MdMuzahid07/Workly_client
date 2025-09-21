@@ -25,7 +25,7 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className="border-border fixed top-0 right-0 left-0 z-[999999] hidden h-18 border-b bg-white/90 backdrop-blur md:flex"
+        className="border-border bg-background/90 fixed top-0 right-0 left-0 z-[999999] hidden h-18 border-b backdrop-blur md:flex"
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
@@ -80,7 +80,7 @@ const Navbar = () => {
               <ProfileDrop />
             ) : (
               <Button
-                className="flex cursor-pointer items-center gap-2 rounded-full bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-lg font-semibold shadow-sm transition-colors duration-200"
                 onClick={() => openAuth("signIn")}
               >
                 Sign In

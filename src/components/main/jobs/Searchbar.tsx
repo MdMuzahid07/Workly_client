@@ -9,9 +9,9 @@ const Searchbar = () => {
 
   return (
     <div className="mx-auto w-full max-w-2xl p-4 md:pt-24">
-      <form className="flex flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-2 shadow-sm sm:flex-row sm:rounded-full">
+      <form className="border-border bg-card flex flex-col gap-2 rounded-2xl border p-2 shadow-sm sm:flex-row sm:rounded-full">
         <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="Job title or company"
             value={searchData.search}
@@ -21,9 +21,9 @@ const Searchbar = () => {
             className="border-0 bg-transparent pl-10 focus:ring-0 focus:outline-0"
           />
         </div>
-        <div className="w-px bg-gray-200" />
+        <div className="bg-border w-px" />
         <div className="relative flex-1">
-          <MapPin className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <MapPin className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="City"
             value={searchData.location}
@@ -35,7 +35,7 @@ const Searchbar = () => {
         </div>
         <Button
           size="sm"
-          className="h-10 cursor-pointer rounded-full bg-green-400 px-6 text-lg font-semibold hover:bg-green-500"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 cursor-pointer rounded-full px-6 text-lg font-semibold"
         >
           Search
         </Button>

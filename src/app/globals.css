@@ -52,125 +52,127 @@
 :root {
   --radius: 0.625rem;
 
-  /* Light Theme - Enhanced Green Design */
-  --background: oklch(0.99 0.005 120); /* Very light green tint */
-  --foreground: oklch(0.15 0.02 120); /* Dark green-tinted text */
+  /* Light Theme - Professional Green Design */
+  --background: 0 0% 100%; /* Pure white background */
+  --foreground: 0 0% 3.9%; /* Near black text */
 
-  --card: oklch(1 0 0); /* Pure white for cards */
-  --card-foreground: oklch(0.15 0.02 120);
+  --card: 0 0% 100%; /* Pure white cards */
+  --card-foreground: 0 0% 3.9%;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 120);
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
 
-  /* Primary Green - Your main brand color */
-  --primary: oklch(0.45 0.15 145); /* Professional green */
-  --primary-foreground: oklch(0.98 0.01 120);
+  /* Primary Green - Your exact brand color #37DF72 */
+  --primary: 142 76% 36%; /* #37DF72 converted to HSL */
+  --primary-foreground: 0 0% 98%;
 
   /* Secondary - Light green accent */
-  --secondary: oklch(0.96 0.02 140);
-  --secondary-foreground: oklch(0.25 0.05 145);
+  --secondary: 142 20% 96%;
+  --secondary-foreground: 142 76% 36%;
 
   /* Muted - Subtle green tints */
-  --muted: oklch(0.97 0.01 130);
-  --muted-foreground: oklch(0.5 0.02 130);
+  --muted: 142 15% 97%;
+  --muted-foreground: 142 10% 45%;
 
   /* Accent - Vibrant green for highlights */
-  --accent: oklch(0.55 0.18 150); /* Brighter green for CTAs */
-  --accent-foreground: oklch(0.98 0.01 120);
+  --accent: 142 76% 36%;
+  --accent-foreground: 0 0% 98%;
 
   /* Success - Green success state */
-  --success: oklch(0.6 0.15 140);
-  --success-foreground: oklch(0.98 0.01 120);
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 98%;
 
-  /* Warning - Orange for warnings */
-  --warning: oklch(0.7 0.15 70);
-  --warning-foreground: oklch(0.15 0.02 70);
+  /* Warning - Amber for warnings */
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 98%;
 
   /* Destructive - Red for errors */
-  --destructive: oklch(0.6 0.2 25);
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
 
   /* Borders and inputs */
-  --border: oklch(0.9 0.01 130);
-  --input: oklch(0.95 0.01 130);
-  --ring: oklch(0.45 0.15 145); /* Focus ring matches primary */
+  --border: 142 15% 90%;
+  --input: 142 15% 95%;
+  --ring: 142 76% 36%; /* Focus ring matches primary */
 
-  /* Charts - Green color palette */
-  --chart-1: oklch(0.55 0.18 150); /* Main green */
-  --chart-2: oklch(0.65 0.12 180); /* Teal */
-  --chart-3: oklch(0.45 0.15 120); /* Forest green */
-  --chart-4: oklch(0.7 0.1 200); /* Light blue-green */
-  --chart-5: oklch(0.35 0.12 140); /* Dark green */
+  /* Charts - Professional green palette */
+  --chart-1: 142 76% 36%; /* Main brand green */
+  --chart-2: 160 60% 45%; /* Teal */
+  --chart-3: 120 50% 40%; /* Forest green */
+  --chart-4: 180 40% 50%; /* Light blue-green */
+  --chart-5: 100 60% 30%; /* Dark green */
 
   /* Sidebar */
-  --sidebar: oklch(0.98 0.01 130);
-  --sidebar-foreground: oklch(0.2 0.03 130);
-  --sidebar-primary: oklch(0.45 0.15 145);
-  --sidebar-primary-foreground: oklch(0.98 0.01 120);
-  --sidebar-accent: oklch(0.94 0.02 135);
-  --sidebar-accent-foreground: oklch(0.25 0.05 135);
-  --sidebar-border: oklch(0.9 0.01 130);
-  --sidebar-ring: oklch(0.45 0.15 145);
+  --sidebar: 142 15% 98%;
+  --sidebar-foreground: 142 20% 20%;
+  --sidebar-primary: 142 76% 36%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 142 20% 94%;
+  --sidebar-accent-foreground: 142 20% 25%;
+  --sidebar-border: 142 15% 90%;
+  --sidebar-ring: 142 76% 36%;
 }
 
 .dark {
-  /* Dark Theme - Enhanced Green Design */
-  --background: oklch(0.08 0.01 120); /* Very dark with subtle green */
-  --foreground: oklch(0.95 0.01 120); /* Light with green tint */
+  /* Dark Theme - Professional Green Design */
+  --background: 0 0% 3.9%; /* Very dark background */
+  --foreground: 0 0% 98%; /* Light text */
 
-  --card: oklch(0.12 0.01 120); /* Dark card background */
-  --card-foreground: oklch(0.95 0.01 120);
+  --card: 0 0% 3.9%; /* Dark card background */
+  --card-foreground: 0 0% 98%;
 
-  --popover: oklch(0.12 0.01 120);
-  --popover-foreground: oklch(0.95 0.01 120);
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
 
   /* Primary - Brighter green for dark mode */
-  --primary: oklch(0.6 0.18 145); /* Brighter green */
-  --primary-foreground: oklch(0.05 0.01 120);
+  --primary: 142 76% 50%; /* Brighter version of brand green */
+  --primary-foreground: 0 0% 3.9%;
 
   /* Secondary - Dark green accent */
-  --secondary: oklch(0.18 0.02 140);
-  --secondary-foreground: oklch(0.9 0.02 140);
+  --secondary: 142 20% 15%;
+  --secondary-foreground: 142 20% 90%;
 
   /* Muted */
-  --muted: oklch(0.16 0.01 130);
-  --muted-foreground: oklch(0.65 0.02 130);
+  --muted: 142 15% 15%;
+  --muted-foreground: 142 10% 65%;
 
   /* Accent - Vibrant green */
-  --accent: oklch(0.65 0.2 150);
-  --accent-foreground: oklch(0.05 0.01 120);
+  --accent: 142 76% 50%;
+  --accent-foreground: 0 0% 3.9%;
 
   /* Success */
-  --success: oklch(0.65 0.18 140);
-  --success-foreground: oklch(0.05 0.01 120);
+  --success: 142 76% 50%;
+  --success-foreground: 0 0% 3.9%;
 
   /* Warning */
-  --warning: oklch(0.75 0.15 70);
-  --warning-foreground: oklch(0.1 0.02 70);
+  --warning: 38 92% 60%;
+  --warning-foreground: 0 0% 3.9%;
 
   /* Destructive */
-  --destructive: oklch(0.65 0.2 25);
+  --destructive: 0 84% 70%;
+  --destructive-foreground: 0 0% 98%;
 
   /* Borders and inputs */
-  --border: oklch(0.2 0.01 130);
-  --input: oklch(0.15 0.01 130);
-  --ring: oklch(0.6 0.18 145);
+  --border: 142 15% 20%;
+  --input: 142 15% 15%;
+  --ring: 142 76% 50%;
 
   /* Charts - Adjusted for dark mode */
-  --chart-1: oklch(0.6 0.2 150);
-  --chart-2: oklch(0.7 0.15 180);
-  --chart-3: oklch(0.5 0.18 120);
-  --chart-4: oklch(0.75 0.12 200);
-  --chart-5: oklch(0.4 0.15 140);
+  --chart-1: 142 76% 50%; /* Brighter brand green */
+  --chart-2: 160 60% 55%; /* Brighter teal */
+  --chart-3: 120 50% 50%; /* Brighter forest green */
+  --chart-4: 180 40% 60%; /* Brighter blue-green */
+  --chart-5: 100 60% 40%; /* Brighter dark green */
 
   /* Sidebar */
-  --sidebar: oklch(0.1 0.01 130);
-  --sidebar-foreground: oklch(0.9 0.02 130);
-  --sidebar-primary: oklch(0.6 0.18 145);
-  --sidebar-primary-foreground: oklch(0.05 0.01 120);
-  --sidebar-accent: oklch(0.18 0.02 135);
-  --sidebar-accent-foreground: oklch(0.9 0.02 135);
-  --sidebar-border: oklch(0.2 0.01 130);
-  --sidebar-ring: oklch(0.6 0.18 145);
+  --sidebar: 142 15% 8%;
+  --sidebar-foreground: 142 20% 90%;
+  --sidebar-primary: 142 76% 50%;
+  --sidebar-primary-foreground: 0 0% 3.9%;
+  --sidebar-accent: 142 20% 18%;
+  --sidebar-accent-foreground: 142 20% 90%;
+  --sidebar-border: 142 15% 20%;
+  --sidebar-ring: 142 76% 50%;
 }
 
 @layer base {
@@ -192,15 +194,15 @@
 
   /* Custom green button variants */
   .btn-green-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary transition-all duration-200;
   }
 
   .btn-green-secondary {
-    @apply bg-accent text-accent-foreground hover:bg-accent/80 focus-visible:ring-accent;
+    @apply bg-accent text-accent-foreground hover:bg-accent/80 focus-visible:ring-accent transition-all duration-200;
   }
 
   .btn-green-outline {
-    @apply border-primary text-primary hover:bg-primary hover:text-primary-foreground focus-visible:ring-primary border;
+    @apply border-primary text-primary hover:bg-primary hover:text-primary-foreground focus-visible:ring-primary border transition-all duration-200;
   }
 
   /* Success/Error states */
@@ -222,6 +224,24 @@
     color: hsl(var(--warning-foreground));
   }
 
+  /* Brand-specific utilities */
+  .text-brand {
+    color: hsl(var(--primary));
+  }
+
+  .bg-brand {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .border-brand {
+    border-color: hsl(var(--primary));
+  }
+
+  .ring-brand {
+    --tw-ring-color: hsl(var(--primary));
+  }
+
   /* Smooth transitions for theme switching */
   * {
     transition:
@@ -232,24 +252,69 @@
 
   /* Job card specific styling */
   .job-card {
-    @apply bg-card border-border rounded-lg border p-6 transition-shadow hover:shadow-md;
+    @apply bg-card border-border hover:border-primary/30 rounded-lg border p-6 transition-all duration-200 hover:shadow-md;
   }
 
   .job-card:hover {
-    @apply border-primary/30 shadow-lg;
+    @apply -translate-y-0.5 transform shadow-lg;
+  }
+
+  /* Company card styling */
+  .company-card {
+    @apply bg-card border-border hover:border-primary/30 rounded-lg border p-6 transition-all duration-200 hover:shadow-md;
+  }
+
+  .company-card:hover {
+    @apply -translate-y-0.5 transform shadow-lg;
   }
 
   /* Search input styling */
   .search-input {
-    @apply bg-input border-border focus:border-primary focus:ring-primary/20;
+    @apply bg-input border-border focus:border-primary focus:ring-primary/20 transition-all duration-200;
   }
 
   /* Category badges */
   .category-badge {
-    @apply bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium;
+    @apply bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium transition-all duration-200;
   }
 
   .category-badge.active {
-    @apply bg-primary text-primary-foreground;
+    @apply bg-primary text-primary-foreground shadow-sm;
+  }
+
+  /* Navigation styling */
+  .nav-link {
+    @apply text-muted-foreground hover:text-primary transition-colors duration-200;
+  }
+
+  .nav-link.active {
+    @apply text-primary font-medium;
+  }
+
+  /* Dashboard cards */
+  .dashboard-card {
+    @apply bg-card border-border rounded-lg border p-6 transition-all duration-200 hover:shadow-sm;
+  }
+
+  /* Form elements */
+  .form-input {
+    @apply bg-input border-border focus:border-primary focus:ring-primary/20 transition-all duration-200;
+  }
+
+  .form-label {
+    @apply text-foreground font-medium;
+  }
+
+  /* Status indicators */
+  .status-active {
+    @apply bg-success text-success-foreground;
+  }
+
+  .status-pending {
+    @apply bg-warning text-warning-foreground;
+  }
+
+  .status-inactive {
+    @apply bg-muted text-muted-foreground;
   }
 }

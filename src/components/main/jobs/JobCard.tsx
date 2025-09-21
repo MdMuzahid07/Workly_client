@@ -36,7 +36,7 @@ const JobCard = ({
 }: JobCardProps) => {
   return (
     <Card
-      className={`w-full rounded-2xl border-0 bg-gray-50 shadow-none drop-shadow-none transition-all duration-200 sm:bg-white`}
+      className={`job-card w-full rounded-2xl border-0 shadow-none drop-shadow-none transition-all duration-200`}
     >
       <CardHeader className="px-0 pb-3 md:px-4">
         <div className="flex items-start justify-between gap-4">
@@ -44,8 +44,8 @@ const JobCard = ({
             <div className="mb-2 flex items-center gap-2">
               {isFeatured && (
                 <Badge
-                  variant="secondary"
-                  className="rounded-full text-xs font-medium"
+                  variant="default"
+                  className="bg-primary text-primary-foreground rounded-full text-xs font-medium"
                 >
                   Featured
                 </Badge>
@@ -112,7 +112,7 @@ const JobCard = ({
           <div className="flex gap-2">
             <Button
               size="sm"
-              className="cursor-pointer rounded-full font-medium"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-full font-medium"
             >
               Apply Now
             </Button>

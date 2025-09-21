@@ -7,10 +7,7 @@ import { Card, CardContent, CardHeader } from "../../ui/card";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CompanyCard = ({ company }: any) => {
   return (
-    <Card
-      key={company.id}
-      className="cursor-pointer rounded-2xl bg-gray-50 sm:bg-white"
-    >
+    <Card key={company.id} className="company-card cursor-pointer rounded-2xl">
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">
           <Image
@@ -23,25 +20,28 @@ const CompanyCard = ({ company }: any) => {
           />
           <div className="flex-1">
             <div className="mb-1 flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900">{company.name}</h3>
+              <h3 className="text-foreground font-semibold">{company.name}</h3>
               {company.featured && (
-                <Badge variant="outline" className="bg-green-400 text-black">
+                <Badge
+                  variant="default"
+                  className="bg-primary text-primary-foreground"
+                >
                   Featured
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-gray-600">{company.industry}</p>
+            <p className="text-muted-foreground text-sm">{company.industry}</p>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="px-0 pt-0 sm:px-4">
         <div className="space-y-4">
-          <p className="line-clamp-2 text-sm leading-relaxed text-gray-700">
+          <p className="text-foreground line-clamp-2 text-sm leading-relaxed">
             {company.description}
           </p>
 
-          <div className="space-y-2 text-sm text-gray-600">
+          <div className="text-muted-foreground space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span>{company.location}</span>
@@ -56,12 +56,12 @@ const CompanyCard = ({ company }: any) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-b pt-4 pb-7 sm:border-t sm:border-b-0 sm:border-gray-100 sm:pb-0">
+          <div className="sm:border-border flex items-center justify-between border-b pt-4 pb-7 sm:border-t sm:border-b-0 sm:pb-0">
             <div className="text-sm">
-              <span className="font-medium text-green-600">
+              <span className="text-primary font-medium">
                 {company.openJobs}
               </span>
-              <span className="ml-1 text-gray-600">open jobs</span>
+              <span className="text-muted-foreground ml-1">open jobs</span>
             </div>
             <Button variant="outline" size="sm">
               View Company

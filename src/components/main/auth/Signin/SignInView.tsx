@@ -32,10 +32,10 @@ const SignInView = () => {
   return (
     <>
       <DialogHeader className="space-y-3">
-        <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+        <DialogTitle className="text-foreground text-center text-2xl font-bold">
           Welcome Back
         </DialogTitle>
-        <DialogDescription className="text-center text-gray-600">
+        <DialogDescription className="text-muted-foreground text-center">
           Sign in to your Workly_job account to continue your career journey.
         </DialogDescription>
       </DialogHeader>
@@ -48,7 +48,7 @@ const SignInView = () => {
               label="Email Address"
               type="email"
               required
-              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:outline-none active:border-green-400"
+              className="form-input rounded-full transition-all duration-200"
             />
 
             <div className="relative">
@@ -57,7 +57,7 @@ const SignInView = () => {
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="form-input rounded-full pr-10 transition-all duration-200"
               />
               <Button
                 type="button"
@@ -67,9 +67,9 @@ const SignInView = () => {
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
+                  <EyeOff className="text-muted-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="text-muted-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -78,7 +78,7 @@ const SignInView = () => {
           <div className="space-y-4">
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 w-full cursor-pointer rounded-full py-3 font-semibold shadow-sm transition-colors duration-200"
             >
               Sign In
             </Button>
@@ -87,7 +87,7 @@ const SignInView = () => {
               <Button
                 type="button"
                 variant="link"
-                className="cursor-pointer text-sm text-gray-500 transition-colors duration-200 hover:text-green-400"
+                className="text-muted-foreground hover:text-primary cursor-pointer text-sm transition-colors duration-200"
                 onClick={() => switchView("forgot")}
               >
                 Forgot your password?
@@ -97,12 +97,12 @@ const SignInView = () => {
         </div>
       </WkForm>
 
-      <div className="mt-6 border-t border-gray-200 pt-6">
-        <p className="text-center text-sm text-gray-600">
+      <div className="border-border mt-6 border-t pt-6">
+        <p className="text-muted-foreground text-center text-sm">
           {`Don't`} have an account?{" "}
           <Button
             variant="link"
-            className="h-auto cursor-pointer p-0 font-medium text-green-400 transition-colors duration-200 hover:text-[#00C299]"
+            className="text-primary hover:text-primary/80 h-auto cursor-pointer p-0 font-medium transition-colors duration-200"
             onClick={() => switchView("signUp")}
           >
             Sign up here
