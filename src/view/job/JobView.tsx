@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 "use client";
-
 import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
@@ -169,6 +168,7 @@ const JobView = () => {
             {jobs.map((job, index) => (
               //@ts-ignore
               <JobCard key={index} {...job} />
+              // <JobCardSkeleton key={index} />
             ))}
           </div>
         </div>
