@@ -12,7 +12,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
   const user = { email: "mdmuzahid.dev@gmail.com" };
-  // const user = false;
+  // const user = { email: "" };
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -25,12 +25,12 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className="border-border fixed top-0 right-0 left-0 z-[999999] hidden h-18 border-b bg-white/90 backdrop-blur md:flex"
+        className={`border-border fixed top-0 right-0 left-0 z-[999999] ${pathname === "/" && !user.email ? "" : "hidden"} h-16 border-b bg-white/90 backdrop-blur sm:h-18 md:flex`}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
       >
-        <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 sm:h-18">
           <Link href="/" className="text-foreground text-xl font-bold">
             Workly_job
           </Link>
@@ -74,10 +74,14 @@ const Navbar = () => {
           ) : (
             ""
           )}
-          <div className="hidden items-center gap-2 md:flex">
+          <div
+            className={`${pathname === "/" ? "flex" : "hidden"} items-center gap-2 md:flex`}
+          >
             <ThemeSwitcher />
             {user && user.email ? (
-              <ProfileDrop />
+              <div className="hidden md:block">
+                <ProfileDrop />
+              </div>
             ) : (
               <Button
                 className="flex cursor-pointer items-center gap-2 rounded-full bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
