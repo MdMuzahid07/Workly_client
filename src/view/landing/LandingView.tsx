@@ -3,17 +3,14 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import { features, globeConfig, globeSampleAreas } from "../../constants";
+import GlobeSkeleton from "../../skeleton/landing/GlobeSkeleton";
 
 const World = dynamic(
   () =>
     import("../../components/ui/globe").then((mod) => ({ default: mod.World })),
   {
     ssr: false,
-    loading: () => (
-      <div className="absolute top-[10rem] right-0 left-0 z-10 flex h-[300px] w-full items-center justify-center sm:-bottom-20 md:h-full">
-        <div className="animate-pulse text-neutral-400">Loading Globe...</div>
-      </div>
-    ),
+    loading: () => <GlobeSkeleton />,
   },
 );
 
