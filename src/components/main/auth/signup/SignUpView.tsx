@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
@@ -25,7 +26,7 @@ interface SignUpFormData {
 }
 
 const SignUpView = () => {
-  const { switchView } = useAuthDialog();
+  const { switchView, closeAuth } = useAuthDialog();
   const dispatch = useAppDispatch();
   const [registerUser] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +34,7 @@ const SignUpView = () => {
   const [selectedRole, setSelectedRole] = useState<"employer" | "jobseeker">(
     "jobseeker",
   );
+  const router = useRouter();
 
   const defaultValues: SignUpFormData = {
     fullName: "",
@@ -75,7 +77,8 @@ const SignUpView = () => {
         );
 
         toast.success("Registration successful!");
-        switchView("signIn");
+        closeAuth();
+        router.push("/jobs");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

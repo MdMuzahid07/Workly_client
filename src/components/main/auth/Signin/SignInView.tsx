@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLoginUserMutation } from "../../../../redux/feature/auth/authApi";
@@ -25,6 +26,7 @@ const SignInView = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginUser] = useLoginUserMutation();
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const defaultValues: SignInFormData = {
     email: "",
@@ -60,6 +62,7 @@ const SignInView = () => {
 
         toast.success("Login successful!");
         closeAuth();
+        router.push("/jobs");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

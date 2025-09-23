@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 import { navLinks } from "../../../constants";
-import { useAppSelector } from "../../../redux/hooks";
+import { useLogoutUserMutation } from "../../../redux/feature/auth/authApi";
+import { logout } from "../../../redux/feature/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ThemeSwitcher from "../ThemeSwitcher";
 import ProfileDrop from "./ProfileDrop";
@@ -12,13 +15,36 @@ import ProfileDrop from "./ProfileDrop";
 const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => state.auth.user) || { email: null };
+  const dispatch = useAppDispatch();
+  const [logoutUser] = useLogoutUserMutation();
 
   const isActive = (href: string) => {
     if (href === "/") {
       return pathname === "/";
     }
     return pathname.startsWith(href);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const loadingToast = toast.loading("Logging out...");
+      await logoutUser(undefined).unwrap();
+
+      localStorage.clear();
+      dispatch(logout());
+
+      toast.dismiss(loadingToast);
+      toast.success("Logged out successfully");
+      window.location.href = "/";
+    } catch (error) {
+      toast.error("Failed to logout. Please try again.");
+      console.error("Logout error:", error);
+
+      localStorage.clear();
+      dispatch(logout());
+      window.location.href = "/";
+    }
   };
 
   return (
@@ -80,7 +106,7 @@ const Navbar = () => {
             <ThemeSwitcher />
             {user && user.email ? (
               <div className="hidden md:block">
-                <ProfileDrop />
+                <ProfileDrop onSignOut={handleLogout} />
               </div>
             ) : (
               <Button
@@ -130,7 +156,7 @@ const Navbar = () => {
                 </motion.div>
               </Link>
             ))}
-            <ProfileDrop isMobile={true} />
+            <ProfileDrop onSignOut={handleLogout} isMobile={true} />
           </div>
         </motion.nav>
       ) : (
