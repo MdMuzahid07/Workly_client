@@ -53,7 +53,7 @@ const AuthDialogProvider = ({ children }: { children: ReactNode }) => {
     <AuthDialogCtx.Provider value={api}>
       {children}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-primary/10 rounded-3xl border-gray-200 shadow-xl sm:max-w-[425px]">
+        <DialogContent className="rounded-3xl border-gray-200 bg-white shadow-xl sm:max-w-[425px]">
           {view === "signIn" && <SignInView />}
           {view === "signUp" && <SignUpView />}
           {view === "forgot" && <ForgetPasswordView />}

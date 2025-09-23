@@ -11,8 +11,8 @@ import ProfileDrop from "./ProfileDrop";
 const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
-  const user = { email: "mdmuzahid.dev@gmail.com" };
-  // const user = { email: "" };
+  // const user = { email: "mdmuzahid.dev@gmail.com" };
+  const user = { email: "" };
 
   const isActive = (href: string) => {
     if (href === "/") {
