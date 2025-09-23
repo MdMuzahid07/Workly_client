@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "../../../constants";
+import { useAppSelector } from "../../../redux/hooks";
 import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ThemeSwitcher from "../ThemeSwitcher";
 import ProfileDrop from "./ProfileDrop";
@@ -11,8 +12,7 @@ import ProfileDrop from "./ProfileDrop";
 const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
-  // const user = { email: "mdmuzahid.dev@gmail.com" };
-  const user = { email: "" };
+  const user = useAppSelector((state) => state.auth.user);
 
   const isActive = (href: string) => {
     if (href === "/") {

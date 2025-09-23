@@ -7,6 +7,10 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLoginUserMutation } from "../../../../redux/feature/auth/authApi";
+import { setCredentials } from "../../../../redux/feature/auth/authSlice";
+import { useAppDispatch } from "../../../../redux/hooks";
 import WkForm from "../../../form/WkForm";
 import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
@@ -17,16 +21,51 @@ interface SignInFormData {
 }
 
 const SignInView = () => {
-  const { switchView } = useAuthDialog();
+  const { switchView, closeAuth } = useAuthDialog();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginUser] = useLoginUserMutation();
+  const dispatch = useAppDispatch();
 
   const defaultValues: SignInFormData = {
     email: "",
     password: "",
   };
 
-  const handleSubmit = (data: SignInFormData) => {
-    console.log(data);
+  const handleSubmit = async (data: SignInFormData) => {
+    try {
+      const response = await loginUser({
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const resData = (response as any).data;
+
+      console.log(resData, "response==========>");
+
+      if (resData?.accessToken && resData?.email) {
+        localStorage.setItem("accessToken", resData.accessToken);
+
+        dispatch(
+          setCredentials({
+            user: {
+              email: resData.email,
+              fullName: resData.fullName,
+              phone: resData.phone,
+            },
+            accessToken: resData.accessToken,
+            refreshToken: resData.refreshToken,
+          }),
+        );
+
+        toast.success("Login successful!");
+        closeAuth();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.data?.errorSources?.message || "Login failed");
+      console.error("Login error:", error);
+    }
   };
 
   return (
