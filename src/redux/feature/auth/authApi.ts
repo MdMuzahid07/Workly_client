@@ -12,7 +12,7 @@ interface IRegisterData {
   password: string;
   fullName: string;
   confirmPassword: string;
-  role: "employer" | "jobseeker";
+  role: "EMPLOYER" | "JOB_SEEKER";
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

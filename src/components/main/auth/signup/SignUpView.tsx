@@ -22,7 +22,7 @@ interface SignUpFormData {
   email: string;
   password: string;
   confirmPassword: string;
-  role: "employer" | "jobseeker";
+  role: "EMPLOYER" | "JOB_SEEKER";
 }
 
 const SignUpView = () => {
@@ -31,8 +31,8 @@ const SignUpView = () => {
   const [registerUser] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<"employer" | "jobseeker">(
-    "jobseeker",
+  const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
+    "JOB_SEEKER",
   );
   const router = useRouter();
 
@@ -41,7 +41,7 @@ const SignUpView = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "jobseeker",
+    role: "JOB_SEEKER",
   };
 
   const handleSubmit = async (data: SignUpFormData) => {
@@ -166,26 +166,26 @@ const SignUpView = () => {
             <div className="flex gap-4">
               <Button
                 type="button"
-                variant={selectedRole === "employer" ? "default" : "outline"}
+                variant={selectedRole === "EMPLOYER" ? "default" : "outline"}
                 className={`hover:bg-primary/100 flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
-                  selectedRole === "employer"
+                  selectedRole === "EMPLOYER"
                     ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
                 }`}
-                onClick={() => setSelectedRole("employer")}
+                onClick={() => setSelectedRole("EMPLOYER")}
               >
                 Employer
               </Button>
 
               <Button
                 type="button"
-                variant={selectedRole === "jobseeker" ? "default" : "outline"}
+                variant={selectedRole === "JOB_SEEKER" ? "default" : "outline"}
                 className={`hover:bg-primary/100 flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
-                  selectedRole === "jobseeker"
+                  selectedRole === "JOB_SEEKER"
                     ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
                 }`}
-                onClick={() => setSelectedRole("jobseeker")}
+                onClick={() => setSelectedRole("JOB_SEEKER")}
               >
                 Job Seeker
               </Button>
