@@ -2,7 +2,7 @@ const FooterBottom = () => {
   const date = new Date().getFullYear();
 
   return (
-    <div className="bg-primary/2 border-t border-gray-200 pb-20 md:pb-0">
+    <div className="bg-primary/3 border-t border-gray-200 pb-20 md:pb-0">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-gray-600">

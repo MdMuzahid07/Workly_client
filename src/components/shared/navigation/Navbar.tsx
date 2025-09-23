@@ -25,7 +25,7 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className={`border-border fixed top-0 right-0 left-0 z-[999999] ${pathname === "/" && !user.email ? "" : "hidden"} h-16 border-b bg-white/90 backdrop-blur sm:h-18 md:flex`}
+        className={`border-border fixed top-0 right-0 left-0 z-[999999] ${pathname === "/" && !user.email ? "" : "hidden"} bg-primary/5 h-16 border-b backdrop-blur sm:h-18 md:flex`}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}

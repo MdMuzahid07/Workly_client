@@ -4,7 +4,7 @@ import MobileAppRecommend from "./MobileAppRecommend";
 
 const Footer = () => {
   return (
-    <footer className="bg-white">
+    <footer className="bg-primary/5">
       <MobileAppRecommend />
       <MainFooter />
       <FooterBottom />
