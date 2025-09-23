@@ -33,7 +33,7 @@ const LandingView = () => {
             }}
             className="div"
           >
-            <h2 className="mx-auto max-w-4xl text-center text-xl font-bold text-green-400 sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl dark:text-white">
+            <h2 className="text-primary mx-auto max-w-4xl text-center text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl dark:text-white">
               Search Smarter, Apply Faster, Hire Better.
             </h2>
             <p className="sm:text-md mx-auto mt-4 max-w-5xl text-center text-base font-normal text-neutral-700 sm:mt-7 md:text-xl md:font-semibold lg:text-3xl dark:text-neutral-200">
