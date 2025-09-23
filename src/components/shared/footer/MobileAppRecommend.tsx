@@ -3,7 +3,7 @@ import HoverHint from "../HoverHint";
 
 const MobileAppRecommend = () => {
   return (
-    <div className="bg-primary/10 py-12">
+    <div className="bg-primary/5 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h3 className="mb-4 text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
