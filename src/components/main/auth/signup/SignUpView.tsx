@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
@@ -34,7 +33,7 @@ const SignUpView = () => {
   const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
     "JOB_SEEKER",
   );
-  const router = useRouter();
+  // const router = useRouter();
 
   const defaultValues: SignUpFormData = {
     fullName: "",
@@ -59,26 +58,28 @@ const SignUpView = () => {
         role: selectedRole,
       }).unwrap();
 
-      console.log(response, "response==========>");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const resData = (response as any).data;
 
-      if (
-        response?.accessToken &&
-        response?.safeUser &&
-        response?.refreshToken
-      ) {
-        localStorage.setItem("accessToken", response.accessToken);
+      if (resData?.accessToken && resData?.email) {
+        localStorage.setItem("accessToken", resData.accessToken);
 
         dispatch(
           setCredentials({
-            user: response.safeUser,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            user: {
+              email: resData.email,
+              fullName: resData.fullName,
+              isVerified: resData.isVerified,
+              phone: resData.phone,
+            },
+            accessToken: resData.accessToken,
+            refreshToken: null,
           }),
         );
 
         toast.success("Registration successful!");
         closeAuth();
-        router.push("/jobs");
+        // router.push("/jobs");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
