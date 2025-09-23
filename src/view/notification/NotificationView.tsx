@@ -210,6 +210,7 @@ const NotificationView = () => {
                   deleteNotification={deleteNotification}
                   markAsRead={markAsRead}
                 />
+                // <NotificationCardSkeleton key={index} />
               ))
             ) : (
               // Fallback for no notifications
