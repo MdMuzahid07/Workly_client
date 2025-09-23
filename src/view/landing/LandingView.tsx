@@ -17,7 +17,7 @@ const World = dynamic(
 const LandingView = () => {
   return (
     <>
-      <div className="bg-primary/10 relative mb-10 flex h-screen w-full flex-row items-center justify-center pt-48 sm:mb-0 md:h-auto md:pt-30 dark:bg-black">
+      <div className="bg-primary/2 relative mb-10 flex h-screen w-full flex-row items-center justify-center pt-48 sm:mb-0 md:h-auto md:pt-30 dark:bg-black">
         <div className="relative z-50 mx-auto h-full min-h-screen w-full max-w-5xl overflow-hidden px-4 sm:h-[65rem]">
           <motion.div
             initial={{
@@ -42,7 +42,7 @@ const LandingView = () => {
               land your next great role.
             </p>
           </motion.div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 w-full bg-gradient-to-b from-transparent to-[#E3EDE2] select-none dark:to-black" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 w-full bg-gradient-to-b from-transparent to-[#F6F9F4] select-none dark:to-black" />
           <div className="absolute top-[10rem] right-0 left-0 z-10 h-[300px] w-full sm:-bottom-20 md:h-full">
             <Suspense
               fallback={
