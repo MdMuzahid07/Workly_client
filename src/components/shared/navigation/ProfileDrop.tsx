@@ -109,8 +109,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           onClick={toggleDropdown}
           variant="ghost"
           size="sm"
-          className={`group relative flex cursor-pointer items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 ring-green-400/30 transition-all duration-200 ${
-            isOpen ? "bg-gray-100/80 focus:ring-2 focus:ring-green-400/70" : ""
+          className={`group ring-primary/50 relative flex cursor-pointer items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 transition-all duration-200 ${
+            isOpen
+              ? "focus:ring-primary hover:bg-primary hover:text-card bg-gray-100/80 focus:ring-2"
+              : ""
           }`}
           aria-expanded={isOpen}
           aria-haspopup="true"
@@ -193,7 +195,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                       priority
                     />
                   ) : (
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-lg font-semibold text-white shadow-sm sm:h-12 sm:w-12">
+                    <div className="from-primary/50 to-primary flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br text-lg font-semibold text-white shadow-sm sm:h-12 sm:w-12">
                       {user.initials}
                     </div>
                   )}
@@ -232,7 +234,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                     </span>
                   </div>
                   {item.badge && (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                    <span className="bg-primary/10 text-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
