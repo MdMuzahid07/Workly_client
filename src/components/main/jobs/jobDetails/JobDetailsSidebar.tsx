@@ -8,7 +8,7 @@ const JobDetailsSidebar = ({ job }: { job: any }) => {
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
-          <Button className="bg-primary/100 mb-4 w-full text-white hover:bg-green-600">
+          <Button className="bg-primary/100 hover:bg-primary mb-4 w-full text-white">
             Apply Now
           </Button>
           <Button variant="outline" className="w-full bg-transparent">

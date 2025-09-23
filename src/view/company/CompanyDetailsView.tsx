@@ -294,7 +294,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                         </div>
                         <Button
                           size="sm"
-                          className="bg-primary/100 text-white hover:bg-green-600"
+                          className="bg-primary/100 hover:bg-primary text-white"
                         >
                           Apply
                         </Button>

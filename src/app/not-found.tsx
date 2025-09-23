@@ -28,7 +28,7 @@ const NotFound = () => {
 
         <div className="flex gap-4">
           <Link href="/">
-            <Button className="bg-primary hover:bg-primary/100 rounded-full font-semibold text-black">
+            <Button className="bg-primary hover:bg-primary/100 text-foreground rounded-full font-semibold">
               Go Home
             </Button>
           </Link>
