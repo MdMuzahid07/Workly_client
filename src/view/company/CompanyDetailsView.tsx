@@ -216,7 +216,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                       key={index}
                       className="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
                     >
-                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                      <div className="bg-primary/100 h-2 w-2 rounded-full"></div>
                       <span className="font-medium text-gray-900">{value}</span>
                     </div>
                   ))}
@@ -236,7 +236,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {company.benefits.map((benefit, index) => (
                     <div key={index} className="flex items-start gap-3">
-                      <div className="mt-2 h-2 w-2 rounded-full bg-green-500"></div>
+                      <div className="bg-primary/100 mt-2 h-2 w-2 rounded-full"></div>
                       <span className="text-gray-700">{benefit}</span>
                     </div>
                   ))}
@@ -294,7 +294,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                         </div>
                         <Button
                           size="sm"
-                          className="bg-green-500 text-white hover:bg-green-600"
+                          className="bg-primary/100 text-white hover:bg-green-600"
                         >
                           Apply
                         </Button>
@@ -306,7 +306,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                 <div className="mt-6 text-center">
                   <Button
                     variant="outline"
-                    className="border-green-600 bg-transparent text-green-600 hover:bg-green-50"
+                    className="hover:bg-primary/10 border-green-600 bg-transparent text-green-600"
                   >
                     View All Jobs
                   </Button>

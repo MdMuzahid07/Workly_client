@@ -7,7 +7,7 @@ const MainFooter = () => {
         {/* Brand Section */}
         <div className="col-span-2 md:col-span-3 lg:col-span-2">
           <div className="mb-6 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-400">
+            <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
               <span className="text-lg font-bold text-white">W</span>
             </div>
             <span className="text-2xl font-bold text-gray-900">Workly_job</span>
@@ -22,7 +22,7 @@ const MainFooter = () => {
               <a
                 key={idx}
                 href={social.href}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-all hover:bg-green-400 hover:text-white"
+                className="hover:bg-primary flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-all hover:text-white"
               >
                 {social.icon}
               </a>

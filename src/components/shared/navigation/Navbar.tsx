@@ -84,7 +84,7 @@ const Navbar = () => {
               </div>
             ) : (
               <Button
-                className="flex cursor-pointer items-center gap-2 rounded-full bg-green-400 px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
+                className="bg-primary flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
                 onClick={() => openAuth("signIn")}
               >
                 Sign In

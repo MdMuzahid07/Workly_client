@@ -48,7 +48,7 @@ const ResetPasswordView = () => {
   };
 
   return (
-    <main className="flex min-h-[calc(100dvh-64px)] items-center justify-center bg-green-50 px-4 py-10">
+    <main className="bg-primary/10 flex min-h-[calc(100dvh-64px)] items-center justify-center px-4 py-10">
       <div className="w-full max-w-[425px] rounded-3xl border border-gray-200 bg-gray-50 p-6">
         <div className="space-y-3">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
@@ -158,7 +158,7 @@ const ResetPasswordView = () => {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200 disabled:opacity-70"
+              className="bg-primary w-full cursor-pointer rounded-lg py-3 font-semibold text-white shadow-sm transition-colors duration-200 disabled:opacity-70"
             >
               {submitting ? "Updating..." : "Update Password"}
             </Button>
@@ -172,7 +172,7 @@ const ResetPasswordView = () => {
             </div>
             <Button
               onClick={() => router.push("/?auth=signin")}
-              className="w-full cursor-pointer rounded-lg bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="bg-primary w-full cursor-pointer rounded-lg py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
               Continue to Sign In
             </Button>

@@ -3,7 +3,7 @@ import HoverHint from "../HoverHint";
 
 const MobileAppRecommend = () => {
   return (
-    <div className="bg-green-50 py-12">
+    <div className="bg-primary/10 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h3 className="mb-4 text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
@@ -15,7 +15,7 @@ const MobileAppRecommend = () => {
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
             <HoverHint hint="Coming soon">
-              <Button className="flex cursor-pointer items-center gap-2 rounded-full bg-green-400 px-6 py-3 text-xs text-white hover:bg-gray-800">
+              <Button className="bg-primary flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-xs text-white hover:bg-gray-800">
                 <svg
                   className="h-6 w-6"
                   viewBox="0 0 24 24"
@@ -28,7 +28,7 @@ const MobileAppRecommend = () => {
             </HoverHint>
 
             <HoverHint hint="Click to download the android app">
-              <Button className="flex cursor-pointer items-center gap-2 rounded-full bg-green-400 px-6 py-3 text-xs text-white hover:bg-gray-800">
+              <Button className="bg-primary flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-xs text-white hover:bg-gray-800">
                 <svg
                   className="h-6 w-6"
                   viewBox="0 0 24 24"

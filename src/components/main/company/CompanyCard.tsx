@@ -25,7 +25,7 @@ const CompanyCard = ({ company }: any) => {
             <div className="mb-1 flex items-center gap-2">
               <h3 className="font-semibold text-gray-900">{company.name}</h3>
               {company.featured && (
-                <Badge variant="outline" className="bg-green-400 text-black">
+                <Badge variant="outline" className="bg-primary text-black">
                   Featured
                 </Badge>
               )}

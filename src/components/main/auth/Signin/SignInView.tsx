@@ -78,7 +78,7 @@ const SignInView = () => {
           <div className="space-y-4">
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
               Sign In
             </Button>

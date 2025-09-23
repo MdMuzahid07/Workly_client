@@ -63,7 +63,7 @@ const getNotificationColor = (type: Notification["type"]) => {
     case "INTERVIEW_SCHEDULED":
       return "bg-orange-50 border-orange-200";
     case "NEW_JOB_MATCH":
-      return "bg-green-50 border-green-200";
+      return "bg-primary/10 border-green-200";
     case "SYSTEM_ANNOUNCEMENT":
       return "bg-yellow-50 border-yellow-200";
     default:

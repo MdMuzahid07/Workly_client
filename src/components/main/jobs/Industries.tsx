@@ -41,7 +41,7 @@ const jobCategories = [
     title: "Finance",
     icon: TrendingUp,
     count: "1,456 jobs",
-    color: "bg-green-500",
+    color: "bg-primary/100",
     description: "Banking, Investment, Accounting",
   },
   {

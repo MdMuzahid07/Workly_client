@@ -11,7 +11,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
       {/* Quick Actions */}
       <Card>
         <CardContent className="p-6">
-          <Button className="mb-3 w-full bg-green-500 text-white hover:bg-green-600">
+          <Button className="bg-primary/100 mb-3 w-full text-white hover:bg-green-600">
             Follow Company
           </Button>
           <Button variant="outline" className="w-full bg-transparent">

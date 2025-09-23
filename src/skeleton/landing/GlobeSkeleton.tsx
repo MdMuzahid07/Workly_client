@@ -21,7 +21,7 @@ const GlobeSkeleton = () => {
           <motion.div
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 left-1/3 h-2 w-2 rounded-full bg-green-400 md:h-3 md:w-3"
+            className="bg-primary absolute top-1/4 left-1/3 h-2 w-2 rounded-full md:h-3 md:w-3"
           />
           <motion.div
             animate={{ opacity: [1, 0.3, 1] }}

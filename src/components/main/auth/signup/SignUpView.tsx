@@ -164,9 +164,9 @@ const SignUpView = () => {
               <Button
                 type="button"
                 variant={selectedRole === "employer" ? "default" : "outline"}
-                className={`flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 hover:bg-green-500 ${
+                className={`hover:bg-primary/100 flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
                   selectedRole === "employer"
-                    ? "border-green-400 bg-green-400 text-white"
+                    ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
                 }`}
                 onClick={() => setSelectedRole("employer")}
@@ -177,9 +177,9 @@ const SignUpView = () => {
               <Button
                 type="button"
                 variant={selectedRole === "jobseeker" ? "default" : "outline"}
-                className={`flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 hover:bg-green-500 ${
+                className={`hover:bg-primary/100 flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
                   selectedRole === "jobseeker"
-                    ? "border-green-400 bg-green-400 text-white"
+                    ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
                 }`}
                 onClick={() => setSelectedRole("jobseeker")}
@@ -192,7 +192,7 @@ const SignUpView = () => {
           <div className="space-y-4">
             <Button
               type="submit"
-              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
               Create Account
             </Button>

@@ -17,7 +17,7 @@ const World = dynamic(
 const LandingView = () => {
   return (
     <>
-      <div className="relative mb-10 flex h-screen w-full flex-row items-center justify-center bg-green-50 pt-48 sm:mb-0 md:h-auto md:pt-30 dark:bg-black">
+      <div className="bg-primary/10 relative mb-10 flex h-screen w-full flex-row items-center justify-center pt-48 sm:mb-0 md:h-auto md:pt-30 dark:bg-black">
         <div className="relative z-50 mx-auto h-full min-h-screen w-full max-w-5xl overflow-hidden px-4 sm:h-[65rem]">
           <motion.div
             initial={{
@@ -71,7 +71,7 @@ const LandingView = () => {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {features.map((feature, index) => (
               <div key={index} className="group cursor-pointer text-center">
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-50 transition-transform duration-300 group-hover:scale-110 group-hover:bg-green-400">
+                <div className="group-hover:bg-primary bg-primary/10 mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-110">
                   <feature.icon className="text-foreground h-10 w-10" />
                 </div>
                 <h3 className="text-foreground mb-2 text-lg font-bold text-balance">
