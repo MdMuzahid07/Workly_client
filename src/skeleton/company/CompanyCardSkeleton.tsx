@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "../../components/ui/card";
 
 const CompanyCardSkeleton = () => {
   return (
-    <Card className="cursor-pointer rounded-2xl bg-gray-50 sm:bg-white">
+    <Card className="bg-primary/2 cursor-pointer rounded-2xl sm:bg-white">
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">
           <Skeleton className="h-12 w-12 rounded-full" />

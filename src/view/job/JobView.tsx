@@ -142,7 +142,7 @@ const jobs = [
 
 const JobView = () => {
   return (
-    <div className="bg-gray-50 pb-12">
+    <div className="bg-primary/2 pb-12">
       <Searchbar />
       <Industries />
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">

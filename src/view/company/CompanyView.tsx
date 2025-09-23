@@ -178,7 +178,7 @@ const companies = [
 
 const CompanyView = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-primary/2 min-h-screen">
       <Searchbar />
       <CompanyFilter />
 

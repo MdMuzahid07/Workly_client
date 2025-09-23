@@ -168,7 +168,7 @@ const DashboardSidebar = () => {
       className={cn(
         "h-auto w-full justify-start gap-3 px-3 py-2.5 font-normal",
         active && "bg-gray-100 font-medium text-gray-900 hover:bg-gray-100",
-        !active && "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+        !active && "hover:bg-primary/2 text-gray-600 hover:text-gray-900",
         "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
       )}
       onClick={() => {

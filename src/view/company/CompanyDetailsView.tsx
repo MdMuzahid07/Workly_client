@@ -108,7 +108,7 @@ const companyData = {
 const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
   const company = companyData;
   return (
-    <div className="min-h-screen bg-gray-50 md:pt-16">
+    <div className="bg-primary/2 min-h-screen md:pt-16">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
@@ -214,7 +214,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                   {company.values.map((value, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
+                      className="bg-primary/2 flex items-center gap-3 rounded-lg p-3"
                     >
                       <div className="bg-primary/100 h-2 w-2 rounded-full"></div>
                       <span className="font-medium text-gray-900">{value}</span>
@@ -269,7 +269,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                   {company.openJobs.map((job) => (
                     <div
                       key={job.id}
-                      className="rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+                      className="hover:bg-primary/2 rounded-lg border border-gray-200 p-4 transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

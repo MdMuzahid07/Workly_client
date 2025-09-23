@@ -56,7 +56,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         <CardContent className="space-y-3">
           <a
             href={`https://${company.socialLinks.linkedin}`}
-            className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50"
+            className="hover:bg-primary/2 flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-600">
               <span className="text-xs font-bold text-white">in</span>
@@ -67,7 +67,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
 
           <a
             href={`https://${company.socialLinks.twitter}`}
-            className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50"
+            className="hover:bg-primary/2 flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-400">
               <span className="text-xs font-bold text-white">𝕏</span>
@@ -78,7 +78,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
 
           <a
             href={`https://${company.socialLinks.github}`}
-            className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50"
+            className="hover:bg-primary/2 flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-900">
               <span className="text-xs font-bold text-white">GH</span>

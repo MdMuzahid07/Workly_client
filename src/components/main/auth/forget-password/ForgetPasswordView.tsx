@@ -74,7 +74,7 @@ const ForgetPasswordView = () => {
           <Button
             onClick={() => setIsSubmitted(false)}
             variant="outline"
-            className="w-full cursor-pointer rounded-full border-gray-300 py-3 font-semibold text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+            className="hover:bg-primary/2 w-full cursor-pointer rounded-full border-gray-300 py-3 font-semibold text-gray-700 transition-colors duration-200"
           >
             Send Another Email
           </Button>

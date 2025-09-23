@@ -37,7 +37,7 @@ const CompanyFilter = () => {
             <Badge
               key={id}
               variant="outline"
-              className="cursor-pointer rounded-full hover:bg-gray-50"
+              className="hover:bg-primary/2 cursor-pointer rounded-full"
             >
               {label}
             </Badge>

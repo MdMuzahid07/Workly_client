@@ -50,7 +50,7 @@ const ProfileView = () => {
   const [user, setUser] = useState(fakeUser);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-primary/2 min-h-screen">
       <div className="mx-auto max-w-6xl py-6 md:pt-24">
         <div className="mb-8 lg:hidden">
           <Card className="from-card to-muted/30 border-0 bg-gradient-to-br">

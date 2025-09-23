@@ -86,7 +86,7 @@ const CompanySettingsView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-primary/2 min-h-screen">
       <DashboardCompanySettingsHeader
         handleSaveSettings={handleSaveSettings}
         isSaving={isSaving}

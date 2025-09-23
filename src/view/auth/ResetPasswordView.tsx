@@ -49,7 +49,7 @@ const ResetPasswordView = () => {
 
   return (
     <main className="bg-primary/10 flex min-h-[calc(100dvh-64px)] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-[425px] rounded-3xl border border-gray-200 bg-gray-50 p-6">
+      <div className="bg-primary/2 w-full max-w-[425px] rounded-3xl border border-gray-200 p-6">
         <div className="space-y-3">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             {isSubmitted ? (

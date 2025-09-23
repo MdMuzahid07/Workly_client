@@ -221,7 +221,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center justify-between px-4 py-3 text-sm text-gray-700 transition-all duration-150 hover:bg-gray-50/80 focus:bg-gray-50/80 focus:outline-none"
+                  className="group hover:bg-primary/2/80 focus:bg-primary/2/80 flex items-center justify-between px-4 py-3 text-sm text-gray-700 transition-all duration-150 focus:outline-none"
                   role="menuitem"
                   onClick={() => setIsOpen(false)}
                 >
