@@ -104,9 +104,13 @@ const NotificationCard = ({
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-40 space-y-3 rounded-2xl bg-white p-4 shadow"
+                  >
                     {!notification.isRead && (
                       <DropdownMenuItem
+                        className="flex cursor-pointer items-center gap-2"
                         onClick={() => markAsRead(notification.id)}
                       >
                         <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -114,8 +118,8 @@ const NotificationCard = ({
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
+                      className="text-destructive flex cursor-pointer items-center gap-2"
                       onClick={() => deleteNotification(notification.id)}
-                      className="text-destructive"
                     >
                       <X className="mr-2 h-4 w-4" />
                       Delete
