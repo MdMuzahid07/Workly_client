@@ -42,7 +42,7 @@ const LandingView = () => {
               land your next great role.
             </p>
           </motion.div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 w-full bg-gradient-to-b from-transparent to-green-50 select-none dark:to-black" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 w-full bg-gradient-to-b from-transparent to-[#E3EDE2] select-none dark:to-black" />
           <div className="absolute top-[10rem] right-0 left-0 z-10 h-[300px] w-full sm:-bottom-20 md:h-full">
             <Suspense
               fallback={
@@ -72,7 +72,7 @@ const LandingView = () => {
             {features.map((feature, index) => (
               <div key={index} className="group cursor-pointer text-center">
                 <div className="group-hover:bg-primary bg-primary/10 mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-110">
-                  <feature.icon className="text-foreground h-10 w-10" />
+                  <feature.icon className="text-foreground group-hover:text-card h-10 w-10" />
                 </div>
                 <h3 className="text-foreground mb-2 text-lg font-bold text-balance">
                   {feature.title}
