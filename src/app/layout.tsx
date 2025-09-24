@@ -35,7 +35,14 @@ export default function RootLayout({
             <AuthDialogProvider>{children}</AuthDialogProvider>
           </ReduxProvider>
         </ThemeProvider>
-        <Toaster />
+        <Toaster
+          position="bottom-center"
+          expand={true}
+          richColors
+          closeButton
+          theme="light"
+          duration={3000}
+        />
       </body>
     </html>
   );
