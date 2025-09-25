@@ -109,9 +109,9 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           onClick={toggleDropdown}
           variant="ghost"
           size="sm"
-          className={`group ring-primary/50 relative flex cursor-pointer items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 transition-all duration-200 ${
+          className={`group ring-primary/50 bg-card relative flex cursor-pointer items-center gap-2 rounded-full border-none p-1 ring-2 transition-all duration-200 ${
             isOpen
-              ? "focus:ring-primary hover:bg-primary hover:text-card bg-gray-100/80 focus:ring-2"
+              ? "focus:ring-primary hover:bg-primary hover:text-card bg-card focus:ring-2"
               : ""
           }`}
           aria-expanded={isOpen}
@@ -174,7 +174,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
               duration: 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className={`z-50 overflow-hidden rounded-2xl border bg-white drop-shadow-2xl ${
+            className={`bg-card z-50 overflow-hidden rounded-2xl border drop-shadow-2xl ${
               isMobile
                 ? "absolute right-0 bottom-full mb-4 h-fit min-h-[65vh] w-full max-w-[82.5vw] min-w-[84vw]"
                 : "absolute top-full right-0 mt-8 w-72"

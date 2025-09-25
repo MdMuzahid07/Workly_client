@@ -23,7 +23,7 @@ const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
   };
 
   return (
-    <Card className="border-0 bg-white">
+    <Card className="bg-card border-0">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold">
           Skills & Expertise

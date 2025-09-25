@@ -26,7 +26,7 @@ const ProfileSidebar = ({
 }) => {
   return (
     <div className="hidden space-y-6 lg:col-span-4 lg:block">
-      <Card className="rounded-2xl bg-white">
+      <Card className="bg-card rounded-2xl">
         <CardContent className="p-8">
           <div className="flex flex-col items-center space-y-6 text-center">
             <Avatar className="ring-primary/20 h-32 w-32 rounded-full shadow-xl ring-4">

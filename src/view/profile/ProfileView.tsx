@@ -117,7 +117,7 @@ const ProfileView = () => {
             <SkillsAndExpertise skills={user.profile.skills} />
             <JobPreference preferences={user.profile.preference} />
 
-            <Card className="border-0 bg-white">
+            <Card className="bg-card border-0">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-xl font-semibold">
                   <Briefcase className="text-primary mr-3 h-6 w-6" />
