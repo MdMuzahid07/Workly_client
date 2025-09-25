@@ -9,7 +9,7 @@ const CompanyCard = ({ company }: any) => {
   return (
     <Card
       key={company.id}
-      className="bg-primary/2 cursor-pointer rounded-2xl sm:bg-white"
+      className="bg-primary/2 sm:bg-card cursor-pointer rounded-2xl"
     >
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">

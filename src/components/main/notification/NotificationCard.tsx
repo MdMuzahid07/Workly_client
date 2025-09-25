@@ -28,7 +28,7 @@ const NotificationCard = ({
   return (
     <Card
       key={notification.id}
-      className={`bg-white transition-all ${
+      className={`bg-card transition-all ${
         !notification.isRead ? "ring-primary/20 bg-primary/5 ring-2" : ""
       }`}
     >
