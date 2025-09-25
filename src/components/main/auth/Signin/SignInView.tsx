@@ -24,7 +24,7 @@ interface SignInFormData {
 const SignInView = () => {
   const { switchView, closeAuth } = useAuthDialog();
   const [showPassword, setShowPassword] = useState(false);
-  const [loginUser] = useLoginUserMutation();
+  const [loginUser, { isLoading }] = useLoginUserMutation();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -120,9 +120,10 @@ const SignInView = () => {
           <div className="space-y-4">
             <Button
               type="submit"
+              disabled={isLoading}
               className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
 
             <div className="text-center">
