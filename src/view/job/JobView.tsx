@@ -148,7 +148,7 @@ const JobView = () => {
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">
         <div className="col-span-12 md:col-span-4">
           <div className="sticky top-24 hidden md:flex">
-            <ScrollArea className="h-[87dvh] w-full">
+            <ScrollArea className="h-[87dvh] w-full rounded-2xl">
               {
                 //@ts-ignore
                 <SidebarFilter className="w-full" />
