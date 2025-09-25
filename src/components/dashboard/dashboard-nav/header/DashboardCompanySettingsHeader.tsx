@@ -9,7 +9,7 @@ const DashboardCompanySettingsHeader = ({
   isSaving: boolean;
 }) => {
   return (
-    <header className="bg-card border-b">
+    <header className="bg-card sticky top-0 border-b">
       <div className="flex h-18 items-center justify-between px-6">
         <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

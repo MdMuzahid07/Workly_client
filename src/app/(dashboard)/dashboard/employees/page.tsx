@@ -1,4 +1,4 @@
-import EmployeeManagementView from "../../../../../view/dashboard/EmployeeManagementView";
+import EmployeeManagementView from "../../../../view/dashboard/EmployeeManagementView";
 
 const page = () => {
   return (

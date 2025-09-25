@@ -1,4 +1,4 @@
-import CompanySettingView from "../../../../../view/dashboard/CompanySettingView";
+import CompanySettingView from "../../../../view/dashboard/CompanySettingView";
 
 const page = () => {
   return (

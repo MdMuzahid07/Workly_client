@@ -70,20 +70,20 @@ const DashboardSidebar = () => {
         {
           icon: Users,
           label: "Employees",
-          value: "/dashboard/company/employees",
+          value: "/dashboard/employees",
           active: activeItem === "Employees",
           badge: "250",
         },
         {
           icon: FileText,
           label: "Applications",
-          value: "",
+          value: "/dashboard/applications",
           active: activeItem === "Applications",
           badge: "156",
         },
         {
           icon: UserCheck,
-          value: "",
+          value: "/dashboard/hiring-pipeline",
           label: "Hiring Pipeline",
           active: activeItem === "Hiring Pipeline",
         },
@@ -149,7 +149,7 @@ const DashboardSidebar = () => {
     {
       icon: Settings,
       label: "Settings",
-      value: "/dashboard/company/settings",
+      value: "/dashboard/settings",
       active: activeItem === "Settings",
     },
   ];

@@ -1,4 +1,4 @@
-import ManageCompanyProfileView from "../../../../../view/dashboard/ManageCompanyProfileView";
+import ManageCompanyProfileView from "../../../../view/dashboard/ManageCompanyProfileView";
 
 const page = () => {
   return (
