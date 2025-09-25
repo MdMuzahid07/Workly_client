@@ -86,7 +86,7 @@ const CompanyDashboardView = () => {
       <div className="container mx-auto space-y-6 px-4 sm:px-6 sm:py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-          <Card className="bg-white">
+          <Card className="bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Total Jobs
@@ -103,7 +103,7 @@ const CompanyDashboardView = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Active Jobs
@@ -118,7 +118,7 @@ const CompanyDashboardView = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Applications
@@ -133,7 +133,7 @@ const CompanyDashboardView = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Employees
@@ -151,7 +151,7 @@ const CompanyDashboardView = () => {
 
         {/* Recent Activity */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <Card className="bg-white">
+          <Card className="bg-card">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">
                 Recent Job Postings
@@ -188,7 +188,7 @@ const CompanyDashboardView = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-card">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">
                 Recent Employees

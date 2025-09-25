@@ -8,7 +8,7 @@ const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
     <header className="bg-card border-b">
       <div className="flex h-18 items-center justify-between px-6">
         <div className="flex min-w-0 flex-1 items-center space-x-3 sm:space-x-4">
-          <Avatar className="h-10 w-10 flex-shrink-0 rounded-full bg-slate-100 sm:h-12 sm:w-12">
+          <Avatar className="bg-card h-10 w-10 flex-shrink-0 rounded-full sm:h-12 sm:w-12">
             <AvatarImage
               src={companyData.logo || "/placeholder.svg"}
               alt={companyData.name}

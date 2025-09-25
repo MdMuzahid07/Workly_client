@@ -106,7 +106,7 @@ const NotificationCard = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-40 space-y-3 rounded-2xl bg-white p-4 shadow"
+                    className="bg-card w-40 space-y-3 rounded-2xl p-4 shadow"
                   >
                     {!notification.isRead && (
                       <DropdownMenuItem
