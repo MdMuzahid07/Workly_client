@@ -10,7 +10,7 @@ const MainFooter = () => {
             <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
               <span className="text-lg font-bold text-white">W</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">Workly_job</span>
+            <span className="text-accent text-2xl font-bold">Workly_job</span>
           </div>
           <p className="mb-6 max-w-sm text-gray-600">
             The {`world's`} largest professional network. Connect, learn, and
@@ -22,7 +22,7 @@ const MainFooter = () => {
               <a
                 key={idx}
                 href={social.href}
-                className="hover:bg-primary flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-all hover:text-white"
+                className="hover:bg-primary bg-card flex h-10 w-10 items-center justify-center rounded-full transition-all hover:text-white"
               >
                 {social.icon}
               </a>
@@ -32,7 +32,7 @@ const MainFooter = () => {
 
         {footerLinks.map((section) => (
           <div key={section.title}>
-            <h4 className="mb-4 font-bold text-gray-900">{section.title}</h4>
+            <h4 className="text-accent mb-4 font-bold">{section.title}</h4>
             <ul className="space-y-3">
               {section.links.map((link) => (
                 <li key={link.name}>
