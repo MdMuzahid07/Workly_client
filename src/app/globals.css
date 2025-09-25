@@ -117,7 +117,7 @@
   --background: oklch(0.08 0.01 120); /* Very dark with subtle green */
   --foreground: oklch(0.95 0.01 120); /* Light with green tint */
 
-  --card: oklch(0.12 0.01 120); /* Dark card background */
+  --card: oklch(17.959% 0.02188 120.952); /* Dark card background */
   --card-foreground: oklch(0.95 0.01 120);
 
   --popover: oklch(0.12 0.01 120);
