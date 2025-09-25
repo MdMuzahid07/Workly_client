@@ -141,7 +141,7 @@ const Industries = () => {
             <SwiperSlide key={category.id} className="!w-auto">
               <Button
                 onClick={() => toggleSelection(category.id)}
-                className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground hover:bg-white"}`}
+                className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground dark:hover:bg-card hover:bg-white"}`}
               >
                 {
                   <category.icon
