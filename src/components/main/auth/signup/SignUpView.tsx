@@ -27,7 +27,7 @@ interface SignUpFormData {
 const SignUpView = () => {
   const { switchView, closeAuth } = useAuthDialog();
   const dispatch = useAppDispatch();
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
@@ -195,10 +195,11 @@ const SignUpView = () => {
 
           <div className="space-y-4">
             <Button
+              disabled={isLoading}
               type="submit"
               className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
-              Create Account
+              {isLoading ? "Signing Up..." : "Sign Up"}
             </Button>
           </div>
         </div>

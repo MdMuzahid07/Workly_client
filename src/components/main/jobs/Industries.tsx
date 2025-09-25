@@ -1,7 +1,4 @@
 "use client";
-import { Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-// import Swiper and modules styles
 import {
   Award,
   ChevronLeft,
@@ -14,9 +11,11 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
+import { Navigation } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Button } from "../../ui/button";
 
 const jobCategories = [
@@ -111,6 +110,18 @@ const jobCategories = [
 ];
 
 const Industries = () => {
+  const [selected, setSelected] = useState<number[]>([]);
+
+  console.log("Selected industries:", selected);
+
+  const toggleSelection = (id: number) => {
+    setSelected((prev) =>
+      prev.includes(id)
+        ? prev.filter((industryId: number) => industryId !== id)
+        : [...prev, id],
+    );
+  };
+
   return (
     <div className="mx-auto mt-4 max-w-7xl p-4 md:mt-7 xl:p-0">
       <Swiper
@@ -123,19 +134,30 @@ const Industries = () => {
         }}
         className="category-slider-2 flex w-full justify-center"
       >
-        {jobCategories.map((category) => (
-          <SwiperSlide key={category.id} className="!w-auto">
-            <Button
-              variant="outline"
-              className="hover:bg-primary group text-foreground bg-card h-auto cursor-pointer rounded-full px-6 py-2 whitespace-nowrap transition-colors hover:text-white"
-            >
-              {category.title}
-              <p className="text-foreground ml-2 text-xs group-hover:text-white">
-                {category.count.split(" ")[0]}
-              </p>
-            </Button>
-          </SwiperSlide>
-        ))}
+        {jobCategories.map((category) => {
+          const isSelected = selected?.includes(category.id);
+
+          return (
+            <SwiperSlide key={category.id} className="!w-auto">
+              <Button
+                onClick={() => toggleSelection(category.id)}
+                className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground hover:bg-white"}`}
+              >
+                {
+                  <category.icon
+                    className={`h-5 w-5 rounded-full p-0.5 ${category.color} text-white`}
+                  />
+                }
+                {category.title}
+                <p
+                  className={`text-foreground ml-2 text-xs ${isSelected ? "text-white" : ""}`}
+                >
+                  {category.count.split(" ")[0]}
+                </p>
+              </Button>
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
 
       <div className="mt-4 flex items-center justify-between">
