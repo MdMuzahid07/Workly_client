@@ -137,7 +137,7 @@ const EditProfileDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[90vh] max-h-[900px] w-[95vw] max-w-4xl p-0">
+      <DialogContent className="bg-card h-[90dvh] max-h-[900px] w-[95dvw] max-w-4xl p-0 md:h-[80dvh]">
         <DialogHeader className="border-border border-b p-6 pb-4">
           <DialogTitle className="text-foreground text-2xl font-bold">
             Edit Profile

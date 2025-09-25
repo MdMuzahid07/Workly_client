@@ -27,7 +27,7 @@ const MobileAppRecommend = () => {
               </Button>
             </HoverHint>
 
-            <HoverHint hint="Click to download the android app">
+            <HoverHint hint="Coming soon">
               <Button className="bg-primary flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-xs text-white hover:bg-gray-800">
                 <svg
                   className="h-6 w-6"
