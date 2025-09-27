@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -11,6 +10,7 @@ import { logout } from "../../../redux/feature/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ThemeSwitcher from "../ThemeSwitcher";
+import WJLogo from "../WJLogo";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
@@ -58,16 +58,7 @@ const Navbar = () => {
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
       >
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 sm:h-18">
-          <Link href="/" className="text-foreground text-xl font-bold">
-            <Image
-              src="/logo/workly_job-logo.png"
-              alt="Workly Job Logo"
-              width={50}
-              height={30}
-              className="h-8 w-auto"
-              priority
-            />
-          </Link>
+          <WJLogo />
           {user && user.email ? (
             <div className="hidden items-center gap-8 md:flex">
               {navLinks.map((item, i) => (
