@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -58,7 +59,14 @@ const Navbar = () => {
       >
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 sm:h-18">
           <Link href="/" className="text-foreground text-xl font-bold">
-            Workly_job
+            <Image
+              src="/logo/workly_job-logo.png"
+              alt="Workly Job Logo"
+              width={50}
+              height={30}
+              className="h-8 w-auto"
+              priority
+            />
           </Link>
           {user && user.email ? (
             <div className="hidden items-center gap-8 md:flex">

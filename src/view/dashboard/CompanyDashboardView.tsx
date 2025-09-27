@@ -9,19 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Briefcase,
-  Building2,
-  Edit3,
-  Eye,
-  Plus,
-  Settings,
-  TrendingUp,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { Briefcase, Eye, TrendingUp, UserPlus, Users } from "lucide-react";
 import DashboardOverviewHeader from "../../components/dashboard/dashboard-nav/header/DashboardOverviewHeader";
-import { Tabs, TabsContent } from "../../components/ui/tabs";
 
 const CompanyDashboardView = () => {
   // fake data
@@ -244,117 +233,6 @@ const CompanyDashboardView = () => {
             </CardContent>
           </Card>
         </div>
-
-        <Tabs defaultValue="jobs" className="w-full">
-          <TabsContent value="jobs">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Job Management
-                </CardTitle>
-                <CardDescription>
-                  Manage your job postings and applications
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <Briefcase className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
-                  <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
-                    Job Management
-                  </h3>
-                  <p className="text-muted-foreground mb-4 px-4 text-sm">
-                    Create and manage your job postings from here
-                  </p>
-                  <Button className="w-full sm:w-auto">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create New Job
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="employees">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Employee Management
-                </CardTitle>
-                <CardDescription>
-                  Manage your team members and their roles
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <Users className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
-                  <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
-                    Employee Management
-                  </h3>
-                  <p className="text-muted-foreground mb-4 px-4 text-sm">
-                    Add and manage your team members
-                  </p>
-                  <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-                    <Button asChild className="w-full sm:w-auto">
-                      <a href="/dashboard/company/employees">
-                        <Users className="mr-2 h-4 w-4" />
-                        Manage Employees
-                      </a>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full bg-transparent sm:w-auto"
-                    >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Add Employee
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Company Profile
-                </CardTitle>
-                <CardDescription>
-                  Update your company information and settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <Building2 className="text-muted-foreground mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
-                  <h3 className="text-foreground mb-2 text-base font-medium sm:text-lg">
-                    Company Profile
-                  </h3>
-                  <p className="text-muted-foreground mb-4 px-4 text-sm">
-                    Manage your company profile and public information
-                  </p>
-                  <div className="flex flex-col justify-center space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-                    <Button asChild className="w-full sm:w-auto">
-                      <a href="/dashboard/company/profile">
-                        <Edit3 className="mr-2 h-4 w-4" />
-                        Edit Profile
-                      </a>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      asChild
-                      className="w-full bg-transparent sm:w-auto"
-                    >
-                      <a href="/dashboard/company/settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );

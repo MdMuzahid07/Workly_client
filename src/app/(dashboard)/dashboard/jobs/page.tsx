@@ -1,5 +1,11 @@
+import DashboardJobManagementView from "../../../../view/dashboard/DashboardJobManagementView";
+
 const page = () => {
-  return <div>page</div>;
+  return (
+    <>
+      <DashboardJobManagementView />
+    </>
+  );
 };
 
 export default page;
