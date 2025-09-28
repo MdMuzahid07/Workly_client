@@ -4,7 +4,7 @@ const jobApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createJob: builder.mutation({
       query: (data) => ({
-        url: "/jobs",
+        url: "/job/create",
         method: "POST",
         body: data,
       }),
@@ -12,7 +12,7 @@ const jobApi = baseApi.injectEndpoints({
 
     getJobs: builder.query({
       query: () => ({
-        url: "/jobs",
+        url: "/job/jobs",
         method: "GET",
       }),
     }),
@@ -26,7 +26,7 @@ const jobApi = baseApi.injectEndpoints({
 
     updateJob: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/jobs/${id}`,
+        url: `/job/update/${id}`,
         method: "PATCH",
         body: data,
       }),
@@ -34,7 +34,7 @@ const jobApi = baseApi.injectEndpoints({
 
     deleteJob: builder.mutation({
       query: (id: string) => ({
-        url: `/jobs/${id}`,
+        url: `/job/delete/${id}`,
         method: "DELETE",
       }),
     }),
