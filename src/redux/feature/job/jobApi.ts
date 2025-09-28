@@ -9,8 +9,43 @@ const jobApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+
+    getJobs: builder.query({
+      query: () => ({
+        url: "/jobs",
+        method: "GET",
+      }),
+    }),
+
+    getJobById: builder.query({
+      query: (id: string) => ({
+        url: `/jobs/${id}`,
+        method: "GET",
+      }),
+    }),
+
+    updateJob: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/jobs/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
+
+    deleteJob: builder.mutation({
+      query: (id: string) => ({
+        url: `/jobs/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useCreateJobMutation } = jobApi;
+export const {
+  useCreateJobMutation,
+  useGetJobsQuery,
+  useGetJobByIdQuery,
+  useUpdateJobMutation,
+  useDeleteJobMutation,
+} = jobApi;
 export default jobApi;
