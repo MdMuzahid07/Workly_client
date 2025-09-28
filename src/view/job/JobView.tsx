@@ -40,19 +40,20 @@ const JobView = () => {
           <div className="flex flex-col md:gap-4">
             {isLoading &&
               [...Array(6)].map((_, index) => <JobCardSkeleton key={index} />)}
+
             {error && (
               <div className="text-center text-red-500">
                 Something went wrong, please try again later.
               </div>
             )}
-            {data && data.jobs.length === 0 && (
+            {data && data?.data?.length === 0 && (
               <div className="text-center">No jobs found.</div>
             )}
             {data &&
               data?.data?.map((job: any) => (
                 //@ts-ignore
                 <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
-                  <JobCard key={job?.id} {...job} />
+                  <JobCard key={job?.id} job={job} />
                 </Suspense>
               ))}
           </div>

@@ -9,31 +9,25 @@ import {
 import { Clock, DollarSign, ExternalLink, Heart, MapPin } from "lucide-react";
 import { Badge } from "../../ui/badge";
 
-interface JobCardProps {
-  title: string;
-  company: string;
-  location: string;
-  budget: string;
-  budgetType: "fixed" | "hourly";
-  timePosted: string;
-  description: string;
-  skills: string[];
-  isUrgent?: boolean;
-  isFeatured?: boolean;
+interface JobProps {
+  job: {
+    id: string;
+    title: string;
+    company: { name: string };
+    location: string;
+    salaryMin: number;
+    salaryMax: number;
+    currency: string;
+    jobType: string;
+    createdAt: string;
+    requirements: string;
+    JobSkill: Array<{ id: string; skillName: string }>;
+    isFeatured: boolean;
+    isRemote: boolean;
+  };
 }
 
-const JobCard = ({
-  title,
-  company,
-  location,
-  budget,
-  budgetType,
-  timePosted,
-  description,
-  skills,
-  isUrgent = false,
-  isFeatured = false,
-}: JobCardProps) => {
+const JobCard = ({ job }: JobProps) => {
   return (
     <Card
       className={`bg-primary/2 sm:bg-card w-full rounded-2xl border-0 shadow-none drop-shadow-none transition-all duration-200`}
@@ -42,7 +36,7 @@ const JobCard = ({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex items-center gap-2">
-              {isFeatured && (
+              {job?.isFeatured && (
                 <Badge
                   variant="secondary"
                   className="rounded-full text-xs font-medium"
@@ -50,28 +44,28 @@ const JobCard = ({
                   Featured
                 </Badge>
               )}
-              {isUrgent && (
+              {job?.isRemote && (
                 <Badge
                   variant="destructive"
                   className="rounded-full text-xs font-medium"
                 >
-                  Urgent
+                  Remote
                 </Badge>
               )}
             </div>
             <h3 className="text-foreground mb-2 text-lg leading-tight font-semibold text-balance">
-              {title}
+              {job?.title}
             </h3>
             <div className="text-muted-foreground flex flex-col gap-2 text-sm sm:flex-row sm:items-center">
-              <span className="font-medium">{company}</span>
+              <span className="font-medium">{job?.company?.name}</span>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
-                  <span>{location}</span>
+                  <span>{job?.location}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  <span>{timePosted}</span>
+                  <span>{new Date(job?.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -83,29 +77,25 @@ const JobCard = ({
         <div className="mb-4 flex items-center gap-2">
           <DollarSign className="text-primary h-4 w-4" />
           <span className="text-foreground text-lg font-semibold">
-            {budget}
+            {job?.currency} {job?.salaryMin} - {job?.salaryMax}
           </span>
           <span className="text-muted-foreground text-sm">
-            {budgetType === "hourly" ? "/hour" : "fixed price"}
+            {job?.jobType === "hourly" ? "/hour" : "fixed price"}
           </span>
         </div>
 
         <p className="text-foreground mb-4 text-sm leading-relaxed text-pretty">
-          {description}
+          {job?.requirements}
         </p>
 
         <div className="flex flex-wrap gap-2">
-          {skills?.map((skill) => (
+          {job?.JobSkill?.map((skill) => (
             <Badge
-              key={
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                //@ts-ignore
-                skill.id
-              }
+              key={skill.id}
               variant="outline"
               className="bg-muted/50 hover:bg-muted rounded-full text-xs font-normal"
             >
-              {skill}
+              {skill.skillName}
             </Badge>
           ))}
         </div>
