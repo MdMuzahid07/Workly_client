@@ -1,146 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
+import { Suspense } from "react";
 import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
 import { ScrollArea } from "../../components/ui/scroll-area";
-
-// fake data
-const jobs = [
-  {
-    title: "Frontend Developer",
-    company: "TechHive Solutions",
-    location: "Dhaka, Bangladesh",
-    budget: "1200",
-    budgetType: "fixed",
-    timePosted: "2 hours ago",
-    description:
-      "We are looking for a React.js developer to build scalable and interactive web applications.",
-    skills: ["React", "TypeScript", "Tailwind CSS"],
-    isUrgent: true,
-    isFeatured: true,
-  },
-  {
-    title: "Backend Engineer",
-    company: "CloudBridge Ltd",
-    location: "Remote",
-    budget: "25",
-    budgetType: "hourly",
-    timePosted: "1 day ago",
-    description:
-      "Seeking an experienced Node.js developer with expertise in PostgreSQL and Prisma.",
-    skills: ["Node.js", "Prisma", "PostgreSQL", "REST APIs"],
-    isUrgent: false,
-    isFeatured: true,
-  },
-  {
-    title: "UI/UX Designer",
-    company: "PixelCraft Studio",
-    location: "London, UK",
-    budget: "800",
-    budgetType: "fixed",
-    timePosted: "5 hours ago",
-    description:
-      "Design intuitive user experiences for web and mobile platforms.",
-    skills: ["Figma", "Adobe XD", "Wireframing", "Prototyping"],
-    isUrgent: true,
-    isFeatured: false,
-  },
-  {
-    title: "Mobile App Developer",
-    company: "AppNation",
-    location: "San Francisco, USA",
-    budget: "30",
-    budgetType: "hourly",
-    timePosted: "3 days ago",
-    description:
-      "Hiring React Native developers to build cross-platform mobile applications.",
-    skills: ["React Native", "Expo", "Redux", "Firebase"],
-    isUrgent: false,
-    isFeatured: true,
-  },
-  {
-    title: "Full Stack Developer",
-    company: "CodeWave Technologies",
-    location: "Berlin, Germany",
-    budget: "2000",
-    budgetType: "fixed",
-    timePosted: "6 hours ago",
-    description:
-      "We need a full stack engineer to work on a SaaS product using MERN stack.",
-    skills: ["MongoDB", "Express.js", "React", "Node.js"],
-    isUrgent: true,
-    isFeatured: true,
-  },
-  {
-    title: "Data Analyst",
-    company: "Insight Analytics",
-    location: "Toronto, Canada",
-    budget: "20",
-    budgetType: "hourly",
-    timePosted: "12 hours ago",
-    description:
-      "Analyze business data and build visual dashboards for better insights.",
-    skills: ["SQL", "Power BI", "Python", "Excel"],
-    isUrgent: false,
-    isFeatured: false,
-  },
-  {
-    title: "DevOps Engineer",
-    company: "NextGen Cloud",
-    location: "Remote",
-    budget: "1500",
-    budgetType: "fixed",
-    timePosted: "2 days ago",
-    description:
-      "Looking for DevOps experts to optimize CI/CD pipelines and cloud deployments.",
-    skills: ["AWS", "Docker", "Kubernetes", "CI/CD"],
-    isUrgent: true,
-    isFeatured: false,
-  },
-  {
-    title: "QA Tester",
-    company: "QualityWorks",
-    location: "Sydney, Australia",
-    budget: "18",
-    budgetType: "hourly",
-    timePosted: "8 hours ago",
-    description: "Manual and automated testing for web applications.",
-    skills: ["Selenium", "Cypress", "Jest", "Manual Testing"],
-    isUrgent: false,
-    isFeatured: true,
-  },
-  {
-    title: "AI Engineer",
-    company: "NeuralNet Labs",
-    location: "New York, USA",
-    budget: "3000",
-    budgetType: "fixed",
-    timePosted: "1 week ago",
-    description:
-      "Work on cutting-edge AI and ML solutions for real-world problems.",
-    skills: ["Python", "TensorFlow", "PyTorch", "NLP"],
-    isUrgent: true,
-    isFeatured: true,
-  },
-  {
-    title: "Content Writer",
-    company: "WriteRight Media",
-    location: "Mumbai, India",
-    budget: "10",
-    budgetType: "hourly",
-    timePosted: "3 hours ago",
-    description:
-      "We need creative writers for blogs, social media, and product descriptions.",
-    skills: ["SEO", "Copywriting", "Content Strategy", "Research"],
-    isUrgent: false,
-    isFeatured: false,
-  },
-];
+import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
+import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
 
 const JobView = () => {
+  const { data, isLoading, error } = useGetJobsQuery(undefined);
+  console.log(data);
+
   return (
     <div className="bg-primary/2 pb-12">
       <Searchbar />
@@ -164,11 +38,23 @@ const JobView = () => {
         </div>
         <div className="col-span-12 md:col-span-8">
           <div className="flex flex-col md:gap-4">
-            {jobs.map((job, index) => (
-              //@ts-ignore
-              <JobCard key={index} {...job} />
-              // <JobCardSkeleton key={index} />
-            ))}
+            {isLoading &&
+              [...Array(6)].map((_, index) => <JobCardSkeleton key={index} />)}
+            {error && (
+              <div className="text-center text-red-500">
+                Something went wrong, please try again later.
+              </div>
+            )}
+            {data && data.jobs.length === 0 && (
+              <div className="text-center">No jobs found.</div>
+            )}
+            {data &&
+              data?.data?.map((job: any) => (
+                //@ts-ignore
+                <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
+                  <JobCard key={job?.id} {...job} />
+                </Suspense>
+              ))}
           </div>
         </div>
       </div>

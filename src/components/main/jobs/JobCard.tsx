@@ -95,9 +95,13 @@ const JobCard = ({
         </p>
 
         <div className="flex flex-wrap gap-2">
-          {skills.map((skill, index) => (
+          {skills?.map((skill) => (
             <Badge
-              key={index}
+              key={
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //@ts-ignore
+                skill.id
+              }
               variant="outline"
               className="bg-muted/50 hover:bg-muted rounded-full text-xs font-normal"
             >
