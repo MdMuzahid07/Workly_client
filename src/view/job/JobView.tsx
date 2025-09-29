@@ -13,7 +13,6 @@ import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
 
 const JobView = () => {
   const { data, isLoading, error } = useGetJobsQuery(undefined);
-  console.log(data);
 
   return (
     <div className="bg-primary/2 pb-12">
@@ -42,7 +41,7 @@ const JobView = () => {
               [...Array(6)].map((_, index) => <JobCardSkeleton key={index} />)}
 
             {error && (
-              <div className="text-center text-red-500">
+              <div className="text-destructive text-center">
                 Something went wrong, please try again later.
               </div>
             )}

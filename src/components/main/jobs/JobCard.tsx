@@ -7,6 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Clock, DollarSign, ExternalLink, Heart, MapPin } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Badge } from "../../ui/badge";
 
 interface JobProps {
@@ -28,6 +29,12 @@ interface JobProps {
 }
 
 const JobCard = ({ job }: JobProps) => {
+  const router = useRouter();
+
+  const navigateToDetails = (jobId: string) => {
+    router.push(`/jobs/${jobId}`);
+  };
+
   return (
     <Card
       className={`bg-primary/2 sm:bg-card w-full rounded-2xl border-0 shadow-none drop-shadow-none transition-all duration-200`}
@@ -111,6 +118,7 @@ const JobCard = ({ job }: JobProps) => {
               Apply Now
             </Button>
             <Button
+              onClick={() => navigateToDetails(job?.id)}
               size="sm"
               variant="outline"
               className="cursor-pointer rounded-full"
