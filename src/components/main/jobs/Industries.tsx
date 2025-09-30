@@ -84,7 +84,7 @@ const jobCategories = [
     description: "Work from anywhere",
   },
   {
-    id: 6,
+    id: 9,
     title: "Sales",
     icon: Users,
     count: "1,234 jobs",
@@ -92,7 +92,7 @@ const jobCategories = [
     description: "B2B, Retail, Account Management",
   },
   {
-    id: 7,
+    id: 10,
     title: "Education",
     icon: Award,
     count: "654 jobs",
@@ -100,7 +100,7 @@ const jobCategories = [
     description: "Teaching, Training, Research",
   },
   {
-    id: 8,
+    id: 11,
     title: "Remote",
     icon: Globe,
     count: "3,421 jobs",

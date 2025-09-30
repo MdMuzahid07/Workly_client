@@ -25,11 +25,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={` ${barlow.variable} antialiased`}>
+    <html
+      lang="en"
+      // fix theme style mismatch
+      suppressHydrationWarning
+    >
+      <body
+        className={` ${barlow.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="enableSystem"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
