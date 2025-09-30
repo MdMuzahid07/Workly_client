@@ -154,7 +154,7 @@ const JobDetailsSidebar = ({
         <CardContent className="p-6">
           <div className="space-y-3">
             <Button
-              className="bg-primary text-card w-full py-2.5 font-medium hover:bg-green-700"
+              className="bg-primary text-card w-full py-2.5 font-medium"
               onClick={handleApply}
               size="lg"
             >
