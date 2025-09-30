@@ -186,7 +186,7 @@ const JobDetailsSidebar = ({
 
           <Button
             variant="outline"
-            className="hover:bg-primary text-foreground mt-4 w-full border-gray-300"
+            className="dark:hover:bg-primary text-foreground dark:text-light mt-4 w-full border-gray-300"
             onClick={handleViewCompany}
           >
             <Users className="mr-2 h-4 w-4" />
