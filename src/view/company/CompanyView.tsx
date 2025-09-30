@@ -183,7 +183,10 @@ const CompanyView = () => {
 
   return (
     <div className="bg-primary/2 min-h-screen">
-      <Searchbar onSearch={handleSearch} />
+      <Searchbar
+        onSearch={handleSearch}
+        placeholder={{ search: "Company name", location: "Location" }}
+      />
       <CompanyFilter />
 
       {/* Main Content */}
