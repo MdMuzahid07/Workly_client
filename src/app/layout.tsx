@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={` ${barlow.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="enableSystem"
           enableSystem
           disableTransitionOnChange
         >

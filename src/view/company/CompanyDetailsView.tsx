@@ -122,25 +122,20 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                     height={100}
                     src={company.logo || "/placeholder.svg"}
                     alt={`${company.name} logo`}
-                    className="h-20 w-20 rounded-full bg-slate-100 object-cover"
+                    className="bg-primary h-20 w-20 rounded-full object-cover object-center"
                   />
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <h1 className="text-3xl font-bold text-gray-900">
+                      <h1 className="text-foreground/90 text-3xl font-bold">
                         {company.name}
                       </h1>
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-100 text-blue-700"
-                      >
-                        Featured
-                      </Badge>
+                      <Badge variant="default">Featured</Badge>
                     </div>
-                    <p className="mb-4 text-lg text-gray-600">
+                    <p className="text-foreground/60 mb-4 text-lg">
                       {company.industry}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+                    <div className="text-foreground/60 flex flex-wrap items-center gap-6 text-sm">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
                         <span>{company.location}</span>
@@ -276,7 +271,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                           <h4 className="mb-1 font-medium text-gray-900">
                             {job.title}
                           </h4>
-                          <div className="mb-2 flex items-center gap-4 text-sm text-gray-600">
+                          <div className="text-foreground/60 mb-2 flex items-center gap-4 text-sm">
                             <span>{job.department}</span>
                             <span>•</span>
                             <span>{job.type}</span>

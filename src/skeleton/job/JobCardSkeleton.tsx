@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const JobCardSkeleton = () => {
   return (
-    <Card className="bg-primary/2 w-full rounded-2xl border-0 shadow-none drop-shadow-none sm:bg-white">
+    <Card className="bg-primary/2 sm:bg-card w-full rounded-2xl border-0 shadow-none drop-shadow-none">
       <CardHeader className="px-0 pb-3 md:px-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">

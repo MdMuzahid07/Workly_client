@@ -72,7 +72,7 @@ const SignInView = () => {
   };
 
   return (
-    <div>
+    <>
       <DialogHeader className="space-y-3">
         <DialogTitle className="text-center text-2xl font-bold text-gray-900">
           Welcome Back
@@ -152,7 +152,7 @@ const SignInView = () => {
           </Button>
         </p>
       </div>
-    </div>
+    </>
   );
 };
 

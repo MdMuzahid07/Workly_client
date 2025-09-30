@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,7 +6,9 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Clock, DollarSign, ExternalLink, Heart, MapPin } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
+import HoverHint from "../../shared/HoverHint";
 import { Badge } from "../../ui/badge";
 
 interface JobProps {
@@ -29,12 +30,6 @@ interface JobProps {
 }
 
 const JobCard = ({ job }: JobProps) => {
-  const router = useRouter();
-
-  const navigateToDetails = (jobId: string) => {
-    router.push(`/jobs/${jobId}`);
-  };
-
   return (
     <Card
       className={`bg-primary/2 sm:bg-card w-full rounded-2xl border-0 shadow-none drop-shadow-none transition-all duration-200`}
@@ -117,24 +112,30 @@ const JobCard = ({ job }: JobProps) => {
             >
               Apply Now
             </Button>
-            <Button
-              onClick={() => navigateToDetails(job?.id)}
-              size="sm"
-              variant="outline"
-              className="cursor-pointer rounded-full"
-            >
-              <ExternalLink className="mr-1 h-3 w-3" />
-              View Details
-            </Button>
+            <Link href={`/jobs/${job?.id}`}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="cursor-pointer rounded-full"
+              >
+                <ExternalLink className="mr-1 h-3 w-3" />
+                View Details
+              </Button>
+            </Link>
           </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="cursor-pointer rounded-full p-2"
-          >
-            <Heart className="h-4 w-4" />
-            <span className="sr-only">Save job</span>
-          </Button>
+          <HoverHint hint="Save job">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="cursor-pointer rounded-full p-2"
+              onClick={() => {
+                toast.error("Save job feature is not implemented yet.");
+              }}
+            >
+              <Heart className="h-4 w-4" />
+              <span className="sr-only">Save job</span>
+            </Button>
+          </HoverHint>
         </div>
       </CardFooter>
     </Card>

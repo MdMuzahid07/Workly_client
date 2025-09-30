@@ -1,5 +1,6 @@
 import { Globe, MapPin, Users } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Card, CardContent, CardHeader } from "../../ui/card";
@@ -16,7 +17,7 @@ const CompanyCard = ({ company }: any) => {
           <Image
             src={company.logo || "/placeholder.svg"}
             alt={`${company.name} logo`}
-            className="h-12 w-12 rounded-full bg-slate-300 object-cover"
+            className="bg-primary h-12 w-12 rounded-full object-cover object-center"
             width={100}
             height={100}
             priority
@@ -30,18 +31,18 @@ const CompanyCard = ({ company }: any) => {
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-gray-600">{company.industry}</p>
+            <p className="text-foreground/60 text-sm">{company.industry}</p>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="px-0 pt-0 sm:px-4">
         <div className="space-y-4">
-          <p className="line-clamp-2 text-sm leading-relaxed text-gray-700">
+          <p className="text-foreground/70 line-clamp-2 text-sm leading-relaxed">
             {company.description}
           </p>
 
-          <div className="space-y-2 text-sm text-gray-600">
+          <div className="text-foreground/60 space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span>{company.location}</span>
@@ -58,14 +59,16 @@ const CompanyCard = ({ company }: any) => {
 
           <div className="flex items-center justify-between border-b pt-4 pb-7 sm:border-t sm:border-b-0 sm:border-gray-100 sm:pb-0">
             <div className="text-sm">
-              <span className="font-medium text-green-600">
+              <span className="text-primary font-medium">
                 {company.openJobs}
               </span>
-              <span className="ml-1 text-gray-600">open jobs</span>
+              <span className="text-foreground/60 ml-1">open jobs</span>
             </div>
-            <Button variant="outline" size="sm">
-              View Company
-            </Button>
+            <Link href={`/companies/${company.id}`}>
+              <Button variant="outline" size="sm">
+                View Company
+              </Button>
+            </Link>
           </div>
         </div>
       </CardContent>
