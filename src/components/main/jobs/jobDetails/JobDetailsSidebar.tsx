@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Building2, Calendar, Eye, FileText, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
 // Types
@@ -84,6 +85,7 @@ const JobDetailsSidebar = ({
   onSave,
   onViewCompany,
 }: JobDetailsSidebarProps) => {
+  const router = useRouter();
   const companyName = job.company?.name || "Unknown Company";
   const industry = job.industry || job.company?.industry || "Not specified";
   const companySize = job.companySize || job.company?.size || "Not specified";
@@ -145,7 +147,8 @@ const JobDetailsSidebar = ({
 
   const handleViewCompany = () => {
     onViewCompany?.();
-    console.log("Viewing company:", job.company?.id);
+    // router.push(`/companies/${job.company?.id}`);
+    router.push(`/companies/1`);
   };
 
   return (
