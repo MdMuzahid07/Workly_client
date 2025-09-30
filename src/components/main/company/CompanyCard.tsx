@@ -8,10 +8,7 @@ import { Card, CardContent, CardHeader } from "../../ui/card";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CompanyCard = ({ company }: any) => {
   return (
-    <Card
-      key={company.id}
-      className="bg-primary/2 sm:bg-card cursor-pointer rounded-2xl"
-    >
+    <Card key={company.id} className="bg-primary/2 sm:bg-card rounded-2xl">
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">
           <Image
@@ -57,7 +54,7 @@ const CompanyCard = ({ company }: any) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-b pt-4 pb-7 sm:border-t sm:border-b-0 sm:border-gray-100 sm:pb-0">
+          <div className="dark:sm:border-accent/50 flex items-center justify-between border-b pt-4 pb-7 sm:border-t sm:border-b-0 sm:border-gray-100 sm:pb-0">
             <div className="text-sm">
               <span className="text-primary font-medium">
                 {company.openJobs}
@@ -65,7 +62,11 @@ const CompanyCard = ({ company }: any) => {
               <span className="text-foreground/60 ml-1">open jobs</span>
             </div>
             <Link href={`/companies/${company.id}`}>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="dark:hover:bg-primary dark:hover:text-white"
+              >
                 View Company
               </Button>
             </Link>

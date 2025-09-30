@@ -116,7 +116,7 @@ const JobCard = ({ job }: JobProps) => {
               <Button
                 size="sm"
                 variant="outline"
-                className="cursor-pointer rounded-full"
+                className="dark:hover:bg-primary dark:hover:text-background cursor-pointer rounded-full"
               >
                 <ExternalLink className="mr-1 h-3 w-3" />
                 View Details
