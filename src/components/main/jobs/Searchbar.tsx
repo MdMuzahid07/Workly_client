@@ -4,16 +4,45 @@ import { useState } from "react";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
-const Searchbar = () => {
-  const [searchData, setSearchData] = useState({ search: "", location: "" });
+interface searchbarProps {
+  onSearch: (searchData: { search: string; location: string }) => void;
+  initialSearch?: string;
+  initialLocation?: string;
+  placeholder?: {
+    search?: string;
+    location?: string;
+  };
+}
+
+const Searchbar = ({
+  onSearch,
+  initialSearch,
+  initialLocation,
+  placeholder = {
+    search: "Job title or company",
+    location: "Location",
+  },
+}: searchbarProps) => {
+  const [searchData, setSearchData] = useState({
+    search: initialSearch || "",
+    location: initialLocation || "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchData);
+  };
 
   return (
     <div className="mx-auto w-full max-w-2xl p-4 md:pt-24">
-      <form className="bg-card flex flex-col gap-2 rounded-2xl border border-gray-200 p-2 shadow-sm sm:flex-row sm:rounded-full">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-card flex flex-col gap-2 rounded-2xl border border-gray-200 p-2 shadow-sm sm:flex-row sm:rounded-full"
+      >
         <div className="relative flex-1">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input
-            placeholder="Job title or company"
+            placeholder={placeholder.search}
             value={searchData.search}
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, search: e.target.value }))
@@ -25,7 +54,7 @@ const Searchbar = () => {
         <div className="relative flex-1">
           <MapPin className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input
-            placeholder="City"
+            placeholder={placeholder.location}
             value={searchData.location}
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, location: e.target.value }))

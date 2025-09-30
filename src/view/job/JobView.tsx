@@ -14,9 +14,13 @@ import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
 const JobView = () => {
   const { data, isLoading, error } = useGetJobsQuery(undefined);
 
+  const handleSearch = (searchData: { search: string; location: string }) => {
+    console.log(searchData);
+  };
+
   return (
     <div className="bg-primary/2 pb-12">
-      <Searchbar />
+      <Searchbar onSearch={handleSearch} />
       <Industries />
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">
         <div className="col-span-12 md:col-span-4">

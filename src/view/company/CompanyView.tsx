@@ -177,9 +177,13 @@ const companies = [
 ];
 
 const CompanyView = () => {
+  const handleSearch = (searchData: { search: string; location: string }) => {
+    console.log(searchData);
+  };
+
   return (
     <div className="bg-primary/2 min-h-screen">
-      <Searchbar />
+      <Searchbar onSearch={handleSearch} />
       <CompanyFilter />
 
       {/* Main Content */}
