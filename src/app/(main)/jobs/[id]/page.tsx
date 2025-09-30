@@ -1,9 +1,9 @@
 import JobDetailsView from "../../../../view/job/JobDetailsView";
 
-const page = ({ params }: { params: { id: string } }) => {
+const page = () => {
   return (
     <>
-      <JobDetailsView params={params} />
+      <JobDetailsView />
     </>
   );
 };

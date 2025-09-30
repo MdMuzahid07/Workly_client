@@ -1,94 +1,234 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@radix-ui/react-select";
+import { Separator } from "@/components/ui/separator";
+import { Building2, Calendar, Eye, FileText, Users } from "lucide-react";
+import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const JobDetailsSidebar = ({ job }: { job: any }) => {
+// Types
+interface Company {
+  id: string;
+  name: string;
+  industry?: string;
+  size?: string;
+  description?: string;
+}
+
+interface Job {
+  id: string;
+  title: string;
+  company: Company;
+  industry?: string;
+  companySize?: string;
+  jobType?: string;
+  type?: string;
+  createdAt?: string;
+  postedTime?: string;
+  viewCount?: number;
+  applyCount?: number;
+}
+
+interface JobDetailsSidebarProps {
+  job: Job;
+  onApply?: () => void;
+  onSave?: () => void;
+  onViewCompany?: () => void;
+}
+
+// Constants
+const STATS_ICONS = {
+  applications: FileText,
+  views: Eye,
+  posted: Calendar,
+} as const;
+
+const StatItem = ({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+}) => (
+  <>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <Icon className="text-foreground/50 h-4 w-4" />
+        <span className="text-foreground/60">{label}</span>
+      </div>
+      <span className="text-foreground/90 font-medium">{value}</span>
+    </div>
+    <Separator />
+  </>
+);
+
+const CompanyInfoItem = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
+  <>
+    <div className="flex items-center justify-between">
+      <span className="text-foreground/60">{label}</span>
+      <span className="text-foreground/90 font-medium">{value}</span>
+    </div>
+    <Separator />
+  </>
+);
+
+const JobDetailsSidebar = ({
+  job,
+  onApply,
+  onSave,
+  onViewCompany,
+}: JobDetailsSidebarProps) => {
+  const companyName = job.company?.name || "Unknown Company";
+  const industry = job.industry || job.company?.industry || "Not specified";
+  const companySize = job.companySize || job.company?.size || "Not specified";
+  const jobType = job.type || job.jobType || "Not specified";
+
+  const postedTime =
+    job.postedTime ||
+    (job.createdAt
+      ? new Date(job.createdAt).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "Recently");
+
+  const stats = [
+    {
+      label: "Applications",
+      value: job.applyCount || 0,
+      icon: STATS_ICONS.applications,
+    },
+    { label: "Views", value: job.viewCount || 0, icon: STATS_ICONS.views },
+    { label: "Posted", value: postedTime, icon: STATS_ICONS.posted },
+  ];
+
+  const similarJobs = [
+    {
+      title: "Full Stack Developer",
+      company: "WebTech Inc",
+      location: "Remote",
+      salary: "$30/hour",
+      type: "contract",
+    },
+    {
+      title: "React Developer",
+      company: "StartupXYZ",
+      location: "New York",
+      salary: "$1500 fixed",
+      type: "fixed-price",
+    },
+    {
+      title: "UI/UX Developer",
+      company: "DesignCorp",
+      location: "London",
+      salary: "$28/hour",
+      type: "contract",
+    },
+  ];
+
+  const handleApply = () => {
+    onApply?.();
+    console.log("Applying for job:", job.id);
+  };
+
+  const handleSave = () => {
+    onSave?.();
+    console.log("Saving job:", job.id);
+  };
+
+  const handleViewCompany = () => {
+    onViewCompany?.();
+    console.log("Viewing company:", job.company?.id);
+  };
+
   return (
-    <div className="space-y-6">
-      <Card>
+    <aside className="space-y-6">
+      <Card className="sticky top-22">
         <CardContent className="p-6">
-          <Button className="bg-primary/100 hover:bg-primary mb-4 w-full text-white">
-            Apply Now
-          </Button>
-          <Button variant="outline" className="w-full bg-transparent">
-            Save Job
-          </Button>
+          <div className="space-y-3">
+            <Button
+              className="bg-primary text-card w-full py-2.5 font-medium hover:bg-green-700"
+              onClick={handleApply}
+              size="lg"
+            >
+              Apply Now
+            </Button>
+            <Button
+              variant="outline"
+              className="hover:bg-primary/10 hover:text-foreground w-full border-gray-300 font-medium"
+              onClick={handleSave}
+              size="lg"
+            >
+              Save Job
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>About {job.company}</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Building2 className="text-foreground/60 h-5 w-5" />
+            About {companyName}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Industry</span>
-            <span className="font-medium">{job.industry}</span>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Company Size</span>
-            <span className="font-medium">{job.companySize}</span>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Job Type</span>
-            <span className="font-medium">{job.type}</span>
-          </div>
-          <Button variant="outline" className="mt-4 w-full bg-transparent">
+          <CompanyInfoItem label="Industry" value={industry} />
+          <CompanyInfoItem label="Company Size" value={companySize} />
+          <CompanyInfoItem label="Job Type" value={jobType} />
+
+          <Button
+            variant="outline"
+            className="hover:bg-primary text-foreground mt-4 w-full border-gray-300"
+            onClick={handleViewCompany}
+          >
+            <Users className="mr-2 h-4 w-4" />
             View Company Profile
           </Button>
         </CardContent>
       </Card>
 
-      {/* Job Stats */}
       <Card>
-        <CardHeader>
-          <CardTitle>Job Statistics</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Job Statistics</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Applications</span>
-            <span className="font-medium">23</span>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Views</span>
-            <span className="font-medium">156</span>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Posted</span>
-            <span className="font-medium">{job.postedTime}</span>
-          </div>
+          {stats.map((stat, index) => (
+            <StatItem
+              key={index}
+              label={stat.label}
+              value={stat.value}
+              icon={stat.icon}
+            />
+          ))}
         </CardContent>
       </Card>
 
-      {/* Similar Jobs */}
       <Card>
-        <CardHeader>
-          <CardTitle>Similar Jobs</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Similar Jobs</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-xl border p-3">
-            <h4 className="text-sm font-medium">Full Stack Developer</h4>
-            <p className="text-xs text-gray-600">WebTech Inc • Remote</p>
-            <p className="text-xs font-medium text-green-600">$30/hour</p>
-          </div>
-          <div className="rounded-xl border p-3">
-            <h4 className="text-sm font-medium">React Developer</h4>
-            <p className="text-xs text-gray-600">StartupXYZ • New York</p>
-            <p className="text-xs font-medium text-green-600">$1500 fixed</p>
-          </div>
-          <div className="rounded-xl border p-3">
-            <h4 className="text-sm font-medium">UI/UX Developer</h4>
-            <p className="text-xs text-gray-600">DesignCorp • London</p>
-            <p className="text-xs font-medium text-green-600">$28/hour</p>
-          </div>
+          {similarJobs.map((similarJob, index) => (
+            <JobDetailsSimilarJobCard
+              key={index}
+              title={similarJob.title}
+              company={similarJob.company}
+              location={similarJob.location}
+              salary={similarJob.salary}
+              type={similarJob.type}
+            />
+          ))}
         </CardContent>
       </Card>
-    </div>
+    </aside>
   );
 };
 
