@@ -45,6 +45,7 @@ const ThemeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
       {isMobile ? (
         <div className="pb-3 pl-4">
           <Button
+            className="dark:hover:text-accent dark:hover:border-accent"
             variant="outline"
             size="sm"
             onClick={() => {

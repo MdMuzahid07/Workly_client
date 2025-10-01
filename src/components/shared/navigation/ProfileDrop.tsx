@@ -243,7 +243,6 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             </div>
 
             {isMobile ? <ThemeSwitcher isMobile={isMobile} /> : ""}
-
             <div className="border-t border-gray-100/80">
               <button
                 onClick={handleSignOut}

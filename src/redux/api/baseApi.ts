@@ -75,15 +75,7 @@ const baseApi = createApi({
   // we calling baseQuery in our custom base query, thats why it will call from there
   // because we called our baseQuery in our custom base query thats why we need to set here the custom one
   baseQuery: baseQueryWithRefreshToken,
-  tagTypes: [
-    "facility",
-    "bookings",
-    "products",
-    "testimonials",
-    "userInfo",
-    "orders",
-    "reviews",
-  ],
+  tagTypes: ["jobs"],
   endpoints: () => ({}),
 });
 

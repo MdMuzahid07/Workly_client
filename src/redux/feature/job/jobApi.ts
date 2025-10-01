@@ -11,10 +11,12 @@ const jobApi = baseApi.injectEndpoints({
     }),
 
     getJobs: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: "/job/jobs",
         method: "GET",
+        params,
       }),
+      providesTags: ["jobs"],
     }),
 
     getJobById: builder.query({

@@ -47,7 +47,10 @@ const fakeUser = {
 
 const ProfileView = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const { data, isLoading, error } = useGetProfileQuery(undefined);
   const [user, setUser] = useState(fakeUser);
+
+  // console.log(data, "data from my profile");
 
   return (
     <div className="bg-primary/2 min-h-screen">
