@@ -77,7 +77,7 @@ const EmployeeManagementTabs = ({
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <div className="w-full overflow-x-auto">
-        <TabsList className="grid w-full min-w-[400px] grid-cols-4 sm:min-w-0">
+        <TabsList className="bg-card grid w-full min-w-[400px] grid-cols-4 sm:min-w-0">
           <TabsTrigger value="all" className="text-xs sm:text-sm">
             All ({employees.length})
           </TabsTrigger>

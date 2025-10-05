@@ -1,5 +1,7 @@
+import DashboardJobApplicationView from "../../../../view/dashboard/DashboardJobApplicationView";
+
 const page = () => {
-  return <div>page</div>;
+  return <DashboardJobApplicationView />;
 };
 
 export default page;
