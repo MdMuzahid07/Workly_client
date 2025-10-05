@@ -10,7 +10,7 @@ const DashboardCompanySettingsHeader = ({
 }) => {
   return (
     <header className="bg-card sticky top-0 border-b">
-      <div className="flex h-18 items-center justify-between px-6">
+      <div className="container mx-auto flex h-18 items-center justify-between px-6">
         <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-foreground flex items-center text-xl font-bold sm:text-2xl">

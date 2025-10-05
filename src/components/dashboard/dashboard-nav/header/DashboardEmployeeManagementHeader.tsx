@@ -17,7 +17,7 @@ const DashboardEmployeeManagementHeader = ({
 }: any) => {
   return (
     <div className="bg-card sticky top-0 border-b">
-      <div className="flex h-auto min-h-[4.5rem] items-center justify-between px-4 py-4 sm:h-18 sm:px-6 sm:py-0">
+      <div className="container mx-auto flex h-auto min-h-[4.5rem] items-center justify-between px-4 py-4 sm:h-18 sm:px-6 sm:py-0">
         <div className="flex w-full flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
           <div className="w-full sm:w-auto">
             <h1 className="text-foreground text-lg font-bold sm:text-xl lg:text-2xl">

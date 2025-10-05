@@ -29,7 +29,7 @@ const EmployeeStatusCards = ({
   return (
     <div className="mb-6 grid grid-cols-2 gap-3 sm:mb-8 sm:gap-4 lg:grid-cols-4 lg:gap-6">
       <Card>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-xs font-medium sm:text-sm">
@@ -44,7 +44,7 @@ const EmployeeStatusCards = ({
         </CardContent>
       </Card>
       <Card>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-xs font-medium sm:text-sm">
@@ -59,7 +59,7 @@ const EmployeeStatusCards = ({
         </CardContent>
       </Card>
       <Card>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-xs font-medium sm:text-sm">
@@ -74,7 +74,7 @@ const EmployeeStatusCards = ({
         </CardContent>
       </Card>
       <Card>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-xs font-medium sm:text-sm">

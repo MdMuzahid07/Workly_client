@@ -12,19 +12,13 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import {
-  BarChart3,
   Bell,
   Briefcase,
-  Building2,
-  Calendar,
   ChevronDown,
   FileText,
   Home,
   Menu,
-  Plus,
   Settings,
-  Tag,
-  TrendingUp,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -90,52 +84,52 @@ const DashboardSidebar = () => {
         },
       ],
     },
-    {
-      title: "Analytics",
-      items: [
-        {
-          icon: BarChart3,
-          label: "Analytics",
-          value: "",
-          active: activeItem === "Analytics",
-        },
-        {
-          icon: TrendingUp,
-          label: "Reports",
-          value: "",
-          active: activeItem === "Reports",
-        },
-        {
-          icon: Calendar,
-          label: "Schedule",
-          value: "",
-          active: activeItem === "Schedule",
-        },
-      ],
-    },
-    {
-      title: "Management",
-      items: [
-        {
-          icon: Plus,
-          label: "Post Job",
-          value: "",
-          active: activeItem === "Post Job",
-        },
-        {
-          icon: Tag,
-          label: "Categories",
-          value: "",
-          active: activeItem === "Categories",
-        },
-        {
-          icon: Building2,
-          label: "Departments",
-          value: "",
-          active: activeItem === "Departments",
-        },
-      ],
-    },
+    // {
+    //   title: "Analytics",
+    //   items: [
+    //     {
+    //       icon: BarChart3,
+    //       label: "Analytics",
+    //       value: "",
+    //       active: activeItem === "Analytics",
+    //     },
+    //     {
+    //       icon: TrendingUp,
+    //       label: "Reports",
+    //       value: "",
+    //       active: activeItem === "Reports",
+    //     },
+    //     {
+    //       icon: Calendar,
+    //       label: "Schedule",
+    //       value: "",
+    //       active: activeItem === "Schedule",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Management",
+    //   items: [
+    //     {
+    //       icon: Plus,
+    //       label: "Post Job",
+    //       value: "",
+    //       active: activeItem === "Post Job",
+    //     },
+    //     {
+    //       icon: Tag,
+    //       label: "Categories",
+    //       value: "",
+    //       active: activeItem === "Categories",
+    //     },
+    //     {
+    //       icon: Building2,
+    //       label: "Departments",
+    //       value: "",
+    //       active: activeItem === "Departments",
+    //     },
+    //   ],
+    // },
   ];
 
   const bottomItems: SidebarItemProps[] = [
