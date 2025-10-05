@@ -1,5 +1,7 @@
+import HiringPipelineView from "../../../../view/dashboard/HiringPipelineView";
+
 const page = () => {
-  return <div>page</div>;
+  return <HiringPipelineView />;
 };
 
 export default page;
