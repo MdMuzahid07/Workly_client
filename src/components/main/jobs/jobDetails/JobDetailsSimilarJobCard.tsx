@@ -15,8 +15,8 @@ const JobDetailsSimilarJobCard = ({
 }) => (
   <div className="hover:bg-primary/5 light:border-gray-200 cursor-pointer rounded-2xl border p-4 transition-all">
     <div className="space-y-2">
-      <h4 className="font-medium text-gray-900">{title}</h4>
-      <div className="flex items-center gap-1 text-sm text-gray-600">
+      <h4 className="text-secondary-foreground font-medium">{title}</h4>
+      <div className="text-secondary-foreground flex items-center gap-1 text-sm">
         <Building2 className="h-3 w-3" />
         <span>{company}</span>
         <span>•</span>
@@ -24,7 +24,9 @@ const JobDetailsSimilarJobCard = ({
       </div>
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-green-600">{salary}</span>
-        <span className="text-xs text-gray-500 capitalize">{type}</span>
+        <span className="text-secondary-foreground text-xs capitalize">
+          {type}
+        </span>
       </div>
     </div>
   </div>

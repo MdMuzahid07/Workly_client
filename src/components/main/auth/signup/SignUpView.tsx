@@ -91,10 +91,10 @@ const SignUpView = () => {
   return (
     <>
       <DialogHeader className="space-y-3">
-        <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+        <DialogTitle className="text-secondary-foreground text-center text-2xl font-bold">
           Join Workly_job
         </DialogTitle>
-        <DialogDescription className="text-center text-gray-600">
+        <DialogDescription className="text-secondary-foreground text-center">
           Create your account and start your career journey today.
         </DialogDescription>
       </DialogHeader>
@@ -134,9 +134,9 @@ const SignUpView = () => {
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
+                  <EyeOff className="text-secondary-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="text-secondary-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -157,9 +157,9 @@ const SignUpView = () => {
                 onClick={() => setShowConfirmPassword((v) => !v)}
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
+                  <EyeOff className="text-secondary-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="text-secondary-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -206,7 +206,7 @@ const SignUpView = () => {
       </WkForm>
 
       <div className="mt-6 border-t border-gray-200 pt-6">
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-secondary-foreground text-center text-sm">
           Already have an account?{" "}
           <Button
             variant="link"

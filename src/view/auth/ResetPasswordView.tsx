@@ -49,19 +49,19 @@ const ResetPasswordView = () => {
 
   return (
     <main className="bg-primary/10 flex min-h-[calc(100dvh-64px)] items-center justify-center px-4 py-10">
-      <div className="bg-primary/2 w-full max-w-[425px] rounded-3xl border border-gray-200 p-6">
+      <div className="bg-card w-full max-w-[425px] rounded-2xl border-2 border-gray-300/40 p-6">
         <div className="space-y-3">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+          <div className="bg-primary/10 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
             {isSubmitted ? (
-              <CheckCircle className="h-6 w-6 text-green-600" />
+              <CheckCircle className="text-primary h-6 w-6" />
             ) : (
-              <Shield className="h-6 w-6 text-green-600" />
+              <Shield className="text-primary h-6 w-6" />
             )}
           </div>
-          <h1 className="text-center text-2xl font-bold text-gray-900">
+          <h1 className="text-secondary-foreground text-center text-2xl font-bold">
             {isSubmitted ? "Password Updated!" : "Create New Password"}
           </h1>
-          <p className="text-center text-gray-600">
+          <p className="text-secondary-foreground text-center">
             {isSubmitted
               ? "Your password has been successfully updated. You can now sign in with your new password."
               : "Enter your new password below. Make sure it's strong and secure."}
@@ -80,7 +80,7 @@ const ResetPasswordView = () => {
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-secondary-foreground text-sm font-medium"
                 >
                   New Password
                 </Label>
@@ -104,9 +104,9 @@ const ResetPasswordView = () => {
                     onClick={() => setShowPassword((v) => !v)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-500" />
+                      <EyeOff className="text-secondary-foreground h-4 w-4" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-500" />
+                      <Eye className="text-secondary-foreground h-4 w-4" />
                     )}
                   </Button>
                 </div>
@@ -115,7 +115,7 @@ const ResetPasswordView = () => {
               <div className="space-y-2">
                 <Label
                   htmlFor="confirmPassword"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-secondary-foreground text-sm font-medium"
                 >
                   Confirm New Password
                 </Label>
@@ -139,17 +139,17 @@ const ResetPasswordView = () => {
                     onClick={() => setShowConfirmPassword((v) => !v)}
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-500" />
+                      <EyeOff className="text-secondary-foreground h-4 w-4" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-500" />
+                      <Eye className="text-secondary-foreground h-4 w-4" />
                     )}
                   </Button>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-lg bg-blue-50 p-3">
-              <p className="text-xs text-blue-800">
+            <div className="bg-background rounded-lg p-3">
+              <p className="text-primary text-xs">
                 Password should be at least 8 characters long and include
                 uppercase, lowercase, numbers, and special characters.
               </p>

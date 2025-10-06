@@ -74,10 +74,10 @@ const SignInView = () => {
   return (
     <>
       <DialogHeader className="space-y-3">
-        <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+        <DialogTitle className="text-secondary-foreground text-center text-2xl font-bold">
           Welcome Back
         </DialogTitle>
-        <DialogDescription className="text-center text-gray-600">
+        <DialogDescription className="text-secondary-foreground text-center">
           Sign in to your Workly_job account to continue your career journey.
         </DialogDescription>
       </DialogHeader>
@@ -109,9 +109,9 @@ const SignInView = () => {
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
+                  <EyeOff className="text-secondary-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="text-secondary-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -130,7 +130,7 @@ const SignInView = () => {
               <Button
                 type="button"
                 variant="link"
-                className="cursor-pointer text-sm text-gray-500 transition-colors duration-200 hover:text-green-400"
+                className="text-secondary-foreground cursor-pointer text-sm transition-colors duration-200 hover:text-green-400"
                 onClick={() => switchView("forgot")}
               >
                 Forgot your password?
@@ -141,7 +141,7 @@ const SignInView = () => {
       </WkForm>
 
       <div className="mt-6 border-t border-gray-200 pt-6">
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-secondary-foreground text-center text-sm">
           {`Don't`} have an account?{" "}
           <Button
             variant="link"

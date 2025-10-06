@@ -28,7 +28,7 @@ const CompanyFilter = () => {
   return (
     <div className="bg-card mx-auto max-w-7xl rounded-lg px-4 py-4 sm:px-6 lg:px-8">
       <div className="flex items-center gap-6 overflow-x-auto">
-        <div className="flex items-center gap-2 text-gray-700">
+        <div className="text-secondary-foreground flex items-center gap-2">
           <Filter className="h-4 w-4" />
           <span className="font-medium">Filters</span>
         </div>

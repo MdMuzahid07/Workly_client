@@ -27,22 +27,22 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Employees</span>
+            <span className="text-secondary-foreground">Employees</span>
             <span className="font-medium">{company.stats.employees}</span>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Offices</span>
+            <span className="text-secondary-foreground">Offices</span>
             <span className="font-medium">{company.stats.offices}</span>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Countries</span>
+            <span className="text-secondary-foreground">Countries</span>
             <span className="font-medium">{company.stats.countries}</span>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Founded</span>
+            <span className="text-secondary-foreground">Founded</span>
             <span className="font-medium">{company.stats.founded}</span>
           </div>
         </CardContent>
@@ -61,7 +61,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
             <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-600">
               <span className="text-xs font-bold text-white">in</span>
             </div>
-            <span className="text-gray-700">LinkedIn</span>
+            <span className="text-secondary-foreground">LinkedIn</span>
             <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
           </a>
 
@@ -72,7 +72,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
             <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-400">
               <span className="text-xs font-bold text-white">𝕏</span>
             </div>
-            <span className="text-gray-700">Twitter</span>
+            <span className="text-secondary-foreground">Twitter</span>
             <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
           </a>
 
@@ -83,7 +83,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
             <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-900">
               <span className="text-xs font-bold text-white">GH</span>
             </div>
-            <span className="text-gray-700">GitHub</span>
+            <span className="text-secondary-foreground">GitHub</span>
             <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
           </a>
         </CardContent>
@@ -106,7 +106,9 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
               />
               <div>
                 <h4 className="text-sm font-medium">InnovateCorp</h4>
-                <p className="text-xs text-gray-600">SaaS • New York</p>
+                <p className="text-secondary-foreground text-xs">
+                  SaaS • New York
+                </p>
               </div>
             </div>
             <p className="text-xs font-medium text-green-600">15 open jobs</p>
@@ -123,7 +125,9 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
               />
               <div>
                 <h4 className="text-sm font-medium">CloudTech Solutions</h4>
-                <p className="text-xs text-gray-600">Cloud • Seattle</p>
+                <p className="text-secondary-foreground text-xs">
+                  Cloud • Seattle
+                </p>
               </div>
             </div>
             <p className="text-xs font-medium text-green-600">22 open jobs</p>
@@ -140,7 +144,9 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
               />
               <div>
                 <h4 className="text-sm font-medium">DataVision Labs</h4>
-                <p className="text-xs text-gray-600">Analytics • Remote</p>
+                <p className="text-secondary-foreground text-xs">
+                  Analytics • Remote
+                </p>
               </div>
             </div>
             <p className="text-xs font-medium text-green-600">8 open jobs</p>

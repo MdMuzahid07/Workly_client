@@ -6,10 +6,10 @@ const MobileAppRecommend = () => {
     <div className="bg-primary/5 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h3 className="mb-4 text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          <h3 className="text-secondary-foreground mb-4 text-xl font-semibold sm:text-2xl dark:text-white">
             Get the Workly_job mobile app
           </h3>
-          <p className="mx-auto mb-8 max-w-2xl text-gray-600">
+          <p className="text-secondary-foreground mx-auto mb-8 max-w-2xl">
             Find your dream job on the go. Download our mobile app and never
             miss an opportunity.
           </p>

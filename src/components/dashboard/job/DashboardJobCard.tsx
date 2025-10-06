@@ -52,7 +52,7 @@ const DashboardJobCard = ({ job }: any) => {
                       ? "border-0 bg-green-100 text-green-700"
                       : job.status === "draft"
                         ? "border-0 bg-orange-100 text-orange-700"
-                        : "border-0 bg-gray-100 text-gray-700"
+                        : "text-secondary-foreground border-0 bg-gray-100"
                   }
                 >
                   {job.status.charAt(0).toUpperCase() + job.status.slice(1)}

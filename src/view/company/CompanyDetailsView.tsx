@@ -181,16 +181,18 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="mb-6 leading-relaxed text-gray-700">
+                <p className="text-secondary-foreground mb-6 leading-relaxed">
                   {company.description}
                 </p>
 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="mb-2 font-medium text-gray-900">
+                    <h4 className="text-secondary-foreground mb-2 font-medium">
                       Our Mission
                     </h4>
-                    <p className="text-gray-700">{company.mission}</p>
+                    <p className="text-secondary-foreground">
+                      {company.mission}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -212,7 +214,9 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                       className="bg-primary/2 flex items-center gap-3 rounded-lg p-3"
                     >
                       <div className="bg-primary/100 h-2 w-2 rounded-full"></div>
-                      <span className="font-medium text-gray-900">{value}</span>
+                      <span className="text-secondary-foreground font-medium">
+                        {value}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -232,7 +236,9 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                   {company.benefits.map((benefit, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <div className="bg-primary/100 mt-2 h-2 w-2 rounded-full"></div>
-                      <span className="text-gray-700">{benefit}</span>
+                      <span className="text-secondary-foreground">
+                        {benefit}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -245,7 +251,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                 <CardTitle>Company Culture</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="leading-relaxed text-gray-700">
+                <p className="text-secondary-foreground leading-relaxed">
                   {company.culture}
                 </p>
               </CardContent>
@@ -268,7 +274,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h4 className="mb-1 font-medium text-gray-900">
+                          <h4 className="text-secondary-foreground mb-1 font-medium">
                             {job.title}
                           </h4>
                           <div className="text-foreground/60 mb-2 flex items-center gap-4 text-sm">
@@ -282,7 +288,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                             <span className="font-medium text-green-600">
                               {job.salary}
                             </span>
-                            <span className="text-gray-500">
+                            <span className="text-secondary-foreground">
                               Posted {job.posted}
                             </span>
                           </div>

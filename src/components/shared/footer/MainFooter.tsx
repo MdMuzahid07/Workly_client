@@ -12,7 +12,7 @@ const MainFooter = () => {
             </div>
             <span className="text-accent text-2xl font-bold">Workly_job</span>
           </div>
-          <p className="mb-6 max-w-sm text-gray-600">
+          <p className="text-secondary-foreground mb-6 max-w-sm">
             The {`world's`} largest professional network. Connect, learn, and
             get hired.
           </p>
@@ -38,7 +38,7 @@ const MainFooter = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-gray-600 transition-colors hover:text-green-600"
+                    className="text-secondary-foreground text-sm transition-colors hover:text-green-600"
                   >
                     {link.name}
                   </a>

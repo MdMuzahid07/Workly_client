@@ -192,8 +192,10 @@ const CompanyView = () => {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 xl:px-0">
         <div className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-gray-900">Companies</h2>
-          <p className="text-gray-600">
+          <h2 className="text-secondary-foreground mb-2 text-2xl font-bold">
+            Companies
+          </h2>
+          <p className="text-secondary-foreground">
             Discover amazing companies and their open positions
           </p>
         </div>

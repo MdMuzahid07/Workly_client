@@ -33,10 +33,10 @@ const ForgetPasswordView = () => {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
           <KeyRound className="h-6 w-6 text-green-600" />
         </div>
-        <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+        <DialogTitle className="text-secondary-foreground text-center text-2xl font-bold">
           Reset Password
         </DialogTitle>
-        <DialogDescription className="text-center text-gray-600">
+        <DialogDescription className="text-secondary-foreground text-center">
           {isSubmitted
             ? "Check your email for password reset instructions."
             : "Enter your email address and we'll send you a link to reset your password."}
@@ -74,7 +74,7 @@ const ForgetPasswordView = () => {
           <Button
             onClick={() => setIsSubmitted(false)}
             variant="outline"
-            className="hover:bg-primary/2 w-full cursor-pointer rounded-full border-gray-300 py-3 font-semibold text-gray-700 transition-colors duration-200"
+            className="hover:bg-primary/2 text-secondary-foreground w-full cursor-pointer rounded-full border-gray-300 py-3 font-semibold transition-colors duration-200"
           >
             Send Another Email
           </Button>
@@ -82,7 +82,7 @@ const ForgetPasswordView = () => {
       )}
 
       <div className="mt-6 border-t border-gray-200 pt-6">
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-secondary-foreground text-center text-sm">
           Remember your password?{" "}
           <Button
             variant="link"
