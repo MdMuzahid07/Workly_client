@@ -9,7 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Briefcase, Eye, TrendingUp, UserPlus, Users } from "lucide-react";
+import { Briefcase, Eye, TrendingUp, Users } from "lucide-react";
+import Link from "next/link";
 import DashboardOverviewHeader from "../../components/dashboard/dashboard-nav/header/DashboardOverviewHeader";
 
 const CompanyDashboardView = () => {
@@ -182,9 +183,11 @@ const CompanyDashboardView = () => {
                   </Badge>
                 </div>
               ))}
-              <Button variant="outline" className="w-full bg-transparent">
-                View All Jobs
-              </Button>
+              <Link href="/dashboard/jobs">
+                <Button variant="outline" className="w-full bg-transparent">
+                  View All Jobs
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -226,10 +229,11 @@ const CompanyDashboardView = () => {
                   </p>
                 </div>
               ))}
-              <Button variant="outline" className="w-full bg-transparent">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Add Employee
-              </Button>
+              <Link href="/dashboard/employees">
+                <Button variant="outline" className="w-full bg-transparent">
+                  View Employees
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
