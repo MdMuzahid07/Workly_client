@@ -156,7 +156,7 @@ const ManageCompanyProfileView = () => {
   const currentProfile = isEditing ? editedProfile : companyProfile;
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen">
       {/* Header */}
       <DashboardCompanyProfileHeader
         setIsEditing={setIsEditing}
@@ -173,12 +173,14 @@ const ManageCompanyProfileView = () => {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="details">Company Details</TabsTrigger>
-            <TabsTrigger value="culture">Culture & Values</TabsTrigger>
-            <TabsTrigger value="media">Media & Branding</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="grid w-full min-w-[600px] grid-cols-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="details">Company Details</TabsTrigger>
+              <TabsTrigger value="culture">Culture & Values</TabsTrigger>
+              <TabsTrigger value="media">Media & Branding</TabsTrigger>
+            </TabsList>
+          </div>
 
           <CompanyProfileOverviewTab
             currentProfile={currentProfile}

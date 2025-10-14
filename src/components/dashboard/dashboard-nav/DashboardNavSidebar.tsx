@@ -61,11 +61,17 @@ const DashboardSidebar = () => {
           href: "/dashboard",
         },
         {
+          icon: Building2,
+          label: "My Company",
+          href: "/dashboard/profile",
+        },
+        {
           icon: Briefcase,
           label: "Jobs",
           href: "/dashboard/jobs",
           badge: "12",
         },
+
         {
           icon: Users,
           label: "Employees",
