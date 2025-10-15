@@ -15,8 +15,14 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: "Workly_job",
+  title: {
+    default: "Workly_job",
+    template: "%s | Workly_job",
+  },
   description: "Find the perfect job for you",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
