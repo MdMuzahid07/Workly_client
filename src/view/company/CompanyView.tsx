@@ -17,6 +17,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
         onSearch={handleSearch}
         placeholder={{ search: "Company name", location: "Location" }}
       />
+
       <CompanyFilter />
 
       <main className="mx-auto max-w-7xl px-4 py-8 xl:px-0">
