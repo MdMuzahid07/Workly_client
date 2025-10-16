@@ -12,14 +12,14 @@ const companyApi = baseApi.injectEndpoints({
 
     getCompanies: builder.query({
       query: () => ({
-        url: "/companies",
+        url: "/company/companies",
         method: "GET",
       }),
     }),
 
     getCompanyBySlug: builder.query({
       query: (slug: string) => ({
-        url: `/companies/${slug}`,
+        url: `/company/companies/${slug}`,
         method: "GET",
       }),
     }),
