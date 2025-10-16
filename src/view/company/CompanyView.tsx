@@ -41,10 +41,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
         </div>
 
         <div className="mt-12 text-center">
-          <Button
-            variant="outline"
-            className="cursor-pointer bg-transparent px-8"
-          >
+          <Button variant="outline" className="px-8">
             Load More Companies
           </Button>
         </div>
