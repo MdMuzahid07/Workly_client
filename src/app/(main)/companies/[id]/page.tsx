@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Company Details",
 };
 
-const page = ({ params }: { params: { id: string } }) => {
+const page = ({ params }: { params: { slug: string } }) => {
   return (
     <>
       <CompanyDetailsView params={params} />

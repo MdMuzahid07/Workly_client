@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader } from "../../ui/card";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CompanyCard = ({ company }: any) => {
+  const slug = company.slug || "";
+
   return (
     <Card key={company.id} className="bg-primary/2 sm:bg-card rounded-2xl">
       <CardHeader className="pb-4">
@@ -61,7 +63,7 @@ const CompanyCard = ({ company }: any) => {
               </span>
               <span className="text-foreground/60 ml-1">open jobs</span>
             </div>
-            <Link href={`/companies/${company.id}`}>
+            <Link href={`/companies/${slug}`}>
               <Button
                 variant="outline"
                 size="sm"

@@ -16,97 +16,48 @@ import {
 import Image from "next/image";
 import CompanyDetailsSidebar from "../../components/main/company/companyDetails/CompanyDetailsSidebar";
 
-// fake data for company details
-const companyData = {
-  id: "1",
-  name: "TechFlow Inc.",
-  logo: "https://mdmuzahid.vercel.app/assets/logo-DuOSblLl.png",
-  industry: "Technology",
-  size: "100-500 employees",
-  location: "San Francisco, CA",
-  website: "techflow.com",
-  founded: "2018",
-  description:
-    "TechFlow Inc. is a leading software development company specializing in web applications and cloud solutions. We're passionate about creating innovative technology that solves real-world problems and helps businesses thrive in the digital age.",
-  mission:
-    "To empower businesses through cutting-edge technology solutions that drive growth and innovation.",
-  values: [
-    "Innovation First",
-    "Customer Success",
-    "Team Collaboration",
-    "Quality Excellence",
-    "Continuous Learning",
-  ],
-  benefits: [
-    "Comprehensive health insurance",
-    "Flexible working hours",
-    "Remote work options",
-    "Professional development budget",
-    "Annual performance bonus",
-    "Stock options",
-    "Unlimited PTO",
-    "Modern office space",
-    "Free meals and snacks",
-    "Gym membership",
-  ],
-  culture:
-    "We foster a collaborative environment where creativity and innovation thrive. Our team values work-life balance, continuous learning, and making a positive impact through technology.",
-  socialLinks: {
-    linkedin: "linkedin.com/company/techflow",
-    twitter: "twitter.com/techflow",
-    github: "github.com/techflow",
-  },
-  stats: {
-    employees: 250,
-    offices: 3,
-    countries: 2,
-    founded: 2018,
-  },
-  openJobs: [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      department: "Engineering",
-      type: "Full-time",
-      location: "San Francisco, CA",
-      salary: "$120,000 - $150,000",
-      posted: "2 days ago",
-    },
-    {
-      id: 2,
-      title: "Product Manager",
-      department: "Product",
-      type: "Full-time",
-      location: "Remote",
-      salary: "$110,000 - $140,000",
-      posted: "1 week ago",
-    },
-    {
-      id: 3,
-      title: "DevOps Engineer",
-      department: "Engineering",
-      type: "Full-time",
-      location: "San Francisco, CA",
-      salary: "$100,000 - $130,000",
-      posted: "3 days ago",
-    },
-    {
-      id: 4,
-      title: "UX Designer",
-      department: "Design",
-      type: "Full-time",
-      location: "Remote",
-      salary: "$85,000 - $110,000",
-      posted: "5 days ago",
-    },
-  ],
+export type Company = {
+  id?: string | number;
+  name?: string;
+  logo?: string;
+  industry?: string;
+  size?: string;
+  location?: string;
+  website?: string;
+  founded?: string | number;
+  description?: string;
+  mission?: string;
+  values?: string[];
+  benefits?: string[];
+  culture?: string;
+  openJobs?: Array<{
+    id: string | number;
+    title: string;
+    department: string;
+    type: string;
+    location: string;
+    salary?: string;
+    posted?: string;
+  }>;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
-  const company = companyData;
+// Allow either direct company data or legacy params prop
+type CompanyDetailsViewProps =
+  | { company: Company | null }
+  | { params: { slug: string } };
+
+const CompanyDetailsView = (props: CompanyDetailsViewProps) => {
+  const company: Company | null = "company" in props ? props.company : null;
+  if (!company) {
+    return (
+      <div className="bg-primary/2 min-h-screen md:pt-16">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-secondary-foreground">Company not found.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-primary/2 min-h-screen md:pt-16">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -208,7 +159,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {company.values.map((value, index) => (
+                  {(company.values || []).map((value, index) => (
                     <div
                       key={index}
                       className="bg-primary/2 flex items-center gap-3 rounded-lg p-3"
@@ -233,7 +184,7 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {company.benefits.map((benefit, index) => (
+                  {(company.benefits || []).map((benefit, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <div className="bg-primary/100 mt-2 h-2 w-2 rounded-full"></div>
                       <span className="text-secondary-foreground">
@@ -262,12 +213,12 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Briefcase className="h-5 w-5" />
-                  Open Positions ({company.openJobs.length})
+                  Open Positions ({(company.openJobs || []).length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {company.openJobs.map((job) => (
+                  {(company.openJobs || []).map((job) => (
                     <div
                       key={job.id}
                       className="hover:bg-primary/2 rounded-lg border border-gray-200 p-4 transition-colors"
@@ -285,12 +236,16 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                             <span>{job.location}</span>
                           </div>
                           <div className="flex items-center gap-4 text-sm">
-                            <span className="font-medium text-green-600">
-                              {job.salary}
-                            </span>
-                            <span className="text-secondary-foreground">
-                              Posted {job.posted}
-                            </span>
+                            {job.salary && (
+                              <span className="font-medium text-green-600">
+                                {job.salary}
+                              </span>
+                            )}
+                            {job.posted && (
+                              <span className="text-secondary-foreground">
+                                Posted {job.posted}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <Button
