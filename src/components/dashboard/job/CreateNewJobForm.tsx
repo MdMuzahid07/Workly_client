@@ -19,11 +19,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
         {/* Job Title */}
         <div className="space-y-2">
           <Label htmlFor="title">Job Title *</Label>
-          <Input
-            id="title"
-            placeholder="e.g. Senior Frontend Developer"
-            className="border-gray-300"
-          />
+          <Input id="title" placeholder="e.g. Senior Frontend Developer" />
         </div>
 
         {/* Job Type and Experience Level */}
@@ -31,7 +27,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <div className="space-y-2">
             <Label htmlFor="type">Job Type *</Label>
             <Select>
-              <SelectTrigger id="type" className="border-gray-300">
+              <SelectTrigger id="type">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
@@ -46,7 +42,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <div className="space-y-2">
             <Label htmlFor="experience">Experience Level *</Label>
             <Select>
-              <SelectTrigger id="experience" className="border-gray-300">
+              <SelectTrigger id="experience">
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>
               <SelectContent>
@@ -63,17 +59,13 @@ const CreateNewJobForm = ({ onClose }: any) => {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="location">Location *</Label>
-            <Input
-              id="location"
-              placeholder="e.g. San Francisco, CA"
-              className="border-gray-300"
-            />
+            <Input id="location" placeholder="e.g. San Francisco, CA" />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="remote">Work Mode *</Label>
             <Select>
-              <SelectTrigger id="remote" className="border-gray-300">
+              <SelectTrigger id="remote">
                 <SelectValue placeholder="Select mode" />
               </SelectTrigger>
               <SelectContent>
@@ -89,22 +81,12 @@ const CreateNewJobForm = ({ onClose }: any) => {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="salaryMin">Minimum Salary</Label>
-            <Input
-              id="salaryMin"
-              type="number"
-              placeholder="80000"
-              className="border-gray-300"
-            />
+            <Input id="salaryMin" type="number" placeholder="80000" />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="salaryMax">Maximum Salary</Label>
-            <Input
-              id="salaryMax"
-              type="number"
-              placeholder="120000"
-              className="border-gray-300"
-            />
+            <Input id="salaryMax" type="number" placeholder="120000" />
           </div>
         </div>
 
@@ -114,7 +96,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <Textarea
             id="description"
             placeholder="Describe the role, responsibilities, and what you're looking for..."
-            className="min-h-[120px] border-gray-300"
+            className="min-h-[120px]"
           />
         </div>
 
@@ -124,7 +106,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <Textarea
             id="requirements"
             placeholder="List the key requirements and qualifications..."
-            className="min-h-[100px] border-gray-300"
+            className="min-h-[100px]"
           />
         </div>
 
@@ -134,7 +116,6 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <Input
             id="skills"
             placeholder="e.g. React, TypeScript, Node.js (comma separated)"
-            className="border-gray-300"
           />
         </div>
 
@@ -144,7 +125,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <Textarea
             id="benefits"
             placeholder="List the benefits and perks..."
-            className="min-h-[80px] border-gray-300"
+            className="min-h-[80px]"
           />
         </div>
 
@@ -153,7 +134,7 @@ const CreateNewJobForm = ({ onClose }: any) => {
           <input
             type="checkbox"
             id="featured"
-            className="h-4 w-4 rounded border-gray-300 text-green-600"
+            className="h-4 w-4 rounded text-green-600"
           />
           <Label htmlFor="featured" className="font-normal">
             Mark as featured job
@@ -167,13 +148,11 @@ const CreateNewJobForm = ({ onClose }: any) => {
           type="button"
           variant="outline"
           onClick={onClose}
-          className="border-gray-300 bg-transparent"
+          className="bg-transparent"
         >
           Cancel
         </Button>
-        <Button type="submit" className="">
-          Create Job Posting
-        </Button>
+        <Button type="submit">Create Job Posting</Button>
       </div>
     </form>
   );
