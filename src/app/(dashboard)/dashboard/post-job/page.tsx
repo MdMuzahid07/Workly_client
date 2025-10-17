@@ -1,7 +1,9 @@
+import CreateNewJobForm from "../../../../components/dashboard/job/CreateNewJobForm";
+
 const page = () => {
   return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <h1 className="text-lg text-pink-500 sm:text-2xl">Coming Soon</h1>
+    <div className="container mx-auto space-y-6 px-4 py-6 sm:px-6 sm:py-8">
+      <CreateNewJobForm />
     </div>
   );
 };
