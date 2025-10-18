@@ -86,10 +86,20 @@ const JobView = () => {
     setFilters(newFilters);
   };
 
+  const handleCategorySelect = (selectedCategoryIds: number[]) => {
+    setFilters((prev) => ({
+      ...prev,
+      categories: selectedCategoryIds,
+    }));
+  };
+
   return (
     <div className="bg-primary/2 pb-12">
       <Searchbar onSearch={handleSearch} />
-      <Industries />
+      <Industries
+        onCategorySelect={handleCategorySelect}
+        multipleSelect={false}
+      />
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">
         <div className="col-span-12 md:col-span-4">
           <div className="sticky top-24 hidden md:flex">

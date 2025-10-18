@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   Award,
@@ -18,7 +19,23 @@ import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Button } from "../../ui/button";
 
-const jobCategories = [
+export type Category = {
+  id: number;
+  title: string;
+  icon: React.ComponentType<any>;
+  count: string;
+  color: string;
+  description: string;
+};
+
+export type IndustriesProps = {
+  categories?: Category[];
+  onCategorySelect?: (selectedIds: number[]) => void;
+  multipleSelect?: boolean;
+  className?: string;
+};
+
+const defaultCategories: Category[] = [
   {
     id: 1,
     title: "Technology",
@@ -109,17 +126,30 @@ const jobCategories = [
   },
 ];
 
-const Industries = () => {
+const Industries = ({
+  categories = defaultCategories,
+  onCategorySelect,
+  multipleSelect = true,
+}: IndustriesProps) => {
   const [selected, setSelected] = useState<number[]>([]);
 
-  console.log("Selected industries:", selected);
-
   const toggleSelection = (id: number) => {
-    setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((industryId: number) => industryId !== id)
-        : [...prev, id],
-    );
+    setSelected((prev) => {
+      let newSelected: number[];
+
+      if (multipleSelect) {
+        newSelected = prev.includes(id)
+          ? prev.filter((industryId: number) => industryId !== id)
+          : [...prev, id];
+      } else {
+        newSelected = prev.includes(id) ? [] : [id];
+      }
+
+      console.log("Selected industries:", newSelected);
+      onCategorySelect?.(newSelected);
+
+      return newSelected;
+    });
   };
 
   return (
@@ -134,7 +164,7 @@ const Industries = () => {
         }}
         className="category-slider-2 flex w-full justify-center"
       >
-        {jobCategories.map((category) => {
+        {categories.map((category) => {
           const isSelected = selected?.includes(category.id);
 
           return (
