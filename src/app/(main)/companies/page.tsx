@@ -1,8 +1,6 @@
 import { Metadata } from "next";
 import CompanyView from "../../../view/company/CompanyView";
 
-export const revalidate = 3600;
-
 type CompanyListItem = {
   id: string | number;
   name: string;
@@ -21,10 +19,10 @@ type CompanyListItem = {
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }): Promise<Metadata> {
-  const query =
-    typeof searchParams?.q === "string" ? searchParams.q : undefined;
+  const params = await searchParams;
+  const query = typeof params?.q === "string" ? params.q : undefined;
   const title = query ? `Companies – ${query}` : "Companies";
   return {
     title,
@@ -34,13 +32,13 @@ export async function generateMetadata({
 }
 
 async function fetchCompanies(
-  params: { q?: string } = {},
+  params: { q?: string | undefined } = {},
 ): Promise<CompanyListItem[]> {
   const url = new URL("http://localhost:5000/api/v1/company/companies");
   if (params.q) url.searchParams.set("q", params.q);
 
   const res = await fetch(url.toString(), {
-    next: { revalidate },
+    next: { revalidate: 3600 },
     credentials: "include",
   });
 
@@ -52,8 +50,13 @@ async function fetchCompanies(
   return (json?.data?.result ?? json?.data ?? []) as CompanyListItem[];
 }
 
-const page = async ({ searchParams }: { searchParams: { q?: string } }) => {
-  const q = typeof searchParams?.q === "string" ? searchParams.q : undefined;
+const page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) => {
+  const params = await searchParams;
+  const q = typeof params?.q === "string" ? params.q : undefined;
   const companies = await fetchCompanies({ q });
   console.log(companies, "companies");
 

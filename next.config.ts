@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
 
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
@@ -14,12 +13,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "mdmuzahid.vercel.app",
-        port: "",
         pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "cdn.example.com",
+        pathname: "/**",
       },
     ],
   },
