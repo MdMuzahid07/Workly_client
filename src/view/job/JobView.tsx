@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 "use client";
 import { Suspense, useMemo, useState } from "react";
 import Industries from "../../components/main/jobs/Industries";
@@ -35,24 +35,37 @@ const DEFAULT_FILTERS: Filters = {
 
 const JobView = () => {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+
   const params = useMemo(() => {
     const p: any = {
       page: 1,
       limit: 12,
       sortBy: "createdAt",
       sortOrder: "desc",
-      isActive: true,
     };
 
-    if (filters.search) p.q = filters.search;
-    if (filters.location) p.location = filters.location;
-    if (filters.jobType) p.jobType = filters.jobType;
-    if (filters.experienceLevel) p.experienceLevel = filters.experienceLevel;
-    if (filters.postedWithin) p.postedWithin = filters.postedWithin;
-    if (filters.isRemote !== undefined) p.isRemote = filters.isRemote;
-    if (filters.skills.length > 0) p.skills = filters.skills;
+    // =========== search term ==============>
+    if (filters.search) p.search = filters.search;
 
-    // Only include budget if changed from default
+    // ============== location ============>
+    if (filters.location) p.location = filters.location;
+
+    // =========== job type (backend expects: FULL_TIME, PART_TIME, CONTRACT, etc.) ==========>
+    if (filters.jobType) p.jobType = filters.jobType;
+
+    // ===== experience level ===============>
+    if (filters.experienceLevel) p.experienceLevel = filters.experienceLevel;
+
+    // ======================== posted within (backend expects: 24h, 3d, 1w, 1m) =============>
+    if (filters.postedWithin) p.postedWithin = filters.postedWithin;
+
+    // ============= remote filter =========>
+    if (filters.isRemote !== undefined) p.isRemote = filters.isRemote;
+
+    // ================= skills (send as comma-separated or array) ========>
+    if (filters.skills.length > 0) p.skills = filters.skills.join(",");
+
+    // ================= salary range (only if changed from default) =================>
     if (filters.budgetRange[0] > 0) p.salaryMin = filters.budgetRange[0];
     if (filters.budgetRange[1] < 10000) p.salaryMax = filters.budgetRange[1];
 
@@ -82,7 +95,6 @@ const JobView = () => {
           <div className="sticky top-24 hidden md:flex">
             <ScrollArea className="h-[87dvh] w-full rounded-2xl">
               {
-                //@ts-ignore
                 <SidebarFilter
                   onFiltersChange={handleFiltersChange}
                   className="w-full"
@@ -91,10 +103,7 @@ const JobView = () => {
             </ScrollArea>
           </div>
           <div className="flex md:hidden">
-            {
-              //@ts-ignore
-              <Sidebar onFiltersChange={handleFiltersChange} />
-            }
+            {<Sidebar onFiltersChange={handleFiltersChange} />}
           </div>
         </div>
         <div className="col-span-12 md:col-span-8">
@@ -112,7 +121,6 @@ const JobView = () => {
             )}
             {data &&
               data?.data?.map((job: any) => (
-                //@ts-ignore
                 <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
                   <JobCard key={job?.id} job={job} />
                 </Suspense>
