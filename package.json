@@ -46,6 +46,7 @@
     "react-hook-form": "^7.62.0",
     "react-infinite-scroll-component": "^6.1.0",
     "react-redux": "^9.2.0",
+    "recharts": "^3.3.0",
     "redux-persist": "^6.0.0",
     "remove": "^0.1.5",
     "shadcn": "^3.0.0",
