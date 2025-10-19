@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
@@ -48,11 +48,13 @@ const CATEGORY_MAP: Record<number, string> = {
 
 const JobView = () => {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allJobs, setAllJobs] = useState<any[]>([]);
 
   const params = useMemo(() => {
     const p: any = {
-      page: 1,
-      limit: 12,
+      page: currentPage,
+      limit: 6,
       sortBy: "createdAt",
       sortOrder: "desc",
     };
@@ -93,9 +95,19 @@ const JobView = () => {
     if (filters.budgetRange[1] < 10000) p.salaryMax = filters.budgetRange[1];
 
     return p;
-  }, [filters]);
+  }, [filters, currentPage]);
 
   const { data, isLoading, error } = useGetJobsQuery(params);
+
+  useEffect(() => {
+    if (data?.data) {
+      if (currentPage === 1) {
+        setAllJobs(data.data);
+      } else {
+        setAllJobs((prev) => [...prev, ...data.data]);
+      }
+    }
+  }, [data, currentPage]);
 
   const handleSearch = (searchData: { search: string; location: string }) => {
     setFilters((prev) => ({
@@ -103,10 +115,20 @@ const JobView = () => {
       search: searchData.search,
       location: searchData.location,
     }));
+    setCurrentPage(1);
+    setAllJobs([]);
+  };
+
+  const loadMore = () => {
+    if (data?.meta && currentPage < data.meta.pages) {
+      setCurrentPage((prev) => prev + 1);
+    }
   };
 
   const handleFiltersChange = (newFilters: Filters) => {
     setFilters(newFilters);
+    setCurrentPage(1);
+    setAllJobs([]);
   };
 
   const handleCategorySelect = (selectedCategoryIds: number[]) => {
@@ -114,6 +136,8 @@ const JobView = () => {
       ...prev,
       categories: selectedCategoryIds,
     }));
+    setCurrentPage(1);
+    setAllJobs([]);
   };
 
   return (
@@ -139,7 +163,7 @@ const JobView = () => {
             {<Sidebar onFiltersChange={handleFiltersChange} />}
           </div>
         </div>
-        <div className="col-span-12 md:col-span-8">
+        {/* <div className="col-span-12 md:col-span-8">
           <div className="flex flex-col md:gap-4">
             {isLoading &&
               [...Array(6)].map((_, index) => <JobCardSkeleton key={index} />)}
@@ -159,6 +183,43 @@ const JobView = () => {
                 </Suspense>
               ))}
           </div>
+        </div> */}
+        <div className="col-span-12 md:col-span-8">
+          <InfiniteScroll
+            dataLength={allJobs.length}
+            next={loadMore}
+            hasMore={data?.meta ? currentPage < data.meta.pages : false}
+            loader={<JobCardSkeleton />}
+            endMessage={
+              <p className="text-muted-foreground py-4 text-center">
+                {allJobs.length > 0 ? "No more jobs to load" : ""}
+              </p>
+            }
+          >
+            <div className="flex flex-col md:gap-4">
+              {isLoading &&
+                currentPage === 1 &&
+                [...Array(6)].map((_, index) => (
+                  <JobCardSkeleton key={index} />
+                ))}
+
+              {error && (
+                <div className="text-destructive text-center">
+                  Something went wrong, please try again later.
+                </div>
+              )}
+
+              {allJobs.length === 0 && !isLoading && (
+                <div className="text-center">No jobs found.</div>
+              )}
+
+              {allJobs.map((job: any) => (
+                <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
+                  <JobCard key={job?.id} job={job} />
+                </Suspense>
+              ))}
+            </div>
+          </InfiniteScroll>
         </div>
       </div>
     </div>
