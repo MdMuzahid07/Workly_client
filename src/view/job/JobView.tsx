@@ -20,6 +20,7 @@ type Filters = {
   skills: string[];
   postedWithin: string;
   isRemote?: boolean;
+  categories?: number[];
 };
 
 const DEFAULT_FILTERS: Filters = {
@@ -31,6 +32,18 @@ const DEFAULT_FILTERS: Filters = {
   skills: [],
   postedWithin: "",
   isRemote: undefined,
+  categories: [],
+};
+
+const CATEGORY_MAP: Record<number, string> = {
+  1: "Software Development",
+  2: "Healthcare",
+  3: "Finance",
+  4: "Marketing",
+  5: "Design",
+  6: "Sales",
+  7: "Education",
+  8: "Remote",
 };
 
 const JobView = () => {
@@ -64,6 +77,16 @@ const JobView = () => {
 
     // ================= skills (send as comma-separated or array) ========>
     if (filters.skills.length > 0) p.skills = filters.skills.join(",");
+
+    // ========== convert category IDs to industry names ===========>
+    if (filters.categories && filters.categories.length > 0) {
+      const industries = filters.categories
+        .map((id) => CATEGORY_MAP[id])
+        .filter(Boolean);
+      if (industries.length > 0) {
+        p.industry = industries.join(",");
+      }
+    }
 
     // ================= salary range (only if changed from default) =================>
     if (filters.budgetRange[0] > 0) p.salaryMin = filters.budgetRange[0];

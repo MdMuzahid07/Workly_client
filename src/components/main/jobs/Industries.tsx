@@ -38,7 +38,7 @@ export type IndustriesProps = {
 const defaultCategories: Category[] = [
   {
     id: 1,
-    title: "Technology",
+    title: "Software Development",
     icon: Code,
     count: "2,847 jobs",
     color: "bg-blue-500",
