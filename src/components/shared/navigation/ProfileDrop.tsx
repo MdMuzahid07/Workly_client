@@ -129,16 +129,16 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 priority
               />
             ) : (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-sm font-semibold text-white shadow-sm">
+              <div className="text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-sm font-semibold shadow-sm">
                 {user.initials}
               </div>
             )}
             <div className="bg-primary/100 absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white shadow-sm"></div>
           </div>
           <ChevronDown
-            className={`text-secondary-foreground h-4 w-4 transition-transform duration-200 ${
+            className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
-            } group-hover:text-secondary-foreground`}
+            } group-hover:text-muted-foreground`}
           />
         </Button>
       ) : (
@@ -195,17 +195,17 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                       priority
                     />
                   ) : (
-                    <div className="from-primary/50 to-primary flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br text-lg font-semibold text-white shadow-sm sm:h-12 sm:w-12">
+                    <div className="from-primary/50 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
                       {user.initials}
                     </div>
                   )}
                   {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-primary/100 shadow-sm"></div> */}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-secondary-foreground truncate text-center font-semibold sm:text-start">
+                  <p className="text-muted-foreground truncate text-center font-semibold sm:text-start">
                     {user.name}
                   </p>
-                  <p className="text-secondary-foreground truncate text-center text-sm sm:text-start">
+                  <p className="text-muted-foreground truncate text-center text-sm sm:text-start">
                     {user.email}
                   </p>
                   {/* <div className="mt-1 flex items-center gap-1">
@@ -223,13 +223,13 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group hover:bg-primary/2/80 focus:bg-primary/2/80 text-secondary-foreground flex items-center justify-between px-4 py-3 text-sm transition-all duration-150 focus:outline-none"
+                  className="group hover:bg-primary/2/80 focus:bg-primary/2/80 text-muted-foreground flex items-center justify-between px-4 py-3 text-sm transition-all duration-150 focus:outline-none"
                   role="menuitem"
                   onClick={() => setIsOpen(false)}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="text-secondary-foreground group-hover:text-secondary-foreground h-4 w-4 transition-colors" />
-                    <span className="text-xs font-medium text-slate-700">
+                    <item.icon className="group-hover:text-muted-foreground text-primary h-4 w-4 transition-colors" />
+                    <span className="text-muted-foreground text-xs font-medium group-hover:text-white">
                       {item.label}
                     </span>
                   </div>
