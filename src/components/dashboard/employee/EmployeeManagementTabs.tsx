@@ -265,7 +265,7 @@ const EmployeeManagementTabs = ({
                   <Card key={employee.id} className="p-4">
                     <div className="mb-3 flex items-start justify-between">
                       <div className="flex min-w-0 flex-1 items-center space-x-3">
-                        <Avatar className="h-10 w-10 flex-shrink-0">
+                        <Avatar className="h-10 w-10">
                           <AvatarImage
                             src={employee.avatar || "/placeholder.svg"}
                             alt={employee.fullName}
@@ -342,11 +342,11 @@ const EmployeeManagementTabs = ({
 
                     <div className="space-y-2 text-xs">
                       <div className="text-muted-foreground flex items-center">
-                        <MapPin className="mr-1 h-3 w-3 flex-shrink-0" />
+                        <MapPin className="mr-1 h-3 w-3" />
                         <span className="truncate">{employee.location}</span>
                       </div>
                       <div className="text-muted-foreground flex items-center">
-                        <Mail className="mr-1 h-3 w-3 flex-shrink-0" />
+                        <Mail className="mr-1 h-3 w-3" />
                         <span className="truncate">{employee.email}</span>
                       </div>
                       <div className="flex items-center justify-between">

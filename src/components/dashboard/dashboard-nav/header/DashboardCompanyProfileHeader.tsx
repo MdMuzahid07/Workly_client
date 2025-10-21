@@ -22,7 +22,7 @@ const DashboardCompanyProfileHeader = ({
 }) => {
   return (
     <DashboardHeaderContainer>
-      <div className="flex items-start justify-between">
+      <div className="flex w-full items-start justify-between">
         <div className="flex items-start space-x-4">
           <Avatar className="h-16 w-16">
             <AvatarImage

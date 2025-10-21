@@ -204,7 +204,7 @@ const CompanyDashboardView = () => {
                   key={employee.id}
                   className="flex items-center space-x-3 rounded-2xl border p-3"
                 >
-                  <Avatar className="h-8 w-8 flex-shrink-0 sm:h-10 sm:w-10">
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                     <AvatarImage
                       src={employee.avatar || "/placeholder.svg"}
                       alt={employee.name}

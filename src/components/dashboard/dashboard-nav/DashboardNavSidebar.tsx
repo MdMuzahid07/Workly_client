@@ -186,7 +186,7 @@ const DashboardSidebar = () => {
           handleItemClick();
         }}
       >
-        <Icon className="h-5 w-5 flex-shrink-0" />
+        <Icon className="h-5 w-5" />
         <span className="flex-1 truncate text-left">{label}</span>
         <div className="flex items-center gap-2">
           {badge && (
@@ -278,7 +278,7 @@ const DashboardSidebar = () => {
         </SheetContent>
       </Sheet>
 
-      <div className="hidden flex-shrink-0 lg:block lg:w-64" />
+      <div className="hidden lg:block lg:w-64" />
     </div>
   );
 };

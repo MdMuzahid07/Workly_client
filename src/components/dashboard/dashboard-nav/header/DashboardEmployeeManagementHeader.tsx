@@ -37,7 +37,7 @@ const DashboardEmployeeManagementHeader = ({
           </DialogTrigger>
 
           <DialogContent className="mx-4 flex max-h-[90vh] w-[calc(100vw-2rem)] max-w-[90vw] flex-col overflow-hidden sm:mx-auto sm:w-full sm:max-w-2xl lg:max-w-4xl">
-            <DialogHeader className="flex-shrink-0 border-b pb-4">
+            <DialogHeader className="border-b pb-4">
               <DialogTitle className="text-lg font-semibold sm:text-xl">
                 Add New Employee
               </DialogTitle>

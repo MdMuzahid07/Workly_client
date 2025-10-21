@@ -346,7 +346,7 @@ const CompanyCreationView = () => {
                     Company Website
                   </Label>
                   <div className="flex items-center space-x-2">
-                    <Globe className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                    <Globe className="text-muted-foreground h-4 w-4" />
                     <Input
                       id="websiteUrl"
                       value={formData.websiteUrl}
@@ -400,7 +400,7 @@ const CompanyCreationView = () => {
                       Contact Email *
                     </Label>
                     <div className="flex items-center space-x-2">
-                      <Mail className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                      <Mail className="text-muted-foreground h-4 w-4" />
                       <Input
                         id="contactEmail"
                         value={formData.contactEmail}
@@ -422,7 +422,7 @@ const CompanyCreationView = () => {
                       Contact Phone
                     </Label>
                     <div className="flex items-center space-x-2">
-                      <Phone className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                      <Phone className="text-muted-foreground h-4 w-4" />
                       <Input
                         id="contactPhone"
                         value={formData.contactPhone}

@@ -192,7 +192,7 @@ const JobDetailsSheet = ({ job, open, onOpenChange }: JobDetailsSheetProps) => {
             <SheetHeader className="bg-muted/30 border-b px-6 py-5">
               <div className="flex items-start gap-4">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
-                  <div className="bg-primary/10 text-primary flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border">
+                  <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl border">
                     <Briefcase className="h-6 w-6" />
                   </div>
                   <div className="min-w-0 flex-1 space-y-2">
@@ -228,7 +228,7 @@ const JobDetailsSheet = ({ job, open, onOpenChange }: JobDetailsSheetProps) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">

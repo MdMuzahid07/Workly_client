@@ -6,7 +6,7 @@ import DashboardHeaderContainer from "./DashboardHeaderContainer";
 const DashboardCategoryHeader = ({ setIsAddOpen }: any) => {
   return (
     <DashboardHeaderContainer>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="bg-primary/10 rounded-lg p-2">
             <Tag className="text-primary h-6 w-6" />

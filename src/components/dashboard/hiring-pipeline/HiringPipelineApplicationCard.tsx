@@ -40,7 +40,7 @@ const HiringPipelineApplicationCard = ({
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            <Avatar className="h-10 w-10 flex-shrink-0">
+            <Avatar className="h-10 w-10">
               <AvatarImage
                 src={application.applicantAvatar || "/placeholder.svg"}
               />
@@ -80,11 +80,11 @@ const HiringPipelineApplicationCard = ({
 
         <div className="space-y-1.5">
           <div className="text-muted-foreground flex items-center gap-2 text-xs">
-            <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+            <Mail className="h-3.5 w-3.5" />
             <span className="truncate">{application.applicantEmail}</span>
           </div>
           <div className="text-muted-foreground flex items-center gap-2 text-xs">
-            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+            <Calendar className="h-3.5 w-3.5" />
             <span>Applied {application.appliedDate}</span>
           </div>
         </div>

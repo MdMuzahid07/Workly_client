@@ -184,7 +184,7 @@ const HiringPipelineView = () => {
                 const stageApplications = getApplicationsByStage(stage.id);
                 const StageIcon = stage.icon;
                 return (
-                  <div key={stage.id} className="w-[320px] flex-shrink-0">
+                  <div key={stage.id} className="w-[320px]">
                     <div className="bg-card mb-3 flex items-center justify-between rounded-lg border p-3">
                       <div className="flex items-center gap-2">
                         <div

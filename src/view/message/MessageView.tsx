@@ -303,7 +303,7 @@ const MessageView = () => {
                                 : ""
                             }`}
                           >
-                            <Avatar className="h-8 w-8 flex-shrink-0">
+                            <Avatar className="h-8 w-8">
                               <AvatarImage
                                 src={message.senderAvatar || "/placeholder.svg"}
                               />

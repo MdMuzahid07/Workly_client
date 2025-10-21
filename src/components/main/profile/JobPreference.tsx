@@ -56,7 +56,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           <div className="space-y-4">
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Briefcase className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Briefcase className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Job Type
@@ -71,7 +71,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
             </div>
 
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <DollarSign className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <DollarSign className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Expected Salary
@@ -85,7 +85,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
 
           <div className="space-y-4">
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <MapPin className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <MapPin className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Preferred Location
@@ -97,7 +97,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
             </div>
 
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Building className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Building className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Industry
@@ -111,7 +111,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
 
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Calendar className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Calendar className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Experience Level
@@ -123,7 +123,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
             </div>
 
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Wifi className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Wifi className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Remote Work

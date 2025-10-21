@@ -156,7 +156,7 @@ const EmployeeProfileDetails = ({
             <SheetHeader className="bg-muted/30 border-b px-6 py-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <Avatar className="border-primary/20 h-16 w-16 flex-shrink-0 border-2">
+                  <Avatar className="border-primary/20 h-16 w-16 border-2">
                     <AvatarImage
                       src={employee.profile?.avatarUrl || "/placeholder.svg"}
                     />
