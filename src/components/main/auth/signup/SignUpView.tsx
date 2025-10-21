@@ -168,7 +168,7 @@ const SignUpView = () => {
               <Button
                 type="button"
                 variant={selectedRole === "EMPLOYER" ? "default" : "outline"}
-                className={`hover:bg-primary/100 flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
+                className={`hover:bg-primary flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
                   selectedRole === "EMPLOYER"
                     ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
@@ -181,7 +181,7 @@ const SignUpView = () => {
               <Button
                 type="button"
                 variant={selectedRole === "JOB_SEEKER" ? "default" : "outline"}
-                className={`hover:bg-primary/100 flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
+                className={`hover:bg-primary flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
                   selectedRole === "JOB_SEEKER"
                     ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"

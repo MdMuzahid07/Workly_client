@@ -26,7 +26,7 @@ function MetricCard({ title, value, change, icon, trend }: MetricCardProps) {
 
   return (
     <Card className="relative overflow-hidden p-6 transition-all">
-      <div className="from-primary/5 absolute inset-0 bg-gradient-to-br to-transparent opacity-0 transition-opacity hover:opacity-100" />
+      <div className="from-primary/5 absolute inset-0 to-transparent opacity-0 transition-opacity hover:opacity-100" />
       <div className="relative space-y-3">
         <div className="flex items-start justify-between">
           <p className="text-muted-foreground text-sm font-medium">{title}</p>

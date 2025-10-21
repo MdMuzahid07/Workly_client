@@ -64,7 +64,7 @@ const Searchbar = ({
         </div>
         <Button
           size="sm"
-          className="bg-primary hover:bg-primary/100 h-10 cursor-pointer rounded-full px-6 text-lg font-semibold"
+          className="bg-primary hover:bg-primary h-10 cursor-pointer rounded-full px-6 text-lg font-semibold"
         >
           Search
         </Button>

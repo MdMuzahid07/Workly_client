@@ -57,7 +57,7 @@ const defaultCategories: Category[] = [
     title: "Finance",
     icon: TrendingUp,
     count: "1,456 jobs",
-    color: "bg-primary/100",
+    color: "bg-primary",
     description: "Banking, Investment, Accounting",
   },
   {
@@ -168,7 +168,7 @@ const Industries = ({
           const isSelected = selected?.includes(category.id);
 
           return (
-            <SwiperSlide key={category.id} className="!w-auto">
+            <SwiperSlide key={category.id} className="w-auto!">
               <Button
                 onClick={() => toggleSelection(category.id)}
                 className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground dark:hover:bg-card hover:bg-white"}`}

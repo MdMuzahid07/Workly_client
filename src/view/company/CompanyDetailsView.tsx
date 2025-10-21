@@ -183,7 +183,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     {transformedBenefits.map((benefit, index) => (
                       <div key={index} className="flex items-start gap-3">
-                        <div className="bg-primary/100 mt-2 h-2 w-2 rounded-full"></div>
+                        <div className="bg-primary mt-2 h-2 w-2 rounded-full"></div>
                         <span className="text-secondary-foreground">
                           {benefit}
                         </span>
@@ -267,7 +267,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                             </div>
                             <Button
                               size="sm"
-                              className="bg-primary/100 hover:bg-primary text-white"
+                              className="bg-primary hover:bg-primary text-white"
                             >
                               Apply
                             </Button>

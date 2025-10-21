@@ -133,7 +133,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 {user.initials}
               </div>
             )}
-            <div className="bg-primary/100 absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white shadow-sm"></div>
+            <div className="bg-primary absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white shadow-sm"></div>
           </div>
           <ChevronDown
             className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${
@@ -195,11 +195,11 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                       priority
                     />
                   ) : (
-                    <div className="from-primary/50 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
+                    <div className="from-primary/50 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
                       {user.initials}
                     </div>
                   )}
-                  {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-primary/100 shadow-sm"></div> */}
+                  {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-primary shadow-sm"></div> */}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-muted-foreground truncate text-center font-semibold sm:text-start">
@@ -209,7 +209,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                     {user.email}
                   </p>
                   {/* <div className="mt-1 flex items-center gap-1">
-                    <div className="h-2 w-2 rounded-full bg-primary/100"></div>
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
                     <span className="text-xs font-medium text-green-600">
                       Online
                     </span>
