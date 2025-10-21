@@ -231,7 +231,7 @@ const JobDetailsView = () => {
                   <ul className="space-y-3">
                     {job.Benefits.map((benefit: any) => (
                       <li key={benefit.id} className="flex items-start">
-                        <span className="bg-primary/100 mt-2 mr-3 h-2 w-2 flex-shrink-0 rounded-full"></span>
+                        <span className="bg-primary mt-2 mr-3 h-2 w-2 rounded-full"></span>
                         <div className="flex-1">
                           <p className="text-foreground/90 font-medium">
                             {benefit.title}
