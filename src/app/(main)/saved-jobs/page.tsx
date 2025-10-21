@@ -1,5 +1,7 @@
+import SavedJobsView from "../../../view/saved-jobs/SavedJobsView";
+
 const page = () => {
-  return <div>page</div>;
+  return <SavedJobsView />;
 };
 
 export default page;
