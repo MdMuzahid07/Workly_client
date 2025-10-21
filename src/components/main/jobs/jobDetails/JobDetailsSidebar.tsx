@@ -5,7 +5,6 @@ import { Building2, Calendar, Eye, FileText, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
-// Types
 interface Company {
   id: string;
   name: string;
@@ -33,9 +32,9 @@ interface JobDetailsSidebarProps {
   onApply?: () => void;
   onSave?: () => void;
   onViewCompany?: () => void;
+  isSaving?: boolean;
 }
 
-// Constants
 const STATS_ICONS = {
   applications: FileText,
   views: Eye,
@@ -83,6 +82,7 @@ const JobDetailsSidebar = ({
   job,
   onApply,
   onSave,
+  isSaving,
   onViewCompany,
 }: JobDetailsSidebarProps) => {
   const router = useRouter();
@@ -168,8 +168,9 @@ const JobDetailsSidebar = ({
               className="hover:bg-primary/10 hover:text-foreground w-full border-gray-300 font-medium"
               onClick={handleSave}
               size="lg"
+              disabled={isSaving}
             >
-              Save Job
+              {isSaving ? "Loading..." : "Save Job"}
             </Button>
           </div>
         </CardContent>

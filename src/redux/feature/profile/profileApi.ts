@@ -25,10 +25,11 @@ const profileApi = baseApi.injectEndpoints({
       }),
     }),
 
-    toggleSaveUnsaveJob: builder.query({
-      query: () => ({
+    toggleSaveUnsaveJob: builder.mutation({
+      query: (jobId: string) => ({
         url: "/profile/save-job",
-        method: "GET",
+        method: "POST",
+        body: { jobId },
       }),
     }),
 
@@ -55,5 +56,5 @@ export const {
   useCreateProfileMutation,
   useGetSavedJobsQuery,
   useUpdateSavedJobMutation,
-  useToggleSaveUnsaveJobQuery,
+  useToggleSaveUnsaveJobMutation,
 } = profileApi;

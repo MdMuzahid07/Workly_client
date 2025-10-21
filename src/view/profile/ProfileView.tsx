@@ -56,7 +56,7 @@ const ProfileView = () => {
     <div className="bg-primary/2 min-h-screen">
       <div className="mx-auto max-w-6xl py-6 md:pt-24">
         <div className="mb-8 lg:hidden">
-          <Card className="from-card to-muted/30 border-0 bg-gradient-to-br">
+          <Card className="from-card to-muted/30 border-0">
             <CardContent className="p-6">
               <div className="flex flex-col items-center space-y-4 text-center">
                 <Avatar className="ring-primary/20 h-24 w-24 ring-4">
@@ -129,7 +129,7 @@ const ProfileView = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                  <div className="from-primary/10 to-primary/5 border-primary/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-primary/10 to-primary/5 border-primary/20 rounded-xl border p-6 text-center">
                     <div className="text-primary mb-2 text-3xl font-bold">
                       12
                     </div>
@@ -137,7 +137,7 @@ const ProfileView = () => {
                       Applications
                     </div>
                   </div>
-                  <div className="from-chart-2/10 to-chart-2/5 border-chart-2/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-chart-2/10 to-chart-2/5 border-chart-2/20 rounded-xl border p-6 text-center">
                     <div className="text-chart-2 mb-2 text-3xl font-bold">
                       5
                     </div>
@@ -145,7 +145,7 @@ const ProfileView = () => {
                       Interviews
                     </div>
                   </div>
-                  <div className="from-chart-3/10 to-chart-3/5 border-chart-3/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-chart-3/10 to-chart-3/5 border-chart-3/20 rounded-xl border p-6 text-center">
                     <div className="text-chart-3 mb-2 text-3xl font-bold">
                       23
                     </div>
@@ -153,7 +153,7 @@ const ProfileView = () => {
                       Saved Jobs
                     </div>
                   </div>
-                  <div className="from-chart-4/10 to-chart-4/5 border-chart-4/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-chart-4/10 to-chart-4/5 border-chart-4/20 rounded-xl border p-6 text-center">
                     <div className="text-chart-4 mb-2 text-3xl font-bold">
                       156
                     </div>

@@ -16,8 +16,11 @@ import {
   Users,
 } from "lucide-react";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import JobDetailsSidebar from "../../components/main/jobs/jobDetails/JobDetailsSidebar";
+import getTimeAgo from "../../helper/getTimeAgo";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
+import { useToggleSaveUnsaveJobMutation } from "../../redux/feature/profile/profileApi";
 import JobDetailsSkeleton from "../../skeleton/job/JobDetailsSkeleton";
 
 const JobDetailsView = () => {
@@ -32,12 +35,34 @@ const JobDetailsView = () => {
     skip: !jobId,
   });
 
-  // Handle loading state
+  const [toggleSaveUnsaveJobMutation, { isLoading: isSaving }] =
+    useToggleSaveUnsaveJobMutation();
+
+  const handleJobSave = async () => {
+    try {
+      toast.loading("Updating job status...", { id: "save_job" });
+
+      const response = await toggleSaveUnsaveJobMutation(jobId).unwrap();
+
+      console.log(response);
+
+      if (response.success && response.data.action === "saved") {
+        toast.success("Job saved successfully", { id: "save_job" });
+      }
+
+      if (response.success && response.data.action === "unsaved") {
+        toast.success("Job unsaved successfully", { id: "save_job" });
+      }
+    } catch (err) {
+      toast.error("Failed to update job status", { id: "save_job" });
+      console.error("Failed to save/unsave job:", err);
+    }
+  };
+
   if (isLoading) {
     return <JobDetailsSkeleton />;
   }
 
-  // Handle error state
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -48,7 +73,6 @@ const JobDetailsView = () => {
     );
   }
 
-  // Handle no data
   if (!response?.data) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -57,24 +81,7 @@ const JobDetailsView = () => {
     );
   }
 
-  // Extract actual job data from API response
   const job = response.data || {};
-
-  // Helper function to format date
-  const getTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInHours / 24);
-
-    if (diffInHours < 1) return "Just now";
-    if (diffInHours < 24)
-      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
-    if (diffInDays < 7)
-      return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
-    return date.toLocaleDateString();
-  };
 
   return (
     <div className="bg-primary/2 min-h-screen">
@@ -283,7 +290,11 @@ const JobDetailsView = () => {
             </Card>
           </div>
 
-          <JobDetailsSidebar job={job} />
+          <JobDetailsSidebar
+            job={job}
+            onSave={handleJobSave}
+            isSaving={isSaving}
+          />
         </div>
       </div>
     </div>
