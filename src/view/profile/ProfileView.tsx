@@ -3,15 +3,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Briefcase, Download, Edit3, Mail, MapPin, Star } from "lucide-react";
+import {
+  Briefcase,
+  Download,
+  Edit3,
+  Mail,
+  MapPin,
+  Star,
+  User,
+} from "lucide-react";
 import { useState } from "react";
 import EditProfileDialog from "../../components/main/profile/EditProfileDialog";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSidebar from "../../components/main/profile/ProfileSidebar";
 import SkillsAndExpertise from "../../components/main/profile/SkillsAndExpertise";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
-
-// fake user data based on your schema
 
 const fakeUser = {
   id: "1",
@@ -60,18 +66,18 @@ const ProfileView = () => {
 
   return (
     <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-6xl py-6 md:pt-24">
+      <div className="mx-auto max-w-6xl px-6 py-6 md:pt-24 xl:px-0">
         <div className="mb-8 lg:hidden">
           <Card className="from-card to-muted/30 border-0">
             <CardContent className="p-6">
               <div className="flex flex-col items-center space-y-4 text-center">
-                <Avatar className="ring-primary/20 h-24 w-24 ring-4">
+                <Avatar className="ring-primary/20 flex h-32 w-32 overflow-hidden rounded-full shadow-xl ring-4">
                   <AvatarImage
                     src={user?.profile?.avatarUrl || "/placeholder.svg"}
                     alt={user?.fullName}
                   />
-                  <AvatarFallback className="bg-primary/10 text-primary rounded-full text-xl font-semibold">
-                    🐱
+                  <AvatarFallback className="bg-primary/10 text-primary flex h-full w-full items-center justify-center rounded-full text-2xl font-semibold">
+                    <User className="size-10" />
                   </AvatarFallback>
                 </Avatar>
 
