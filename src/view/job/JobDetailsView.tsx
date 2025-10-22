@@ -165,6 +165,23 @@ const JobDetailsView = () => {
                 </div>
               </CardContent>
             </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Benefits</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
+                  {job.benefits
+                    ?.split(",")
+                    .map((benefit: string, index: number) => (
+                      <ul key={index} className="mb-2 flex items-start">
+                        <li className="mr-2">{index + 1}.</li>
+                        <li>{benefit.trim()}</li>
+                      </ul>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
 
             <div className="grid gap-6 sm:grid-cols-2">
               {job.discipline && (
