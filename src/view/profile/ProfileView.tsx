@@ -18,6 +18,7 @@ import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSidebar from "../../components/main/profile/ProfileSidebar";
 import SkillsAndExpertise from "../../components/main/profile/SkillsAndExpertise";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
+import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
 
 const fakeUser = {
   id: "1",
@@ -63,6 +64,10 @@ const ProfileView = () => {
     data,
     "data from my profile ++++++++++++++++++++++++++++++++++++++++++++++++",
   );
+
+  if (isLoading && !data) {
+    return <ProfileSkeleton />;
+  }
 
   return (
     <div className="bg-primary/2 min-h-screen">
