@@ -20,45 +20,45 @@ import SkillsAndExpertise from "../../components/main/profile/SkillsAndExpertise
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
 
-const fakeUser = {
-  id: "1",
-  email: "john.doe@example.com",
-  fullName: "John Doe",
-  phone: "+1 (555) 123-4567",
-  role: "JOB_SEEKER",
-  isVerified: true,
-  profile: {
-    bio: "Passionate full-stack developer with 5+ years of experience building scalable web applications. I love working with modern technologies and solving complex problems.",
-    location: "San Francisco, CA",
-    avatarUrl: "/cat-profile.png", // Changed to cat image
-    coverUrl: "/tech-workspace-background.jpg",
-    resumeUrl: "/resume.pdf",
-    linkedInUrl: "https://linkedin.com/in/johndoe",
-    websiteUrl: "https://johndoe.dev",
-    skills: [
-      { skillName: "React", experienceYears: 4 },
-      { skillName: "Node.js", experienceYears: 5 },
-      { skillName: "TypeScript", experienceYears: 3 },
-      { skillName: "PostgreSQL", experienceYears: 4 },
-      { skillName: "AWS", experienceYears: 2 },
-      { skillName: "Docker", experienceYears: 3 },
-    ],
-    preference: {
-      jobType: "FULL_TIME",
-      expectedSalary: 120000,
-      preferredLocation: "San Francisco, CA",
-      remoteWork: true,
-      industry: "Technology",
-      workExperience: "Senior Level",
-    },
-  },
-};
+// const fakeUser = {
+//   id: "1",
+//   email: "john.doe@example.com",
+//   fullName: "John Doe",
+//   phone: "+1 (555) 123-4567",
+//   role: "JOB_SEEKER",
+//   isVerified: true,
+//   profile: {
+//     bio: "Passionate full-stack developer with 5+ years of experience building scalable web applications. I love working with modern technologies and solving complex problems.",
+//     location: "San Francisco, CA",
+//     avatarUrl: "/cat-profile.png", // Changed to cat image
+//     coverUrl: "/tech-workspace-background.jpg",
+//     resumeUrl: "/resume.pdf",
+//     linkedInUrl: "https://linkedin.com/in/johndoe",
+//     websiteUrl: "https://johndoe.dev",
+//     skills: [
+//       { skillName: "React", experienceYears: 4 },
+//       { skillName: "Node.js", experienceYears: 5 },
+//       { skillName: "TypeScript", experienceYears: 3 },
+//       { skillName: "PostgreSQL", experienceYears: 4 },
+//       { skillName: "AWS", experienceYears: 2 },
+//       { skillName: "Docker", experienceYears: 3 },
+//     ],
+//     preference: {
+//       jobType: "FULL_TIME",
+//       expectedSalary: 120000,
+//       preferredLocation: "San Francisco, CA",
+//       remoteWork: true,
+//       industry: "Technology",
+//       workExperience: "Senior Level",
+//     },
+//   },
+// };
 
 const ProfileView = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data, isLoading, error } = useGetProfileQuery(undefined);
-  const [user, setUser] = useState(data?.data || fakeUser);
+  const [user, setUser] = useState(data?.data);
 
   console.log(
     data,

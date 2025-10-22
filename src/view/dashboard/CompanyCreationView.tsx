@@ -1,7 +1,9 @@
 "use client";
 
-import type React from "react";
-
+import WkForm from "@/components/form/WkForm";
+import WKInput from "@/components/form/WkInput";
+import WKSelect from "@/components/form/WkSelect";
+import WKTextArea from "@/components/form/WkTextArea";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,18 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Building2, Globe, Mail, MapPin, Phone, Upload } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 
 interface CompanyFormData {
   name: string;
@@ -38,8 +31,336 @@ interface CompanyFormData {
   coverUrl: string;
 }
 
+const industries = [
+  { value: "technology", label: "Technology" },
+  { value: "healthcare", label: "Healthcare" },
+  { value: "finance", label: "Finance" },
+  { value: "education", label: "Education" },
+  { value: "marketing", label: "Marketing" },
+  { value: "design", label: "Design" },
+  { value: "sales", label: "Sales" },
+  { value: "remote", label: "Remote" },
+  { value: "startup", label: "Startup" },
+  { value: "enterprise", label: "Enterprise" },
+];
+
+const companySizes = [
+  { value: "1-10", label: "1-10 employees" },
+  { value: "11-50", label: "11-50 employees" },
+  { value: "51-200", label: "51-200 employees" },
+  { value: "201-500", label: "201-500 employees" },
+  { value: "501-1000", label: "501-1000 employees" },
+  { value: "1000+", label: "1000+ employees" },
+];
+
+// Auto-generate slug component wrapper
+const SlugAutoGenerator = () => {
+  const { watch, setValue } = useFormContext<CompanyFormData>();
+  const name = watch("name");
+
+  useEffect(() => {
+    if (name) {
+      const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      setValue("slug", slug);
+    }
+  }, [name, setValue]);
+
+  return null;
+};
+
+// Step 1: Basic Information
+const BasicInfoStep = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center text-lg sm:text-xl">
+          <Building2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          Basic Company Information
+        </CardTitle>
+        <CardDescription className="text-sm">
+          Tell us about your company&apos;s core details
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+          <WKInput
+            name="name"
+            label="Company Name"
+            required
+            className="h-10 sm:h-11"
+          />
+          <div className="space-y-2">
+            <label htmlFor="slug" className="text-sm font-medium">
+              Company URL Slug <span className="text-destructive ml-1">*</span>
+            </label>
+            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0">
+              <span className="text-muted-foreground truncate text-xs sm:mr-2 sm:text-sm">
+                workly.com/company/
+              </span>
+              <WKInput name="slug" label="" required className="h-10 sm:h-11" />
+            </div>
+          </div>
+        </div>
+
+        <WKTextArea
+          name="description"
+          label="Company Description"
+          required
+          rows={4}
+          className="resize-none"
+        />
+
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+          <WKSelect
+            name="industry"
+            label="Industry"
+            placeholder="Select industry"
+            required
+            options={industries}
+            className="h-10 sm:h-11"
+          />
+          <WKSelect
+            name="size"
+            label="Company Size"
+            placeholder="Select company size"
+            required
+            options={companySizes}
+            className="h-10 sm:h-11"
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Step 2: Location & Details
+const LocationDetailsStep = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center text-lg sm:text-xl">
+          <MapPin className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          Location & Company Details
+        </CardTitle>
+        <CardDescription className="text-sm">
+          Add location and founding information
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+          <WKInput
+            name="location"
+            label="Headquarters Location"
+            required
+            className="h-10 sm:h-11"
+          />
+          <WKInput
+            name="founded"
+            label="Founded Year"
+            type="text"
+            className="h-10 sm:h-11"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="websiteUrl" className="text-sm font-medium">
+            Company Website
+          </label>
+          <div className="flex items-center space-x-2">
+            <Globe className="text-muted-foreground h-4 w-4" />
+            <WKInput
+              name="websiteUrl"
+              label=""
+              type="text"
+              className="h-10 sm:h-11"
+            />
+          </div>
+        </div>
+
+        <div className="bg-muted rounded-lg p-3 sm:p-4">
+          <h4 className="mb-2 text-sm font-medium sm:text-base">
+            Why add these details?
+          </h4>
+          <ul className="text-muted-foreground space-y-1 text-xs sm:text-sm">
+            <li>• Location helps candidates find relevant opportunities</li>
+            <li>• Company website builds trust and credibility</li>
+            <li>• Founded year shows company stability and experience</li>
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Step 3: Media & Contact
+const MediaContactStep = () => {
+  const { watch } = useFormContext<CompanyFormData>();
+  const formData = watch();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center text-lg sm:text-xl">
+          <Upload className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          Media & Contact Information
+        </CardTitle>
+        <CardDescription className="text-sm">
+          Add your logo and contact details
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="contactEmail" className="text-sm font-medium">
+              Contact Email <span className="text-destructive ml-1">*</span>
+            </label>
+            <div className="flex items-center space-x-2">
+              <Mail className="text-muted-foreground h-4 w-4" />
+              <WKInput
+                name="contactEmail"
+                label=""
+                type="email"
+                required
+                className="h-10 sm:h-11"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="contactPhone" className="text-sm font-medium">
+              Contact Phone
+            </label>
+            <div className="flex items-center space-x-2">
+              <Phone className="text-muted-foreground h-4 w-4" />
+              <WKInput
+                name="contactPhone"
+                label=""
+                type="text"
+                className="h-10 sm:h-11"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Company Logo</label>
+            <div className="border-border rounded-lg border-2 border-dashed p-4 text-center sm:p-6">
+              <Upload className="text-muted-foreground mx-auto mb-2 h-6 w-6 sm:h-8 sm:w-8" />
+              <p className="text-muted-foreground mb-2 text-xs sm:text-sm">
+                Upload your company logo (PNG, JPG up to 2MB)
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full bg-transparent sm:w-auto"
+              >
+                Choose File
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Cover Image (Optional)
+            </label>
+            <div className="border-border rounded-lg border-2 border-dashed p-4 text-center sm:p-6">
+              <Upload className="text-muted-foreground mx-auto mb-2 h-6 w-6 sm:h-8 sm:w-8" />
+              <p className="text-muted-foreground mb-2 text-xs sm:text-sm">
+                Upload a cover image for your company profile
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full bg-transparent sm:w-auto"
+              >
+                Choose File
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-accent rounded-lg p-3 sm:p-4">
+          <h4 className="mb-2 text-sm font-medium sm:text-base">
+            📋 Review Your Information
+          </h4>
+          <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 sm:gap-4 sm:text-sm">
+            <div className="space-y-1">
+              <p>
+                <strong>Company:</strong>{" "}
+                <span className="wrap-break-words">
+                  {formData.name || "Not set"}
+                </span>
+              </p>
+              <p>
+                <strong>Industry:</strong> {formData.industry || "Not set"}
+              </p>
+              <p>
+                <strong>Size:</strong> {formData.size || "Not set"}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p>
+                <strong>Location:</strong>{" "}
+                <span className="wrap-break-words">
+                  {formData.location || "Not set"}
+                </span>
+              </p>
+              <p>
+                <strong>Website:</strong>{" "}
+                <span className="break-all">
+                  {formData.websiteUrl || "Not set"}
+                </span>
+              </p>
+              <p>
+                <strong>Email:</strong>{" "}
+                <span className="break-all">
+                  {formData.contactEmail || "Not set"}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const CompanyCreationView = () => {
-  const [formData, setFormData] = useState<CompanyFormData>({
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (data: CompanyFormData) => {
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      console.log("Company data:", data);
+
+      // In real app, redirect to company dashboard
+      // router.push('/company/dashboard');
+    } catch (error) {
+      console.error("Failed to create company:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const nextStep = () => {
+    if (currentStep < 3) setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const defaultValues: Partial<CompanyFormData> = {
     name: "",
     slug: "",
     description: "",
@@ -52,70 +373,6 @@ const CompanyCreationView = () => {
     founded: "",
     logoUrl: "",
     coverUrl: "",
-  });
-
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const industries = [
-    "Technology",
-    "Healthcare",
-    "Finance",
-    "Education",
-    "Marketing",
-    "Design",
-    "Sales",
-    "Remote",
-    "Startup",
-    "Enterprise",
-  ];
-
-  const companySizes = [
-    "1-10 employees",
-    "11-50 employees",
-    "51-200 employees",
-    "201-500 employees",
-    "501-1000 employees",
-    "1000+ employees",
-  ];
-
-  const handleInputChange = (field: keyof CompanyFormData, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Auto-generate slug from company name
-    if (field === "name") {
-      const slug = value
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      setFormData((prev) => ({
-        ...prev,
-        slug,
-      }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("Company data:", formData);
-    setIsSubmitting(false);
-    // In real app, redirect to company dashboard
-  };
-
-  const nextStep = () => {
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
   return (
@@ -174,354 +431,20 @@ const CompanyCreationView = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <WkForm<CompanyFormData>
+          onSubmit={handleSubmit}
+          defaultValues={defaultValues}
+        >
+          <SlugAutoGenerator />
+
           {/* Step 1: Basic Information */}
-          {currentStep === 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg sm:text-xl">
-                  <Building2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Basic Company Information
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Tell us about your {`company's`} core details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-6">
-                <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">
-                      Company Name *
-                    </Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) =>
-                        handleInputChange("name", e.target.value)
-                      }
-                      placeholder="Enter company name"
-                      required
-                      className="h-10 sm:h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="slug" className="text-sm font-medium">
-                      Company URL Slug *
-                    </Label>
-                    <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0">
-                      <span className="text-muted-foreground truncate text-xs sm:mr-2 sm:text-sm">
-                        workly.com/company/
-                      </span>
-                      <Input
-                        id="slug"
-                        value={formData.slug}
-                        onChange={(e) =>
-                          handleInputChange("slug", e.target.value)
-                        }
-                        placeholder="company-slug"
-                        required
-                        className="h-10 sm:h-11"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium">
-                    Company Description *
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      handleInputChange("description", e.target.value)
-                    }
-                    placeholder="Describe your company, mission, and what makes you unique..."
-                    rows={4}
-                    required
-                    className="resize-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="industry" className="text-sm font-medium">
-                      Industry *
-                    </Label>
-                    <Select
-                      value={formData.industry}
-                      onValueChange={(value) =>
-                        handleInputChange("industry", value)
-                      }
-                    >
-                      <SelectTrigger className="h-10 sm:h-11">
-                        <SelectValue placeholder="Select industry" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {industries.map((industry) => (
-                          <SelectItem key={industry} value={industry}>
-                            {industry}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="size" className="text-sm font-medium">
-                      Company Size *
-                    </Label>
-                    <Select
-                      value={formData.size}
-                      onValueChange={(value) =>
-                        handleInputChange("size", value)
-                      }
-                    >
-                      <SelectTrigger className="h-10 sm:h-11">
-                        <SelectValue placeholder="Select company size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {companySizes.map((size) => (
-                          <SelectItem key={size} value={size}>
-                            {size}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {currentStep === 1 && <BasicInfoStep />}
 
           {/* Step 2: Location & Details */}
-          {currentStep === 2 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg sm:text-xl">
-                  <MapPin className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Location & Company Details
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Add location and founding information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-6">
-                <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="location" className="text-sm font-medium">
-                      Headquarters Location *
-                    </Label>
-                    <Input
-                      id="location"
-                      value={formData.location}
-                      onChange={(e) =>
-                        handleInputChange("location", e.target.value)
-                      }
-                      placeholder="e.g., San Francisco, CA"
-                      required
-                      className="h-10 sm:h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="founded" className="text-sm font-medium">
-                      Founded Year
-                    </Label>
-                    <Input
-                      id="founded"
-                      value={formData.founded}
-                      onChange={(e) =>
-                        handleInputChange("founded", e.target.value)
-                      }
-                      placeholder="e.g., 2018"
-                      type="number"
-                      min="1800"
-                      max={new Date().getFullYear()}
-                      className="h-10 sm:h-11"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="websiteUrl" className="text-sm font-medium">
-                    Company Website
-                  </Label>
-                  <div className="flex items-center space-x-2">
-                    <Globe className="text-muted-foreground h-4 w-4" />
-                    <Input
-                      id="websiteUrl"
-                      value={formData.websiteUrl}
-                      onChange={(e) =>
-                        handleInputChange("websiteUrl", e.target.value)
-                      }
-                      placeholder="https://yourcompany.com"
-                      type="url"
-                      className="h-10 sm:h-11"
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-muted rounded-lg p-3 sm:p-4">
-                  <h4 className="mb-2 text-sm font-medium sm:text-base">
-                    Why add these details?
-                  </h4>
-                  <ul className="text-muted-foreground space-y-1 text-xs sm:text-sm">
-                    <li>
-                      • Location helps candidates find relevant opportunities
-                    </li>
-                    <li>• Company website builds trust and credibility</li>
-                    <li>
-                      • Founded year shows company stability and experience
-                    </li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {currentStep === 2 && <LocationDetailsStep />}
 
           {/* Step 3: Media & Contact */}
-          {currentStep === 3 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg sm:text-xl">
-                  <Upload className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Media & Contact Information
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Add your logo and contact details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-6">
-                <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="contactEmail"
-                      className="text-sm font-medium"
-                    >
-                      Contact Email *
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Mail className="text-muted-foreground h-4 w-4" />
-                      <Input
-                        id="contactEmail"
-                        value={formData.contactEmail}
-                        onChange={(e) =>
-                          handleInputChange("contactEmail", e.target.value)
-                        }
-                        placeholder="contact@yourcompany.com"
-                        type="email"
-                        required
-                        className="h-10 sm:h-11"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="contactPhone"
-                      className="text-sm font-medium"
-                    >
-                      Contact Phone
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Phone className="text-muted-foreground h-4 w-4" />
-                      <Input
-                        id="contactPhone"
-                        value={formData.contactPhone}
-                        onChange={(e) =>
-                          handleInputChange("contactPhone", e.target.value)
-                        }
-                        placeholder="+1 (555) 123-4567"
-                        type="tel"
-                        className="h-10 sm:h-11"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Company Logo</Label>
-                    <div className="border-border rounded-lg border-2 border-dashed p-4 text-center sm:p-6">
-                      <Upload className="text-muted-foreground mx-auto mb-2 h-6 w-6 sm:h-8 sm:w-8" />
-                      <p className="text-muted-foreground mb-2 text-xs sm:text-sm">
-                        Upload your company logo (PNG, JPG up to 2MB)
-                      </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full bg-transparent sm:w-auto"
-                      >
-                        Choose File
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                      Cover Image (Optional)
-                    </Label>
-                    <div className="border-border rounded-lg border-2 border-dashed p-4 text-center sm:p-6">
-                      <Upload className="text-muted-foreground mx-auto mb-2 h-6 w-6 sm:h-8 sm:w-8" />
-                      <p className="text-muted-foreground mb-2 text-xs sm:text-sm">
-                        Upload a cover image for your company profile
-                      </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full bg-transparent sm:w-auto"
-                      >
-                        Choose File
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-accent rounded-lg p-3 sm:p-4">
-                  <h4 className="mb-2 text-sm font-medium sm:text-base">
-                    📋 Review Your Information
-                  </h4>
-                  <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 sm:gap-4 sm:text-sm">
-                    <div className="space-y-1">
-                      <p>
-                        <strong>Company:</strong>{" "}
-                        <span className="break-words">
-                          {formData.name || "Not set"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Industry:</strong>{" "}
-                        {formData.industry || "Not set"}
-                      </p>
-                      <p>
-                        <strong>Size:</strong> {formData.size || "Not set"}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p>
-                        <strong>Location:</strong>{" "}
-                        <span className="break-words">
-                          {formData.location || "Not set"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Website:</strong>{" "}
-                        <span className="break-all">
-                          {formData.websiteUrl || "Not set"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Email:</strong>{" "}
-                        <span className="break-all">
-                          {formData.contactEmail || "Not set"}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {currentStep === 3 && <MediaContactStep />}
 
           {/* Navigation Buttons */}
           <div className="mt-6 flex flex-col items-center justify-between space-y-3 sm:mt-8 sm:flex-row sm:space-y-0">
@@ -554,7 +477,7 @@ const CompanyCreationView = () => {
               )}
             </div>
           </div>
-        </form>
+        </WkForm>
       </div>
     </div>
   );
