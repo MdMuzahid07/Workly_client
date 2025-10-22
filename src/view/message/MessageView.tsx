@@ -22,8 +22,9 @@ import {
   Trash2,
   Video,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
+import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
 
 interface Message {
   id: string;
@@ -54,6 +55,17 @@ const MessageView = () => {
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
+
+  // fake loading state for skeleton
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const conversations: Conversation[] = [
     {
@@ -159,6 +171,10 @@ const MessageView = () => {
     setShowMobileChat(false);
     setSelectedConversation(null);
   };
+
+  if (isLoading) {
+    return <MessageViewSkeleton />;
+  }
 
   return (
     <div className="md:bg-primary/2 bg-background min-h-screen md:pt-20">
@@ -321,7 +337,7 @@ const MessageView = () => {
                                   : "bg-muted text-foreground"
                               }`}
                             >
-                              <p className="text-sm break-words">
+                              <p className="text-sm wrap-break-word">
                                 {message.content}
                               </p>
                               <p
