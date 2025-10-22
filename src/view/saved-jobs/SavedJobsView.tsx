@@ -18,9 +18,9 @@ import { useState } from "react";
 import JobCard from "../../components/main/jobs/JobCard";
 import EmptyState from "../../components/main/saved-jobs/EmptyState";
 import ErrorState from "../../components/main/saved-jobs/ErrorState";
-import LoadingState from "../../components/main/saved-jobs/LoadingState";
 import StatsCards from "../../components/main/saved-jobs/StatsCards";
 import { useGetSavedJobsQuery } from "../../redux/feature/profile/profileApi";
+import SavedJobsViewSkeleton from "../../skeleton/saved-jobs/SavedJobsViewSkeleton";
 
 const SearchFilterSection = ({
   searchTerm,
@@ -140,7 +140,7 @@ const SavedJobsView = () => {
     setSelectedCompanies([]);
   };
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <SavedJobsViewSkeleton />;
   if (error) return <ErrorState onRetry={() => window.location.reload()} />;
 
   return (
