@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Briefcase,
+  Building2,
   ChevronDown,
   FileText,
   Heart,
@@ -86,6 +87,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     { icon: Briefcase, label: "My Jobs", href: "/my-jobs", badge: 3 },
     { icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 },
     { icon: FileText, label: "My Resume", href: "/resume" },
+    { icon: Building2, label: "Create Company", href: "/create-company" },
     { icon: FileText, label: "Company Dashboard", href: "/dashboard" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];

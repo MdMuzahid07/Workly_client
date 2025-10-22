@@ -1,4 +1,4 @@
-import CompanyCreationView from "../../../../view/dashboard/CompanyCreationView";
+import CompanyCreationView from "../../../view/dashboard/CompanyCreationView";
 
 const page = () => {
   return (
