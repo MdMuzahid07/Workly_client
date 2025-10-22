@@ -47,7 +47,7 @@ const DashboardCompanyJobsHeader = ({
               Create New Job
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+          <DialogContent className="bg-card max-h-[90vh] overflow-y-auto sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Create New Job Posting</DialogTitle>
               <DialogDescription>
