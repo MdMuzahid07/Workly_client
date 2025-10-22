@@ -63,9 +63,9 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                 </div>
                 <Badge
                   variant="outline"
-                  className={`text-xs ${getJobTypeColor(preferences.jobType)}`}
+                  className={`text-xs ${getJobTypeColor(preferences?.jobType)}`}
                 >
-                  {preferences.jobType.replace("_", " ")}
+                  {preferences?.jobType.replace("_", " ")}
                 </Badge>
               </div>
             </div>
@@ -77,7 +77,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                   Expected Salary
                 </div>
                 <div className="text-foreground text-sm font-medium sm:text-base">
-                  {formatSalary(preferences.expectedSalary)}
+                  {formatSalary(preferences?.expectedSalary)}
                 </div>
               </div>
             </div>
@@ -91,7 +91,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                   Preferred Location
                 </div>
                 <div className="text-foreground truncate text-sm font-medium sm:text-base">
-                  {preferences.preferredLocation}
+                  {preferences?.preferredLocation}
                 </div>
               </div>
             </div>
@@ -103,7 +103,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                   Industry
                 </div>
                 <div className="text-foreground text-sm font-medium sm:text-base">
-                  {preferences.industry}
+                  {preferences?.industry}
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                   Experience Level
                 </div>
                 <div className="text-foreground text-sm font-medium sm:text-base">
-                  {preferences.workExperience}
+                  {preferences?.workExperience}
                 </div>
               </div>
             </div>
@@ -131,12 +131,12 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                 <Badge
                   variant="outline"
                   className={`text-xs ${
-                    preferences.remoteWork
+                    preferences?.remoteWork
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {preferences.remoteWork
+                  {preferences?.remoteWork
                     ? "Open to Remote"
                     : "Office Preferred"}
                 </Badge>

@@ -37,6 +37,9 @@ const CreateNewJobForm = ({ onClose, companyId }: any) => {
   const [createJob, { isLoading }] = useCreateJobMutation();
 
   const handleSubmit = async (data: JobFormData) => {
+    //! todo => company is undefined, need to fix it later
+    console.log("Form Data Submitted:", data, "company id", ": => ", companyId);
+
     try {
       const payload = {
         ...data,

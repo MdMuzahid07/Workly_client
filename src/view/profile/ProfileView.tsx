@@ -9,8 +9,10 @@ import EditProfileDialog from "../../components/main/profile/EditProfileDialog";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSidebar from "../../components/main/profile/ProfileSidebar";
 import SkillsAndExpertise from "../../components/main/profile/SkillsAndExpertise";
+import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 
 // fake user data based on your schema
+
 const fakeUser = {
   id: "1",
   email: "john.doe@example.com",
@@ -47,10 +49,14 @@ const fakeUser = {
 
 const ProfileView = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const { data, isLoading, error } = useGetProfileQuery(undefined);
-  const [user, setUser] = useState(fakeUser);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data, isLoading, error } = useGetProfileQuery(undefined);
+  const [user, setUser] = useState(data?.data || fakeUser);
 
-  // console.log(data, "data from my profile");
+  console.log(
+    data,
+    "data from my profile ++++++++++++++++++++++++++++++++++++++++++++++++",
+  );
 
   return (
     <div className="bg-primary/2 min-h-screen">
@@ -61,8 +67,8 @@ const ProfileView = () => {
               <div className="flex flex-col items-center space-y-4 text-center">
                 <Avatar className="ring-primary/20 h-24 w-24 ring-4">
                   <AvatarImage
-                    src={user.profile.avatarUrl || "/placeholder.svg"}
-                    alt={user.fullName}
+                    src={user?.profile?.avatarUrl || "/placeholder.svg"}
+                    alt={user?.fullName}
                   />
                   <AvatarFallback className="bg-primary/10 text-primary rounded-full text-xl font-semibold">
                     🐱
@@ -71,9 +77,9 @@ const ProfileView = () => {
 
                 <div className="space-y-2">
                   <h1 className="text-foreground text-2xl font-bold">
-                    {user.fullName}
+                    {user?.fullName}
                   </h1>
-                  {user.isVerified && (
+                  {user?.isVerified && (
                     <Badge
                       variant="secondary"
                       className="bg-primary/10 text-primary border-primary/20"
@@ -87,11 +93,11 @@ const ProfileView = () => {
                 <div className="text-muted-foreground space-y-2 text-sm">
                   <div className="flex items-center justify-center">
                     <MapPin className="text-primary mr-2 h-4 w-4" />
-                    {user.profile.location}
+                    {user?.profile?.location}
                   </div>
                   <div className="flex items-center justify-center">
                     <Mail className="text-primary mr-2 h-4 w-4" />
-                    {user.email}
+                    {user?.email}
                   </div>
                 </div>
 
@@ -117,8 +123,8 @@ const ProfileView = () => {
           <ProfileSidebar user={user} setIsEditModalOpen={setIsEditModalOpen} />
 
           <div className="space-y-6 lg:col-span-8">
-            <SkillsAndExpertise skills={user.profile.skills} />
-            <JobPreference preferences={user.profile.preference} />
+            <SkillsAndExpertise skills={user?.profile?.skills} />
+            <JobPreference preferences={user?.profile?.preference} />
 
             <Card className="bg-card border-0">
               <CardHeader className="pb-4">

@@ -161,7 +161,7 @@ const EditProfileDialog = ({
                   </Label>
                   <Input
                     id="fullName"
-                    value={formData.fullName}
+                    value={formData?.fullName}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
@@ -181,7 +181,7 @@ const EditProfileDialog = ({
                   </Label>
                   <Input
                     id="phone"
-                    value={formData.phone}
+                    value={formData?.phone}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
@@ -203,7 +203,7 @@ const EditProfileDialog = ({
                 </Label>
                 <Textarea
                   id="bio"
-                  value={formData.profile.bio}
+                  value={formData?.profile.bio}
                   onChange={(e) => updateProfile("bio", e.target.value)}
                   rows={4}
                   className="w-full resize-none"
@@ -220,7 +220,7 @@ const EditProfileDialog = ({
                 </Label>
                 <Input
                   id="location"
-                  value={formData.profile.location}
+                  value={formData?.profile?.location}
                   onChange={(e) => updateProfile("location", e.target.value)}
                   className="w-full"
                   placeholder="City, State/Country"
@@ -245,7 +245,7 @@ const EditProfileDialog = ({
                   </Label>
                   <Input
                     id="website"
-                    value={formData.profile.websiteUrl || ""}
+                    value={formData?.profile?.websiteUrl || ""}
                     onChange={(e) =>
                       updateProfile("websiteUrl", e.target.value)
                     }
@@ -262,7 +262,7 @@ const EditProfileDialog = ({
                   </Label>
                   <Input
                     id="linkedin"
-                    value={formData.profile.linkedInUrl || ""}
+                    value={formData?.profile?.linkedInUrl || ""}
                     onChange={(e) =>
                       updateProfile("linkedInUrl", e.target.value)
                     }
@@ -281,7 +281,7 @@ const EditProfileDialog = ({
                 </Label>
                 <Input
                   id="resume"
-                  value={formData.profile.resumeUrl || ""}
+                  value={formData?.profile?.resumeUrl || ""}
                   onChange={(e) => updateProfile("resumeUrl", e.target.value)}
                   placeholder="https://drive.google.com/file/d/your-resume"
                   className="w-full"
@@ -298,15 +298,15 @@ const EditProfileDialog = ({
 
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  {formData.profile.skills.map((skill, index) => (
+                  {formData?.profile?.skills?.map((skill, index) => (
                     <Badge
                       key={index}
                       variant="secondary"
                       className="bg-primary text-primary-foreground border-primary flex items-center gap-2 px-3 py-2"
                     >
-                      <span className="font-medium">{skill.skillName}</span>
+                      <span className="font-medium">{skill?.skillName}</span>
                       <span className="text-xs opacity-90">
-                        ({skill.experienceYears}y)
+                        ({skill?.experienceYears}y)
                       </span>
                       <button
                         onClick={() => removeSkill(index)}
@@ -328,7 +328,7 @@ const EditProfileDialog = ({
                     </Label>
                     <Input
                       id="newSkill"
-                      value={newSkill.skillName}
+                      value={newSkill?.skillName}
                       onChange={(e) =>
                         setNewSkill((prev) => ({
                           ...prev,
@@ -351,7 +351,7 @@ const EditProfileDialog = ({
                       type="number"
                       min="0"
                       max="50"
-                      value={newSkill.experienceYears}
+                      value={newSkill?.experienceYears}
                       onChange={(e) =>
                         setNewSkill((prev) => ({
                           ...prev,
@@ -366,7 +366,7 @@ const EditProfileDialog = ({
                       type="button"
                       onClick={addSkill}
                       className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
-                      disabled={!newSkill.skillName.trim()}
+                      disabled={!newSkill?.skillName?.trim()}
                     >
                       <Plus className="mr-2 h-4 w-4" />
                       Add Skill
@@ -392,7 +392,7 @@ const EditProfileDialog = ({
                     Preferred Job Type
                   </Label>
                   <Select
-                    value={formData.profile.preference.jobType}
+                    value={formData?.profile?.preference?.jobType}
                     onValueChange={(value) =>
                       updatePreference("jobType", value)
                     }
@@ -422,7 +422,7 @@ const EditProfileDialog = ({
                     id="expectedSalary"
                     type="number"
                     min="0"
-                    value={formData.profile.preference.expectedSalary}
+                    value={formData?.profile?.preference?.expectedSalary}
                     onChange={(e) =>
                       updatePreference("expectedSalary", Number(e.target.value))
                     }
@@ -442,7 +442,7 @@ const EditProfileDialog = ({
                   </Label>
                   <Input
                     id="industry"
-                    value={formData.profile.preference.industry}
+                    value={formData?.profile?.preference?.industry}
                     onChange={(e) =>
                       updatePreference("industry", e.target.value)
                     }
@@ -459,7 +459,7 @@ const EditProfileDialog = ({
                     Experience Level
                   </Label>
                   <Select
-                    value={formData.profile.preference.workExperience}
+                    value={formData?.profile?.preference?.workExperience}
                     onValueChange={(value) =>
                       updatePreference("workExperience", value)
                     }
@@ -494,7 +494,7 @@ const EditProfileDialog = ({
                 </Label>
                 <Input
                   id="preferredLocation"
-                  value={formData.profile.preference.preferredLocation}
+                  value={formData?.profile?.preference?.preferredLocation}
                   onChange={(e) =>
                     updatePreference("preferredLocation", e.target.value)
                   }
@@ -506,7 +506,7 @@ const EditProfileDialog = ({
               <div className="bg-primary/5 border-primary/20 flex items-center space-x-3 rounded-lg border p-4">
                 <Checkbox
                   id="remoteWork"
-                  checked={formData.profile.preference.remoteWork}
+                  checked={formData?.profile?.preference?.remoteWork}
                   onCheckedChange={(checked) =>
                     updatePreference("remoteWork", checked)
                   }

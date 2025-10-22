@@ -32,8 +32,8 @@ const ProfileSidebar = ({
           <div className="flex flex-col items-center space-y-6 text-center">
             <Avatar className="ring-primary/20 flex h-32 w-32 overflow-hidden rounded-full shadow-xl ring-4">
               <AvatarImage
-                src={user.profile.avatarUrl || "/placeholder.svg"}
-                alt={user.fullName}
+                src={user?.profile?.avatarUrl || "/placeholder.svg"}
+                alt={user?.fullName}
               />
               <AvatarFallback className="bg-primary/10 text-primary flex h-full w-full items-center justify-center rounded-full text-2xl font-semibold">
                 <User className="size-10" />
@@ -42,9 +42,9 @@ const ProfileSidebar = ({
 
             <div className="space-y-3">
               <h2 className="text-foreground text-2xl font-bold">
-                {user.fullName}
+                {user?.fullName}
               </h2>
-              {user.isVerified && (
+              {user?.isVerified && (
                 <Badge
                   variant="secondary"
                   className="bg-primary/10 text-primary border-primary/20"
@@ -56,21 +56,23 @@ const ProfileSidebar = ({
             </div>
 
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {user.profile.bio}
+              {user?.profile?.bio}
             </p>
 
             <div className="w-full space-y-4 text-sm">
               <div className="bg-muted/50 flex items-center rounded-full p-3">
                 <MapPin className="text-primary mr-3 h-5 w-5" />
-                <span className="text-foreground">{user.profile.location}</span>
+                <span className="text-foreground">
+                  {user?.profile?.location}
+                </span>
               </div>
               <div className="bg-muted/50 flex items-center rounded-full p-3">
                 <Mail className="text-primary mr-3 h-5 w-5" />
-                <span className="text-foreground truncate">{user.email}</span>
+                <span className="text-foreground truncate">{user?.email}</span>
               </div>
               <div className="bg-muted/50 flex items-center rounded-full p-3">
                 <Phone className="text-primary mr-3 h-5 w-5" />
-                <span className="text-foreground">{user.phone}</span>
+                <span className="text-foreground">{user?.phone}</span>
               </div>
             </div>
 
@@ -119,18 +121,18 @@ const ProfileSidebar = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {user.profile.websiteUrl && (
+          {user?.profile?.websiteUrl && (
             <a
-              href={user.profile.websiteUrl}
+              href={user?.profile?.websiteUrl}
               className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
             >
               <Globe className="text-primary mr-3 h-5 w-5" />
               <span className="font-medium">Personal Website</span>
             </a>
           )}
-          {user.profile.linkedInUrl && (
+          {user?.profile?.linkedInUrl && (
             <a
-              href={user.profile.linkedInUrl}
+              href={user?.profile?.linkedInUrl}
               className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
             >
               <Linkedin className="text-primary mr-3 h-5 w-5" />
