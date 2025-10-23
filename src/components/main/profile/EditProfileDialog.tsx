@@ -197,30 +197,30 @@ const EditProfileDialog = ({
   user,
   onSave,
 }: ProfileEditModalProps) => {
-  const [skills, setSkills] = useState<Skill[]>(user.profile.skills || []);
+  const [skills, setSkills] = useState<Skill[]>(user?.profile?.skills || []);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
   const handleSubmit = async (data: ProfileFormData) => {
     const updatedUser: User = {
       ...user,
-      fullName: data.fullName,
-      phone: data.phone,
+      fullName: data?.fullName,
+      phone: data?.phone,
       profile: {
-        ...user.profile,
-        bio: data.bio,
-        location: data.location,
-        websiteUrl: data.websiteUrl,
-        linkedInUrl: data.linkedInUrl,
-        resumeUrl: data.resumeUrl,
+        ...user?.profile,
+        bio: data?.bio,
+        location: data?.location,
+        websiteUrl: data?.websiteUrl,
+        linkedInUrl: data?.linkedInUrl,
+        resumeUrl: data?.resumeUrl,
         skills: skills,
         preference: {
           ...user.profile.preference,
-          jobType: data.jobType,
-          expectedSalary: data.expectedSalary,
-          industry: data.industry,
-          workExperience: data.workExperience,
-          preferredLocation: data.preferredLocation,
-          remoteWork: data.remoteWork,
+          jobType: data?.jobType,
+          expectedSalary: data?.expectedSalary,
+          industry: data?.industry,
+          workExperience: data?.workExperience,
+          preferredLocation: data?.preferredLocation,
+          remoteWork: data?.remoteWork,
         },
       },
     };
@@ -235,19 +235,19 @@ const EditProfileDialog = ({
   };
 
   const defaultValues: ProfileFormData = {
-    fullName: user.fullName || "",
-    phone: user.phone || "",
-    bio: user.profile?.bio || "",
-    location: user.profile?.location || "",
-    websiteUrl: user.profile?.websiteUrl || "",
-    linkedInUrl: user.profile?.linkedInUrl || "",
-    resumeUrl: user.profile?.resumeUrl || "",
-    jobType: user.profile?.preference?.jobType || "",
-    expectedSalary: user.profile?.preference?.expectedSalary || 0,
-    industry: user.profile?.preference?.industry || "",
-    workExperience: user.profile?.preference?.workExperience || "",
-    preferredLocation: user.profile?.preference?.preferredLocation || "",
-    remoteWork: user.profile?.preference?.remoteWork || false,
+    fullName: user?.fullName || "",
+    phone: user?.phone || "",
+    bio: user?.profile?.bio || "",
+    location: user?.profile?.location || "",
+    websiteUrl: user?.profile?.websiteUrl || "",
+    linkedInUrl: user?.profile?.linkedInUrl || "",
+    resumeUrl: user?.profile?.resumeUrl || "",
+    jobType: user?.profile?.preference?.jobType || "",
+    expectedSalary: user?.profile?.preference?.expectedSalary || 0,
+    industry: user?.profile?.preference?.industry || "",
+    workExperience: user?.profile?.preference?.workExperience || "",
+    preferredLocation: user?.profile?.preference?.preferredLocation || "",
+    remoteWork: user?.profile?.preference?.remoteWork || false,
   };
 
   return (
