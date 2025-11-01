@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
+import ComingSoonAlert from "../../components/temp_components/ComingSoonAlert";
 import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
 
 interface Message {
@@ -178,7 +179,7 @@ const MessageView = () => {
 
   return (
     <div className="md:bg-primary/2 bg-background min-h-screen md:pt-20">
-      {/* Header */}
+      {/* message header  */}
       <div className="border-border bg-card sticky top-0 z-50 flex w-full justify-start border-b md:hidden">
         <div className="max-w-6xl p-4">
           {showMobileChat && selectedConversation && currentConversation ? (
@@ -396,6 +397,8 @@ const MessageView = () => {
           </div>
         </div>
       </div>
+
+      <ComingSoonAlert />
     </div>
   );
 };
