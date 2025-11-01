@@ -16,10 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Plus, X } from "lucide-react";
-import { useState } from "react";
-import { useUpdateProfileMutation } from "../../../redux/feature/profile/profileApi";
+import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
+import { AlertCircle, Plus, Sparkles, X } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
+// ==================== Types ====================
 interface Skill {
   skillName: string;
   experienceYears: number;
@@ -56,13 +58,6 @@ interface User {
   profile: Profile;
 }
 
-interface ProfileEditModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  user: User;
-  onSave: (user: User) => void;
-}
-
 interface ProfileFormData {
   fullName: string;
   phone: string;
@@ -79,77 +74,182 @@ interface ProfileFormData {
   remoteWork: boolean;
 }
 
-const SkillsManagementSection = ({
-  skills,
-  onSkillsChange,
-}: {
+interface EditProfileDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  user: User;
+  onSave: (user: User) => void;
+}
+
+// ==================== Constants ====================
+const LIMITS = {
+  MAX_SKILLS: 50,
+  MAX_SKILL_NAME: 100,
+  MAX_EXPERIENCE_YEARS: 50,
+} as const;
+
+const JOB_TYPE_OPTIONS = [
+  { value: "FULL_TIME", label: "Full Time" },
+  { value: "PART_TIME", label: "Part Time" },
+  { value: "CONTRACT", label: "Contract" },
+  { value: "FREELANCE", label: "Freelance" },
+  { value: "INTERNSHIP", label: "Internship" },
+  { value: "REMOTE", label: "Remote" },
+] as const;
+
+const EXPERIENCE_OPTIONS = [
+  { value: "Entry Level", label: "Entry Level (0-2 years)" },
+  { value: "Mid Level", label: "Mid Level (3-5 years)" },
+  { value: "Senior Level", label: "Senior Level (6-10 years)" },
+  { value: "Executive", label: "Executive (10+ years)" },
+] as const;
+
+// ==================== Helper Functions ====================
+const skillHelpers = {
+  sanitize: (name: string) => name.trim().replace(/\s+/g, " "),
+  isDuplicate: (skills: Skill[], name: string) =>
+    skills.some((s) => s.skillName.toLowerCase() === name.toLowerCase()),
+  isValidExperience: (years: number) =>
+    years >= 0 && years <= LIMITS.MAX_EXPERIENCE_YEARS,
+};
+
+// ==================== Skills Management Component ====================
+interface SkillsManagementProps {
   skills: Skill[];
   onSkillsChange: (skills: Skill[]) => void;
-}) => {
-  const [newSkill, setNewSkill] = useState({
+}
+
+const SkillsManagement = ({
+  skills,
+  onSkillsChange,
+}: SkillsManagementProps) => {
+  const [newSkill, setNewSkill] = useState<Skill>({
     skillName: "",
     experienceYears: 1,
   });
+  const [error, setError] = useState("");
 
-  const addSkill = () => {
-    if (newSkill.skillName.trim()) {
-      onSkillsChange([...skills, { ...newSkill }]);
-      setNewSkill({ skillName: "", experienceYears: 1 });
+  const validateAndAddSkill = useCallback(() => {
+    const trimmedName = skillHelpers.sanitize(newSkill.skillName);
+
+    if (!trimmedName) {
+      setError("Skill name cannot be empty");
+      return;
     }
-  };
 
-  const removeSkill = (index: number) => {
-    onSkillsChange(skills.filter((_, i) => i !== index));
+    if (trimmedName.length > LIMITS.MAX_SKILL_NAME) {
+      setError(`Skill name cannot exceed ${LIMITS.MAX_SKILL_NAME} characters`);
+      return;
+    }
+
+    if (skillHelpers.isDuplicate(skills, trimmedName)) {
+      setError("This skill has already been added");
+      return;
+    }
+
+    if (!skillHelpers.isValidExperience(newSkill.experienceYears)) {
+      setError(
+        `Experience must be between 0 and ${LIMITS.MAX_EXPERIENCE_YEARS} years`,
+      );
+      return;
+    }
+
+    if (skills.length >= LIMITS.MAX_SKILLS) {
+      setError(`Maximum ${LIMITS.MAX_SKILLS} skills allowed`);
+      return;
+    }
+
+    onSkillsChange([...skills, { ...newSkill, skillName: trimmedName }]);
+    setNewSkill({ skillName: "", experienceYears: 1 });
+    setError("");
+    toast.success("Skill added successfully");
+  }, [newSkill, skills, onSkillsChange]);
+
+  const removeSkill = useCallback(
+    (index: number) => {
+      const removed = skills[index];
+      onSkillsChange(skills.filter((_, i) => i !== index));
+      toast.success(`${removed.skillName} removed`);
+    },
+    [skills, onSkillsChange],
+  );
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      validateAndAddSkill();
+    }
   };
 
   return (
     <div className="space-y-6">
-      <h3 className="text-foreground text-xl font-semibold">
-        Skills & Expertise
-      </h3>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-foreground flex items-center text-xl font-semibold">
+          <Sparkles className="text-primary mr-2 h-5 w-5" />
+          Skills & Expertise
+        </h3>
+        <Badge variant="secondary" className="text-xs">
+          {skills.length} / {LIMITS.MAX_SKILLS}
+        </Badge>
+      </div>
 
-      <div className="space-y-4">
+      {/* Skills Display */}
+      {skills.length > 0 ? (
         <div className="flex flex-wrap gap-2">
-          {skills?.map((skill, index) => (
+          {skills.map((skill, index) => (
             <Badge
-              key={index}
+              key={`${skill.skillName}-${index}`}
               variant="secondary"
-              className="bg-primary text-primary-foreground border-primary flex items-center gap-2 px-3 py-2"
+              className="bg-primary text-primary-foreground border-primary flex items-center gap-2 px-3 py-2 transition-all hover:scale-105"
             >
-              <span className="font-medium">{skill?.skillName}</span>
+              <span className="font-medium">{skill.skillName}</span>
               <span className="text-xs opacity-90">
-                ({skill?.experienceYears}y)
+                ({skill.experienceYears}y)
               </span>
               <button
                 type="button"
                 onClick={() => removeSkill(index)}
                 className="hover:text-destructive ml-1 transition-colors"
+                aria-label={`Remove ${skill.skillName}`}
               >
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           ))}
         </div>
+      ) : (
+        <div className="bg-muted/30 border-border flex items-center justify-center rounded-lg border border-dashed p-8">
+          <div className="space-y-2 text-center">
+            <AlertCircle className="text-muted-foreground mx-auto h-8 w-8" />
+            <p className="text-muted-foreground text-sm">
+              No skills added yet. Add your first skill below!
+            </p>
+          </div>
+        </div>
+      )}
 
-        <div className="bg-muted/30 border-border grid grid-cols-1 gap-4 rounded-lg border p-4 md:grid-cols-3">
+      {/* Add Skill Form */}
+      <div className="bg-muted/30 border-border space-y-4 rounded-lg border p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="md:col-span-2">
             <Label
               htmlFor="newSkill"
               className="text-foreground text-sm font-medium"
             >
-              Add New Skill
+              Add New Skill *
             </Label>
             <Input
               id="newSkill"
-              value={newSkill?.skillName}
-              onChange={(e) =>
-                setNewSkill((prev) => ({
-                  ...prev,
-                  skillName: e.target.value,
-                }))
-              }
+              value={newSkill.skillName}
+              onChange={(e) => {
+                setNewSkill((prev) => ({ ...prev, skillName: e.target.value }));
+                setError("");
+              }}
+              onKeyPress={handleKeyPress}
               placeholder="e.g., React, Python, Project Management"
               className="mt-1 w-full"
+              maxLength={LIMITS.MAX_SKILL_NAME}
             />
           </div>
           <div>
@@ -157,106 +257,136 @@ const SkillsManagementSection = ({
               htmlFor="experience"
               className="text-foreground text-sm font-medium"
             >
-              Years of Experience
+              Years *
             </Label>
             <Input
               id="experience"
               type="number"
               min="0"
-              max="50"
-              value={newSkill?.experienceYears}
-              onChange={(e) =>
+              max={LIMITS.MAX_EXPERIENCE_YEARS}
+              step="0.5"
+              value={newSkill.experienceYears}
+              onChange={(e) => {
                 setNewSkill((prev) => ({
                   ...prev,
                   experienceYears: Number(e.target.value),
-                }))
-              }
+                }));
+                setError("");
+              }}
               className="mt-1 w-full"
             />
           </div>
-          <div className="md:col-span-3">
-            <Button
-              type="button"
-              onClick={addSkill}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
-              disabled={!newSkill?.skillName?.trim()}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Skill
-            </Button>
-          </div>
         </div>
+
+        {error && (
+          <div className="bg-destructive/10 text-destructive flex items-start gap-2 rounded-md p-3 text-sm">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <Button
+          type="button"
+          onClick={validateAndAddSkill}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
+          disabled={
+            !newSkill.skillName.trim() || skills.length >= LIMITS.MAX_SKILLS
+          }
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Skill
+        </Button>
       </div>
     </div>
   );
 };
 
+// ==================== Main Component ====================
 const EditProfileDialog = ({
   isOpen,
   onClose,
   user,
   onSave,
-}: ProfileEditModalProps) => {
+}: EditProfileDialogProps) => {
   const [skills, setSkills] = useState<Skill[]>(user?.profile?.skills || []);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
   const handleSubmit = async (data: ProfileFormData) => {
-    const updatedUser: User = {
-      ...user,
-      fullName: data?.fullName,
-      phone: data?.phone,
-      profile: {
-        ...user?.profile,
-        bio: data?.bio,
-        location: data?.location,
-        websiteUrl: data?.websiteUrl,
-        linkedInUrl: data?.linkedInUrl,
-        resumeUrl: data?.resumeUrl,
-        skills: skills,
-        preference: {
-          ...user.profile.preference,
-          jobType: data?.jobType,
-          expectedSalary: data?.expectedSalary,
-          industry: data?.industry,
-          workExperience: data?.workExperience,
-          preferredLocation: data?.preferredLocation,
-          remoteWork: data?.remoteWork,
-        },
-      },
-    };
-
-    onSave(updatedUser);
-    const response = await updateProfile(updatedUser).unwrap();
-    if (response) {
-      console.log(response, "Profile updated successfully");
+    if (skills.length === 0) {
+      toast.error("Please add at least one skill");
+      return;
     }
 
-    onClose();
+    try {
+      const updatedUser: User = {
+        ...user,
+        fullName: data.fullName,
+        phone: data.phone,
+        profile: {
+          ...user.profile,
+          bio: data.bio,
+          location: data.location,
+          websiteUrl: data.websiteUrl,
+          linkedInUrl: data.linkedInUrl,
+          resumeUrl: data.resumeUrl,
+          skills,
+          preference: {
+            ...user.profile.preference,
+            jobType: data.jobType,
+            expectedSalary: data.expectedSalary,
+            industry: data.industry,
+            workExperience: data.workExperience,
+            preferredLocation: data.preferredLocation,
+            remoteWork: data.remoteWork,
+          },
+        },
+      };
+
+      await updateProfile(updatedUser).unwrap();
+      onSave(updatedUser);
+      toast.success("Profile updated successfully!");
+      onClose();
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile. Please try again.");
+    }
   };
 
-  const defaultValues: ProfileFormData = {
-    fullName: user?.fullName || "",
-    phone: user?.phone || "",
-    bio: user?.profile?.bio || "",
-    location: user?.profile?.location || "",
-    websiteUrl: user?.profile?.websiteUrl || "",
-    linkedInUrl: user?.profile?.linkedInUrl || "",
-    resumeUrl: user?.profile?.resumeUrl || "",
-    jobType: user?.profile?.preference?.jobType || "",
-    expectedSalary: user?.profile?.preference?.expectedSalary || 0,
-    industry: user?.profile?.preference?.industry || "",
-    workExperience: user?.profile?.preference?.workExperience || "",
-    preferredLocation: user?.profile?.preference?.preferredLocation || "",
-    remoteWork: user?.profile?.preference?.remoteWork || false,
-  };
+  const defaultValues: ProfileFormData = useMemo(
+    () => ({
+      fullName: user?.fullName || "",
+      phone: user?.phone || "",
+      bio: user?.profile?.bio || "",
+      location: user?.profile?.location || "",
+      websiteUrl: user?.profile?.websiteUrl || "",
+      linkedInUrl: user?.profile?.linkedInUrl || "",
+      resumeUrl: user?.profile?.resumeUrl || "",
+      jobType: user?.profile?.preference?.jobType || "FULL_TIME",
+      expectedSalary: user?.profile?.preference?.expectedSalary || 0,
+      industry: user?.profile?.preference?.industry || "",
+      workExperience:
+        user?.profile?.preference?.workExperience || "Entry Level",
+      preferredLocation: user?.profile?.preference?.preferredLocation || "",
+      remoteWork: user?.profile?.preference?.remoteWork || false,
+    }),
+    [user],
+  );
+
+  const handleClose = useCallback(() => {
+    setSkills(user?.profile?.skills || []);
+    onClose();
+  }, [user, onClose]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card h-[90dvh] max-h-[900px] w-[95dvw] max-w-5xl p-0 md:h-[80dvh]">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="bg-card h-[90dvh] max-h-[900px] w-[95dvw] max-w-5xl p-0 md:h-[85dvh]">
         <DialogHeader className="border-border border-b p-6 pb-4">
           <DialogTitle className="text-foreground text-2xl font-bold">
             Edit Profile
           </DialogTitle>
+          <p className="text-muted-foreground text-sm">
+            Update your profile information and preferences
+          </p>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto px-6">
@@ -265,163 +395,98 @@ const EditProfileDialog = ({
             defaultValues={defaultValues}
           >
             <div className="space-y-8 pb-6">
-              <div className="space-y-6">
-                <h3 className="text-foreground flex items-center text-xl font-semibold">
+              {/* Basic Information */}
+              <section className="space-y-6">
+                <h3 className="text-foreground text-xl font-semibold">
                   Basic Information
                 </h3>
-
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <WKInput
-                    name="fullName"
-                    label="Full Name"
-                    required
-                    className="w-full"
-                  />
-                  <WKInput
-                    name="phone"
-                    label="Phone Number"
-                    type="text"
-                    className="w-full"
-                  />
+                  <WKInput name="fullName" label="Full Name" required />
+                  <WKInput name="phone" label="Phone Number" />
                 </div>
-
-                <WKTextArea
-                  name="bio"
-                  label="Professional Bio"
-                  rows={4}
-                  className="w-full resize-none"
-                />
-
-                <WKInput
-                  name="location"
-                  label="Current Location"
-                  className="w-full"
-                />
-              </div>
+                <WKTextArea name="bio" label="Professional Bio" rows={4} />
+                <WKInput name="location" label="Current Location" />
+              </section>
 
               <Separator />
 
-              <div className="space-y-6">
+              {/* Professional Links */}
+              <section className="space-y-6">
                 <h3 className="text-foreground text-xl font-semibold">
                   Professional Links & Files
                 </h3>
-
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <WKInput
-                    name="websiteUrl"
-                    label="Personal Website"
-                    type="text"
-                    className="w-full"
-                  />
-                  <WKInput
-                    name="linkedInUrl"
-                    label="LinkedIn Profile"
-                    type="text"
-                    className="w-full"
-                  />
+                  <WKInput name="websiteUrl" label="Personal Website" />
+                  <WKInput name="linkedInUrl" label="LinkedIn Profile" />
                 </div>
-
-                <WKInput
-                  name="resumeUrl"
-                  label="Resume URL"
-                  type="text"
-                  className="w-full"
-                />
-              </div>
+                <WKInput name="resumeUrl" label="Resume URL" />
+              </section>
 
               <Separator />
 
-              <SkillsManagementSection
-                skills={skills}
-                onSkillsChange={setSkills}
-              />
+              {/* Skills */}
+              <SkillsManagement skills={skills} onSkillsChange={setSkills} />
 
               <Separator />
 
-              <div className="space-y-6">
+              {/* Job Preferences */}
+              <section className="space-y-6">
                 <h3 className="text-foreground text-xl font-semibold">
                   Job Preferences
                 </h3>
-
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <WKSelect
                     name="jobType"
                     label="Preferred Job Type"
                     placeholder="Select job type"
-                    options={[
-                      { value: "FULL_TIME", label: "Full Time" },
-                      { value: "PART_TIME", label: "Part Time" },
-                      { value: "CONTRACT", label: "Contract" },
-                      { value: "FREELANCE", label: "Freelance" },
-                      { value: "INTERNSHIP", label: "Internship" },
-                      { value: "REMOTE", label: "Remote" },
-                    ]}
-                    className="w-full"
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    options={JOB_TYPE_OPTIONS}
                   />
-
                   <WKInput
                     name="expectedSalary"
                     label="Expected Annual Salary (USD)"
-                    type="text"
-                    className="w-full"
                   />
                 </div>
-
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <WKInput
-                    name="industry"
-                    label="Preferred Industry"
-                    className="w-full"
-                  />
-
+                  <WKInput name="industry" label="Preferred Industry" />
                   <WKSelect
                     name="workExperience"
                     label="Experience Level"
                     placeholder="Select experience level"
-                    options={[
-                      {
-                        value: "Entry Level",
-                        label: "Entry Level (0-2 years)",
-                      },
-                      { value: "Mid Level", label: "Mid Level (3-5 years)" },
-                      {
-                        value: "Senior Level",
-                        label: "Senior Level (6-10 years)",
-                      },
-                      { value: "Executive", label: "Executive (10+ years)" },
-                    ]}
-                    className="w-full"
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    options={EXPERIENCE_OPTIONS}
                   />
                 </div>
-
                 <WKInput
                   name="preferredLocation"
                   label="Preferred Work Location"
-                  className="w-full"
                 />
-
-                <div className="bg-primary/5 border-primary/20 flex items-center space-x-3 rounded-lg border p-4">
+                <div className="bg-primary/5 border-primary/20 rounded-lg border p-4">
                   <WKCheckbox
                     name="remoteWork"
                     label="I'm open to remote work opportunities"
                   />
                 </div>
-              </div>
+              </section>
             </div>
 
-            <div className="border-border bg-muted/20 flex flex-col justify-end space-y-3 border-t p-6 sm:flex-row sm:space-y-0 sm:space-x-4">
+            {/* Footer */}
+            <div className="border-border bg-muted/20 sticky bottom-0 flex flex-col gap-3 border-t p-6 sm:flex-row sm:justify-end">
               <Button
                 type="button"
                 variant="outline"
-                onClick={onClose}
-                className="order-2 w-full bg-transparent sm:order-1 sm:w-auto"
+                onClick={handleClose}
+                disabled={isLoading}
+                className="w-full bg-transparent sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground order-1 w-full shadow-lg sm:order-2 sm:w-auto"
+                disabled={isLoading || skills.length === 0}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground w-full shadow-lg sm:w-auto"
               >
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
