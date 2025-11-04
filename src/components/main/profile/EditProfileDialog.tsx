@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import WKCheckbox from "@/components/form/WKCheckbox";
 import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
@@ -21,7 +21,7 @@ import { AlertCircle, Plus, Sparkles, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-// ==================== Types ====================
+// ========== Types =============>
 interface Skill {
   skillName: string;
   experienceYears: number;
@@ -81,7 +81,7 @@ interface EditProfileDialogProps {
   onSave: (user: User) => void;
 }
 
-// ==================== Constants ====================
+// ============ constants ==================>
 const LIMITS = {
   MAX_SKILLS: 50,
   MAX_SKILL_NAME: 100,
@@ -104,7 +104,7 @@ const EXPERIENCE_OPTIONS = [
   { value: "Executive", label: "Executive (10+ years)" },
 ] as const;
 
-// ==================== Helper Functions ====================
+// =========== helper function ===============>
 const skillHelpers = {
   sanitize: (name: string) => name.trim().replace(/\s+/g, " "),
   isDuplicate: (skills: Skill[], name: string) =>
@@ -113,7 +113,7 @@ const skillHelpers = {
     years >= 0 && years <= LIMITS.MAX_EXPERIENCE_YEARS,
 };
 
-// ==================== Skills Management Component ====================
+// ========== skills management component ==================>
 interface SkillsManagementProps {
   skills: Skill[];
   onSkillsChange: (skills: Skill[]) => void;
@@ -301,7 +301,7 @@ const SkillsManagement = ({
   );
 };
 
-// ==================== Main Component ====================
+// ==================== main component ================>
 const EditProfileDialog = ({
   isOpen,
   onClose,
@@ -318,6 +318,38 @@ const EditProfileDialog = ({
     }
 
     try {
+      //==================== helper function to convert empty string to null ================>
+      const sanitizeValue = (value: any) => {
+        if (value === "" || value === undefined) return null;
+        return value;
+      };
+
+      const updatePayload = {
+        bio: sanitizeValue(data.bio),
+        location: sanitizeValue(data.location),
+        websiteUrl: sanitizeValue(data.websiteUrl),
+        linkedInUrl: sanitizeValue(data.linkedInUrl),
+        resumeUrl: sanitizeValue(data.resumeUrl),
+        skills: skills,
+        preference: {
+          jobType: data.jobType,
+          expectedSalary:
+            data.expectedSalary && Number(data.expectedSalary) > 0
+              ? Number(data.expectedSalary)
+              : null,
+          industry: sanitizeValue(data.industry),
+          workExperience: sanitizeValue(data.workExperience),
+          preferredLocation: sanitizeValue(data.preferredLocation),
+          remoteWork: Boolean(data.remoteWork),
+        },
+      };
+
+      console.log("Sending payload:", JSON.stringify(updatePayload, null, 2));
+
+      // ============  send only profile data to api ====>
+      await updateProfile(updatePayload).unwrap();
+
+      // ======= update local user state with the new data==============>
       const updatedUser: User = {
         ...user,
         fullName: data.fullName,
@@ -342,7 +374,6 @@ const EditProfileDialog = ({
         },
       };
 
-      await updateProfile(updatedUser).unwrap();
       onSave(updatedUser);
       toast.success("Profile updated successfully!");
       onClose();
@@ -446,6 +477,7 @@ const EditProfileDialog = ({
                   <WKInput
                     name="expectedSalary"
                     label="Expected Annual Salary (USD)"
+                    type="number"
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

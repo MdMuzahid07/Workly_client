@@ -8,6 +8,7 @@ const profileApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["profile"],
     }),
 
     getProfile: builder.query({
@@ -15,6 +16,7 @@ const profileApi = baseApi.injectEndpoints({
         url: "/profile/profile",
         method: "GET",
       }),
+      providesTags: ["profile"],
     }),
 
     updateProfile: builder.mutation({
@@ -23,6 +25,7 @@ const profileApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: ["profile"],
     }),
 
     toggleSaveUnsaveJob: builder.mutation({
@@ -31,6 +34,7 @@ const profileApi = baseApi.injectEndpoints({
         method: "POST",
         body: { jobId },
       }),
+      invalidatesTags: ["profile"],
     }),
 
     getSavedJobs: builder.query({

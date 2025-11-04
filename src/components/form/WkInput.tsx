@@ -8,7 +8,7 @@ import { useFormContext } from "react-hook-form";
 interface WKInputProps {
   size?: "sm" | "md" | "lg";
   required?: boolean;
-  type?: "text" | "email" | "password";
+  type?: "text" | "email" | "password" | "number";
   label: string;
   name: string;
   className?: string;
