@@ -511,7 +511,7 @@ const EditProfileDialog = ({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="w-full bg-transparent sm:w-auto"
+                className="hover:bg-destructive! w-full hover:text-white sm:w-auto"
               >
                 Cancel
               </Button>
