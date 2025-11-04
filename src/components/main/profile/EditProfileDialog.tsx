@@ -18,8 +18,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
 import { AlertCircle, Plus, Sparkles, X } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useUploadSingleFileMutation } from "../../../redux/feature/upload/uploadApi";
 
 // ========== Types =============>
 interface Skill {
@@ -310,6 +312,27 @@ const EditProfileDialog = ({
 }: EditProfileDialogProps) => {
   const [skills, setSkills] = useState<Skill[]>(user?.profile?.skills || []);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const [avatar, setAvatar] = useState<string | null>(
+    user?.profile?.avatarUrl || null,
+  );
+
+  const [uploadSingleFile, { isLoading: isUploading }] =
+    useUploadSingleFileMutation();
+
+  const handleAvatarUpload = async (file: File | null) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const result = await uploadSingleFile(formData).unwrap();
+      setAvatar(result.data.url);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload avatar. Please try again.");
+    }
+  };
 
   const handleSubmit = async (data: ProfileFormData) => {
     if (skills.length === 0) {
@@ -328,6 +351,8 @@ const EditProfileDialog = ({
         bio: sanitizeValue(data.bio),
         location: sanitizeValue(data.location),
         websiteUrl: sanitizeValue(data.websiteUrl),
+        avatarUrl: avatar || user.profile.avatarUrl,
+
         linkedInUrl: sanitizeValue(data.linkedInUrl),
         resumeUrl: sanitizeValue(data.resumeUrl),
         skills: skills,
@@ -431,6 +456,53 @@ const EditProfileDialog = ({
                 <h3 className="text-foreground text-xl font-semibold">
                   Basic Information
                 </h3>
+                <div>
+                  <Label className="text-foreground text-sm font-medium">
+                    Profile Picture
+                  </Label>
+
+                  <div className="mt-2 flex items-center gap-4">
+                    {user?.profile?.avatarUrl || avatar ? (
+                      <Image
+                        src={avatar || user.profile.avatarUrl!}
+                        alt={`${user.fullName || "User"} avatar`}
+                        className={`h-16 w-16 rounded-full border object-cover ${isUploading ? "animate-pulse" : ""}`}
+                        width={100}
+                        height={100}
+                      />
+                    ) : (
+                      <div className="bg-muted flex h-20 w-20 items-center justify-center rounded-full text-lg font-semibold">
+                        {user?.fullName
+                          ? user.fullName
+                              .split(" ")
+                              .map((n) => n[0])
+                              .slice(0, 2)
+                              .join("")
+                              .toUpperCase()
+                          : "U"}
+                      </div>
+                    )}
+
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="avatarUpload"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-block cursor-pointer rounded-full px-4 py-2 text-sm font-medium"
+                      >
+                        Choose Image
+                      </label>
+                      <input
+                        id="avatarUpload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleAvatarUpload(e.target.files?.[0] || null)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <WKInput name="fullName" label="Full Name" required />
                   <WKInput name="phone" label="Phone Number" />
