@@ -8,6 +8,7 @@ import {
 import { Clock, DollarSign, ExternalLink, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useToggleSaveUnsaveJobMutation } from "../../../redux/feature/profile/profileApi";
 import HoverHint from "../../shared/HoverHint";
 import { Badge } from "../../ui/badge";
 
@@ -30,6 +31,31 @@ interface JobProps {
 }
 
 const JobCard = ({ job }: JobProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [toggleSaveUnsaveJobMutation, { isLoading: isSaving }] =
+    useToggleSaveUnsaveJobMutation();
+
+  const handleJobSave = async (jobId: string) => {
+    try {
+      toast.loading("Updating job status...", { id: "save_job" });
+
+      const response = await toggleSaveUnsaveJobMutation(jobId).unwrap();
+
+      console.log(response);
+
+      if (response.success && response.data.action === "saved") {
+        toast.success("Job saved successfully", { id: "save_job" });
+      }
+
+      if (response.success && response.data.action === "unsaved") {
+        toast.success("Job unsaved successfully", { id: "save_job" });
+      }
+    } catch (err) {
+      toast.error("Failed to update job status", { id: "save_job" });
+      console.error("Failed to save/unsave job:", err);
+    }
+  };
+
   return (
     <Card
       className={`bg-primary/2 sm:bg-card w-full rounded-2xl border-0 shadow-none drop-shadow-none transition-all duration-200`}
@@ -128,9 +154,7 @@ const JobCard = ({ job }: JobProps) => {
               size="sm"
               variant="ghost"
               className="cursor-pointer rounded-full p-2"
-              onClick={() => {
-                toast.error("Save job feature is not implemented yet.");
-              }}
+              onClick={() => handleJobSave(job?.id)}
             >
               <Heart className="h-4 w-4" />
               <span className="sr-only">Save job</span>
