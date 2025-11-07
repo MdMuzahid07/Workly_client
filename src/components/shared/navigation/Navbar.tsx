@@ -52,7 +52,7 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className={`border-border fixed top-0 right-0 left-0 z-[999999] ${pathname === "/" && !user.email ? "" : "hidden"} bg-primary/5 h-16 border-b backdrop-blur sm:h-18 md:flex`}
+        className={`border-border fixed top-0 right-0 left-0 z-999999 ${pathname === "/" && !user.email ? "" : "hidden"} bg-primary/5 h-16 border-b backdrop-blur sm:h-18 md:flex`}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
@@ -105,7 +105,7 @@ const Navbar = () => {
             <ThemeSwitcher />
             {user && user.email ? (
               <div className="hidden md:block">
-                <ProfileDrop onSignOut={handleLogout} />
+                <ProfileDrop onSignOut={handleLogout} user={user} />
               </div>
             ) : (
               <Button
@@ -122,7 +122,7 @@ const Navbar = () => {
       {/* mobile nav */}
       {user && user.email ? (
         <motion.nav
-          className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-[9999999] rounded-full border backdrop-blur-xs md:hidden"
+          className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-50 rounded-full border backdrop-blur-xs md:hidden"
           initial={{ y: 80 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
@@ -155,7 +155,7 @@ const Navbar = () => {
                 </motion.div>
               </Link>
             ))}
-            <ProfileDrop onSignOut={handleLogout} isMobile={true} />
+            <ProfileDrop onSignOut={handleLogout} isMobile={true} user={user} />
           </div>
         </motion.nav>
       ) : (

@@ -25,7 +25,7 @@ interface MenuItem {
 }
 
 interface UserProfile {
-  name: string;
+  fullName: string;
   email: string;
   avatar?: string;
   initials: string;
@@ -39,11 +39,7 @@ interface ProfileDropProps {
 }
 
 const ProfileDrop: React.FC<ProfileDropProps> = ({
-  user = {
-    name: "John Doe",
-    email: "john.doe@email.com",
-    initials: "JD",
-  },
+  user,
   onSignOut,
   isMobile,
   className = "",
@@ -121,10 +117,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           aria-label="User menu"
         >
           <div className="relative">
-            {user.avatar ? (
+            {user?.avatar ? (
               <Image
-                src={user.avatar}
-                alt={user.name}
+                src={user?.avatar}
+                alt={user?.fullName}
                 className="h-6 w-6 rounded-full border-2 border-white object-cover shadow-sm"
                 width={25}
                 height={25}
@@ -132,7 +128,11 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
               />
             ) : (
               <div className="text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-sm font-semibold shadow-sm">
-                {user.initials}
+                {user?.fullName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
               </div>
             )}
             <div className="bg-primary absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white shadow-sm"></div>
@@ -187,28 +187,32 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             <div className="border-b border-gray-100/80 p-4">
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-start">
                 <div className="relative">
-                  {user.avatar ? (
+                  {user?.avatar ? (
                     <Image
-                      src={user.avatar}
-                      alt={user.name}
+                      src={user?.avatar}
+                      alt={user?.fullName}
                       className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-sm sm:h-12 sm:w-12"
                       width={48}
                       height={48}
                       priority
                     />
                   ) : (
-                    <div className="from-primary/50 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
-                      {user.initials}
+                    <div className="from-primary/50 border-primary/20 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full border text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
+                      {user?.fullName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()}
                     </div>
                   )}
                   {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-primary shadow-sm"></div> */}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-muted-foreground truncate text-center font-semibold sm:text-start">
-                    {user.name}
+                    {user?.fullName}
                   </p>
                   <p className="text-muted-foreground truncate text-center text-sm sm:text-start">
-                    {user.email}
+                    {user?.email}
                   </p>
                   {/* <div className="mt-1 flex items-center gap-1">
                     <div className="h-2 w-2 rounded-full bg-primary"></div>
