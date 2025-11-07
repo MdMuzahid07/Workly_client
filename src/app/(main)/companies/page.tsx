@@ -34,7 +34,14 @@ export async function generateMetadata({
 async function fetchCompanies(
   params: { q?: string | undefined } = {},
 ): Promise<CompanyListItem[]> {
-  const url = new URL("http://localhost:5000/api/v1/company/companies");
+  const url = new URL(
+    `${
+      process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
+        ? process.env.NEXT_PUBLIC_BACKEND_URL
+        : "http://localhost:5000/api/v1/companies"
+    }`,
+  );
+
   if (params.q) url.searchParams.set("q", params.q);
 
   const res = await fetch(url.toString(), {

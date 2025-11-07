@@ -4,7 +4,10 @@ import { logout, setCredentials } from "../feature/auth/authSlice";
 import { RootState } from "../store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000/api/v1",
+  baseUrl:
+    process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
+      ? process.env.NEXT_PUBLIC_BACKEND_URL
+      : "http://localhost:5000/api/v1",
   credentials: "include",
   // extra added with fetchBaseQuery
   // in prepareHeaders we get two parameters (header,api), we get the getState() from the api
