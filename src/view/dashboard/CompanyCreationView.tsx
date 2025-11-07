@@ -3,6 +3,7 @@ import WkForm from "@/components/form/WkForm";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 import BasicInfoStep from "../../components/main/company/createCompany/BasicInfoStep";
 import LocationDetailsStep from "../../components/main/company/createCompany/LocationDetailsStep";
 import MediaContactStep from "../../components/main/company/createCompany/MediaContactStep";
@@ -88,9 +89,15 @@ const CompanyCreationView = () => {
     try {
       const result = await createCompany(data).unwrap();
 
+      if (result && result.success) {
+        toast.success("Company created successfully!");
+      }
+
       console.log("Company data:", result);
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Failed to create company:", error);
+      toast.error(`${error?.data?.errorSources?.message || "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -140,25 +147,19 @@ const CompanyCreationView = () => {
             ))}
           </div>
           <div className="mt-3 flex justify-center">
-            <div className="text-muted-foreground grid grid-cols-3 gap-4 text-center text-xs sm:flex sm:space-x-16 sm:text-sm">
+            <div className="text-muted-foreground grid grid-cols-3 text-center text-xs sm:flex sm:space-x-16 sm:text-sm">
               <span
-                className={
-                  currentStep >= 1 ? "text-primary w-26 font-medium" : ""
-                }
+                className={currentStep >= 1 ? "text-primary font-medium" : ""}
               >
                 Basic Info
               </span>
               <span
-                className={
-                  currentStep >= 2 ? "text-primary w-26 font-medium" : ""
-                }
+                className={currentStep >= 2 ? "text-primary font-medium" : ""}
               >
                 Details
               </span>
               <span
-                className={
-                  currentStep >= 3 ? "text-primary w-26 font-medium" : ""
-                }
+                className={currentStep >= 3 ? "text-primary font-medium" : ""}
               >
                 Media & Contact
               </span>
