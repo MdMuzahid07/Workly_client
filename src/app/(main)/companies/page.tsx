@@ -34,13 +34,12 @@ export async function generateMetadata({
 async function fetchCompanies(
   params: { q?: string | undefined } = {},
 ): Promise<CompanyListItem[]> {
-  const url = new URL(
-    `${
-      process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
-        ? process.env.NEXT_PUBLIC_BACKEND_URL
-        : "http://localhost:5000/api/v1/companies"
-    }`,
-  );
+  const baseUrl =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
+      ? process.env.NEXT_PUBLIC_BACKEND_URL
+      : "http://localhost:5000";
+
+  const url = new URL(`${baseUrl}/api/v1/company/companies`);
 
   if (params.q) url.searchParams.set("q", params.q);
 

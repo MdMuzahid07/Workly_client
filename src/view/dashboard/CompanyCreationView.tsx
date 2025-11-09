@@ -86,6 +86,8 @@ const CompanyCreationView = () => {
   const handleSubmit = async (data: CompanyFormData) => {
     setIsSubmitting(true);
 
+    console.log(data);
+
     try {
       const result = await createCompany(data).unwrap();
 
