@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Building2, Calendar, Eye, FileText, Users } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
@@ -156,13 +157,15 @@ const JobDetailsSidebar = ({
       <Card className="sticky top-22">
         <CardContent className="p-6">
           <div className="space-y-3">
-            <Button
-              className="bg-primary text-card w-full py-2.5 font-medium"
-              onClick={handleApply}
-              size="lg"
-            >
-              Apply Now
-            </Button>
+            <Link href={`/jobs/${job?.id}/apply`}>
+              <Button
+                className="bg-primary text-card w-full py-2.5 font-medium"
+                onClick={handleApply}
+                size="lg"
+              >
+                Apply Now
+              </Button>
+            </Link>
             <Button
               variant="outline"
               className="hover:bg-primary/10 hover:text-foreground w-full border-gray-300 font-medium"

@@ -132,12 +132,14 @@ const JobCard = ({ job }: JobProps) => {
       <CardFooter className="border-border border-b px-0 pb-7 md:border-t md:border-b-0 md:px-4 md:pt-4 md:pb-0">
         <div className="flex w-full items-center justify-between gap-3">
           <div className="flex gap-2">
-            <Button
-              size="sm"
-              className="cursor-pointer rounded-full font-medium"
-            >
-              Apply Now
-            </Button>
+            <Link href={`/jobs/${job?.id}/apply`}>
+              <Button
+                size="sm"
+                className="cursor-pointer rounded-full font-medium"
+              >
+                Apply Now
+              </Button>
+            </Link>
             <Link href={`/jobs/${job?.id}`}>
               <Button
                 size="sm"
