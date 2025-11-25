@@ -16,9 +16,13 @@ import ProfileDrop from "./ProfileDrop";
 const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
-  const user = useAppSelector((state) => state.auth.user) || { email: null };
+  const { user, isVerified } = useAppSelector((state) => state.auth) || {
+    email: null,
+  };
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
+
+  console.log(user, "from navbar");
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -52,14 +56,14 @@ const Navbar = () => {
     <>
       {/* desktop nav */}
       <motion.nav
-        className={`border-border fixed top-0 right-0 left-0 z-999999 ${pathname === "/" && !user.email ? "" : "hidden"} bg-primary/5 h-16 border-b backdrop-blur sm:h-18 md:flex`}
+        className={`border-border fixed top-0 right-0 left-0 z-999999 ${pathname === "/" && !user?.email && isVerified ? "" : "hidden"} bg-primary/5 h-16 border-b backdrop-blur sm:h-18 md:flex`}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
       >
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 sm:h-18">
           <WJLogo />
-          {user && user.email ? (
+          {user?.email && isVerified ? (
             <div className="hidden items-center gap-8 md:flex">
               {navLinks.map((item, i) => (
                 <Link
@@ -103,7 +107,7 @@ const Navbar = () => {
             className={`${pathname === "/" ? "flex" : "hidden"} items-center gap-2 md:flex`}
           >
             <ThemeSwitcher />
-            {user && user.email ? (
+            {user?.email && isVerified ? (
               <div className="hidden md:block">
                 <ProfileDrop onSignOut={handleLogout} user={user} />
               </div>
@@ -120,7 +124,7 @@ const Navbar = () => {
       </motion.nav>
 
       {/* mobile nav */}
-      {user && user.email ? (
+      {user?.email && isVerified ? (
         <motion.nav
           className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-50 rounded-full border backdrop-blur-xs md:hidden"
           initial={{ y: 80 }}

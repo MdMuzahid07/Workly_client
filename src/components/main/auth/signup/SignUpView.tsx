@@ -6,9 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import z from "zod";
 import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
 import { setCredentials } from "../../../../redux/feature/auth/authSlice";
 import { useAppDispatch } from "../../../../redux/hooks";
@@ -24,8 +26,30 @@ interface SignUpFormData {
   role: "EMPLOYER" | "JOB_SEEKER";
 }
 
+const signUpSchema = z
+  .object({
+    fullName: z.string().min(1, "Full Name is required"),
+    email: z.string().email("Invalid email address"),
+    role: z.enum(["EMPLOYER", "JOB_SEEKER"]),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Password must contain at least one special character",
+      ),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 const SignUpView = () => {
-  const { switchView, closeAuth } = useAuthDialog();
+  const { switchView } = useAuthDialog();
   const dispatch = useAppDispatch();
   const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +57,6 @@ const SignUpView = () => {
   const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
     "JOB_SEEKER",
   );
-  // const router = useRouter();
 
   const defaultValues: SignUpFormData = {
     fullName: "",
@@ -45,11 +68,6 @@ const SignUpView = () => {
 
   const handleSubmit = async (data: SignUpFormData) => {
     try {
-      if (data.password !== data.confirmPassword) {
-        toast.error("Passwords don't match!");
-        return;
-      }
-
       const response = await registerUser({
         fullName: data.fullName,
         email: data.email,
@@ -77,9 +95,8 @@ const SignUpView = () => {
           }),
         );
 
-        toast.success("Registration successful!");
-        closeAuth();
-        // router.push("/jobs");
+        toast.success("Please verify your email!");
+        switchView("verificationEmailSent");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -99,7 +116,11 @@ const SignUpView = () => {
         </DialogDescription>
       </DialogHeader>
 
-      <WkForm defaultValues={defaultValues} onSubmit={handleSubmit}>
+      <WkForm
+        defaultValues={defaultValues}
+        onSubmit={handleSubmit}
+        resolver={zodResolver(signUpSchema)}
+      >
         <div className="mt-6 space-y-6">
           <div className="space-y-4">
             <WKInput

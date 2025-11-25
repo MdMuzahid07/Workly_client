@@ -8,11 +8,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import AccountVerificationEmailAlert from "./AccountVerificationEmailAlert";
 import ForgetPasswordView from "./forget-password/ForgetPasswordView";
 import SignInView from "./Signin/SignInView";
 import SignUpView from "./signup/SignUpView";
 
-export type AuthView = "signIn" | "signUp" | "forgot";
+export type AuthView = "signIn" | "signUp" | "forgot" | "verificationEmailSent";
 
 type Ctx = {
   open: boolean;
@@ -57,6 +58,9 @@ const AuthDialogProvider = ({ children }: { children: ReactNode }) => {
           {view === "signIn" && <SignInView />}
           {view === "signUp" && <SignUpView />}
           {view === "forgot" && <ForgetPasswordView />}
+          {view === "verificationEmailSent" && (
+            <AccountVerificationEmailAlert />
+          )}
         </DialogContent>
       </Dialog>
     </AuthDialogCtx.Provider>
