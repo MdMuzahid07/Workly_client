@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useForgotPasswordMutation } from "../../../../redux/feature/auth/authApi";
 import WkForm from "../../../form/WkForm";
 import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
@@ -19,12 +21,24 @@ interface ForgetPasswordFormData {
 const ForgetPasswordView = () => {
   const { switchView } = useAuthDialog();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const defaultValues: ForgetPasswordFormData = { email: "" };
 
-  const handleSubmit = (data: ForgetPasswordFormData) => {
-    console.log(data);
-    setIsSubmitted(true);
+  const handleSubmit = async (data: ForgetPasswordFormData) => {
+    const result = await forgotPassword({ email: data.email });
+    console.log(result.data);
+
+    if (result && result.data) {
+      toast.success(result.data.message);
+      setIsSubmitted(true);
+    } else if (result && "error" in result) {
+      toast.error(
+        "error" in result.error
+          ? result.error.error
+          : "An error occurred. Please try again.",
+      );
+    }
   };
 
   return (
@@ -57,10 +71,11 @@ const ForgetPasswordView = () => {
             </div>
 
             <Button
+              disabled={isLoading}
               type="submit"
               className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
-              Send Reset Link
+              {isLoading ? "Sending..." : "Send Password Reset Email"}
             </Button>
           </div>
         </WkForm>
