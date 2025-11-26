@@ -8,7 +8,6 @@ import {
   FileText,
   Heart,
   LogOut,
-  Settings,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -82,10 +81,8 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     { icon: User, label: "My Profile", href: "/profile" },
     { icon: Briefcase, label: "Applied Jobs", href: "/applied-jobs", badge: 3 },
     { icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 },
-    { icon: FileText, label: "My Resume", href: "/resume" },
     { icon: Building2, label: "Create Company", href: "/create-company" },
     { icon: FileText, label: "Company Dashboard", href: "/dashboard" },
-    { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
   const handleSignOut = async () => {
