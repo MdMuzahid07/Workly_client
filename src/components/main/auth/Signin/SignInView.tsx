@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -43,23 +44,27 @@ const SignInView = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const resData = (response as any).data;
 
-      console.log(resData, "response==========>");
-
       if (resData?.accessToken && resData?.email) {
         localStorage.setItem("accessToken", resData.accessToken);
 
-        dispatch(
-          setCredentials({
-            user: {
-              email: resData.email,
-              fullName: resData.fullName,
-              isVerified: resData.isVerified,
-              phone: resData.phone,
-            },
-            accessToken: resData.accessToken,
-            refreshToken: resData.refreshToken,
-          }),
-        );
+        const decodedToken = jwtDecode(resData.accessToken) as {
+          isVerified: boolean;
+        };
+
+        if (decodedToken) {
+          dispatch(
+            setCredentials({
+              user: {
+                email: resData.email,
+                fullName: resData.fullName,
+                isVerified: decodedToken.isVerified,
+                phone: resData.phone,
+              },
+              accessToken: resData.accessToken,
+              refreshToken: resData.refreshToken,
+            }),
+          );
+        }
 
         toast.success("Login successful!");
         closeAuth();

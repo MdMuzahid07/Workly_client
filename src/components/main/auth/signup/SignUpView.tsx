@@ -87,7 +87,6 @@ const SignUpView = () => {
             user: {
               email: resData.email,
               fullName: resData.fullName,
-              isVerified: resData.isVerified,
               phone: resData.phone,
             },
             accessToken: resData.accessToken,
