@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthDialog } from "../../../components/main/auth/AuthDialogProvider";
 import { useVerifyEmailMutation } from "../../../redux/feature/auth/authApi";
+import { updateUser } from "../../../redux/feature/auth/authSlice";
+import { useAppDispatch } from "../../../redux/hooks";
 
 type VerificationStatus = "loading" | "success" | "error";
 
@@ -13,6 +15,7 @@ const VerifyEmailPage = () => {
   const router = useRouter();
   const { openAuth } = useAuthDialog();
   const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
   const token = searchParams.get("token");
   const [verifyEmail] = useVerifyEmailMutation();
 
@@ -28,7 +31,18 @@ const VerifyEmailPage = () => {
       }
 
       try {
-        await verifyEmail({ token }).unwrap();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result: any = await verifyEmail({ token }).unwrap();
+        const data = result.data;
+        console.log(data, "result");
+        if (result?.success) {
+          dispatch(
+            updateUser({
+              isVerified: data.isVerified,
+            }),
+          );
+        }
+
         setStatus("success");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -42,7 +56,7 @@ const VerifyEmailPage = () => {
     };
 
     handleVerification();
-  }, [token, verifyEmail]);
+  }, [token, verifyEmail, dispatch]);
 
   const handleContinue = () => {
     router.push("/");
