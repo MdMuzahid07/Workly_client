@@ -9,6 +9,7 @@ import ApplicationCard, {
 } from "../../components/main/jobs/myAppliedJobs/ApplicationCard";
 
 import { Loader2 } from "lucide-react";
+import ErrorState from "../../components/main/jobs/myAppliedJobs/ErrorState";
 import { useGetMyApplicationsQuery } from "../../redux/feature/job/jobApi";
 import MyAppliedJobsSkeleton from "../../skeleton/job/MyAppliedJobsSkeleton ";
 
@@ -55,20 +56,7 @@ const MyAppliedJobsView = () => {
   }
 
   if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Card className="border-destructive bg-card">
-          <CardContent className="p-6 text-center">
-            <p className="text-destructive font-semibold">
-              Failed to load Job Applications
-            </p>
-            <p className="text-muted-foreground mt-2 text-sm">
-              Please try again later
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <ErrorState onRetry={() => window.location.reload()} />;
   }
 
   return (

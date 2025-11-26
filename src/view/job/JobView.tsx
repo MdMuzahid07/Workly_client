@@ -163,27 +163,6 @@ const JobView = () => {
             {<Sidebar onFiltersChange={handleFiltersChange} />}
           </div>
         </div>
-        {/* <div className="col-span-12 md:col-span-8">
-          <div className="flex flex-col md:gap-4">
-            {isLoading &&
-              [...Array(6)].map((_, index) => <JobCardSkeleton key={index} />)}
-
-            {error && (
-              <div className="text-destructive text-center">
-                Something went wrong, please try again later.
-              </div>
-            )}
-            {data && data?.data?.length === 0 && (
-              <div className="text-center">No jobs found.</div>
-            )}
-            {data &&
-              data?.data?.map((job: any) => (
-                <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
-                  <JobCard key={job?.id} job={job} />
-                </Suspense>
-              ))}
-          </div>
-        </div> */}
         <div className="col-span-12 md:col-span-8">
           <InfiniteScroll
             dataLength={allJobs.length}
