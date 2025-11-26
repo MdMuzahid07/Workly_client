@@ -15,11 +15,9 @@ import {
   ArrowLeft,
   Info,
   MoreVertical,
-  Phone,
   Send,
   Star,
   Trash2,
-  Video,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
@@ -393,12 +391,12 @@ const MessageView = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button variant="ghost" size="sm">
+                      {/* <Button variant="ghost" size="sm">
                         <Phone className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
                         <Video className="h-4 w-4" />
-                      </Button>
+                      </Button> */}
                       <Button variant="ghost" size="sm">
                         <Info className="h-4 w-4" />
                       </Button>

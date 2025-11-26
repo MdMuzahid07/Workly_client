@@ -124,7 +124,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 priority
               />
             ) : (
-              <div className="text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-sm font-semibold shadow-sm">
+              <div className="text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-[10px] font-semibold shadow-sm">
                 {user?.fullName
                   .split(" ")
                   .map((n) => n[0])
