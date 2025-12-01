@@ -205,7 +205,7 @@ const JobApplyForm = ({
 
             {/* Resume Upload Section */}
             <div className="space-y-4">
-              <h3 className="font-semibold">Resume</h3>
+              <h3 className="font-semibold">Resume (PDF)</h3>
               <FormField
                 control={form.control}
                 name="resumeFile"

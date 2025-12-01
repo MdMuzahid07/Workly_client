@@ -10,7 +10,7 @@ import ApplicationCard, {
 
 import { Loader2 } from "lucide-react";
 import ErrorState from "../../components/main/jobs/myAppliedJobs/ErrorState";
-import { useGetMyApplicationsQuery } from "../../redux/feature/job/jobApi";
+import { useGetMyApplicationsQuery } from "../../redux/feature/application/applicationApi";
 import MyAppliedJobsSkeleton from "../../skeleton/job/MyAppliedJobsSkeleton ";
 
 type ApplicationStatus =

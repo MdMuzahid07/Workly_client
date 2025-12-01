@@ -40,15 +40,6 @@ const jobApi = baseApi.injectEndpoints({
         method: "DELETE",
       }),
     }),
-
-    getMyApplications: builder.query({
-      query: (params) => ({
-        url: "/application/my-applications",
-        method: "GET",
-        params,
-      }),
-      providesTags: ["applications"],
-    }),
   }),
 });
 
@@ -58,6 +49,5 @@ export const {
   useGetJobByIdQuery,
   useUpdateJobMutation,
   useDeleteJobMutation,
-  useGetMyApplicationsQuery,
 } = jobApi;
 export default jobApi;

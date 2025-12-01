@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { Navigation } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Button } from "../../ui/button";
 
@@ -155,7 +155,7 @@ const Industries = ({
   return (
     <div className="mx-auto mt-4 max-w-7xl p-4 md:mt-7 xl:p-0">
       <Swiper
-        modules={[Navigation]}
+        modules={[Navigation, Autoplay]}
         spaceBetween={12}
         slidesPerView="auto"
         navigation={{

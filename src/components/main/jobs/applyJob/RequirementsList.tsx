@@ -21,7 +21,7 @@ const RequirementsList = ({
       </CardTitle>
     </CardHeader>
     <CardContent className="space-y-3">
-      {items.map((item, index) => (
+      {items?.map((item, index) => (
         <div key={index} className="flex gap-3">
           <CheckCircle2 className="text-success mt-0.5 h-5 w-5 shrink-0" />
           <p className="text-muted-foreground text-sm">{item}</p>

@@ -8,7 +8,6 @@ interface PageProps {
 
 const page = async ({ params }: PageProps) => {
   const { id } = await params;
-
   return <ApplyJobView jobId={id} />;
 };
 

@@ -3,10 +3,10 @@ import baseApi from "../../api/baseApi";
 const uploadApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     uploadSingleFile: builder.mutation({
-      query: (data) => ({
+      query: (formData: FormData) => ({
         url: "/upload/single",
         method: "POST",
-        body: data,
+        body: formData,
       }),
     }),
     uploadMultipleFiles: builder.mutation({
