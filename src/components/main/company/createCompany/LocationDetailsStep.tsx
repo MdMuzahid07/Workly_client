@@ -1,11 +1,12 @@
-import { MapPin, Globe } from "lucide-react";
+import { Globe, MapPin } from "lucide-react";
+import WKDatePicker from "../../../form/WKDatePicker";
 import WKInput from "../../../form/WkInput";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "../../../ui/card";
 
 const LocationDetailsStep = () => {
@@ -28,10 +29,10 @@ const LocationDetailsStep = () => {
             required
             className="h-10 sm:h-11"
           />
-          <WKInput
+          <WKDatePicker
             name="founded"
             label="Founded Year"
-            type="text"
+            required={false}
             className="h-10 sm:h-11"
           />
         </div>

@@ -7,7 +7,9 @@ import { toast } from "sonner";
 import BasicInfoStep from "../../components/main/company/createCompany/BasicInfoStep";
 import LocationDetailsStep from "../../components/main/company/createCompany/LocationDetailsStep";
 import MediaContactStep from "../../components/main/company/createCompany/MediaContactStep";
+import { updateUser } from "../../redux/feature/auth/authSlice";
 import { useCreateCompanyMutation } from "../../redux/feature/company/companyApi";
+import { useAppDispatch } from "../../redux/hooks";
 
 export interface CompanyFormData {
   name: string;
@@ -82,6 +84,7 @@ const CompanyCreationView = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createCompany, { isLoading }] = useCreateCompanyMutation();
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (data: CompanyFormData) => {
     setIsSubmitting(true);
@@ -93,9 +96,13 @@ const CompanyCreationView = () => {
 
       if (result && result.success) {
         toast.success("Company created successfully!");
+        dispatch(
+          updateUser({
+            companyId: result.data.id || "",
+          }),
+        );
       }
 
-      console.log("Company data:", result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create company:", error);
