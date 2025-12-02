@@ -11,6 +11,7 @@ import { Button } from "../../ui/button";
 import CreateJobFromSkillSection, {
   SkillRequired,
 } from "./CreateJobFromSkillSection";
+import StringArrayField from "./StringArrayField";
 
 export interface JobFormData {
   title: string;
@@ -23,8 +24,8 @@ export interface JobFormData {
   salaryMax: number;
   currency: string;
   description: string;
-  requirements: string;
-  benefits: string;
+  requirements: string[];
+  benefits: string[];
   contactEmail: string;
   applicationDeadline: string;
   maxApplications: number;
@@ -74,8 +75,8 @@ const CreateNewJobForm = ({ onClose, companyId }: any) => {
     salaryMax: 0,
     currency: "BDT",
     description: "",
-    requirements: "",
-    benefits: "",
+    requirements: [],
+    benefits: [],
     contactEmail: "",
     applicationDeadline: "",
     maxApplications: 100,
@@ -164,14 +165,18 @@ const CreateNewJobForm = ({ onClose, companyId }: any) => {
             rows={5}
           />
 
-          <WKTextArea
-            name="requirements"
+          <StringArrayField
+            fieldName="requirements"
             label="Requirements"
+            placeholder="Enter a requirement..."
             required
-            rows={4}
           />
 
-          <WKTextArea name="benefits" label="Benefits" rows={3} />
+          <StringArrayField
+            fieldName="benefits"
+            label="Benefits"
+            placeholder="Enter a benefit..."
+          />
 
           <CreateJobFromSkillSection />
 
@@ -206,7 +211,7 @@ const CreateNewJobForm = ({ onClose, companyId }: any) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-gray-200 pt-6">
+        <div className="border-primary/10 flex justify-end gap-3 border-t pt-6">
           <Button
             type="button"
             variant="outline"

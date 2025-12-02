@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import {
   Briefcase,
   Building2,
@@ -23,11 +24,18 @@ interface MenuItem {
   badge?: number;
 }
 
+interface AuthTokenPayload extends JwtPayload {
+  role?: string;
+  companyId?: string | number;
+}
+
 interface UserProfile {
   fullName: string;
   email: string;
   avatar?: string;
   initials: string;
+  role?: string;
+  companyId?: string | number;
 }
 
 interface ProfileDropProps {
@@ -77,12 +85,33 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     };
   }, [isOpen, handleClickOutside, handleEscapeKey]);
 
+  const decodedToken = jwtDecode<AuthTokenPayload>(
+    localStorage.getItem("accessToken") || "",
+  );
+  const isEmployer = decodedToken?.role === "EMPLOYER";
+  const hasCompany = Boolean(decodedToken?.companyId);
+
   const menuItems: MenuItem[] = [
     { icon: User, label: "My Profile", href: "/profile" },
-    { icon: Briefcase, label: "Applied Jobs", href: "/applied-jobs", badge: 3 },
-    { icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 },
-    { icon: Building2, label: "Create Company", href: "/create-company" },
-    { icon: FileText, label: "Company Dashboard", href: "/dashboard" },
+    ...(!isEmployer && !hasCompany
+      ? [
+          {
+            icon: Briefcase,
+            label: "Applied Jobs",
+            href: "/applied-jobs",
+            badge: 3,
+          },
+        ]
+      : []),
+    ...(!isEmployer && hasCompany
+      ? [{ icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 }]
+      : []),
+    ...(!hasCompany
+      ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
+      : []),
+    ...(isEmployer && hasCompany
+      ? [{ icon: FileText, label: "Company Dashboard", href: "/dashboard" }]
+      : []),
   ];
 
   const handleSignOut = async () => {

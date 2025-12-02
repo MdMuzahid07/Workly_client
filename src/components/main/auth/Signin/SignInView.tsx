@@ -59,9 +59,10 @@ const SignInView = () => {
                 fullName: resData.fullName,
                 isVerified: decodedToken.isVerified,
                 phone: resData.phone,
+                companyId: resData.companyId,
               },
               accessToken: resData.accessToken,
-              refreshToken: resData.refreshToken,
+              refreshToken: null,
             }),
           );
         }

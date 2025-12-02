@@ -88,6 +88,7 @@ const SignUpView = () => {
               email: resData.email,
               fullName: resData.fullName,
               phone: resData.phone,
+              companyId: resData.companyId,
             },
             accessToken: resData.accessToken,
             refreshToken: null,

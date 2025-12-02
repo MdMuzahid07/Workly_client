@@ -60,7 +60,7 @@ const CreateJobFromSkillSection = () => {
       </div>
 
       {skills.length === 0 ? (
-        <div className="text-muted-foreground rounded-lg border border-dashed border-gray-300 p-4 text-center text-sm">
+        <div className="text-muted-foreground border-primary/20 rounded-lg border border-dashed p-4 text-center text-sm">
           No skills added yet. Click {`"Add Skill"`} to get started.
         </div>
       ) : (
