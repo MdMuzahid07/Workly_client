@@ -88,8 +88,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
   const decodedToken = jwtDecode<AuthTokenPayload>(
     localStorage.getItem("accessToken") || "",
   );
-  const isEmployer = decodedToken?.role === "EMPLOYER";
-  const hasCompany = Boolean(decodedToken?.companyId);
+  const isEmployer =
+    decodedToken?.role === "EMPLOYER" || user?.role === "EMPLOYER";
+  const hasCompany =
+    Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
 
   const menuItems: MenuItem[] = [
     { icon: User, label: "My Profile", href: "/profile" },
