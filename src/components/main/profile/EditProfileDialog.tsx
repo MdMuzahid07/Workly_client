@@ -5,7 +5,6 @@ import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
 import WKSelect from "@/components/form/WkSelect";
 import WKTextArea from "@/components/form/WkTextArea";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,15 +12,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
-import { AlertCircle, Plus, Sparkles, X } from "lucide-react";
+import { Check, FileText, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useUploadSingleFileMutation } from "../../../redux/feature/upload/uploadApi";
+import ProfileSkillManagement from "./ProfileSkillManagement";
 
 // ========== Types =============>
 interface Skill {
@@ -83,13 +82,6 @@ interface EditProfileDialogProps {
   onSave: (user: User) => void;
 }
 
-// ============ constants ==================>
-const LIMITS = {
-  MAX_SKILLS: 50,
-  MAX_SKILL_NAME: 100,
-  MAX_EXPERIENCE_YEARS: 50,
-} as const;
-
 const JOB_TYPE_OPTIONS = [
   { value: "FULL_TIME", label: "Full Time" },
   { value: "PART_TIME", label: "Part Time" },
@@ -106,204 +98,8 @@ const EXPERIENCE_OPTIONS = [
   { value: "Executive", label: "Executive (10+ years)" },
 ] as const;
 
-// =========== helper function ===============>
-const skillHelpers = {
-  sanitize: (name: string) => name.trim().replace(/\s+/g, " "),
-  isDuplicate: (skills: Skill[], name: string) =>
-    skills.some((s) => s.skillName.toLowerCase() === name.toLowerCase()),
-  isValidExperience: (years: number) =>
-    years >= 0 && years <= LIMITS.MAX_EXPERIENCE_YEARS,
-};
-
-// ========== skills management component ==================>
-interface SkillsManagementProps {
-  skills: Skill[];
-  onSkillsChange: (skills: Skill[]) => void;
-}
-
-const SkillsManagement = ({
-  skills,
-  onSkillsChange,
-}: SkillsManagementProps) => {
-  const [newSkill, setNewSkill] = useState<Skill>({
-    skillName: "",
-    experienceYears: 1,
-  });
-  const [error, setError] = useState("");
-
-  const validateAndAddSkill = useCallback(() => {
-    const trimmedName = skillHelpers.sanitize(newSkill.skillName);
-
-    if (!trimmedName) {
-      setError("Skill name cannot be empty");
-      return;
-    }
-
-    if (trimmedName.length > LIMITS.MAX_SKILL_NAME) {
-      setError(`Skill name cannot exceed ${LIMITS.MAX_SKILL_NAME} characters`);
-      return;
-    }
-
-    if (skillHelpers.isDuplicate(skills, trimmedName)) {
-      setError("This skill has already been added");
-      return;
-    }
-
-    if (!skillHelpers.isValidExperience(newSkill.experienceYears)) {
-      setError(
-        `Experience must be between 0 and ${LIMITS.MAX_EXPERIENCE_YEARS} years`,
-      );
-      return;
-    }
-
-    if (skills.length >= LIMITS.MAX_SKILLS) {
-      setError(`Maximum ${LIMITS.MAX_SKILLS} skills allowed`);
-      return;
-    }
-
-    onSkillsChange([...skills, { ...newSkill, skillName: trimmedName }]);
-    setNewSkill({ skillName: "", experienceYears: 1 });
-    setError("");
-    toast.success("Skill added successfully");
-  }, [newSkill, skills, onSkillsChange]);
-
-  const removeSkill = useCallback(
-    (index: number) => {
-      const removed = skills[index];
-      onSkillsChange(skills.filter((_, i) => i !== index));
-      toast.success(`${removed.skillName} removed`);
-    },
-    [skills, onSkillsChange],
-  );
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      validateAndAddSkill();
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-foreground flex items-center text-xl font-semibold">
-          <Sparkles className="text-primary mr-2 h-5 w-5" />
-          Skills & Expertise
-        </h3>
-        <Badge variant="secondary" className="text-xs">
-          {skills.length} / {LIMITS.MAX_SKILLS}
-        </Badge>
-      </div>
-
-      {/* Skills Display */}
-      {skills.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill, index) => (
-            <Badge
-              key={`${skill.skillName}-${index}`}
-              variant="secondary"
-              className="bg-primary text-primary-foreground border-primary flex items-center gap-2 px-3 py-2 transition-all hover:scale-105"
-            >
-              <span className="font-medium">{skill.skillName}</span>
-              <span className="text-xs opacity-90">
-                ({skill.experienceYears}y)
-              </span>
-              <button
-                type="button"
-                onClick={() => removeSkill(index)}
-                className="hover:text-destructive ml-1 transition-colors"
-                aria-label={`Remove ${skill.skillName}`}
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      ) : (
-        <div className="bg-muted/30 border-border flex items-center justify-center rounded-lg border border-dashed p-8">
-          <div className="space-y-2 text-center">
-            <AlertCircle className="text-muted-foreground mx-auto h-8 w-8" />
-            <p className="text-muted-foreground text-sm">
-              No skills added yet. Add your first skill below!
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Add Skill Form */}
-      <div className="bg-muted/30 border-border space-y-4 rounded-lg border p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <Label
-              htmlFor="newSkill"
-              className="text-foreground text-sm font-medium"
-            >
-              Add New Skill *
-            </Label>
-            <Input
-              id="newSkill"
-              value={newSkill.skillName}
-              onChange={(e) => {
-                setNewSkill((prev) => ({ ...prev, skillName: e.target.value }));
-                setError("");
-              }}
-              onKeyPress={handleKeyPress}
-              placeholder="e.g., React, Python, Project Management"
-              className="mt-1 w-full"
-              maxLength={LIMITS.MAX_SKILL_NAME}
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor="experience"
-              className="text-foreground text-sm font-medium"
-            >
-              Years *
-            </Label>
-            <Input
-              id="experience"
-              type="number"
-              min="0"
-              max={LIMITS.MAX_EXPERIENCE_YEARS}
-              step="0.5"
-              value={newSkill.experienceYears}
-              onChange={(e) => {
-                setNewSkill((prev) => ({
-                  ...prev,
-                  experienceYears: Number(e.target.value),
-                }));
-                setError("");
-              }}
-              className="mt-1 w-full"
-            />
-          </div>
-        </div>
-
-        {error && (
-          <div className="bg-destructive/10 text-destructive flex items-start gap-2 rounded-md p-3 text-sm">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <Button
-          type="button"
-          onClick={validateAndAddSkill}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
-          disabled={
-            !newSkill.skillName.trim() || skills.length >= LIMITS.MAX_SKILLS
-          }
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Skill
-        </Button>
-      </div>
-    </div>
-  );
-};
-
 // ==================== main component ================>
+
 const EditProfileDialog = ({
   isOpen,
   onClose,
@@ -315,9 +111,19 @@ const EditProfileDialog = ({
   const [avatar, setAvatar] = useState<string | null>(
     user?.profile?.avatarUrl || null,
   );
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [uploadedResumeUrl, setUploadedResumeUrl] = useState<string | null>(
+    user?.profile?.resumeUrl || null,
+  );
 
   const [uploadSingleFile, { isLoading: isUploading }] =
     useUploadSingleFileMutation();
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   const handleAvatarUpload = async (file: File | null) => {
     if (!file) return;
@@ -328,10 +134,40 @@ const EditProfileDialog = ({
     try {
       const result = await uploadSingleFile(formData).unwrap();
       setAvatar(result.data.url);
+      toast.success("Avatar uploaded successfully");
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Failed to upload avatar. Please try again.");
     }
+  };
+
+  const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = [".pdf", ".doc", ".docx"];
+      const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
+
+      if (!validTypes.includes(fileExtension)) {
+        toast.error("Please upload a valid resume file (PDF, DOC, DOCX)");
+        return;
+      }
+
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        return;
+      }
+
+      setResumeFile(file);
+      toast.success("Resume file selected");
+    }
+  };
+
+  const handleRemoveResumeFile = () => {
+    setResumeFile(null);
+    setUploadedResumeUrl(null);
+    toast.success("Resume removed");
   };
 
   const handleSubmit = async (data: ProfileFormData) => {
@@ -341,6 +177,20 @@ const EditProfileDialog = ({
     }
 
     try {
+      let finalResumeUrl = uploadedResumeUrl;
+
+      // Upload resume file if a new one is selected
+      if (resumeFile) {
+        const formData = new FormData();
+        formData.append("file", resumeFile);
+
+        const resumeResult = await uploadSingleFile(formData).unwrap();
+        if (resumeResult.success) {
+          finalResumeUrl = resumeResult.data.url;
+          setUploadedResumeUrl(finalResumeUrl);
+        }
+      }
+
       //==================== helper function to convert empty string to null ================>
       const sanitizeValue = (value: any) => {
         if (value === "" || value === undefined) return null;
@@ -352,9 +202,8 @@ const EditProfileDialog = ({
         location: sanitizeValue(data.location),
         websiteUrl: sanitizeValue(data.websiteUrl),
         avatarUrl: avatar || user.profile.avatarUrl,
-
         linkedInUrl: sanitizeValue(data.linkedInUrl),
-        resumeUrl: sanitizeValue(data.resumeUrl),
+        resumeUrl: finalResumeUrl || null,
         skills: skills,
         preference: {
           jobType: data.jobType,
@@ -385,7 +234,7 @@ const EditProfileDialog = ({
           location: data.location,
           websiteUrl: data.websiteUrl,
           linkedInUrl: data.linkedInUrl,
-          resumeUrl: data.resumeUrl,
+          resumeUrl: finalResumeUrl || undefined,
           skills,
           preference: {
             ...user.profile.preference,
@@ -430,6 +279,8 @@ const EditProfileDialog = ({
 
   const handleClose = useCallback(() => {
     setSkills(user?.profile?.skills || []);
+    setResumeFile(null);
+    setUploadedResumeUrl(user?.profile?.resumeUrl || null);
     onClose();
   }, [user, onClose]);
 
@@ -513,7 +364,7 @@ const EditProfileDialog = ({
 
               <Separator />
 
-              {/* Professional Links */}
+              {/* Professional Links & Resume */}
               <section className="space-y-6">
                 <h3 className="text-foreground text-xl font-semibold">
                   Professional Links & Files
@@ -522,13 +373,147 @@ const EditProfileDialog = ({
                   <WKInput name="websiteUrl" label="Personal Website" />
                   <WKInput name="linkedInUrl" label="LinkedIn Profile" />
                 </div>
-                <WKInput name="resumeUrl" label="Resume URL" />
+
+                {/* Resume Upload Section */}
+                <div className="space-y-4">
+                  <Label className="text-foreground text-sm font-medium">
+                    Resume
+                  </Label>
+
+                  {/* Upload Area */}
+                  {!resumeFile && !uploadedResumeUrl && (
+                    <div className="border-border bg-muted/30 rounded-lg border-2 border-dashed">
+                      <label
+                        htmlFor="resume-upload"
+                        className="flex cursor-pointer flex-col items-center justify-center px-6 py-8"
+                      >
+                        <div className="bg-muted mb-4 rounded-full p-4">
+                          <Upload className="text-muted-foreground h-8 w-8" />
+                        </div>
+
+                        <div className="space-y-2 text-center">
+                          <p className="text-foreground font-medium">
+                            Drop your resume here or{" "}
+                            <span className="text-primary underline">
+                              browse
+                            </span>
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            PDF, DOC, DOCX up to 5MB
+                          </p>
+                        </div>
+
+                        <input
+                          id="resume-upload"
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleResumeFileChange}
+                        />
+                      </label>
+                    </div>
+                  )}
+
+                  {/* Selected File Display */}
+                  {resumeFile && (
+                    <div className="border-primary/20 bg-primary/5 rounded-lg border p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex min-w-0 flex-1 items-start gap-3">
+                          <div className="bg-primary/10 shrink-0 rounded-lg p-2">
+                            <FileText className="text-primary h-6 w-6" />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1 flex items-center gap-2">
+                              <p className="text-foreground truncate font-medium">
+                                {resumeFile.name}
+                              </p>
+                              <Check className="text-primary h-4 w-4 shrink-0" />
+                            </div>
+                            <p className="text-muted-foreground text-sm">
+                              {formatFileSize(resumeFile.size)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRemoveResumeFile}
+                          className="hover:bg-destructive/10 hover:text-destructive shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Existing Resume Display */}
+                  {!resumeFile && uploadedResumeUrl && (
+                    <div className="border-border bg-muted/30 rounded-lg border p-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-muted rounded-lg p-2">
+                            <FileText className="text-muted-foreground h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="text-foreground text-sm font-medium">
+                              Current Resume
+                            </p>
+                            <a
+                              href={uploadedResumeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary text-xs hover:underline"
+                            >
+                              View Resume
+                            </a>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <label htmlFor="resume-upload-replace">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="cursor-pointer"
+                              asChild
+                            >
+                              <span>Replace</span>
+                            </Button>
+                            <input
+                              id="resume-upload-replace"
+                              type="file"
+                              className="hidden"
+                              accept=".pdf,.doc,.docx"
+                              onChange={handleResumeFileChange}
+                            />
+                          </label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleRemoveResumeFile}
+                            className="hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </section>
 
               <Separator />
 
               {/* Skills */}
-              <SkillsManagement skills={skills} onSkillsChange={setSkills} />
+              <ProfileSkillManagement
+                skills={skills}
+                onSkillsChange={setSkills}
+              />
 
               <Separator />
 
