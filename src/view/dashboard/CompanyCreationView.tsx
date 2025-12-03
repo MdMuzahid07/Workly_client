@@ -1,6 +1,7 @@
 "use client";
 import WkForm from "@/components/form/WkForm";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
@@ -85,11 +86,10 @@ const CompanyCreationView = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createCompany, { isLoading }] = useCreateCompanyMutation();
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const handleSubmit = async (data: CompanyFormData) => {
     setIsSubmitting(true);
-
-    console.log(data);
 
     try {
       const result = await createCompany(data).unwrap();
@@ -101,8 +101,8 @@ const CompanyCreationView = () => {
             companyId: result.data.id || "",
           }),
         );
+        router.push("/dashboard");
       }
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create company:", error);

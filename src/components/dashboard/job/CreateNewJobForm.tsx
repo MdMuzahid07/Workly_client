@@ -1,6 +1,9 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { JwtPayload, jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
 import { useCreateJobMutation } from "../../../redux/feature/job/jobApi";
+import { useAppSelector } from "../../../redux/hooks";
 import WKCheckbox from "../../form/WKCheckbox";
 import WKDatePicker from "../../form/WKDatePicker";
 import WkForm from "../../form/WkForm";
@@ -34,17 +37,30 @@ export interface JobFormData {
   skillsRequired: SkillRequired[];
 }
 
-const CreateNewJobForm = ({ onClose, companyId }: any) => {
+interface AuthTokenPayload extends JwtPayload {
+  companyId?: string | number;
+}
+
+interface CreateNewJobFormProps {
+  onClose?: () => void;
+}
+
+const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
   const [createJob, { isLoading }] = useCreateJobMutation();
+  const user = useAppSelector((state) => state.auth.user);
+  const decodedToken = jwtDecode<AuthTokenPayload>(
+    localStorage.getItem("accessToken") || "",
+  );
+
+  const userCompanyId = decodedToken?.companyId || user?.companyId;
+
+  console.log(userCompanyId, "userCompanyId");
 
   const handleSubmit = async (data: JobFormData) => {
-    //! todo => company is undefined, need to fix it later
-    console.log("Form Data Submitted:", data, "company id", ": => ", companyId);
-
     try {
       const payload = {
         ...data,
-        companyId,
+        companyId: userCompanyId,
         salaryMin: Number(data.salaryMin),
         salaryMax: Number(data.salaryMax),
         maxApplications: Number(data.maxApplications),
@@ -52,10 +68,18 @@ const CreateNewJobForm = ({ onClose, companyId }: any) => {
         applicationDeadline: new Date(data.applicationDeadline).toISOString(),
       };
 
-      await createJob(payload).unwrap();
-      onClose();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result: any = await createJob(payload);
+
+      if (result.success) {
+        toast.success("Job created successfully");
+        onClose?.();
+      }
+
+      onClose?.();
     } catch (error) {
       console.error("Failed to create job:", error);
+      toast.error("Failed to create job");
     }
   };
 
@@ -215,7 +239,7 @@ const CreateNewJobForm = ({ onClose, companyId }: any) => {
           <Button
             type="button"
             variant="outline"
-            onClick={onClose}
+            onClick={onClose ? onClose : undefined}
             className="bg-transparent"
             disabled={isLoading}
           >
