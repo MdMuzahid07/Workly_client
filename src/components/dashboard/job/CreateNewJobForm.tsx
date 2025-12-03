@@ -68,18 +68,16 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
         applicationDeadline: new Date(data.applicationDeadline).toISOString(),
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result: any = await createJob(payload);
-
-      if (result.success) {
-        toast.success("Job created successfully");
-        onClose?.();
-      }
-
+      const response = await createJob(payload).unwrap();
+      toast.success(response?.message ?? "Job created successfully");
       onClose?.();
     } catch (error) {
-      console.error("Failed to create job:", error);
-      toast.error("Failed to create job");
+      const errorMessage =
+        (error as { data?: { message?: string }; message?: string })?.data
+          ?.message ??
+        (error as { message?: string })?.message ??
+        "Failed to create job";
+      toast.error(errorMessage);
     }
   };
 

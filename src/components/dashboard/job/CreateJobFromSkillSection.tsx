@@ -1,8 +1,11 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
+import WKCheckbox from "../../form/WKCheckbox";
+import WKInput from "../../form/WkInput";
+import WKSelect from "../../form/WkSelect";
+import WKTextArea from "../../form/WkTextArea";
 import { Button } from "../../ui/button";
 import { JobFormData } from "./CreateNewJobForm";
 
@@ -20,7 +23,7 @@ const CreateJobFromSkillSection = () => {
   const addSkill = () => {
     const newSkill: SkillRequired = {
       skillName: "",
-      experienceYears: 0,
+      experienceYears: 1,
       isRequired: true,
       priority: "MEDIUM",
       description: "",
@@ -30,16 +33,6 @@ const CreateJobFromSkillSection = () => {
 
   const removeSkill = (index: number) => {
     const updatedSkills = skills.filter((_, i) => i !== index);
-    setValue("skillsRequired", updatedSkills);
-  };
-
-  const updateSkill = (
-    index: number,
-    field: keyof SkillRequired,
-    value: any,
-  ) => {
-    const updatedSkills = [...skills];
-    updatedSkills[index] = { ...updatedSkills[index], [field]: value };
     setValue("skillsRequired", updatedSkills);
   };
 
@@ -84,87 +77,49 @@ const CreateJobFromSkillSection = () => {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Skill Name *</label>
-                  <input
-                    type="text"
-                    value={skill.skillName}
-                    onChange={(e) =>
-                      updateSkill(index, "skillName", e.target.value)
-                    }
-                    placeholder="e.g. React.js"
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  />
-                </div>
+                <WKInput
+                  name={`skillsRequired.${index}.skillName`}
+                  label="Skill Name"
+                  required
+                  size="md"
+                />
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Experience (Years) *
-                  </label>
-                  <input
-                    type="number"
-                    value={skill.experienceYears}
-                    onChange={(e) =>
-                      updateSkill(
-                        index,
-                        "experienceYears",
-                        Number(e.target.value),
-                      )
-                    }
-                    placeholder="3"
-                    min="0"
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  />
-                </div>
+                <WKInput
+                  name={`skillsRequired.${index}.experienceYears`}
+                  label="Experience (Years)"
+                  type="number"
+                  required
+                  size="md"
+                />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Priority *</label>
-                  <select
-                    value={skill.priority}
-                    onChange={(e) =>
-                      updateSkill(index, "priority", e.target.value)
-                    }
-                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  >
-                    <option value="HIGH">High</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="GOOD_TO_HAVE">Good to Have</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center space-y-2 pt-7">
-                  <input
-                    type="checkbox"
-                    id={`required-${index}`}
-                    checked={skill.isRequired}
-                    onChange={(e) =>
-                      updateSkill(index, "isRequired", e.target.checked)
-                    }
-                    className="h-4 w-4 rounded text-green-600"
-                  />
-                  <label
-                    htmlFor={`required-${index}`}
-                    className="ml-2 text-sm font-normal"
-                  >
-                    Required
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
-                <textarea
-                  value={skill.description}
-                  onChange={(e) =>
-                    updateSkill(index, "description", e.target.value)
-                  }
-                  placeholder="Describe the skill requirements..."
-                  rows={2}
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[60px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                <WKSelect
+                  name={`skillsRequired.${index}.priority`}
+                  label="Priority"
+                  placeholder="Select priority"
+                  required
+                  size="md"
+                  options={[
+                    { value: "HIGH", label: "High" },
+                    { value: "MEDIUM", label: "Medium" },
+                    { value: "GOOD_TO_HAVE", label: "Good to Have" },
+                  ]}
                 />
+
+                <div className="pt-7">
+                  <WKCheckbox
+                    name={`skillsRequired.${index}.isRequired`}
+                    label="Required"
+                  />
+                </div>
               </div>
+
+              <WKTextArea
+                name={`skillsRequired.${index}.description`}
+                label="Description"
+                rows={2}
+              />
             </div>
           ))}
         </div>
