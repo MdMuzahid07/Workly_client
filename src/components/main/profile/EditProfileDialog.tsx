@@ -199,6 +199,7 @@ const EditProfileDialog = ({
 
       const updatePayload = {
         bio: sanitizeValue(data.bio),
+        phone: sanitizeValue(data.phone),
         location: sanitizeValue(data.location),
         websiteUrl: sanitizeValue(data.websiteUrl),
         avatarUrl: avatar || user.profile.avatarUrl,
@@ -218,7 +219,6 @@ const EditProfileDialog = ({
         },
       };
 
-      // ============  send only profile data to api ====>
       await updateProfile(updatePayload).unwrap();
 
       // ======= update local user state with the new data==============>

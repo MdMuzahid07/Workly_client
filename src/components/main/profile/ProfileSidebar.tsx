@@ -124,6 +124,8 @@ const ProfileSidebar = ({
           {user?.profile?.websiteUrl && (
             <a
               href={user?.profile?.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
             >
               <Globe className="text-primary mr-3 h-5 w-5" />
@@ -133,6 +135,8 @@ const ProfileSidebar = ({
           {user?.profile?.linkedInUrl && (
             <a
               href={user?.profile?.linkedInUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
             >
               <Linkedin className="text-primary mr-3 h-5 w-5" />
