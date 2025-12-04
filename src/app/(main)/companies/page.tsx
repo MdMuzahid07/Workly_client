@@ -64,7 +64,6 @@ const page = async ({
   const params = await searchParams;
   const q = typeof params?.q === "string" ? params.q : undefined;
   const companies = await fetchCompanies({ q });
-  console.log(companies, "companies");
 
   return (
     <>

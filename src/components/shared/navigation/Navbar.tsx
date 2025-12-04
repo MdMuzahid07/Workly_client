@@ -22,8 +22,6 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
 
-  console.log(user, "from navbar");
-
   const isActive = (href: string) => {
     if (href === "/") {
       return pathname === "/";

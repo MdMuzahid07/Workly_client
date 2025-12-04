@@ -4,8 +4,6 @@ import RequirementsList from "./RequirementsList";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const JobRequirementsSidebar = ({ jobData }: any) => {
-  console.log(jobData, "jobData in JobRequirementsSidebar");
-
   return (
     <div className="space-y-6">
       <RequirementsList

@@ -27,7 +27,6 @@ const ForgetPasswordView = () => {
 
   const handleSubmit = async (data: ForgetPasswordFormData) => {
     const result = await forgotPassword({ email: data.email });
-    console.log(result.data);
 
     if (result && result.data) {
       toast.success(result.data.message);

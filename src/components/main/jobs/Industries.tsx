@@ -145,7 +145,6 @@ const Industries = ({
         newSelected = prev.includes(id) ? [] : [id];
       }
 
-      console.log("Selected industries:", newSelected);
       onCategorySelect?.(newSelected);
 
       return newSelected;

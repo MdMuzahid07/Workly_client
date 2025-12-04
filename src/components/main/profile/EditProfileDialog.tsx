@@ -218,8 +218,6 @@ const EditProfileDialog = ({
         },
       };
 
-      console.log("Sending payload:", JSON.stringify(updatePayload, null, 2));
-
       // ============  send only profile data to api ====>
       await updateProfile(updatePayload).unwrap();
 

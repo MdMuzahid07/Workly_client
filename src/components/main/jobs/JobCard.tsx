@@ -41,8 +41,6 @@ const JobCard = ({ job }: JobProps) => {
 
       const response = await toggleSaveUnsaveJobMutation(jobId).unwrap();
 
-      console.log(response);
-
       if (response.success && response.data.action === "saved") {
         toast.success("Job saved successfully", { id: "save_job" });
       }

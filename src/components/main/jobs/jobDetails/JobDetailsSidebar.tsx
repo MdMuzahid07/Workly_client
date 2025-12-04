@@ -138,12 +138,10 @@ const JobDetailsSidebar = ({
 
   const handleApply = () => {
     onApply?.();
-    console.log("Applying for job:", job.id);
   };
 
   const handleSave = () => {
     onSave?.();
-    console.log("Saving job:", job.id);
   };
 
   const handleViewCompany = () => {

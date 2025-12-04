@@ -54,8 +54,6 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
 
   const userCompanyId = decodedToken?.companyId || user?.companyId;
 
-  console.log(userCompanyId, "userCompanyId");
-
   const handleSubmit = async (data: JobFormData) => {
     try {
       const payload = {
