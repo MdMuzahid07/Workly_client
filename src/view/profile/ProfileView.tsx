@@ -22,20 +22,8 @@ import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
 
 const ProfileView = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data, isLoading, error } = useGetProfileQuery(undefined);
+  const { data, isLoading } = useGetProfileQuery(undefined);
   const user = data?.data;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleProfileSave = (updatedUser: any) => {
-    console.log("Profile updated:", updatedUser);
-    // The profile will automatically update via RTK Query cache
-  };
-
-  console.log(
-    data,
-    "data from my profile ++++++++++++++++++++++++++++++++++++++++++++++++",
-  );
 
   if (isLoading && !data) {
     return <ProfileSkeleton />;
@@ -161,7 +149,6 @@ const ProfileView = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         user={user}
-        onSave={handleProfileSave}
       />
     </div>
   );

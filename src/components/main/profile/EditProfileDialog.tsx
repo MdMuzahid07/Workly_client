@@ -79,7 +79,6 @@ interface EditProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
   user: User;
-  onSave: (user: User) => void;
 }
 
 const JOB_TYPE_OPTIONS = [
@@ -104,7 +103,6 @@ const EditProfileDialog = ({
   isOpen,
   onClose,
   user,
-  onSave,
 }: EditProfileDialogProps) => {
   const [skills, setSkills] = useState<Skill[]>(user?.profile?.skills || []);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
@@ -221,32 +219,6 @@ const EditProfileDialog = ({
 
       await updateProfile(updatePayload).unwrap();
 
-      // ======= update local user state with the new data==============>
-      const updatedUser: User = {
-        ...user,
-        fullName: data.fullName,
-        phone: data.phone,
-        profile: {
-          ...user.profile,
-          bio: data.bio,
-          location: data.location,
-          websiteUrl: data.websiteUrl,
-          linkedInUrl: data.linkedInUrl,
-          resumeUrl: finalResumeUrl || undefined,
-          skills,
-          preference: {
-            ...user.profile.preference,
-            jobType: data.jobType,
-            expectedSalary: data.expectedSalary,
-            industry: data.industry,
-            workExperience: data.workExperience,
-            preferredLocation: data.preferredLocation,
-            remoteWork: data.remoteWork,
-          },
-        },
-      };
-
-      onSave(updatedUser);
       toast.success("Profile updated successfully!");
       onClose();
     } catch (error) {
