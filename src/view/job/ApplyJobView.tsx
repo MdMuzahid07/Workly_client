@@ -5,7 +5,6 @@ import { DollarSign, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import Loading from "../../app/loading";
 import ApplyJobHeader from "../../components/main/jobs/applyJob/ApplyJobHeader";
 import ApplySuccessMessage from "../../components/main/jobs/applyJob/ApplySuccessMessage";
 import JobApplyForm from "../../components/main/jobs/applyJob/JobApplyForm";
@@ -15,6 +14,7 @@ import JobSummaryCard from "../../components/main/jobs/applyJob/JobSummaryCard";
 import { useCreateApplicationMutation } from "../../redux/feature/application/applicationSlice";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
 import { useUploadSingleFileMutation } from "../../redux/feature/upload/uploadApi";
+import JobApplyViewSkeleton from "../../skeleton/job/JobApplyViewSkeleton";
 
 interface ApplyJobViewProps {
   jobId: string;
@@ -132,7 +132,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   };
 
   if (isJobLoading) {
-    return <Loading />;
+    return <JobApplyViewSkeleton />;
   }
 
   return (

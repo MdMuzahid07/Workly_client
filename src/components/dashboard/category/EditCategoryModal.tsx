@@ -52,7 +52,7 @@ const EditCategoryModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="bg-card sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit Category</DialogTitle>
           <DialogDescription>Update category information</DialogDescription>
