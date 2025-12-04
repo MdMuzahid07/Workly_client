@@ -35,6 +35,8 @@ const JobDetailsView = () => {
     skip: !jobId,
   });
 
+  console.log(response);
+
   const [toggleSaveUnsaveJobMutation, { isLoading: isSaving }] =
     useToggleSaveUnsaveJobMutation();
 
@@ -163,20 +165,25 @@ const JobDetailsView = () => {
                 </div>
               </CardContent>
             </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Benefits</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
-                  {job.benefits
-                    ?.split(",")
-                    .map((benefit: string, index: number) => (
+                  {job.benefits && job.benefits.length > 0 ? (
+                    job.benefits.map((benefit: string, index: number) => (
                       <ul key={index} className="mb-2 flex items-start">
                         <li className="mr-2">{index + 1}.</li>
                         <li>{benefit.trim()}</li>
                       </ul>
-                    ))}
+                    ))
+                  ) : (
+                    <p className="text-foreground/60">
+                      No benefits information available
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -206,6 +213,28 @@ const JobDetailsView = () => {
                 </Card>
               )}
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Requirements</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
+                  {job.requirements && job.requirements.length > 0 ? (
+                    job.requirements.map((benefit: string, index: number) => (
+                      <ul key={index} className="mb-2 flex items-start">
+                        <li className="mr-2">{index + 1}.</li>
+                        <li>{benefit.trim()}</li>
+                      </ul>
+                    ))
+                  ) : (
+                    <p className="text-foreground/60">
+                      No requirements information available
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
             {job.JobSkill && job.JobSkill.length > 0 && (
               <Card>
