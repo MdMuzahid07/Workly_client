@@ -30,7 +30,7 @@ const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {skills?.map((skill, index) => {
             const skillInfo = getSkillLevel(skill.experienceYears);
             return (
