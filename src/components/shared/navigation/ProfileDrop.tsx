@@ -108,7 +108,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     ...(!isEmployer && hasCompany
       ? [{ icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 }]
       : []),
-    ...(!hasCompany
+    ...(!hasCompany && isEmployer
       ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
       : []),
     ...(isEmployer && hasCompany
