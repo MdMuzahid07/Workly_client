@@ -121,13 +121,8 @@ const DashboardSidebar = () => {
         },
         {
           icon: Tag,
-          label: "Categories",
+          label: "Job Categories",
           href: "/dashboard/categories",
-        },
-        {
-          icon: Building2,
-          label: "Departments",
-          href: "/dashboard/departments",
         },
       ],
     },

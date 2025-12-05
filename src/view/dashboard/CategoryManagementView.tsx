@@ -1,14 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,14 +11,55 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type {
+  Category,
+  CategoryFormValues,
+  CategoryStatus,
+  Subcategory,
+} from "@/types/categories";
 import { Edit, FileText, MoreVertical, Search, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AddCategoryModal from "../../components/dashboard/category/AddCategoryModal";
 import EditCategoryModal from "../../components/dashboard/category/EditCategoryModal";
 import DashboardCategoryHeader from "../../components/dashboard/dashboard-nav/header/DashboardCategoryHeader";
 
-// fake categories
-const fakeCategories = [
+const normalizeSlug = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "") || "untitled";
+
+const toSubcategories = (
+  input: string,
+  categoryId: string,
+  existing: Subcategory[] = [],
+): Subcategory[] => {
+  const existingBySlug = new Map(
+    existing.map((sub) => [sub.slug, sub] as const),
+  );
+
+  return input
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((name, index) => {
+      const slug = normalizeSlug(name);
+      const preserved = existingBySlug.get(slug);
+
+      return (
+        preserved ?? {
+          id: `${categoryId}-sub-${slug || index + 1}`,
+          name,
+          slug,
+          description: "",
+          status: "active" as CategoryStatus,
+        }
+      );
+    });
+};
+
+const initialCategories: Category[] = [
   {
     id: "1",
     name: "Engineering",
@@ -35,6 +69,22 @@ const fakeCategories = [
     applications: 567,
     description: "Software development and technical roles",
     status: "active",
+    subcategories: [
+      {
+        id: "1-sub-frontend",
+        name: "Frontend",
+        slug: "frontend",
+        description: "Web UI engineering",
+        status: "active",
+      },
+      {
+        id: "1-sub-backend",
+        name: "Backend",
+        slug: "backend",
+        description: "API and services",
+        status: "active",
+      },
+    ],
   },
   {
     id: "2",
@@ -45,6 +95,15 @@ const fakeCategories = [
     applications: 234,
     description: "Product strategy and management positions",
     status: "active",
+    subcategories: [
+      {
+        id: "2-sub-platform",
+        name: "Platform",
+        slug: "platform",
+        description: "Internal platforms",
+        status: "active",
+      },
+    ],
   },
   {
     id: "3",
@@ -55,6 +114,22 @@ const fakeCategories = [
     applications: 312,
     description: "UI/UX and graphic design roles",
     status: "active",
+    subcategories: [
+      {
+        id: "3-sub-ux",
+        name: "UX",
+        slug: "ux",
+        description: "User experience",
+        status: "active",
+      },
+      {
+        id: "3-sub-visual",
+        name: "Visual Design",
+        slug: "visual-design",
+        description: "Brand and visual systems",
+        status: "active",
+      },
+    ],
   },
   {
     id: "4",
@@ -65,6 +140,22 @@ const fakeCategories = [
     applications: 445,
     description: "Digital marketing and growth positions",
     status: "active",
+    subcategories: [
+      {
+        id: "4-sub-content",
+        name: "Content",
+        slug: "content",
+        description: "Content strategy",
+        status: "active",
+      },
+      {
+        id: "4-sub-performance",
+        name: "Performance",
+        slug: "performance",
+        description: "Paid acquisition",
+        status: "active",
+      },
+    ],
   },
   {
     id: "5",
@@ -75,6 +166,22 @@ const fakeCategories = [
     applications: 289,
     description: "Sales and business development roles",
     status: "active",
+    subcategories: [
+      {
+        id: "5-sub-enterprise",
+        name: "Enterprise",
+        slug: "enterprise",
+        description: "Large accounts",
+        status: "active",
+      },
+      {
+        id: "5-sub-smb",
+        name: "SMB",
+        slug: "smb",
+        description: "Small and medium business",
+        status: "active",
+      },
+    ],
   },
   {
     id: "6",
@@ -85,6 +192,15 @@ const fakeCategories = [
     applications: 156,
     description: "Operations and logistics positions",
     status: "inactive",
+    subcategories: [
+      {
+        id: "6-sub-logistics",
+        name: "Logistics",
+        slug: "logistics",
+        description: "Supply chain",
+        status: "inactive",
+      },
+    ],
   },
 ];
 
@@ -92,53 +208,168 @@ const CategoryManagementView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("all");
-  const [categories, setCategories] = useState(fakeCategories);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
+  const [activeTab, setActiveTab] = useState<CategoryStatus | "all">("all");
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
 
-  const filteredCategories = categories.filter((cat) => {
-    const matchesSearch =
-      cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cat.slug.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = activeTab === "all" || cat.status === activeTab;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredCategories = useMemo(
+    () =>
+      categories.filter((cat) => {
+        const matchesSearch =
+          cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          cat.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          cat.subcategories.some((sub) =>
+            sub.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          );
 
-  const getCategoriesByStatus = (status: string) => {
+        const matchesStatus = activeTab === "all" || cat.status === activeTab;
+        return matchesSearch && matchesStatus;
+      }),
+    [activeTab, categories, searchQuery],
+  );
+
+  const getCategoriesByStatus = (status: CategoryStatus | "all") => {
     if (status === "all") return categories;
     return categories.filter((cat) => cat.status === status);
   };
 
-  const handleAddCategory = (data: any) => {
-    const newCategory = {
-      id: String(categories.length + 1),
-      ...data,
-      jobCount: 0,
-      activeJobs: 0,
-      applications: 0,
-      status: "active",
-    };
-    setCategories([...categories, newCategory]);
+  const totals = useMemo(
+    () =>
+      categories.reduce(
+        (acc, cat) => {
+          acc.totalJobs += cat.jobCount;
+          acc.activeJobs += cat.activeJobs;
+          acc.totalApplications += cat.applications;
+          acc.activeCategories += cat.status === "active" ? 1 : 0;
+          return acc;
+        },
+        {
+          totalJobs: 0,
+          activeJobs: 0,
+          totalApplications: 0,
+          activeCategories: 0,
+        },
+      ),
+    [categories],
+  );
+
+  const buildCategoryFromForm = (
+    data: CategoryFormValues,
+    categoryId: string,
+    existing?: Category,
+  ): Category => ({
+    id: categoryId,
+    name: data.name,
+    slug: normalizeSlug(data.slug || data.name),
+    description: data.description,
+    jobCount: existing?.jobCount ?? 0,
+    activeJobs: existing?.activeJobs ?? 0,
+    applications: existing?.applications ?? 0,
+    status: existing?.status ?? "active",
+    subcategories: toSubcategories(
+      data.subcategories,
+      categoryId,
+      existing?.subcategories,
+    ),
+  });
+
+  const handleAddCategory = (data: CategoryFormValues) => {
+    const id = crypto.randomUUID?.() ?? `category-${Date.now()}`;
+    const newCategory = buildCategoryFromForm(data, id);
+    setCategories((prev) => [...prev, newCategory]);
     setIsAddOpen(false);
   };
 
-  const handleEditCategory = (data: any) => {
-    setCategories(
-      categories.map((cat) =>
-        cat.id === selectedCategory.id ? { ...cat, ...data } : cat,
-      ),
+  const handleEditCategory = (data: CategoryFormValues) => {
+    if (!selectedCategory) return;
+
+    const updated = buildCategoryFromForm(
+      data,
+      selectedCategory.id,
+      selectedCategory,
+    );
+
+    setCategories((prev) =>
+      prev.map((cat) => (cat.id === selectedCategory.id ? updated : cat)),
     );
     setIsEditOpen(false);
     setSelectedCategory(null);
   };
 
   const handleDeleteCategory = (id: string) => {
-    setCategories(categories.filter((cat) => cat.id !== id));
+    setCategories((prev) => prev.filter((cat) => cat.id !== id));
   };
 
+  const handleAddSubcategory = (
+    categoryId: string,
+    subcategory: Pick<Subcategory, "name"> &
+      Partial<Pick<Subcategory, "description" | "status" | "slug" | "id">>,
+  ) => {
+    setCategories((prev) =>
+      prev.map((cat) => {
+        if (cat.id !== categoryId) return cat;
+
+        const slug = normalizeSlug(subcategory.slug ?? subcategory.name);
+        const existing =
+          cat.subcategories.find(
+            (sub) => sub.id === subcategory.id || sub.slug === slug,
+          ) ?? null;
+
+        const newSubcategory: Subcategory = {
+          id:
+            existing?.id ??
+            subcategory.id ??
+            `${categoryId}-sub-${slug}-${Date.now()}`,
+          name: subcategory.name,
+          slug,
+          description: subcategory.description ?? existing?.description ?? "",
+          status: subcategory.status ?? existing?.status ?? "active",
+        };
+
+        const subcategories = existing
+          ? cat.subcategories.map((sub) =>
+              sub.id === existing.id ? newSubcategory : sub,
+            )
+          : [...cat.subcategories, newSubcategory];
+
+        return { ...cat, subcategories };
+      }),
+    );
+  };
+
+  const handleUpdateSubcategory = (
+    categoryId: string,
+    subcategoryId: string,
+    updates: Partial<Omit<Subcategory, "id">>,
+  ) => {
+    setCategories((prev) =>
+      prev.map((cat) => {
+        if (cat.id !== categoryId) return cat;
+
+        const subcategories = cat.subcategories.map((sub) =>
+          sub.id === subcategoryId
+            ? {
+                ...sub,
+                ...updates,
+                slug: normalizeSlug(updates.slug ?? sub.slug ?? sub.name),
+              }
+            : sub,
+        );
+
+        return { ...cat, subcategories };
+      }),
+    );
+  };
+
+  // Functions reserved for future subcategory UI integrations.
+  void handleAddSubcategory;
+  void handleUpdateSubcategory;
+
   const handleToggleStatus = (id: string) => {
-    setCategories(
-      categories.map((cat) =>
+    setCategories((prev) =>
+      prev.map((cat) =>
         cat.id === id
           ? { ...cat, status: cat.status === "active" ? "inactive" : "active" }
           : cat,
@@ -146,19 +377,10 @@ const CategoryManagementView = () => {
     );
   };
 
-  const openEditModal = (category: any) => {
+  const openEditModal = (category: Category) => {
     setSelectedCategory(category);
     setIsEditOpen(true);
   };
-
-  const totalJobs = categories.reduce((sum, cat) => sum + cat.jobCount, 0);
-  const totalApplications = categories.reduce(
-    (sum, cat) => sum + cat.applications,
-    0,
-  );
-  const activeCategories = categories.filter(
-    (cat) => cat.status === "active",
-  ).length;
 
   return (
     <div className="min-h-screen">
@@ -178,7 +400,7 @@ const CategoryManagementView = () => {
                 {categories.length}
               </div>
               <p className="text-muted-foreground mt-1 text-xs">
-                {activeCategories} active
+                {totals.activeCategories} active
               </p>
             </CardContent>
           </Card>
@@ -190,10 +412,11 @@ const CategoryManagementView = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold sm:text-3xl">{totalJobs}</div>
+              <div className="text-2xl font-bold sm:text-3xl">
+                {totals.totalJobs}
+              </div>
               <p className="text-muted-foreground mt-1 text-xs">
-                {categories.reduce((sum, cat) => sum + cat.activeJobs, 0)}{" "}
-                active
+                {totals.activeJobs} active
               </p>
             </CardContent>
           </Card>
@@ -206,7 +429,7 @@ const CategoryManagementView = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold sm:text-3xl">
-                {totalApplications}
+                {totals.totalApplications}
               </div>
               <p className="text-muted-foreground mt-1 text-xs">
                 Across all categories
@@ -222,7 +445,9 @@ const CategoryManagementView = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold sm:text-3xl">
-                {Math.round(totalApplications / categories.length)}
+                {Math.round(
+                  totals.totalApplications / Math.max(categories.length, 1),
+                )}
               </div>
               <p className="text-muted-foreground mt-1 text-xs">Per category</p>
             </CardContent>
@@ -250,7 +475,12 @@ const CategoryManagementView = () => {
           )}
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as CategoryStatus | "all")
+          }
+        >
           <TabsList className="w-full">
             <TabsTrigger value="all">All ({categories.length})</TabsTrigger>
             <TabsTrigger value="active">
@@ -263,12 +493,6 @@ const CategoryManagementView = () => {
 
           <TabsContent value={activeTab} className="mt-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Categories</CardTitle>
-                <CardDescription>
-                  {filteredCategories.length} categories found
-                </CardDescription>
-              </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -314,6 +538,13 @@ const CategoryManagementView = () => {
                                 <p className="font-medium">{category.name}</p>
                                 <p className="text-muted-foreground text-sm">
                                   {category.slug}
+                                </p>
+                                <p className="text-muted-foreground text-xs">
+                                  {category.subcategories.length > 0
+                                    ? `Subcategories: ${category.subcategories
+                                        .map((sub) => sub.name)
+                                        .join(", ")}`
+                                    : "No subcategories"}
                                 </p>
                               </div>
                             </td>
