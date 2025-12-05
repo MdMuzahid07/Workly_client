@@ -11,6 +11,7 @@ interface WKTextAreaProps {
   name: string;
   className?: string;
   rows?: number;
+  placeholder?: string;
 }
 
 const WKTextArea = ({
@@ -20,6 +21,7 @@ const WKTextArea = ({
   name,
   className,
   rows = 3,
+  placeholder,
   ...rest
 }: WKTextAreaProps) => {
   const {
@@ -47,6 +49,7 @@ const WKTextArea = ({
         })}
         id={name}
         rows={rows}
+        placeholder={placeholder}
         className={`${sizeClasses[size]} ${
           hasError ? "border-destructive focus-visible:ring-destructive" : ""
         } ${className || ""}`}

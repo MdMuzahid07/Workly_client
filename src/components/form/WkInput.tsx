@@ -12,6 +12,7 @@ interface WKInputProps {
   label: string;
   name: string;
   className?: string;
+  placeholder?: string;
 }
 
 const WKInput = ({
@@ -21,6 +22,7 @@ const WKInput = ({
   label,
   name,
   className,
+  placeholder,
 }: WKInputProps) => {
   const {
     register,
@@ -47,6 +49,7 @@ const WKInput = ({
         })}
         id={name}
         type={type}
+        placeholder={placeholder}
         className={cn(
           sizeClasses[size],
           hasError && "border-destructive focus-visible:ring-destructive",

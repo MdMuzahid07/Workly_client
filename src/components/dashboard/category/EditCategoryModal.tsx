@@ -1,4 +1,4 @@
-import type React from "react";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -8,11 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import type { Category, CategoryFormValues } from "@/types/categories";
-import { useEffect, useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import * as z from "zod";
+import WkForm from "../../form/WkForm";
+import WkInput from "../../form/WkInput";
+import WkTextArea from "../../form/WkTextArea";
+import SubcategoriesArrayField from "./SubcategoriesArrayField";
 
 interface EditCategoryModalProps {
   open: boolean;
@@ -21,19 +25,31 @@ interface EditCategoryModalProps {
   onSubmit: (data: CategoryFormValues) => void;
 }
 
-const initialFormState: CategoryFormValues = {
-  name: "",
-  slug: "",
-  description: "",
-  subcategories: "",
-};
+const categorySchema = z.object({
+  name: z.string().min(1, "Category name is required").trim(),
+  slug: z.string().min(1, "Slug is required").trim(),
+  description: z.string(),
+  subcategories: z.array(
+    z.string().trim().min(1, "Subcategory cannot be empty"),
+  ),
+});
 
-const normalizeSlug = (value: string) =>
+type CategoryFormData = z.infer<typeof categorySchema>;
+
+const normalizeSlug = (value: string): string =>
   value
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+
+const convertSubcategoriesArrayToString = (subcategories: string[]): string => {
+  if (!subcategories || subcategories.length === 0) return "";
+  return subcategories
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(", ");
+};
 
 const EditCategoryModal = ({
   open,
@@ -41,161 +57,132 @@ const EditCategoryModal = ({
   category,
   onSubmit,
 }: EditCategoryModalProps) => {
-  const [formData, setFormData] =
-    useState<CategoryFormValues>(initialFormState);
-  const [slugLocked, setSlugLocked] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; slug?: string }>({});
-
-  const isValid = useMemo(
-    () => Boolean(formData.name.trim()) && Boolean(formData.slug.trim()),
-    [formData.name, formData.slug],
-  );
-
-  useEffect(() => {
-    if (category) {
-      setFormData({
-        name: category.name,
-        slug: category.slug,
-        description: category.description,
-        subcategories: category.subcategories.map((sub) => sub.name).join(", "),
-      });
-      setSlugLocked(true);
-      setErrors({});
+  const getDefaultValues = (): CategoryFormData => {
+    if (!category) {
+      return {
+        name: "",
+        slug: "",
+        description: "",
+        subcategories: [],
+      };
     }
-  }, [category, open]);
-
-  const validate = () => {
-    const nextErrors: { name?: string; slug?: string } = {};
-    if (!formData.name.trim()) nextErrors.name = "Category name is required.";
-    if (!formData.slug.trim()) nextErrors.slug = "Slug is required.";
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    return {
+      name: category.name,
+      slug: category.slug,
+      description: category.description || "",
+      subcategories: category.subcategories.map((sub) => sub.name),
+    };
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    onSubmit({
-      ...formData,
-      name: formData.name.trim(),
-      slug: normalizeSlug(formData.slug) || normalizeSlug(formData.name),
-      description: formData.description.trim(),
-      subcategories: formData.subcategories.trim(),
-    });
-  };
-
-  const handleNameChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      name: value,
-      slug: slugLocked ? prev.slug : normalizeSlug(value),
-    }));
-    if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
-  };
-
-  const handleSlugChange = (value: string) => {
-    const nextSlug = normalizeSlug(value);
-    setSlugLocked(Boolean(nextSlug));
-    setFormData((prev) => ({ ...prev, slug: nextSlug }));
-    if (errors.slug) setErrors((prev) => ({ ...prev, slug: undefined }));
-  };
-
-  const handleDescriptionChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, description: value }));
-  };
-
-  const handleSubcategoriesChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, subcategories: value }));
+  const handleSubmit = (data: CategoryFormData) => {
+    const normalizedData: CategoryFormValues = {
+      name: data.name.trim(),
+      slug: normalizeSlug(data.slug) || normalizeSlug(data.name),
+      description: data.description.trim(),
+      subcategories: convertSubcategoriesArrayToString(data.subcategories),
+    };
+    onSubmit(normalizedData);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) {
-      setFormData(initialFormState);
-      setSlugLocked(false);
-      setErrors({});
-    }
     onOpenChange(nextOpen);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-card sm:max-w-md">
+      <DialogContent className="bg-card sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit Category</DialogTitle>
           <DialogDescription>Update category information</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="edit-name">Category Name</Label>
-            <Input
-              id="edit-name"
-              name="name"
-              value={formData.name}
-              onChange={(e) => handleNameChange(e.target.value)}
-              required
-            />
-            {errors.name && (
-              <p className="text-destructive text-xs">{errors.name}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-slug">Slug</Label>
-            <Input
-              id="edit-slug"
-              name="slug"
-              value={formData.slug}
-              onChange={(e) => handleSlugChange(e.target.value)}
-              required
-            />
-            <p className="text-muted-foreground text-xs">
-              Auto-generated from name; you can override if needed.
-            </p>
-            {errors.slug && (
-              <p className="text-destructive text-xs">{errors.slug}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-description">Description</Label>
-            <Textarea
-              id="edit-description"
-              name="description"
-              value={formData.description}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-subcategories">Subcategories</Label>
-            <Textarea
-              id="edit-subcategories"
-              name="subcategories"
-              value={formData.subcategories}
-              onChange={(e) => handleSubcategoriesChange(e.target.value)}
-              placeholder="Comma separated e.g., Frontend, Backend"
-              rows={2}
-            />
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="flex-1" disabled={!isValid}>
-              Save Changes
-            </Button>
-          </div>
-        </form>
+        {category && (
+          <WkForm<CategoryFormData>
+            key={category.id}
+            defaultValues={getDefaultValues()}
+            resolver={zodResolver(categorySchema)}
+            onSubmit={handleSubmit}
+          >
+            <CategoryFormFields />
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="flex-1">
+                Save Changes
+              </Button>
+            </div>
+          </WkForm>
+        )}
       </DialogContent>
     </Dialog>
+  );
+};
+
+const CategoryFormFields = () => {
+  const { setValue, watch } = useFormContext<CategoryFormData>();
+  const name = watch("name");
+  const slug = watch("slug");
+  const [slugLocked, setSlugLocked] = useState(true);
+
+  useEffect(() => {
+    if (!slugLocked && name) {
+      const autoSlug = normalizeSlug(name);
+      if (autoSlug) {
+        setValue("slug", autoSlug, { shouldValidate: true });
+      }
+    }
+  }, [name, slugLocked, setValue]);
+
+  useEffect(() => {
+    if (slug) {
+      const normalized = normalizeSlug(slug);
+      if (normalized !== slug) {
+        setSlugLocked(Boolean(normalized));
+        if (normalized) {
+          setValue("slug", normalized, { shouldValidate: true });
+        }
+      } else if (normalized) {
+        setSlugLocked(true);
+      }
+    }
+  }, [slug, setValue]);
+
+  return (
+    <div className="space-y-4">
+      <WkInput
+        name="name"
+        label="Category Name"
+        required
+        placeholder="e.g., Engineering"
+      />
+
+      <div className="space-y-2">
+        <WkInput
+          name="slug"
+          label="Slug"
+          required
+          placeholder="e.g., engineering"
+        />
+        <p className="text-muted-foreground text-xs">
+          Auto-generated from name; you can override if needed.
+        </p>
+      </div>
+
+      <WkTextArea
+        name="description"
+        label="Description"
+        placeholder="Describe this category..."
+        rows={3}
+      />
+
+      <SubcategoriesArrayField name="subcategories" />
+    </div>
   );
 };
 
