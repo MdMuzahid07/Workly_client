@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -350,24 +349,21 @@ const CategoryManagementView = () => {
                   <table className="w-full">
                     <thead className="border-b">
                       <tr>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Category
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Jobs
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Active
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Applications
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Status
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-right text-xs font-medium tracking-wider uppercase">
-                          Actions
-                        </th>
+                        {[
+                          "Category",
+                          "Jobs",
+                          "Active",
+                          "Applications",
+                          "Status",
+                          "Actions",
+                        ].map((header, index) => (
+                          <th
+                            key={index}
+                            className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase"
+                          >
+                            {header}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y">
