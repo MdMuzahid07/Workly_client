@@ -3,11 +3,13 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredentials } from "../feature/auth/authSlice";
 import { RootState } from "../store";
 
+const url =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
+    ? process.env.NEXT_PUBLIC_BACKEND_URL
+    : "http://localhost:5000/api/v1";
+
 const baseQuery = fetchBaseQuery({
-  baseUrl:
-    process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
-      ? process.env.NEXT_PUBLIC_BACKEND_URL
-      : "http://localhost:5000/api/v1",
+  baseUrl: url,
   credentials: "include",
   // extra added with fetchBaseQuery
   // in prepareHeaders we get two parameters (header,api), we get the getState() from the api
@@ -38,13 +40,15 @@ const baseQueryWithRefreshToken = async (
 ) => {
   // we can call our baseQuery here with this three arguments received in custom base query
   let result = await baseQuery(args, api, extraOptions);
-
-  if (result?.error?.status === 401) {
-    const res = await fetch("http://localhost:3001/api/v1/auth/refresh", {
+  let res;
+  if (result?.error?.status === 401 && url) {
+    res = await fetch(url, {
       method: "POST",
       credentials: "include",
     });
+  }
 
+  if (res) {
     const data = await res.json();
 
     if (data?.data?.accessToken) {
@@ -59,7 +63,6 @@ const baseQueryWithRefreshToken = async (
 
       result = await baseQuery(args, api, extraOptions);
     } else {
-      // if refresh token is invalid then user will logout
       api.dispatch(logout());
     }
     return result;
@@ -78,7 +81,7 @@ const baseApi = createApi({
   // we calling baseQuery in our custom base query, thats why it will call from there
   // because we called our baseQuery in our custom base query thats why we need to set here the custom one
   baseQuery: baseQueryWithRefreshToken,
-  tagTypes: ["jobs", "profile", "user", "applications"],
+  tagTypes: ["jobs", "profile", "user", "applications", "categories"],
   endpoints: () => ({}),
 });
 

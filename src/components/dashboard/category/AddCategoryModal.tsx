@@ -8,11 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { CategoryFormValues } from "@/types/categories";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
+import { useCreateCategoryMutation } from "../../../redux/feature/category/categoryApi";
 import WkForm from "../../form/WkForm";
 import WkInput from "../../form/WkInput";
 import WkTextArea from "../../form/WkTextArea";
@@ -21,7 +22,6 @@ import SubcategoriesArrayField from "./SubcategoriesArrayField";
 interface AddCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: CategoryFormValues) => void;
 }
 
 const categorySchema = z.object({
@@ -42,14 +42,6 @@ const normalizeSlug = (value: string): string =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-const convertSubcategoriesArrayToString = (subcategories: string[]): string => {
-  if (!subcategories || subcategories.length === 0) return "";
-  return subcategories
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .join(", ");
-};
-
 const defaultValues: CategoryFormData = {
   name: "",
   slug: "",
@@ -57,20 +49,34 @@ const defaultValues: CategoryFormData = {
   subcategories: [],
 };
 
-const AddCategoryModal = ({
-  open,
-  onOpenChange,
-  onSubmit,
-}: AddCategoryModalProps) => {
-  const handleSubmit = (data: CategoryFormData) => {
-    const normalizedData: CategoryFormValues = {
-      name: data.name.trim(),
-      slug: normalizeSlug(data.slug) || normalizeSlug(data.name),
-      description: data.description.trim(),
-      subcategories: convertSubcategoriesArrayToString(data.subcategories),
-    };
-    onSubmit(normalizedData);
-    onOpenChange(false);
+const AddCategoryModal = ({ open, onOpenChange }: AddCategoryModalProps) => {
+  const [createCategory, { isLoading }] = useCreateCategoryMutation();
+
+  const handleSubmit = async (data: CategoryFormData) => {
+    try {
+      const payload = {
+        name: data.name.trim(),
+        slug: normalizeSlug(data.slug) || normalizeSlug(data.name),
+        description: data.description.trim() || null,
+        subcategories: data.subcategories
+          .map((item) => item.trim())
+          .filter(Boolean),
+        active: true,
+      };
+
+      const result = await createCategory(payload).unwrap();
+
+      if (result?.success) {
+        toast.success(result?.message || "Category created successfully");
+        onOpenChange(false);
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as { data?: { errorSources: { message: string } } })?.data
+          ?.errorSources?.message || "Failed to create category";
+      toast.error(errorMessage);
+      console.log(error);
+    }
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -102,8 +108,8 @@ const AddCategoryModal = ({
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
-              Create Category
+            <Button type="submit" className="flex-1" disabled={isLoading}>
+              {isLoading ? "Creating..." : "Create Category"}
             </Button>
           </div>
         </WkForm>

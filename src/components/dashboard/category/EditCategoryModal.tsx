@@ -8,11 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Category, CategoryFormValues } from "@/types/categories";
+import type { Category } from "@/types/categories";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
+import { useUpdateCategoryMutation } from "../../../redux/feature/category/categoryApi";
 import WkForm from "../../form/WkForm";
 import WkInput from "../../form/WkInput";
 import WkTextArea from "../../form/WkTextArea";
@@ -22,7 +24,6 @@ interface EditCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category: Category | null;
-  onSubmit: (data: CategoryFormValues) => void;
 }
 
 const categorySchema = z.object({
@@ -43,20 +44,13 @@ const normalizeSlug = (value: string): string =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-const convertSubcategoriesArrayToString = (subcategories: string[]): string => {
-  if (!subcategories || subcategories.length === 0) return "";
-  return subcategories
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .join(", ");
-};
-
 const EditCategoryModal = ({
   open,
   onOpenChange,
   category,
-  onSubmit,
 }: EditCategoryModalProps) => {
+  const [updateCategory, { isLoading }] = useUpdateCategoryMutation();
+
   const getDefaultValues = (): CategoryFormData => {
     if (!category) {
       return {
@@ -74,14 +68,32 @@ const EditCategoryModal = ({
     };
   };
 
-  const handleSubmit = (data: CategoryFormData) => {
-    const normalizedData: CategoryFormValues = {
-      name: data.name.trim(),
-      slug: normalizeSlug(data.slug) || normalizeSlug(data.name),
-      description: data.description.trim(),
-      subcategories: convertSubcategoriesArrayToString(data.subcategories),
-    };
-    onSubmit(normalizedData);
+  const handleSubmit = async (data: CategoryFormData) => {
+    if (!category) return;
+
+    try {
+      const payload = {
+        categoryId: category.id,
+        name: data.name.trim(),
+        slug: normalizeSlug(data.slug) || normalizeSlug(data.name),
+        description: data.description.trim() || null,
+        subcategories: data.subcategories
+          .map((item) => item.trim())
+          .filter(Boolean),
+      };
+
+      const result = await updateCategory(payload).unwrap();
+
+      if (result?.success) {
+        toast.success(result?.message || "Category updated successfully");
+        onOpenChange(false);
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as { data?: { errorSources: { message: string } } })?.data
+          ?.errorSources?.message || "Failed to update category";
+      toast.error(errorMessage);
+    }
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -113,8 +125,8 @@ const EditCategoryModal = ({
               >
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1">
-                Save Changes
+              <Button type="submit" className="flex-1" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </WkForm>

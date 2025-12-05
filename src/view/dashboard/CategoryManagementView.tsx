@@ -11,53 +11,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type {
-  Category,
-  CategoryFormValues,
-  CategoryStatus,
-  Subcategory,
-} from "@/types/categories";
+import type { Category, CategoryStatus } from "@/types/categories";
 import { Edit, FileText, MoreVertical, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import AddCategoryModal from "../../components/dashboard/category/AddCategoryModal";
 import EditCategoryModal from "../../components/dashboard/category/EditCategoryModal";
 import DashboardCategoryHeader from "../../components/dashboard/dashboard-nav/header/DashboardCategoryHeader";
-
-const normalizeSlug = (value: string) =>
-  value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "") || "untitled";
-
-const toSubcategories = (
-  input: string,
-  categoryId: string,
-  existing: Subcategory[] = [],
-): Subcategory[] => {
-  const existingBySlug = new Map(
-    existing.map((sub) => [sub.slug, sub] as const),
-  );
-
-  return input
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((name, index) => {
-      const slug = normalizeSlug(name);
-      const preserved = existingBySlug.get(slug);
-
-      return (
-        preserved ?? {
-          id: `${categoryId}-sub-${slug || index + 1}`,
-          name,
-          slug,
-          description: "",
-          status: "active" as CategoryStatus,
-        }
-      );
-    });
-};
 
 const initialCategories: Category[] = [
   {
@@ -211,6 +170,7 @@ const CategoryManagementView = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
   );
+
   const [activeTab, setActiveTab] = useState<CategoryStatus | "all">("all");
   const [categories, setCategories] = useState<Category[]>(initialCategories);
 
@@ -255,117 +215,9 @@ const CategoryManagementView = () => {
     [categories],
   );
 
-  const buildCategoryFromForm = (
-    data: CategoryFormValues,
-    categoryId: string,
-    existing?: Category,
-  ): Category => ({
-    id: categoryId,
-    name: data.name,
-    slug: normalizeSlug(data.slug || data.name),
-    description: data.description,
-    jobCount: existing?.jobCount ?? 0,
-    activeJobs: existing?.activeJobs ?? 0,
-    applications: existing?.applications ?? 0,
-    status: existing?.status ?? "active",
-    subcategories: toSubcategories(
-      data.subcategories,
-      categoryId,
-      existing?.subcategories,
-    ),
-  });
-
-  const handleAddCategory = (data: CategoryFormValues) => {
-    const id = crypto.randomUUID?.() ?? `category-${Date.now()}`;
-    const newCategory = buildCategoryFromForm(data, id);
-    setCategories((prev) => [...prev, newCategory]);
-    setIsAddOpen(false);
-  };
-
-  const handleEditCategory = (data: CategoryFormValues) => {
-    if (!selectedCategory) return;
-
-    const updated = buildCategoryFromForm(
-      data,
-      selectedCategory.id,
-      selectedCategory,
-    );
-
-    setCategories((prev) =>
-      prev.map((cat) => (cat.id === selectedCategory.id ? updated : cat)),
-    );
-    setIsEditOpen(false);
-    setSelectedCategory(null);
-  };
-
   const handleDeleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
   };
-
-  const handleAddSubcategory = (
-    categoryId: string,
-    subcategory: Pick<Subcategory, "name"> &
-      Partial<Pick<Subcategory, "description" | "status" | "slug" | "id">>,
-  ) => {
-    setCategories((prev) =>
-      prev.map((cat) => {
-        if (cat.id !== categoryId) return cat;
-
-        const slug = normalizeSlug(subcategory.slug ?? subcategory.name);
-        const existing =
-          cat.subcategories.find(
-            (sub) => sub.id === subcategory.id || sub.slug === slug,
-          ) ?? null;
-
-        const newSubcategory: Subcategory = {
-          id:
-            existing?.id ??
-            subcategory.id ??
-            `${categoryId}-sub-${slug}-${Date.now()}`,
-          name: subcategory.name,
-          slug,
-          description: subcategory.description ?? existing?.description ?? "",
-          status: subcategory.status ?? existing?.status ?? "active",
-        };
-
-        const subcategories = existing
-          ? cat.subcategories.map((sub) =>
-              sub.id === existing.id ? newSubcategory : sub,
-            )
-          : [...cat.subcategories, newSubcategory];
-
-        return { ...cat, subcategories };
-      }),
-    );
-  };
-
-  const handleUpdateSubcategory = (
-    categoryId: string,
-    subcategoryId: string,
-    updates: Partial<Omit<Subcategory, "id">>,
-  ) => {
-    setCategories((prev) =>
-      prev.map((cat) => {
-        if (cat.id !== categoryId) return cat;
-
-        const subcategories = cat.subcategories.map((sub) =>
-          sub.id === subcategoryId
-            ? {
-                ...sub,
-                ...updates,
-                slug: normalizeSlug(updates.slug ?? sub.slug ?? sub.name),
-              }
-            : sub,
-        );
-
-        return { ...cat, subcategories };
-      }),
-    );
-  };
-
-  // Functions reserved for future subcategory UI integrations.
-  void handleAddSubcategory;
-  void handleUpdateSubcategory;
 
   const handleToggleStatus = (id: string) => {
     setCategories((prev) =>
@@ -616,17 +468,12 @@ const CategoryManagementView = () => {
         </Tabs>
       </div>
 
-      <AddCategoryModal
-        open={isAddOpen}
-        onOpenChange={setIsAddOpen}
-        onSubmit={handleAddCategory}
-      />
+      <AddCategoryModal open={isAddOpen} onOpenChange={setIsAddOpen} />
       {selectedCategory && (
         <EditCategoryModal
           open={isEditOpen}
           onOpenChange={setIsEditOpen}
           category={selectedCategory}
-          onSubmit={handleEditCategory}
         />
       )}
     </div>

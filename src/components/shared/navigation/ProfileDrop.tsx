@@ -90,6 +90,9 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
   );
   const isEmployer =
     decodedToken?.role === "EMPLOYER" || user?.role === "EMPLOYER";
+  const isAdmin = decodedToken?.role === "ADMIN" || user?.role === "ADMIN";
+  const isSuperAdmin =
+    decodedToken?.role === "SUPER_ADMIN" || user?.role === "SUPER_ADMIN";
   const hasCompany =
     Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
 
@@ -111,7 +114,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     ...(!hasCompany && isEmployer
       ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
       : []),
-    ...(isEmployer && hasCompany
+    ...((isEmployer && hasCompany) || isAdmin || isSuperAdmin
       ? [{ icon: FileText, label: "Company Dashboard", href: "/dashboard" }]
       : []),
   ];
