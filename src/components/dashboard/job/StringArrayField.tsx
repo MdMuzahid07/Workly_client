@@ -65,7 +65,7 @@ const StringArrayField = ({
           {items.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 rounded-lg border border-gray-200 p-3"
+              className="border-primary/30 flex items-center gap-2 rounded-lg border p-3"
             >
               <Input
                 type="text"

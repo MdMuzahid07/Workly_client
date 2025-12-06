@@ -8,6 +8,7 @@ import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
 import { ScrollArea } from "../../components/ui/scroll-area";
+import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
 import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
 
@@ -50,6 +51,8 @@ const JobView = () => {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [allJobs, setAllJobs] = useState<any[]>([]);
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery(undefined);
 
   const params = useMemo(() => {
     const p: any = {
@@ -146,6 +149,8 @@ const JobView = () => {
       <Industries
         onCategorySelect={handleCategorySelect}
         multipleSelect={false}
+        categories={categories?.data}
+        isLoading={categoriesLoading}
       />
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">
         <div className="col-span-12 md:col-span-4">
