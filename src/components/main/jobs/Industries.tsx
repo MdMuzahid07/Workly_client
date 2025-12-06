@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -6,13 +5,14 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import getIconComponent from "../../../helper/getIconComponent";
 import IndustriesSkeleton from "../../../skeleton/job/IndustriesSkeleton ";
 import { Button } from "../../ui/button";
 
 export type Category = {
   id: number;
   name: string;
-  icon: React.ComponentType<any>;
+  icon: string;
   count: string;
   color: string;
   description: string;
@@ -70,18 +70,16 @@ const Industries = ({
       >
         {categories?.map((category) => {
           const isSelected = selected?.includes(category.id);
-          console.log("Rendering category:", category);
+          const { icon: CategoryIcon, color } = getIconComponent(category.icon);
           return (
             <SwiperSlide key={category.id} className="w-auto!">
               <Button
                 onClick={() => toggleSelection(category.id)}
                 className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground dark:hover:bg-card hover:bg-white"}`}
               >
-                {category.icon ? (
-                  <category.icon
-                    className={`h-5 w-5 rounded-full p-0.5 ${category.color} text-white`}
-                  />
-                ) : null}
+                <CategoryIcon
+                  className={`h-5 w-5 ${color} rounded-full p-0.5 text-white`}
+                />
                 {category.name}
                 {category.count ? (
                   <p
