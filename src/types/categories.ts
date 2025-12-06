@@ -13,6 +13,7 @@ export interface Category {
   name: string;
   slug: string;
   jobCount: number;
+  icon: string;
   activeJobs: number;
   applications: number;
   description: string;

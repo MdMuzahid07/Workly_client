@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { useUpdateCategoryMutation } from "../../../redux/feature/category/categoryApi";
 import WkForm from "../../form/WkForm";
+import WKIconPicker from "../../form/WKIconPicker ";
 import WkInput from "../../form/WkInput";
 import WkTextArea from "../../form/WkTextArea";
 import SubcategoriesArrayField from "./SubcategoriesArrayField";
@@ -29,6 +30,7 @@ interface EditCategoryModalProps {
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required").trim(),
   slug: z.string().min(1, "Slug is required").trim(),
+  icon: z.string().min(1, "Icon is required").trim(),
   description: z.string(),
   subcategories: z.array(
     z.string().trim().min(1, "Subcategory cannot be empty"),
@@ -56,6 +58,7 @@ const EditCategoryModal = ({
       return {
         name: "",
         slug: "",
+        icon: "",
         description: "",
         subcategories: [],
       };
@@ -63,6 +66,7 @@ const EditCategoryModal = ({
     return {
       name: category.name,
       slug: category.slug,
+      icon: category.icon || "",
       description: category.description || "",
       subcategories: category.subcategories.map((sub) => sub.name),
     };
@@ -75,6 +79,7 @@ const EditCategoryModal = ({
       const payload = {
         categoryId: category.id,
         name: data.name.trim(),
+        icon: data.icon,
         slug: normalizeSlug(data.slug) || normalizeSlug(data.name),
         description: data.description.trim() || null,
         subcategories: data.subcategories
@@ -173,6 +178,8 @@ const CategoryFormFields = () => {
         required
         placeholder="e.g., Engineering"
       />
+
+      <WKIconPicker name="icon" label="Category Icon" required />
 
       <div className="space-y-2">
         <WkInput

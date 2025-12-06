@@ -23,6 +23,7 @@ const initialCategories: Category[] = [
     name: "Engineering",
     slug: "engineering",
     jobCount: 45,
+    icon: "code",
     activeJobs: 32,
     applications: 567,
     description: "Software development and technical roles",
@@ -47,6 +48,7 @@ const initialCategories: Category[] = [
   {
     id: "2",
     name: "Product Management",
+    icon: "code",
     slug: "product-management",
     jobCount: 12,
     activeJobs: 8,
@@ -66,6 +68,7 @@ const initialCategories: Category[] = [
   {
     id: "3",
     name: "Design",
+    icon: "code",
     slug: "design",
     jobCount: 18,
     activeJobs: 14,
@@ -95,6 +98,7 @@ const initialCategories: Category[] = [
     slug: "marketing",
     jobCount: 23,
     activeJobs: 19,
+    icon: "code",
     applications: 445,
     description: "Digital marketing and growth positions",
     status: "active",
@@ -122,6 +126,7 @@ const initialCategories: Category[] = [
     jobCount: 15,
     activeJobs: 12,
     applications: 289,
+    icon: "code",
     description: "Sales and business development roles",
     status: "active",
     subcategories: [
@@ -147,6 +152,7 @@ const initialCategories: Category[] = [
     slug: "operations",
     jobCount: 9,
     activeJobs: 0,
+    icon: "code",
     applications: 156,
     description: "Operations and logistics positions",
     status: "inactive",

@@ -42,7 +42,7 @@ const LandingView = () => {
               land your next great role.
             </p>
           </motion.div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 w-full bg-gradient-to-b from-transparent to-[#F6F9F4] select-none dark:to-black" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 w-full bg-linear-to-b from-transparent to-[#F6F9F4] select-none dark:to-black" />
           <div className="absolute top-[10rem] right-0 left-0 z-10 h-[300px] w-full sm:-bottom-20 md:h-full">
             <Suspense
               fallback={
