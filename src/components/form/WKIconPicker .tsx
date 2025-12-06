@@ -104,7 +104,7 @@ const WKIconPicker = ({
                               setOpen(false);
                             }}
                           >
-                            <Icon className="mr-2 h-4 w-4" />
+                            <Icon className="text-primary/70 h-4 w-4" />
                             {iconName}
                             <Check
                               className={cn(
