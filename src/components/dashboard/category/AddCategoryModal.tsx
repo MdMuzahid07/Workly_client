@@ -68,9 +68,8 @@ const AddCategoryModal = ({ open, onOpenChange }: AddCategoryModalProps) => {
         active: true,
       };
 
-      console.log("Submitting category:", payload);
-
       const result = await createCategory(payload).unwrap();
+      console.log("Submitting category:", payload, result);
 
       if (result?.success) {
         toast.success(result?.message || "Category created successfully");
