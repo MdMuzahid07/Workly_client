@@ -117,31 +117,28 @@ const MediaContactStep = () => {
       <CardContent className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="contactEmail" className="text-sm font-medium">
-              Contact Email <span className="text-destructive ml-1">*</span>
-            </label>
             <div className="flex items-center space-x-2">
-              <Mail className="text-muted-foreground h-4 w-4" />
               <WKInput
                 name="contactEmail"
-                label=""
+                labelIcon={<Mail className="text-muted-foreground h-4 w-4" />}
+                label="Contact Email"
                 type="email"
+                placeholder="contact@example.com"
                 required
-                className="h-10 sm:h-11"
+                className="h-10 rounded-full sm:h-11"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <label htmlFor="contactPhone" className="text-sm font-medium">
-              Contact Phone
-            </label>
             <div className="flex items-center space-x-2">
-              <Phone className="text-muted-foreground h-4 w-4" />
               <WKInput
                 name="contactPhone"
-                label=""
+                label="Contact Phone"
+                placeholder="+0 000 000 0000"
+                labelIcon={<Phone className="text-muted-foreground h-4 w-4" />}
+                required
                 type="text"
-                className="h-10 sm:h-11"
+                className="h-10 rounded-full sm:h-11"
               />
             </div>
           </div>

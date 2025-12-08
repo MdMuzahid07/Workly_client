@@ -4,18 +4,30 @@ import WKSelect from "../../../form/WkSelect";
 import WKTextArea from "../../../form/WkTextArea";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "../../../ui/card";
 
 const BasicInfoStep = ({
   industries,
   companySizes,
+  loadingIndustries,
 }: {
-  industries: { label: string; value: string }[];
+  industries: {
+    id: string;
+    name: string;
+    slug: string;
+    active: boolean;
+    description: string;
+    icon: string;
+    subcategories: [];
+    createdAt: string;
+    updatedAt: string;
+  }[];
   companySizes: { label: string; value: string }[];
+  loadingIndustries: boolean;
 }) => {
   return (
     <Card>
@@ -33,18 +45,23 @@ const BasicInfoStep = ({
           <WKInput
             name="name"
             label="Company Name"
+            labelIcon={<Building2 className="text-muted-foreground h-4 w-4" />}
             required
-            className="h-10 sm:h-11"
+            className="h-10 rounded-full sm:h-11"
           />
+
           <div className="space-y-2">
-            <label htmlFor="slug" className="text-sm font-medium">
-              Company URL Slug <span className="text-destructive ml-1">*</span>
-            </label>
             <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0">
-              <span className="text-muted-foreground truncate text-xs sm:mr-2 sm:text-sm">
+              <span className="text-muted-foreground mt-[22px] inline-block truncate text-xs sm:text-sm">
                 workly.com/company/
               </span>
-              <WKInput name="slug" label="" required className="h-10 sm:h-11" />
+              <WKInput
+                name="slug"
+                label="Company Slug"
+                required
+                className="h-10 rounded-full px-0 sm:h-11"
+                disabled={true}
+              />
             </div>
           </div>
         </div>
@@ -52,6 +69,7 @@ const BasicInfoStep = ({
         <WKTextArea
           name="description"
           label="Company Description"
+          placeholder="Describe your company..."
           required
           rows={4}
           className="resize-none"
@@ -61,10 +79,17 @@ const BasicInfoStep = ({
           <WKSelect
             name="industry"
             label="Industry"
-            placeholder="Select industry"
+            placeholder={loadingIndustries ? "Loading..." : "Select Industry"}
             required
-            options={industries}
-            className="h-10 sm:h-11"
+            options={
+              industries?.map(
+                (cat: { id: string; name: string; slug: string }) => ({
+                  value: cat.id,
+                  label: cat.name,
+                }),
+              ) || []
+            }
+            className="h-10 w-full rounded-full sm:h-11"
           />
           <WKSelect
             name="size"
@@ -72,7 +97,7 @@ const BasicInfoStep = ({
             placeholder="Select company size"
             required
             options={companySizes}
-            className="h-10 sm:h-11"
+            className="h-10 w-full rounded-full sm:h-11"
           />
         </div>
       </CardContent>

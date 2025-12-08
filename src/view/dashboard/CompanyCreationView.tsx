@@ -9,6 +9,7 @@ import BasicInfoStep from "../../components/main/company/createCompany/BasicInfo
 import LocationDetailsStep from "../../components/main/company/createCompany/LocationDetailsStep";
 import MediaContactStep from "../../components/main/company/createCompany/MediaContactStep";
 import { updateUser } from "../../redux/feature/auth/authSlice";
+import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 import { useCreateCompanyMutation } from "../../redux/feature/company/companyApi";
 import { useAppDispatch } from "../../redux/hooks";
 
@@ -26,19 +27,6 @@ export interface CompanyFormData {
   logoUrl: string;
   coverUrl: string;
 }
-
-const industries = [
-  { value: "technology", label: "Technology" },
-  { value: "healthcare", label: "Healthcare" },
-  { value: "finance", label: "Finance" },
-  { value: "education", label: "Education" },
-  { value: "marketing", label: "Marketing" },
-  { value: "design", label: "Design" },
-  { value: "sales", label: "Sales" },
-  { value: "remote", label: "Remote" },
-  { value: "startup", label: "Startup" },
-  { value: "enterprise", label: "Enterprise" },
-];
 
 const companySizes = [
   { value: "1-10", label: "1-10 employees" },
@@ -85,6 +73,8 @@ const CompanyCreationView = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createCompany, { isLoading }] = useCreateCompanyMutation();
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery(undefined);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -92,7 +82,13 @@ const CompanyCreationView = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await createCompany(data).unwrap();
+      const payload = {
+        ...data,
+        founded: data.founded ? new Date(data.founded).toISOString() : null,
+        websiteUrl: `https://${data.websiteUrl}`,
+      };
+
+      const result = await createCompany(payload).unwrap();
 
       if (result && result.success) {
         toast.success("Company created successfully!");
@@ -133,7 +129,7 @@ const CompanyCreationView = () => {
           </p>
         </div>
 
-        {/* Progress Steps */}
+        {/* progress steps */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-center">
             {[1, 2, 3].map((step) => (
@@ -184,8 +180,9 @@ const CompanyCreationView = () => {
 
           {currentStep === 1 && (
             <BasicInfoStep
-              industries={industries}
+              industries={categories?.data || []}
               companySizes={companySizes}
+              loadingIndustries={categoriesLoading}
             />
           )}
 

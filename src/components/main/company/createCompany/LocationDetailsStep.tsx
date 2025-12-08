@@ -25,32 +25,27 @@ const LocationDetailsStep = () => {
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <WKInput
             name="location"
+            placeholder="Dhaka,Bangladesh"
             label="Headquarters Location"
             required
-            className="h-10 sm:h-11"
+            className="h-10 rounded-full sm:h-11"
           />
           <WKDatePicker
             name="founded"
             label="Founded Year"
             required={false}
-            className="h-10 sm:h-11"
+            className="h-10 rounded-full sm:h-11"
           />
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="websiteUrl" className="text-sm font-medium">
-            Company Website
-          </label>
-          <div className="flex items-center space-x-2">
-            <Globe className="text-muted-foreground h-4 w-4" />
-            <WKInput
-              name="websiteUrl"
-              label=""
-              type="text"
-              className="h-10 sm:h-11"
-            />
-          </div>
-        </div>
+        <WKInput
+          name="websiteUrl"
+          placeholder="example.com"
+          label="Company Website"
+          labelIcon={<Globe className="text-muted-foreground h-4 w-4" />}
+          type="text"
+          className="h-10 w-full flex-1 rounded-full sm:h-11"
+        />
 
         <div className="bg-muted rounded-lg p-3 sm:p-4">
           <h4 className="mb-2 text-sm font-medium sm:text-base">
