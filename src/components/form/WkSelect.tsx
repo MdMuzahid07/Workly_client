@@ -18,6 +18,7 @@ interface WKSelectProps {
   options: { value: string; label: string }[];
   required?: boolean;
   className?: string;
+  disabled?: boolean;
   size?: "sm" | "md" | "lg";
 }
 
@@ -29,6 +30,7 @@ const WKSelect = ({
   required = false,
   className,
   size = "lg",
+  disabled = false,
 }: WKSelectProps) => {
   const {
     control,
@@ -54,7 +56,11 @@ const WKSelect = ({
         control={control}
         rules={{ required: required ? `${label} is required` : false }}
         render={({ field }) => (
-          <Select onValueChange={field.onChange} value={field.value}>
+          <Select
+            onValueChange={field.onChange}
+            value={field.value}
+            disabled={disabled}
+          >
             <SelectTrigger
               id={name}
               className={cn(

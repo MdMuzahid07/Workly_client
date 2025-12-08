@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { JwtPayload, jwtDecode } from "jwt-decode";
+import { useMemo } from "react";
+import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { useGetCategoriesQuery } from "../../../redux/feature/category/categoryApi";
 import { useCreateJobMutation } from "../../../redux/feature/job/jobApi";
 import { useAppSelector } from "../../../redux/hooks";
 import WKCheckbox from "../../form/WKCheckbox";
@@ -19,6 +23,7 @@ import StringArrayField from "./StringArrayField";
 export interface JobFormData {
   title: string;
   discipline: string;
+  category: string;
   jobType: string;
   experienceLevel: string;
   location: string;
@@ -45,8 +50,43 @@ interface CreateNewJobFormProps {
   onClose?: () => void;
 }
 
+const SubcategorySelect = ({ categories }: { categories: any }) => {
+  const { watch } = useFormContext<JobFormData>();
+  const selectedIndustry = watch("category");
+
+  const subcategoryOptions = useMemo(() => {
+    if (!categories?.data || !selectedIndustry) return [];
+
+    const category = categories.data.find(
+      (cat: any) => cat.id === selectedIndustry,
+    );
+    return (
+      category?.subcategories.map((sub: string) => ({
+        value: sub,
+        label: sub,
+      })) || []
+    );
+  }, [categories, selectedIndustry]);
+
+  return (
+    <WKSelect
+      className="w-full"
+      name="discipline"
+      label="Discipline"
+      placeholder={
+        selectedIndustry ? "Select discipline" : "Select industry first"
+      }
+      required
+      disabled={!selectedIndustry}
+      options={subcategoryOptions}
+    />
+  );
+};
+
 const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
   const [createJob, { isLoading }] = useCreateJobMutation();
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery(undefined);
   const user = useAppSelector((state) => state.auth.user);
   const decodedToken = jwtDecode<AuthTokenPayload>(
     localStorage.getItem("accessToken") || "",
@@ -89,14 +129,54 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
     discipline: "",
     jobType: "",
     experienceLevel: "",
+    category: "",
     location: "",
     isRemote: false,
     salaryMin: 0,
     salaryMax: 0,
     currency: "BDT",
     description: "",
-    requirements: [],
-    benefits: [],
+    requirements: [
+      "Bachelor's degree in relevant field or equivalent experience",
+      "Strong communication skills in English",
+      "Proven problem-solving abilities",
+      "Ability to work independently and in a team",
+      "Adaptability to changing priorities and deadlines",
+      "Strong work ethic and professional attitude",
+      "Willingness to learn and develop new skills",
+      "Ability to handle multiple tasks simultaneously",
+      "Good interpersonal skills",
+      "Critical thinking and analytical skills",
+      "Positive attitude and enthusiasm",
+      "Collaborative mindset",
+      "Ability to work under pressure",
+    ],
+    benefits: [
+      "Performance bonuses and yearly increments",
+      "Festival bonuses (Eid bonuses)",
+      "Provident fund contribution",
+      "Medical insurance for employee and family",
+      "Life insurance coverage",
+      "Transportation or conveyance allowance",
+      "Lunch or meal allowance",
+      "Paid time off and sick leave",
+      "Casual leave and earned leave",
+      "Public holiday observance",
+      "Prayer break facilities",
+      "Training and skill development programs",
+      "Online course subscriptions",
+      "Mentorship programs",
+      "Professional certification support",
+      "Annual health checkups",
+      "Gym membership or wellness programs",
+      "Mental health support",
+      "Ergonomic workspace setup",
+      "Health and safety equipment",
+      "Annual team outings or trips",
+      "Free snacks and beverages",
+      "Employee recognition programs",
+      "Performance-based stock options",
+    ],
     contactEmail: "",
     applicationDeadline: "",
     maxApplications: 100,
@@ -109,10 +189,13 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
     <WkForm<JobFormData> onSubmit={handleSubmit} defaultValues={defaultValues}>
       <div className="space-y-6">
         <div className="space-y-4">
-          <WKInput name="title" label="Job Title" required />
-
           <div className="grid gap-4 sm:grid-cols-2">
-            <WKInput name="discipline" label="Discipline" required />
+            <WKInput
+              name="title"
+              label="Job Title"
+              placeholder="Write job title"
+              required
+            />
 
             <WKSelect
               name="jobType"
@@ -144,7 +227,29 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
               ]}
             />
 
-            <WKInput name="location" label="Location" required />
+            <WKInput
+              name="location"
+              label="Location"
+              placeholder="Add company location"
+              required
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <WKSelect
+              className="w-full"
+              name="category"
+              label="Industry"
+              placeholder={categoriesLoading ? "Loading..." : "Select Industry"}
+              required
+              options={
+                categories?.data?.map((cat: any) => ({
+                  value: cat.id,
+                  label: cat.name,
+                })) || []
+              }
+            />
+            <SubcategorySelect categories={categories} />
           </div>
 
           <WKCheckbox name="isRemote" label="Remote position" />
@@ -181,6 +286,7 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
           <WKTextArea
             name="description"
             label="Job Description"
+            placeholder="Write job description..."
             required
             rows={5}
           />
@@ -205,6 +311,7 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
               name="contactEmail"
               label="Contact Email"
               type="email"
+              placeholder="Add contact email"
               required
             />
 

@@ -22,7 +22,7 @@ const StringArrayField = ({
   const items = watch(fieldName) || [];
 
   const addItem = () => {
-    setValue(fieldName, [...items, ""]);
+    setValue(fieldName, ["", ...items]);
   };
 
   const removeItem = (index: number) => {
