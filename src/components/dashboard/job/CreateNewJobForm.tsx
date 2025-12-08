@@ -23,7 +23,7 @@ import StringArrayField from "./StringArrayField";
 export interface JobFormData {
   title: string;
   discipline: string;
-  category: string;
+  categoryId: string;
   jobType: string;
   experienceLevel: string;
   location: string;
@@ -52,7 +52,7 @@ interface CreateNewJobFormProps {
 
 const SubcategorySelect = ({ categories }: { categories: any }) => {
   const { watch } = useFormContext<JobFormData>();
-  const selectedIndustry = watch("category");
+  const selectedIndustry = watch("categoryId");
 
   const subcategoryOptions = useMemo(() => {
     if (!categories?.data || !selectedIndustry) return [];
@@ -104,6 +104,10 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
         maxApplications: Number(data.maxApplications),
         isActive: true,
         applicationDeadline: new Date(data.applicationDeadline).toISOString(),
+        skillsRequired: data.skillsRequired.map((skill) => ({
+          ...skill,
+          experienceYears: Number(skill.experienceYears),
+        })),
       };
 
       const response = await createJob(payload).unwrap();
@@ -129,7 +133,7 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
     discipline: "",
     jobType: "",
     experienceLevel: "",
-    category: "",
+    categoryId: "",
     location: "",
     isRemote: false,
     salaryMin: 0,
@@ -238,7 +242,7 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
           <div className="grid gap-4 sm:grid-cols-2">
             <WKSelect
               className="w-full"
-              name="category"
+              name="categoryId"
               label="Industry"
               placeholder={categoriesLoading ? "Loading..." : "Select Industry"}
               required

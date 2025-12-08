@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Plus, Settings } from "lucide-react";
+import Link from "next/link";
 import { Button } from "../../../ui/button";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
@@ -30,10 +31,13 @@ const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
           <Settings className="mr-2 h-4 w-4" />
           Settings
         </Button>
-        <Button size="sm">
+        <Link
+          href="dashboard/post-job"
+          className="hover:text-primary flex items-center"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Post Job
-        </Button>
+        </Link>
       </div>
     </DashboardHeaderContainer>
   );
