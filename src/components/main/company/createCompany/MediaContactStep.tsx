@@ -296,7 +296,7 @@ const MediaContactStep = () => {
                 </span>
               </p>
               <p>
-                <strong>Industry:</strong> {formData.industry || "Not set"}
+                <strong>Industry:</strong> {formData.industryId || "Not set"}
               </p>
               <p>
                 <strong>Size:</strong> {formData.size || "Not set"}

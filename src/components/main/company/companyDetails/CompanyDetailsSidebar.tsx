@@ -54,7 +54,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
           {company?.socialLinks?.linkedin && (
             <a
               href={`https://${company?.socialLinks?.linkedin}`}
-              className="hover:bg-primary/2 flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors"
+              className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-600">
                 <span className="text-xs font-bold text-white">in</span>
@@ -66,7 +66,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
           {company?.socialLinks?.twitter && (
             <a
               href={`https://${company?.socialLinks?.twitter}`}
-              className="hover:bg-primary/2 flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors"
+              className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-400">
                 <span className="text-xs font-bold text-white">𝕏</span>
@@ -78,7 +78,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
           {company?.socialLinks?.github && (
             <a
               href={`https://${company?.socialLinks?.github}`}
-              className="hover:bg-primary/2 flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors"
+              className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-900">
                 <span className="text-xs font-bold text-white">GH</span>
@@ -96,7 +96,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
           <CardTitle>Similar Companies</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-xl border border-gray-200 p-3">
+          <div className="border-primary/10 rounded-xl border p-3">
             <div className="mb-2 flex items-center gap-3">
               <Image
                 width={100}
@@ -115,7 +115,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
             <p className="text-xs font-medium text-green-600">15 open jobs</p>
           </div>
 
-          <div className="rounded-xl border border-gray-200 p-3">
+          <div className="border-primary/10 rounded-xl border p-3">
             <div className="mb-2 flex items-center gap-3">
               <Image
                 width={100}
@@ -134,7 +134,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
             <p className="text-xs font-medium text-green-600">22 open jobs</p>
           </div>
 
-          <div className="rounded-xl border border-gray-200 p-3">
+          <div className="border-primary/10 rounded-xl border p-3">
             <div className="mb-2 flex items-center gap-3">
               <Image
                 width={100}

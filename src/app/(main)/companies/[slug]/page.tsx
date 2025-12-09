@@ -12,7 +12,11 @@ export type CompanyDetails = {
   logoUrl: string;
   coverUrl: string;
   location: string;
-  industry: string;
+  industry: {
+    id: string;
+    name: string;
+    icon: string;
+  };
   size: string;
   contactEmail: string;
   contactPhone: string;
@@ -58,7 +62,7 @@ export async function generateMetadata({
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/company/company/${slug}`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/company/company/${slug}`,
       {
         method: "GET",
         headers: {
@@ -96,7 +100,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/company/company/${slug}`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/company/company/${slug}`,
       {
         method: "GET",
         headers: {

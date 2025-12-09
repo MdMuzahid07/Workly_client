@@ -30,7 +30,9 @@ const CompanyCard = ({ company }: any) => {
                 </Badge>
               )}
             </div>
-            <p className="text-foreground/60 text-sm">{company.industry}</p>
+            <p className="text-foreground/60 text-sm">
+              {company.industry.name}
+            </p>
           </div>
         </div>
       </CardHeader>

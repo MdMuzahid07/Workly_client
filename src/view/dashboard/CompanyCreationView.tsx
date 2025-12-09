@@ -17,7 +17,7 @@ export interface CompanyFormData {
   name: string;
   slug: string;
   description: string;
-  industry: string;
+  industryId: string;
   size: string;
   location: string;
   websiteUrl: string;
@@ -58,10 +58,10 @@ const defaultValues: Partial<CompanyFormData> = {
   name: "",
   slug: "",
   description: "",
-  industry: "",
+  industryId: "",
   size: "",
   location: "",
-  websiteUrl: "",
+  websiteUrl: "https://",
   contactEmail: "",
   contactPhone: "",
   founded: "",
@@ -85,9 +85,8 @@ const CompanyCreationView = () => {
       const payload = {
         ...data,
         founded: data.founded ? new Date(data.founded).toISOString() : null,
-        websiteUrl: `https://${data.websiteUrl}`,
+        websiteUrl: data.websiteUrl,
       };
-
       const result = await createCompany(payload).unwrap();
 
       if (result && result.success) {

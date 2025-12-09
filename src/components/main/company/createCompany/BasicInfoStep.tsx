@@ -77,7 +77,7 @@ const BasicInfoStep = ({
 
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <WKSelect
-            name="industry"
+            name="industryId"
             label="Industry"
             placeholder={loadingIndustries ? "Loading..." : "Select Industry"}
             required

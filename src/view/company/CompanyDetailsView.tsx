@@ -18,16 +18,22 @@ import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CompanyDetails } from "../../app/(main)/companies/[slug]/page";
 import CompanyDetailsSidebar from "../../components/main/company/companyDetails/CompanyDetailsSidebar";
+import getIconComponent from "../../helper/getIconComponent";
 
 interface CompanyDetailsViewProps {
   companyDetails: CompanyDetails | null;
 }
 
 const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
+  console.log(companyDetails, "companyDetails");
   //* infinite scroll state for jobs start here =============>
   const [visibleJobsCount, setVisibleJobsCount] = useState(4);
   const jobsPerLoad = 4;
   //* infinite scroll state for jobs end here =============<
+
+  const { icon: CategoryIcon } = getIconComponent(
+    companyDetails?.industry?.icon || "Briefcase",
+  );
 
   if (!companyDetails) {
     return (
@@ -110,8 +116,9 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                         <Badge variant="default">Verified</Badge>
                       )}
                     </div>
-                    <p className="text-foreground/60 mb-4 text-lg">
-                      {companyDetails.industry}
+                    <p className="text-foreground/60 mb-4 flex items-center gap-2 text-lg">
+                      <CategoryIcon className={`h-5 w-5 text-white`} />
+                      {companyDetails?.industry?.name}
                     </p>
 
                     <div className="text-foreground/60 flex flex-wrap items-center gap-6 text-sm">
