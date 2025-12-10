@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,234 +11,129 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Category, CategoryStatus } from "@/types/categories";
-import { Edit, FileText, MoreVertical, Search, Trash2 } from "lucide-react";
+
+import {
+  Edit,
+  FileText,
+  Loader2,
+  MoreVertical,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import AddCategoryModal from "../../components/dashboard/category/AddCategoryModal";
 import EditCategoryModal from "../../components/dashboard/category/EditCategoryModal";
 import DashboardCategoryHeader from "../../components/dashboard/dashboard-nav/header/DashboardCategoryHeader";
-
-const initialCategories: Category[] = [
-  {
-    id: "1",
-    name: "Engineering",
-    slug: "engineering",
-    jobCount: 45,
-    icon: "code",
-    activeJobs: 32,
-    applications: 567,
-    description: "Software development and technical roles",
-    status: "active",
-    subcategories: [
-      {
-        id: "1-sub-frontend",
-        name: "Frontend",
-        slug: "frontend",
-        description: "Web UI engineering",
-        status: "active",
-      },
-      {
-        id: "1-sub-backend",
-        name: "Backend",
-        slug: "backend",
-        description: "API and services",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: "Product Management",
-    icon: "code",
-    slug: "product-management",
-    jobCount: 12,
-    activeJobs: 8,
-    applications: 234,
-    description: "Product strategy and management positions",
-    status: "active",
-    subcategories: [
-      {
-        id: "2-sub-platform",
-        name: "Platform",
-        slug: "platform",
-        description: "Internal platforms",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: "3",
-    name: "Design",
-    icon: "code",
-    slug: "design",
-    jobCount: 18,
-    activeJobs: 14,
-    applications: 312,
-    description: "UI/UX and graphic design roles",
-    status: "active",
-    subcategories: [
-      {
-        id: "3-sub-ux",
-        name: "UX",
-        slug: "ux",
-        description: "User experience",
-        status: "active",
-      },
-      {
-        id: "3-sub-visual",
-        name: "Visual Design",
-        slug: "visual-design",
-        description: "Brand and visual systems",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: "4",
-    name: "Marketing",
-    slug: "marketing",
-    jobCount: 23,
-    activeJobs: 19,
-    icon: "code",
-    applications: 445,
-    description: "Digital marketing and growth positions",
-    status: "active",
-    subcategories: [
-      {
-        id: "4-sub-content",
-        name: "Content",
-        slug: "content",
-        description: "Content strategy",
-        status: "active",
-      },
-      {
-        id: "4-sub-performance",
-        name: "Performance",
-        slug: "performance",
-        description: "Paid acquisition",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: "5",
-    name: "Sales",
-    slug: "sales",
-    jobCount: 15,
-    activeJobs: 12,
-    applications: 289,
-    icon: "code",
-    description: "Sales and business development roles",
-    status: "active",
-    subcategories: [
-      {
-        id: "5-sub-enterprise",
-        name: "Enterprise",
-        slug: "enterprise",
-        description: "Large accounts",
-        status: "active",
-      },
-      {
-        id: "5-sub-smb",
-        name: "SMB",
-        slug: "smb",
-        description: "Small and medium business",
-        status: "active",
-      },
-    ],
-  },
-  {
-    id: "6",
-    name: "Operations",
-    slug: "operations",
-    jobCount: 9,
-    activeJobs: 0,
-    icon: "code",
-    applications: 156,
-    description: "Operations and logistics positions",
-    status: "inactive",
-    subcategories: [
-      {
-        id: "6-sub-logistics",
-        name: "Logistics",
-        slug: "logistics",
-        description: "Supply chain",
-        status: "inactive",
-      },
-    ],
-  },
-];
+import {
+  useDeleteCategoryMutation,
+  useGetCategoryStatisticsQuery,
+  useToggleCategoryStatusMutation,
+} from "../../redux/feature/category/categoryApi";
+import CategoryManagementSkeleton from "../../skeleton/dashboard/category/CategoryManagementSkeleton";
+import { CategoryStatus } from "../../types/categories";
 
 const CategoryManagementView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  );
-
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<CategoryStatus | "all">("all");
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
 
-  const filteredCategories = useMemo(
-    () =>
-      categories.filter((cat) => {
-        const matchesSearch =
-          cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          cat.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          cat.subcategories.some((sub) =>
-            sub.name.toLowerCase().includes(searchQuery.toLowerCase()),
-          );
+  const {
+    data: statisticsData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetCategoryStatisticsQuery({
+    search: searchQuery,
+    active:
+      activeTab === "all" ? "all" : activeTab === "active" ? "true" : "false",
+  });
 
-        const matchesStatus = activeTab === "all" || cat.status === activeTab;
-        return matchesSearch && matchesStatus;
-      }),
-    [activeTab, categories, searchQuery],
+  const [toggleStatus] = useToggleCategoryStatusMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
+
+  const categories = useMemo(
+    () => statisticsData?.data?.categories || [],
+    [statisticsData],
   );
-
-  const getCategoriesByStatus = (status: CategoryStatus | "all") => {
-    if (status === "all") return categories;
-    return categories.filter((cat) => cat.status === status);
+  const summary = statisticsData?.data?.summary || {
+    totalCategories: 0,
+    activeCategories: 0,
+    inactiveCategories: 0,
+    totalJobs: 0,
+    activeJobs: 0,
+    totalApplications: 0,
+    averageApplicationsPerCategory: 0,
   };
 
-  const totals = useMemo(
-    () =>
-      categories.reduce(
-        (acc, cat) => {
-          acc.totalJobs += cat.jobCount;
-          acc.activeJobs += cat.activeJobs;
-          acc.totalApplications += cat.applications;
-          acc.activeCategories += cat.status === "active" ? 1 : 0;
-          return acc;
-        },
-        {
-          totalJobs: 0,
-          activeJobs: 0,
-          totalApplications: 0,
-          activeCategories: 0,
-        },
-      ),
-    [categories],
-  );
+  const filteredCategories = useMemo(() => {
+    return categories.filter((cat: any) => {
+      const matchesSearch =
+        cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        cat.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (cat.subcategories &&
+          Array.isArray(cat.subcategories) &&
+          cat.subcategories.some((sub: string) =>
+            sub.toLowerCase().includes(searchQuery.toLowerCase()),
+          ));
 
-  const handleDeleteCategory = (id: string) => {
-    setCategories((prev) => prev.filter((cat) => cat.id !== id));
+      const matchesStatus =
+        activeTab === "all" ||
+        (activeTab === "active" && cat.active) ||
+        (activeTab === "inactive" && !cat.active);
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [categories, searchQuery, activeTab]);
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+
+    try {
+      await deleteCategory(id).unwrap();
+      toast.success("Category deleted successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete category");
+    }
   };
 
-  const handleToggleStatus = (id: string) => {
-    setCategories((prev) =>
-      prev.map((cat) =>
-        cat.id === id
-          ? { ...cat, status: cat.status === "active" ? "inactive" : "active" }
-          : cat,
-      ),
-    );
+  const handleToggleStatus = async (id: string) => {
+    try {
+      await toggleStatus(id).unwrap();
+      toast.success("Category status updated successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update category status");
+    }
   };
 
-  const openEditModal = (category: Category) => {
+  const openEditModal = (category: any) => {
     setSelectedCategory(category);
     setIsEditOpen(true);
   };
+
+  if (isLoading) {
+    return <CategoryManagementSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto max-w-7xl px-4 py-6 pt-24">
+        <div className="py-12 text-center">
+          <FileText className="text-destructive mx-auto mb-4 h-16 w-16" />
+          <h3 className="mb-2 text-lg font-semibold">
+            Failed to load categories
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            {(error as any)?.data?.message ||
+              "There was an error loading categories. Please try again."}
+          </p>
+          <Button onClick={() => refetch()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -253,12 +149,18 @@ const CategoryManagementView = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold sm:text-3xl">
-                {categories.length}
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs">
-                {totals.activeCategories} active
-              </p>
+              {isLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold sm:text-3xl">
+                    {summary.totalCategories}
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    {summary.activeCategories} active
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -269,12 +171,18 @@ const CategoryManagementView = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold sm:text-3xl">
-                {totals.totalJobs}
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs">
-                {totals.activeJobs} active
-              </p>
+              {isLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold sm:text-3xl">
+                    {summary.totalJobs}
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    {summary.activeJobs} active
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -285,12 +193,18 @@ const CategoryManagementView = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold sm:text-3xl">
-                {totals.totalApplications}
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs">
-                Across all categories
-              </p>
+              {isLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold sm:text-3xl">
+                    {summary.totalApplications}
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Across all categories
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -301,12 +215,18 @@ const CategoryManagementView = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold sm:text-3xl">
-                {Math.round(
-                  totals.totalApplications / Math.max(categories.length, 1),
-                )}
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs">Per category</p>
+              {isLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold sm:text-3xl">
+                    {Math.round(summary.averageApplicationsPerCategory)}
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Per category
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -339,12 +259,14 @@ const CategoryManagementView = () => {
           }
         >
           <TabsList className="w-full">
-            <TabsTrigger value="all">All ({categories.length})</TabsTrigger>
+            <TabsTrigger value="all">
+              All ({isLoading ? "..." : summary.totalCategories})
+            </TabsTrigger>
             <TabsTrigger value="active">
-              Active ({getCategoriesByStatus("active").length})
+              Active ({isLoading ? "..." : summary.activeCategories})
             </TabsTrigger>
             <TabsTrigger value="inactive">
-              Inactive ({getCategoriesByStatus("inactive").length})
+              Inactive ({isLoading ? "..." : summary.inactiveCategories})
             </TabsTrigger>
           </TabsList>
 
@@ -373,7 +295,18 @@ const CategoryManagementView = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {filteredCategories.length === 0 ? (
+                      {isLoading ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-12 text-center">
+                            <div className="flex flex-col items-center gap-2">
+                              <Loader2 className="h-8 w-8 animate-spin" />
+                              <p className="text-muted-foreground text-sm">
+                                Loading categories...
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : filteredCategories.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="px-4 py-12 text-center">
                             <div className="flex flex-col items-center gap-2">
@@ -385,25 +318,46 @@ const CategoryManagementView = () => {
                           </td>
                         </tr>
                       ) : (
-                        filteredCategories.map((category) => (
+                        filteredCategories.map((category: any) => (
                           <tr key={category.id} className="hover:bg-muted/50">
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div>
+                            <td className="px-4 py-4">
+                              <div className="space-y-1">
                                 <p className="font-medium">{category.name}</p>
                                 <p className="text-muted-foreground text-sm">
                                   {category.slug}
                                 </p>
-                                <p className="text-muted-foreground text-xs">
-                                  {category.subcategories.length > 0
-                                    ? `Subcategories: ${category.subcategories
-                                        .map((sub) => sub.name)
-                                        .join(", ")}`
-                                    : "No subcategories"}
-                                </p>
+                                {category.subcategories &&
+                                  category.subcategories.length > 0 && (
+                                    <div className="mt-2">
+                                      <p className="text-muted-foreground mb-1 text-xs font-medium">
+                                        Subcategories:
+                                      </p>
+                                      <div className="flex flex-wrap gap-1">
+                                        {category.subcategories
+                                          .slice(0, 5)
+                                          .map((sub: string, idx: number) => (
+                                            <span
+                                              key={idx}
+                                              className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                            >
+                                              {sub}
+                                            </span>
+                                          ))}
+                                        {category.subcategories.length > 5 && (
+                                          <span className="bg-muted text-muted-foreground inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
+                                            +{category.subcategories.length - 5}{" "}
+                                            more
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
                               </div>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
-                              <p className="font-medium">{category.jobCount}</p>
+                              <p className="font-medium">
+                                {category.totalJobs}
+                              </p>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
                               <p className="text-primary font-medium">
@@ -412,19 +366,19 @@ const CategoryManagementView = () => {
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
                               <p className="font-medium">
-                                {category.applications}
+                                {category.totalApplications}
                               </p>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
                               <div className="flex items-center gap-2">
                                 <Switch
-                                  checked={category.status === "active"}
+                                  checked={category.active}
                                   onCheckedChange={() =>
                                     handleToggleStatus(category.id)
                                   }
                                 />
                                 <span className="text-muted-foreground text-sm capitalize">
-                                  {category.status}
+                                  {category.active ? "active" : "inactive"}
                                 </span>
                               </div>
                             </td>

@@ -52,6 +52,7 @@ const EditCategoryModal = ({
   category,
 }: EditCategoryModalProps) => {
   const [updateCategory, { isLoading }] = useUpdateCategoryMutation();
+  console.log(category, "from edit category modal ");
 
   const getDefaultValues = (): CategoryFormData => {
     if (!category) {

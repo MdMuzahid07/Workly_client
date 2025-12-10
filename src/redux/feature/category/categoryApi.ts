@@ -60,6 +60,21 @@ const categoryApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["categories"],
     }),
+
+    getCategoryStatistics: builder.query({
+      query: (params?: { search?: string; active?: string }) => {
+        const searchParams = new URLSearchParams();
+        if (params?.search) searchParams.append("search", params.search);
+        if (params?.active) searchParams.append("active", params.active);
+
+        const queryString = searchParams.toString();
+        return {
+          url: `/category/category-statistics${queryString ? `?${queryString}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["categories"],
+    }),
   }),
 });
 
@@ -70,6 +85,7 @@ export const {
   useUpdateCategoryMutation,
   useToggleCategoryStatusMutation,
   useDeleteCategoryMutation,
+  useGetCategoryStatisticsQuery,
 } = categoryApi;
 
 export default categoryApi;

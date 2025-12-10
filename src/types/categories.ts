@@ -25,8 +25,6 @@ export interface CategoryFormValues {
   name: string;
   slug: string;
   description: string;
-  /**
-   * Comma-separated list of subcategory names.
-   */
+
   subcategories: string;
 }

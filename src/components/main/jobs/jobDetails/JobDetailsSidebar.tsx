@@ -9,7 +9,7 @@ import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 interface Company {
   id: string;
   name: string;
-  industry?: string;
+  industry?: { name: string };
   size?: string;
   description?: string;
 }
@@ -18,7 +18,7 @@ interface Job {
   id: string;
   title: string;
   company: Company;
-  industry?: string;
+  industry?: { name: string };
   companySize?: string;
   jobType?: string;
   type?: string;
@@ -88,7 +88,8 @@ const JobDetailsSidebar = ({
 }: JobDetailsSidebarProps) => {
   const router = useRouter();
   const companyName = job.company?.name || "Unknown Company";
-  const industry = job.industry || job.company?.industry || "Not specified";
+  const industry =
+    job.industry?.name || job.company?.industry?.name || "Not specified";
   const companySize = job.companySize || job.company?.size || "Not specified";
   const jobType = job.type || job.jobType || "Not specified";
 

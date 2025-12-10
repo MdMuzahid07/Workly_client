@@ -14,11 +14,13 @@ interface SubcategoriesArrayFieldProps {
 
 const SubcategoriesArrayField = ({
   name,
-  label = "Subcategories",
+  label = "subcategories",
   placeholder = "Enter subcategory name...",
 }: SubcategoriesArrayFieldProps) => {
   const { watch, setValue } = useFormContext();
   const items = watch(name) || [];
+
+  console.log(items, "from array fields ");
 
   const addItem = () => {
     setValue(name, ["", ...items], { shouldValidate: true });
