@@ -74,7 +74,7 @@ const CategoryManagementSkeleton = () => {
                     </thead>
 
                     <tbody className="divide-y">
-                      {[1, 2, 3, 4].map((row) => (
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((row) => (
                         <tr key={row}>
                           <td className="px-4 py-4">
                             <Skeleton className="mb-2 h-3 w-32" />
