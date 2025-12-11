@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import AddCategoryModal from "../../components/dashboard/category/AddCategoryModal";
 import EditCategoryModal from "../../components/dashboard/category/EditCategoryModal";
 import DashboardCategoryHeader from "../../components/dashboard/dashboard-nav/header/DashboardCategoryHeader";
+import DeleteConfirmationModal from "../../components/shared/DeleteConfirmationModal";
 import {
   useDeleteCategoryMutation,
   useGetCategoryStatisticsQuery,
@@ -39,6 +40,8 @@ const CategoryManagementView = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<CategoryStatus | "all">("all");
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
 
   const {
     data: statisticsData,
@@ -89,13 +92,10 @@ const CategoryManagementView = () => {
   }, [categories, searchQuery, activeTab]);
 
   const handleDeleteCategory = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
-
     try {
       await deleteCategory(id).unwrap();
-      toast.success("Category deleted successfully");
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete category");
+      throw new Error(error?.data?.message || "Failed to delete category");
     }
   };
 
@@ -401,9 +401,10 @@ const CategoryManagementView = () => {
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() =>
-                                      handleDeleteCategory(category.id)
-                                    }
+                                    onClick={() => {
+                                      setCategoryToDelete(category);
+                                      setIsDeleteOpen(true);
+                                    }}
                                     className="text-destructive"
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -432,6 +433,19 @@ const CategoryManagementView = () => {
           category={selectedCategory}
         />
       )}
+
+      <DeleteConfirmationModal
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={async () => {
+          if (!categoryToDelete?.id)
+            return Promise.reject(new Error("No category selected"));
+          return handleDeleteCategory(categoryToDelete.id);
+        }}
+        title="Delete Category?"
+        description="This will permanently delete"
+        itemName={categoryToDelete?.name}
+      />
     </div>
   );
 };
