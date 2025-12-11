@@ -15,8 +15,8 @@ import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useUpdateCategoryMutation } from "../../../redux/feature/category/categoryApi";
-import WkForm from "../../form/WkForm";
 import WKIconPicker from "../../form/WKIconPicker ";
+import WkForm from "../../form/WkForm";
 import WkInput from "../../form/WkInput";
 import WkTextArea from "../../form/WkTextArea";
 import SubcategoriesArrayField from "./SubcategoriesArrayField";
@@ -69,7 +69,9 @@ const EditCategoryModal = ({
       slug: category.slug,
       icon: category.icon || "",
       description: category.description || "",
-      subcategories: category.subcategories.map((sub) => sub.name),
+      subcategories: category.subcategories.map((sub) =>
+        typeof sub === "string" ? sub : sub?.name || "",
+      ),
     };
   };
 
