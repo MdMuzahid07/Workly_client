@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import DashboardCompanyProfileHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanyProfileHeader";
 import CompanyProfileCultureValuesTab from "../../components/dashboard/profile-tabs/CompanyProfileCultureValuesTab";
 import CompanyProfileDetailsTab from "../../components/dashboard/profile-tabs/CompanyProfileDetailsTab";
 import CompanyProfileMediaTabs from "../../components/dashboard/profile-tabs/CompanyProfileMediaTabs";
 import CompanyProfileOverviewTab from "../../components/dashboard/profile-tabs/CompanyProfileOverviewTab";
+import {
+  useGetMyCompanyQuery,
+  useUpdateCompanyByIdMutation,
+} from "../../redux/feature/company/companyApi";
 
 export interface CompanyProfile {
   id: string;
   name: string;
   slug: string;
   description: string;
-  industry: string;
+  industry: string | { id: string; name: string } | null;
   size: string;
   location: string;
   websiteUrl: string;
@@ -24,105 +29,246 @@ export interface CompanyProfile {
   coverUrl: string;
   isVerified: boolean;
   verifiedAt: string | null;
-  mission: string;
-  values: string[];
-  benefits: string[];
-  socialLinks: {
-    linkedin: string;
-    twitter: string;
-    github: string;
-    facebook: string;
-  };
-  stats: {
+  mission?: string;
+  values?: string[];
+  benefits?:
+    | Array<{ id?: string; title: string; description?: string }>
+    | string[];
+  socialLinks?: Array<{ id?: string; platform: string; url: string }>;
+  stats?: {
     totalEmployees: number;
     totalJobs: number;
     totalApplications: number;
     profileViews: number;
+  };
+  _count?: {
+    employees?: number;
+    jobs?: number;
   };
 }
 
 const ManageCompanyProfileView = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [companyId, setCompanyId] = useState<string | null>(null);
 
-  // fake data
-  const [companyProfile, setCompanyProfile] = useState<CompanyProfile>({
-    id: "1",
-    name: "TechFlow Inc.",
-    slug: "techflow-inc",
-    description:
-      "Leading software development company specializing in web applications and cloud solutions. We're passionate about creating innovative technology that solves real-world problems and helps businesses thrive in the digital age.",
-    industry: "Technology",
-    size: "100-500 employees",
-    location: "San Francisco, CA",
-    websiteUrl: "https://techflow.com",
-    contactEmail: "contact@techflow.com",
-    contactPhone: "+1 (555) 123-4567",
-    founded: "2018",
-    logoUrl: "/generic-company-logo.png",
-    coverUrl: "",
-    isVerified: true,
-    verifiedAt: "2023-06-15T10:30:00Z",
-    mission:
-      "To empower businesses through cutting-edge technology solutions that drive growth and innovation.",
-    values: [
-      "Innovation First",
-      "Customer Success",
-      "Team Collaboration",
-      "Quality Excellence",
-      "Continuous Learning",
-    ],
-    benefits: [
-      "Health Insurance",
-      "Remote Work",
-      "Flexible Hours",
-      "Professional Development",
-      "Stock Options",
-    ],
-    socialLinks: {
-      linkedin: "https://linkedin.com/company/techflow",
-      twitter: "https://twitter.com/techflow",
-      github: "https://github.com/techflow",
-      facebook: "",
-    },
-    stats: {
-      totalEmployees: 250,
-      totalJobs: 12,
-      totalApplications: 156,
-      profileViews: 1240,
-    },
+  const {
+    data: companyData,
+    isLoading: isLoadingCompany,
+    error: companyError,
+  } = useGetMyCompanyQuery(undefined, {
+    skip: false,
   });
 
+  const [updateCompany, { isLoading: isSaving }] =
+    useUpdateCompanyByIdMutation();
+
+  const defaultProfile: CompanyProfile = {
+    id: "",
+    name: "",
+    slug: "",
+    description: "",
+    industry: null,
+    size: "",
+    location: "",
+    websiteUrl: "",
+    contactEmail: "",
+    contactPhone: "",
+    founded: "",
+    logoUrl: "",
+    coverUrl: "",
+    isVerified: false,
+    verifiedAt: null,
+    mission: "",
+    values: [],
+    benefits: [],
+    socialLinks: [],
+    stats: {
+      totalEmployees: 0,
+      totalJobs: 0,
+      totalApplications: 0,
+      profileViews: 0,
+    },
+  };
+
+  const [companyProfile, setCompanyProfile] =
+    useState<CompanyProfile>(defaultProfile);
   const [editedProfile, setEditedProfile] =
-    useState<CompanyProfile>(companyProfile);
+    useState<CompanyProfile>(defaultProfile);
+  const [socialLinks, setSocialLinks] = useState<
+    Array<{ id?: string; platform: string; url: string }>
+  >([]);
+
+  useEffect(() => {
+    if (companyData?.data) {
+      const company = companyData.data;
+      setCompanyId(company.id);
+
+      let formattedFounded = "";
+      if (company.founded) {
+        try {
+          const date = new Date(company.founded);
+          formattedFounded = date.toISOString().split("T")[0];
+        } catch {
+          formattedFounded = company.founded;
+        }
+      }
+
+      // ============= map backend data to frontend structure =====>
+      const mappedProfile: CompanyProfile = {
+        id: company.id,
+        name: company.name || "",
+        slug: company.slug || "",
+        description: company.description || "",
+        industry: company.industry || null,
+        size: company.size || "",
+        location: company.location || "",
+        websiteUrl: company.websiteUrl || "",
+        contactEmail: company.contactEmail || "",
+        contactPhone: company.contactPhone || "",
+        founded: formattedFounded,
+        logoUrl: company.logoUrl || "",
+        coverUrl: company.coverUrl || "",
+        isVerified: company.isVerified || false,
+        verifiedAt: company.verifiedAt
+          ? new Date(company.verifiedAt).toISOString()
+          : null,
+        mission: company.mission || "",
+        values: company.values || [],
+        benefits: company.benefits?.map((b: any) => b.title || b) || [],
+        socialLinks: company.socialLinks || [],
+        stats: {
+          totalEmployees: company._count?.employees || 0,
+          totalJobs: company._count?.jobs || 0,
+          totalApplications: 0,
+          profileViews: 0,
+        },
+      };
+
+      setCompanyProfile(mappedProfile);
+      setEditedProfile(mappedProfile);
+
+      // ======= set social links separately =====>
+      if (company.socialLinks) {
+        setSocialLinks(company.socialLinks);
+      }
+    }
+  }, [companyData]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setCompanyProfile(editedProfile);
-    setIsEditing(false);
-    setIsSaving(false);
+    if (!companyId) {
+      toast.error("Company not found");
+      return;
+    }
+
+    try {
+      // ==== strip React elements (icons) from socialLinks before sending to API ====>
+      const socialLinksData = socialLinks.map(({ id, platform, url }) => ({
+        id,
+        platform,
+        url,
+      }));
+
+      // ===== prepare update payload ====>
+      const updatePayload: any = {
+        name: editedProfile.name,
+        description: editedProfile.description,
+        location: editedProfile.location,
+        websiteUrl: editedProfile.websiteUrl,
+        contactEmail: editedProfile.contactEmail,
+        contactPhone: editedProfile.contactPhone,
+        founded: editedProfile.founded,
+        logoUrl: editedProfile.logoUrl,
+        coverUrl: editedProfile.coverUrl,
+        size: editedProfile.size,
+        mission: editedProfile.mission,
+        values: editedProfile.values || [],
+        socialLinks: socialLinksData,
+      };
+
+      // ===== extract industryId from the industry field ======>
+      //  ===== it can be: string (industryId), object with id, or null ====>
+      if (editedProfile.industry) {
+        if (typeof editedProfile.industry === "string") {
+          // ====== if it's already a string (industryId), use it directly ===>
+          updatePayload.industryId = editedProfile.industry;
+        } else if (
+          typeof editedProfile.industry === "object" &&
+          editedProfile.industry.id
+        ) {
+          // ===== if it's an object with id property, extract the id ===>
+          updatePayload.industryId = editedProfile.industry.id;
+        }
+      }
+
+      // ====== add benefits if they exist ====>
+      if (editedProfile.benefits && editedProfile.benefits.length > 0) {
+        updatePayload.benefits = editedProfile.benefits.map((benefit: any) => {
+          if (typeof benefit === "string") {
+            return { title: benefit, isActive: true };
+          }
+          return benefit;
+        });
+      }
+
+      await updateCompany({
+        companyId,
+        ...updatePayload,
+      }).unwrap();
+
+      toast.success("Company profile updated successfully");
+
+      // ==== clean editedProfile before setting it to avoid React elements ======>
+      const cleanedProfile = {
+        ...editedProfile,
+        socialLinks: socialLinksData,
+      };
+
+      setCompanyProfile(cleanedProfile);
+      setEditedProfile(cleanedProfile);
+      setIsEditing(false);
+    } catch (error: any) {
+      toast.error(
+        error?.data?.message ||
+          error?.data?.errorSources?.message ||
+          "Failed to update company profile",
+      );
+    }
+  };
+
+  const handleSocialLinksChange = (
+    links: Array<{ id?: string; platform: string; url: string }>,
+  ) => {
+    setSocialLinks(links);
+    // ===== also update editedProfile to keep in sync ====>
+    setEditedProfile((prev) => ({
+      ...prev,
+      socialLinks: links,
+    }));
   };
 
   const handleCancel = () => {
     setEditedProfile(companyProfile);
+    setSocialLinks(companyProfile.socialLinks || []);
     setIsEditing(false);
   };
 
   const updateField = (field: keyof CompanyProfile, value: any) => {
-    setEditedProfile((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setEditedProfile((prev) => {
+      const updated = {
+        ...prev,
+        [field]: value,
+      };
+      return updated;
+    });
   };
 
   const addValue = (newValue: string) => {
-    if (newValue.trim() && !editedProfile.values.includes(newValue.trim())) {
+    const currentValues = editedProfile.values || [];
+    if (newValue.trim() && !currentValues.includes(newValue.trim())) {
       setEditedProfile((prev) => ({
         ...prev,
-        values: [...prev.values, newValue.trim()],
+        values: [...(prev.values || []), newValue.trim()],
       }));
     }
   };
@@ -130,34 +276,76 @@ const ManageCompanyProfileView = () => {
   const removeValue = (valueToRemove: string) => {
     setEditedProfile((prev) => ({
       ...prev,
-      values: prev.values.filter((value) => value !== valueToRemove),
+      values: (prev.values || []).filter((value) => value !== valueToRemove),
     }));
   };
 
   const addBenefit = (newBenefit: string) => {
-    if (
-      newBenefit.trim() &&
-      !editedProfile.benefits.includes(newBenefit.trim())
-    ) {
-      setEditedProfile((prev) => ({
-        ...prev,
-        benefits: [...prev.benefits, newBenefit.trim()],
-      }));
+    const currentBenefits = editedProfile.benefits || [];
+    const benefitStrings = currentBenefits.map((b: any) =>
+      typeof b === "string" ? b : b.title || "",
+    );
+    if (newBenefit.trim() && !benefitStrings.includes(newBenefit.trim())) {
+      setEditedProfile((prev) => {
+        const prevBenefits = prev.benefits || [];
+        const prevStrings = prevBenefits.map((b: any) =>
+          typeof b === "string" ? b : b.title || "",
+        );
+        return {
+          ...prev,
+          benefits: [...prevStrings, newBenefit.trim()] as string[],
+        };
+      });
     }
   };
 
   const removeBenefit = (benefitToRemove: string) => {
-    setEditedProfile((prev) => ({
-      ...prev,
-      benefits: prev.benefits.filter((benefit) => benefit !== benefitToRemove),
-    }));
+    setEditedProfile((prev) => {
+      const currentBenefits = prev.benefits || [];
+      const benefitStrings = currentBenefits.map((b: any) =>
+        typeof b === "string" ? b : b.title || "",
+      );
+      const filtered = benefitStrings.filter(
+        (benefit) => benefit !== benefitToRemove,
+      );
+      return {
+        ...prev,
+        benefits: filtered as string[],
+      };
+    });
   };
 
   const currentProfile = isEditing ? editedProfile : companyProfile;
 
+  if (isLoadingCompany) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-muted-foreground">
+            Loading company profile...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (companyError || !companyData?.data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-destructive mb-2">
+            Failed to load company profile
+          </div>
+          <div className="text-muted-foreground text-sm">
+            {companyError ? "Please try again later" : "Company not found"}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <DashboardCompanyProfileHeader
         setIsEditing={setIsEditing}
         isEditing={isEditing}
@@ -194,6 +382,8 @@ const ManageCompanyProfileView = () => {
             isEditing={isEditing}
             updateField={updateField}
             editedProfile={editedProfile}
+            socialLinks={socialLinks}
+            onSocialLinksChange={handleSocialLinksChange}
           />
 
           <CompanyProfileCultureValuesTab

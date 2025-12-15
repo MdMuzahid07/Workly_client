@@ -32,11 +32,37 @@ const companyApi = baseApi.injectEndpoints({
       }),
     }),
 
+    updateCompanyById: builder.mutation({
+      query: ({ companyId, ...data }) => ({
+        url: `/company/update/${companyId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["company"],
+    }),
+
     deleteCompany: builder.mutation({
       query: (id: string) => ({
         url: `/companies/${id}`,
         method: "DELETE",
       }),
+    }),
+
+    getMyCompany: builder.query({
+      query: () => ({
+        url: "/company/my-company",
+        method: "GET",
+      }),
+      providesTags: ["company"],
+    }),
+
+    updateCompanySettings: builder.mutation({
+      query: ({ companyId, ...data }) => ({
+        url: `/company/settings/${companyId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["company"],
     }),
   }),
 });
@@ -47,5 +73,8 @@ export const {
   useGetCompanyBySlugQuery,
   useUpdateCompanyMutation,
   useDeleteCompanyMutation,
+  useGetMyCompanyQuery,
+  useUpdateCompanySettingsMutation,
+  useUpdateCompanyByIdMutation,
 } = companyApi;
 export default companyApi;

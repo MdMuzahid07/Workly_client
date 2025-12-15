@@ -1,9 +1,8 @@
-import CompanySettingView from "../../../../view/dashboard/CompanySettingView";
-
 const page = () => {
   return (
     <>
-      <CompanySettingView />
+      {/* <CompanySettingView /> */}
+      <p>this page undergoing developments</p>
     </>
   );
 };

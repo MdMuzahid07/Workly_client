@@ -24,10 +24,11 @@ const DashboardCompanyProfileHeader = ({
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-4">
-          <Avatar className="bg-primary h-10 w-10 overflow-hidden rounded-full p-2 sm:h-12 sm:w-12">
+          <Avatar className="bg-primary h-10 w-10 overflow-hidden rounded-full sm:h-12 sm:w-12">
             <AvatarImage
               src={currentProfile.logoUrl || "/placeholder.svg"}
               alt={currentProfile.name}
+              className="rounded-full"
             />
             <AvatarFallback className="flex items-center justify-center text-lg">
               {currentProfile.name

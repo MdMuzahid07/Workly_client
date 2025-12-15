@@ -44,6 +44,8 @@ const SignInView = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const resData = (response as any).data;
 
+      console.log(response, "resData");
+
       if (resData?.accessToken && resData?.email) {
         localStorage.setItem("accessToken", resData.accessToken);
 

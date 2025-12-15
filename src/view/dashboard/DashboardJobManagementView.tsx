@@ -162,7 +162,6 @@ const DashboardJobManagementView = () => {
         <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <JobStatusCards jobs={jobs} />
 
-          {/* Main Content */}
           <Card className="border-border bg-card">
             <div className="border-border border-b p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import BillingSettingTab from "../../components/dashboard/company-settings/settings-tabs/BillingSettingTab";
 import JobPostingManagementTab from "../../components/dashboard/company-settings/settings-tabs/JobPostingManagementTab";
 import NotificationSettingTab from "../../components/dashboard/company-settings/settings-tabs/NotificationSettingTab";
 import PrivacySettingTab from "../../components/dashboard/company-settings/settings-tabs/PrivacySettingTab";
 import SocialLinkSettingTab from "../../components/dashboard/company-settings/settings-tabs/SocialLinkSettingTab";
 import DashboardCompanySettingsHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanySettingsHeader";
+import {
+  useGetMyCompanyQuery,
+  useUpdateCompanySettingsMutation,
+} from "../../redux/feature/company/companyApi";
 
 interface CompanySettings {
   notifications: {
@@ -37,7 +42,18 @@ interface CompanySettings {
 
 const CompanySettingsView = () => {
   const [activeTab, setActiveTab] = useState("general");
-  const [isSaving, setIsSaving] = useState(false);
+  const [companyId, setCompanyId] = useState<string | null>(null);
+
+  const {
+    data: companyData,
+    isLoading: isLoadingCompany,
+    error: companyError,
+  } = useGetMyCompanyQuery(undefined, {
+    skip: false,
+  });
+
+  const [updateCompanySettings, { isLoading: isSaving }] =
+    useUpdateCompanySettingsMutation();
 
   const [settings, setSettings] = useState<CompanySettings>({
     notifications: {
@@ -60,15 +76,68 @@ const CompanySettingsView = () => {
     },
     billing: {
       plan: "Professional",
-      billingEmail: "billing@techflow.com",
+      billingEmail: "",
       autoRenew: true,
     },
   });
 
+  const [socialLinks, setSocialLinks] = useState<any[]>([]);
+
+  // ====== load company data when it's fetched =====>
+  useEffect(() => {
+    if (companyData?.data) {
+      const company = companyData.data;
+      setCompanyId(company.id);
+
+      // ==== map company data to settings =======>
+      setSettings((prev) => ({
+        ...prev,
+        billing: {
+          ...prev.billing,
+          billingEmail: company.contactEmail || "",
+        },
+        //  ====== you can add more mappings here when settings are stored in the database =====>
+      }));
+
+      // ==== set social links ====>
+      if (company.socialLinks) {
+        setSocialLinks(company.socialLinks);
+      }
+    }
+  }, [companyData]);
+
   const handleSaveSettings = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSaving(false);
+    if (!companyId) {
+      toast.error("Company not found");
+      return;
+    }
+
+    try {
+      // ======= strip React elements (icons) from socialLinks before sending to API =====>
+      const socialLinksData = socialLinks.map(({ id, platform, url }) => ({
+        id,
+        platform,
+        url,
+      }));
+
+      await updateCompanySettings({
+        companyId,
+        ...settings,
+        socialLinks: socialLinksData,
+      }).unwrap();
+
+      toast.success("Settings saved successfully");
+    } catch (error: any) {
+      toast.error(
+        error?.data?.message ||
+          error?.data?.errorSources?.message ||
+          "Failed to save settings",
+      );
+    }
+  };
+
+  const handleSocialLinksChange = (links: any[]) => {
+    setSocialLinks(links);
   };
 
   const updateSettings = (
@@ -84,6 +153,33 @@ const CompanySettingsView = () => {
       },
     }));
   };
+
+  if (isLoadingCompany) {
+    return (
+      <div className="bg-primary/2 flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-muted-foreground">
+            Loading company settings...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (companyError || !companyData?.data) {
+    return (
+      <div className="bg-primary/2 flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-destructive mb-2">
+            Failed to load company settings
+          </div>
+          <div className="text-muted-foreground text-sm">
+            {companyError ? "Please try again later" : "Company not found"}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-primary/2 min-h-screen">
@@ -133,7 +229,10 @@ const CompanySettingsView = () => {
             settings={settings}
           />
 
-          <SocialLinkSettingTab />
+          <SocialLinkSettingTab
+            socialLinks={socialLinks}
+            onSocialLinksChange={handleSocialLinksChange}
+          />
 
           <BillingSettingTab
             updateSettings={updateSettings}

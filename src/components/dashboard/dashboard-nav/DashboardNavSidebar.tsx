@@ -22,7 +22,6 @@ import {
   Home,
   Menu,
   Plus,
-  Settings,
   Tag,
   TrendingUp,
   UserCheck,
@@ -136,11 +135,11 @@ const DashboardSidebar = () => {
       hasDropdown: true,
       badge: "3",
     },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/dashboard/settings",
-    },
+    // {
+    //   icon: Settings,
+    //   label: "Settings",
+    //   href: "/dashboard/settings",
+    // },
   ];
 
   const handleItemClick = () => {

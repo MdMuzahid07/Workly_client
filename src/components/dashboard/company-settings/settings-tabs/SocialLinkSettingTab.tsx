@@ -29,39 +29,67 @@ import {
   Trash2,
   Twitter,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AddCompanySocialLink from "../AddCompanySocialLink";
 
 interface SocialLink {
-  id: string;
+  id?: string;
   platform: string;
   url: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
-const SocialLinkSettingTab = () => {
+interface SocialLinkSettingTabProps {
+  socialLinks?: Array<{ id?: string; platform: string; url: string }>;
+  onSocialLinksChange?: (links: SocialLink[]) => void;
+}
+
+const SocialLinkSettingTab = ({
+  socialLinks: initialSocialLinks = [],
+  onSocialLinksChange,
+}: SocialLinkSettingTabProps) => {
   const [isAddSocialOpen, setIsAddSocialOpen] = useState(false);
 
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
-    {
-      id: "1",
-      platform: "LinkedIn",
-      url: "https://linkedin.com/company/techflow",
-      icon: <Linkedin className="h-4 w-4" />,
-    },
-    {
-      id: "2",
-      platform: "Twitter",
-      url: "https://twitter.com/techflow",
-      icon: <Twitter className="h-4 w-4" />,
-    },
-    {
-      id: "3",
-      platform: "GitHub",
-      url: "https://github.com/techflow",
-      icon: <Github className="h-4 w-4" />,
-    },
-  ]);
+  const getIconForPlatform = (platform: string) => {
+    const platformLower = platform.toLowerCase();
+    if (platformLower.includes("linkedin"))
+      return <Linkedin className="h-4 w-4" />;
+    if (platformLower.includes("twitter") || platformLower.includes("x"))
+      return <Twitter className="h-4 w-4" />;
+    if (platformLower.includes("github")) return <Github className="h-4 w-4" />;
+    if (platformLower.includes("facebook"))
+      return <Facebook className="h-4 w-4" />;
+    if (platformLower.includes("instagram"))
+      return <Instagram className="h-4 w-4" />;
+    if (platformLower.includes("website") || platformLower.includes("web"))
+      return <Globe className="h-4 w-4" />;
+    return <Link className="h-4 w-4" />;
+  };
+
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => {
+    return initialSocialLinks.map((link) => ({
+      ...link,
+      icon: getIconForPlatform(link.platform),
+    }));
+  });
+
+  // =========== create a stable dependency string based on actual data (without React elements) ======>
+  const linksKey = useMemo(
+    () =>
+      initialSocialLinks
+        .map((link) => `${link.id || ""}-${link.platform}-${link.url}`)
+        .join(","),
+    [initialSocialLinks],
+  );
+
+  // ======== update local state when props change ========>
+  useEffect(() => {
+    const mappedLinks = initialSocialLinks.map((link) => ({
+      ...link,
+      icon: getIconForPlatform(link.platform),
+    }));
+    setSocialLinks(mappedLinks);
+  }, [linksKey, initialSocialLinks]);
 
   const availablePlatforms = [
     { name: "LinkedIn", icon: <Linkedin className="h-4 w-4" /> },
@@ -81,19 +109,25 @@ const SocialLinkSettingTab = () => {
         url: url.trim(),
         icon: platformData.icon,
       };
-      setSocialLinks((prev) => [...prev, newLink]);
+      const updatedLinks = [...socialLinks, newLink];
+      setSocialLinks(updatedLinks);
+      onSocialLinksChange?.(updatedLinks);
       setIsAddSocialOpen(false);
     }
   };
 
   const removeSocialLink = (id: string) => {
-    setSocialLinks((prev) => prev.filter((link) => link.id !== id));
+    const updatedLinks = socialLinks.filter((link) => link.id !== id);
+    setSocialLinks(updatedLinks);
+    onSocialLinksChange?.(updatedLinks);
   };
 
   const updateSocialLink = (id: string, url: string) => {
-    setSocialLinks((prev) =>
-      prev.map((link) => (link.id === id ? { ...link, url } : link)),
+    const updatedLinks = socialLinks.map((link) =>
+      link.id === id ? { ...link, url } : link,
     );
+    setSocialLinks(updatedLinks);
+    onSocialLinksChange?.(updatedLinks);
   };
 
   return (
@@ -117,7 +151,7 @@ const SocialLinkSettingTab = () => {
                   Add Link
                 </Button>
               </DialogTrigger>
-              <DialogContent className="mx-4 max-w-md">
+              <DialogContent className="bg-card mx-4 max-w-md">
                 <DialogHeader>
                   <DialogTitle>Add Social Media Link</DialogTitle>
                   <DialogDescription>
@@ -146,14 +180,16 @@ const SocialLinkSettingTab = () => {
                 <div className="flex-1">
                   <Input
                     value={link.url}
-                    onChange={(e) => updateSocialLink(link.id, e.target.value)}
+                    onChange={(e) =>
+                      updateSocialLink(link.id || "", e.target.value)
+                    }
                     placeholder={`Enter ${link.platform} URL`}
                   />
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeSocialLink(link.id)}
+                  onClick={() => removeSocialLink(link.id || "")}
                   className="text-destructive hover:text-destructive w-full sm:w-auto"
                 >
                   <Trash2 className="h-4 w-4" />

@@ -32,7 +32,7 @@ const AddCompanySocialLink = ({
               key={platform.name}
               type="button"
               onClick={() => setSelectedPlatform(platform.name)}
-              className={`hover:bg-accent flex items-center justify-center space-x-1 rounded-lg border p-2 text-sm ${
+              className={`hover:bg-accent flex items-center justify-center space-x-1 rounded-full border p-2 text-sm ${
                 selectedPlatform === platform.name
                   ? "border-primary bg-primary/5"
                   : ""
@@ -54,6 +54,7 @@ const AddCompanySocialLink = ({
           onChange={(e) => setUrl(e.target.value)}
           placeholder={`Enter ${selectedPlatform || "social media"} URL`}
           required
+          className="rounded-full"
         />
       </div>
 
