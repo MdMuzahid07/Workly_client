@@ -17,6 +17,7 @@ import { useAppDispatch } from "../../../../redux/hooks";
 import WkForm from "../../../form/WkForm";
 import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
+import { GoogleLoginButton } from "../GoogleLoginButton";
 
 interface SignUpFormData {
   fullName: string;
@@ -227,7 +228,8 @@ const SignUpView = () => {
       </WkForm>
 
       <div className="mt-6 border-t border-gray-200 pt-6">
-        <p className="text-secondary-foreground text-center text-sm">
+        <GoogleLoginButton role={selectedRole} />
+        <p className="text-secondary-foreground mt-3 text-center text-sm">
           Already have an account?{" "}
           <Button
             variant="link"
