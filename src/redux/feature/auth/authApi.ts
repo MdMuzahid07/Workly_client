@@ -12,7 +12,7 @@ interface IRegisterData {
   password: string;
   fullName: string;
   confirmPassword: string;
-  role: "employer" | "jobseeker";
+  role: "EMPLOYER" | "JOB_SEEKER";
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -40,6 +40,12 @@ const authApi = baseApi.injectEndpoints({
         url: "/auth/login",
         method: "POST",
         body: data,
+      }),
+    }),
+    logoutUser: builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
       }),
     }),
     verifyEmail: builder.mutation<
@@ -103,6 +109,7 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useRefreshTokenMutation,
+  useLogoutUserMutation,
 } = authApi;
 
 export default authApi;

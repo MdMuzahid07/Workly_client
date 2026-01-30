@@ -28,7 +28,7 @@ const NotificationCard = ({
   return (
     <Card
       key={notification.id}
-      className={`bg-white transition-all ${
+      className={`bg-card transition-all ${
         !notification.isRead ? "ring-primary/20 bg-primary/5 ring-2" : ""
       }`}
     >
@@ -104,9 +104,13 @@ const NotificationCard = ({
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-card w-40 space-y-3 rounded-2xl p-4 shadow"
+                  >
                     {!notification.isRead && (
                       <DropdownMenuItem
+                        className="flex cursor-pointer items-center gap-2"
                         onClick={() => markAsRead(notification.id)}
                       >
                         <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -114,8 +118,8 @@ const NotificationCard = ({
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
+                      className="text-destructive flex cursor-pointer items-center gap-2"
                       onClick={() => deleteNotification(notification.id)}
-                      className="text-destructive"
                     >
                       <X className="mr-2 h-4 w-4" />
                       Delete

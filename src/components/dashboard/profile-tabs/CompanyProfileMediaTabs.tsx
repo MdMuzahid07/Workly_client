@@ -32,13 +32,14 @@ const CompanyProfileMediaTabs = ({
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Company Logo</Label>
-              <div className="border-border rounded-lg border-2 border-dashed p-6 text-center">
+              <div className="border-border rounded-lg border-2 border-dashed py-6 pr-6 text-center">
                 {currentProfile.logoUrl ? (
                   <div className="space-y-2">
                     <Avatar className="mx-auto h-16 w-16">
                       <AvatarImage
                         src={currentProfile.logoUrl || "/placeholder.svg"}
                         alt="Company logo"
+                        className="h-24 w-24 rounded-full"
                       />
                       <AvatarFallback>Logo</AvatarFallback>
                     </Avatar>

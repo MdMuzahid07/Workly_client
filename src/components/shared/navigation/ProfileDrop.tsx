@@ -1,13 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import {
   Briefcase,
+  Building2,
   ChevronDown,
   FileText,
   Heart,
   LogOut,
-  Settings,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -23,11 +24,18 @@ interface MenuItem {
   badge?: number;
 }
 
+interface AuthTokenPayload extends JwtPayload {
+  role?: string;
+  companyId?: string | number;
+}
+
 interface UserProfile {
-  name: string;
+  fullName: string;
   email: string;
   avatar?: string;
   initials: string;
+  role?: string;
+  companyId?: string | number;
 }
 
 interface ProfileDropProps {
@@ -38,11 +46,7 @@ interface ProfileDropProps {
 }
 
 const ProfileDrop: React.FC<ProfileDropProps> = ({
-  user = {
-    name: "John Doe",
-    email: "john.doe@email.com",
-    initials: "JD",
-  },
+  user,
   onSignOut,
   isMobile,
   className = "",
@@ -81,13 +85,38 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     };
   }, [isOpen, handleClickOutside, handleEscapeKey]);
 
+  const decodedToken = jwtDecode<AuthTokenPayload>(
+    localStorage.getItem("accessToken") || "",
+  );
+  const isEmployer =
+    decodedToken?.role === "EMPLOYER" || user?.role === "EMPLOYER";
+  const isAdmin = decodedToken?.role === "ADMIN" || user?.role === "ADMIN";
+  const isSuperAdmin =
+    decodedToken?.role === "SUPER_ADMIN" || user?.role === "SUPER_ADMIN";
+  const hasCompany =
+    Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
+
   const menuItems: MenuItem[] = [
     { icon: User, label: "My Profile", href: "/profile" },
-    { icon: Briefcase, label: "My Jobs", href: "/my-jobs", badge: 3 },
-    { icon: Heart, label: "Saved Jobs", href: "/saved", badge: 12 },
-    { icon: FileText, label: "My Resume", href: "/resume" },
-    { icon: FileText, label: "Company Dashboard", href: "/dashboard" },
-    { icon: Settings, label: "Settings", href: "/settings" },
+    ...(!isEmployer && !hasCompany
+      ? [
+          {
+            icon: Briefcase,
+            label: "Applied Jobs",
+            href: "/applied-jobs",
+            badge: 3,
+          },
+        ]
+      : []),
+    ...(!isEmployer && hasCompany
+      ? [{ icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 }]
+      : []),
+    ...(!hasCompany && isEmployer
+      ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
+      : []),
+    ...((isEmployer && hasCompany) || isAdmin || isSuperAdmin
+      ? [{ icon: FileText, label: "Company Dashboard", href: "/dashboard" }]
+      : []),
   ];
 
   const handleSignOut = async () => {
@@ -109,34 +138,40 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           onClick={toggleDropdown}
           variant="ghost"
           size="sm"
-          className={`group relative flex cursor-pointer items-center gap-2 rounded-full border-none bg-gray-100/80 p-1 ring-2 ring-green-400/30 transition-all duration-200 ${
-            isOpen ? "bg-gray-100/80 focus:ring-2 focus:ring-green-400/70" : ""
+          className={`group ring-primary/50 bg-card relative flex cursor-pointer items-center gap-2 rounded-full border-none p-1 ring-2 transition-all duration-200 ${
+            isOpen
+              ? "focus:ring-primary hover:bg-primary hover:text-card bg-card focus:ring-2"
+              : ""
           }`}
           aria-expanded={isOpen}
           aria-haspopup="true"
           aria-label="User menu"
         >
           <div className="relative">
-            {user.avatar ? (
+            {user?.avatar ? (
               <Image
-                src={user.avatar}
-                alt={user.name}
+                src={user?.avatar}
+                alt={user?.fullName}
                 className="h-6 w-6 rounded-full border-2 border-white object-cover shadow-sm"
                 width={25}
                 height={25}
                 priority
               />
             ) : (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-sm font-semibold text-white shadow-sm">
-                {user.initials}
+              <div className="text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-[10px] font-semibold shadow-sm">
+                {user?.fullName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
               </div>
             )}
-            <div className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-green-500 shadow-sm"></div>
+            <div className="bg-primary absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white shadow-sm"></div>
           </div>
           <ChevronDown
-            className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+            className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
-            } group-hover:text-gray-700`}
+            } group-hover:text-muted-foreground`}
           />
         </Button>
       ) : (
@@ -172,7 +207,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
               duration: 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className={`z-50 overflow-hidden rounded-2xl border bg-white drop-shadow-2xl ${
+            className={`bg-card z-50 overflow-hidden rounded-2xl border drop-shadow-2xl ${
               isMobile
                 ? "absolute right-0 bottom-full mb-4 h-fit min-h-[65vh] w-full max-w-[82.5vw] min-w-[84vw]"
                 : "absolute top-full right-0 mt-8 w-72"
@@ -183,31 +218,35 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             <div className="border-b border-gray-100/80 p-4">
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-start">
                 <div className="relative">
-                  {user.avatar ? (
+                  {user?.avatar ? (
                     <Image
-                      src={user.avatar}
-                      alt={user.name}
+                      src={user?.avatar}
+                      alt={user?.fullName}
                       className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-sm sm:h-12 sm:w-12"
                       width={48}
                       height={48}
                       priority
                     />
                   ) : (
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-lg font-semibold text-white shadow-sm sm:h-12 sm:w-12">
-                      {user.initials}
+                    <div className="from-primary/50 border-primary/20 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full border text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
+                      {user?.fullName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()}
                     </div>
                   )}
-                  {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-green-500 shadow-sm"></div> */}
+                  {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-primary shadow-sm"></div> */}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-center font-semibold text-gray-900 sm:text-start">
-                    {user.name}
+                  <p className="text-muted-foreground truncate text-center font-semibold sm:text-start">
+                    {user?.fullName}
                   </p>
-                  <p className="truncate text-center text-sm text-gray-600 sm:text-start">
-                    {user.email}
+                  <p className="text-muted-foreground truncate text-center text-sm sm:text-start">
+                    {user?.email}
                   </p>
                   {/* <div className="mt-1 flex items-center gap-1">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
                     <span className="text-xs font-medium text-green-600">
                       Online
                     </span>
@@ -221,18 +260,18 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center justify-between px-4 py-3 text-sm text-gray-700 transition-all duration-150 hover:bg-gray-50/80 focus:bg-gray-50/80 focus:outline-none"
+                  className="group hover:bg-primary/2/80 focus:bg-primary/2/80 text-muted-foreground flex items-center justify-between px-4 py-3 text-sm transition-all duration-150 focus:outline-none"
                   role="menuitem"
                   onClick={() => setIsOpen(false)}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="h-4 w-4 text-gray-500 transition-colors group-hover:text-gray-700" />
-                    <span className="text-xs font-medium text-slate-700">
+                    <item.icon className="group-hover:text-muted-foreground text-primary h-4 w-4 transition-colors" />
+                    <span className="text-muted-foreground text-xs font-medium group-hover:text-white">
                       {item.label}
                     </span>
                   </div>
                   {item.badge && (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                    <span className="bg-primary/10 text-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
@@ -241,7 +280,6 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             </div>
 
             {isMobile ? <ThemeSwitcher isMobile={isMobile} /> : ""}
-
             <div className="border-t border-gray-100/80">
               <button
                 onClick={handleSignOut}

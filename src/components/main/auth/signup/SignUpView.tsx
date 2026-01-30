@@ -6,9 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import z from "zod";
 import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
 import { setCredentials } from "../../../../redux/feature/auth/authSlice";
 import { useAppDispatch } from "../../../../redux/hooks";
@@ -21,17 +23,39 @@ interface SignUpFormData {
   email: string;
   password: string;
   confirmPassword: string;
-  role: "employer" | "jobseeker";
+  role: "EMPLOYER" | "JOB_SEEKER";
 }
+
+const signUpSchema = z
+  .object({
+    fullName: z.string().min(1, "Full Name is required"),
+    email: z.string().email("Invalid email address"),
+    role: z.enum(["EMPLOYER", "JOB_SEEKER"]),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Password must contain at least one special character",
+      ),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const SignUpView = () => {
   const { switchView } = useAuthDialog();
   const dispatch = useAppDispatch();
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<"employer" | "jobseeker">(
-    "jobseeker",
+  const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
+    "JOB_SEEKER",
   );
 
   const defaultValues: SignUpFormData = {
@@ -39,16 +63,11 @@ const SignUpView = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "jobseeker",
+    role: "JOB_SEEKER",
   };
 
   const handleSubmit = async (data: SignUpFormData) => {
     try {
-      if (data.password !== data.confirmPassword) {
-        toast.error("Passwords don't match!");
-        return;
-      }
-
       const response = await registerUser({
         fullName: data.fullName,
         email: data.email,
@@ -57,25 +76,27 @@ const SignUpView = () => {
         role: selectedRole,
       }).unwrap();
 
-      console.log(response, "response==========>");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const resData = (response as any).data;
 
-      if (
-        response?.accessToken &&
-        response?.safeUser &&
-        response?.refreshToken
-      ) {
-        localStorage.setItem("accessToken", response.accessToken);
+      if (resData?.accessToken && resData?.email) {
+        localStorage.setItem("accessToken", resData.accessToken);
 
         dispatch(
           setCredentials({
-            user: response.safeUser,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
+            user: {
+              email: resData.email,
+              fullName: resData.fullName,
+              phone: resData.phone,
+              companyId: resData.companyId,
+            },
+            accessToken: resData.accessToken,
+            refreshToken: null,
           }),
         );
 
-        toast.success("Registration successful!");
-        switchView("signIn");
+        toast.success("Please verify your email!");
+        switchView("verificationEmailSent");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -87,15 +108,19 @@ const SignUpView = () => {
   return (
     <>
       <DialogHeader className="space-y-3">
-        <DialogTitle className="text-foreground text-center text-2xl font-bold">
+        <DialogTitle className="text-secondary-foreground text-center text-2xl font-bold">
           Join Workly_job
         </DialogTitle>
-        <DialogDescription className="text-muted-foreground text-center">
+        <DialogDescription className="text-secondary-foreground text-center">
           Create your account and start your career journey today.
         </DialogDescription>
       </DialogHeader>
 
-      <WkForm defaultValues={defaultValues} onSubmit={handleSubmit}>
+      <WkForm
+        defaultValues={defaultValues}
+        onSubmit={handleSubmit}
+        resolver={zodResolver(signUpSchema)}
+      >
         <div className="mt-6 space-y-6">
           <div className="space-y-4">
             <WKInput
@@ -130,9 +155,9 @@ const SignUpView = () => {
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
+                  <EyeOff className="text-secondary-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="text-secondary-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -153,9 +178,9 @@ const SignUpView = () => {
                 onClick={() => setShowConfirmPassword((v) => !v)}
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4 text-gray-500" />
+                  <EyeOff className="text-secondary-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-gray-500" />
+                  <Eye className="text-secondary-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -163,26 +188,26 @@ const SignUpView = () => {
             <div className="flex gap-4">
               <Button
                 type="button"
-                variant={selectedRole === "employer" ? "default" : "outline"}
-                className={`flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 hover:bg-green-500 ${
-                  selectedRole === "employer"
-                    ? "border-green-400 bg-green-400 text-white"
+                variant={selectedRole === "EMPLOYER" ? "default" : "outline"}
+                className={`hover:bg-primary flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
+                  selectedRole === "EMPLOYER"
+                    ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
                 }`}
-                onClick={() => setSelectedRole("employer")}
+                onClick={() => setSelectedRole("EMPLOYER")}
               >
                 Employer
               </Button>
 
               <Button
                 type="button"
-                variant={selectedRole === "jobseeker" ? "default" : "outline"}
-                className={`flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 hover:bg-green-500 ${
-                  selectedRole === "jobseeker"
-                    ? "border-green-400 bg-green-400 text-white"
+                variant={selectedRole === "JOB_SEEKER" ? "default" : "outline"}
+                className={`hover:bg-primary flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
+                  selectedRole === "JOB_SEEKER"
+                    ? "bg-primary border-green-400 text-white"
                     : "border-slate-300 text-green-400"
                 }`}
-                onClick={() => setSelectedRole("jobseeker")}
+                onClick={() => setSelectedRole("JOB_SEEKER")}
               >
                 Job Seeker
               </Button>
@@ -191,17 +216,18 @@ const SignUpView = () => {
 
           <div className="space-y-4">
             <Button
+              disabled={isLoading}
               type="submit"
-              className="w-full cursor-pointer rounded-full bg-green-400 py-3 font-semibold text-white shadow-sm transition-colors duration-200"
+              className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
-              Create Account
+              {isLoading ? "Signing Up..." : "Sign Up"}
             </Button>
           </div>
         </div>
       </WkForm>
 
       <div className="mt-6 border-t border-gray-200 pt-6">
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-secondary-foreground text-center text-sm">
           Already have an account?{" "}
           <Button
             variant="link"

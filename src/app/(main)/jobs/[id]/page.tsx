@@ -1,9 +1,14 @@
+import { Metadata } from "next";
 import JobDetailsView from "../../../../view/job/JobDetailsView";
 
-const page = ({ params }: { params: { id: string } }) => {
+export const metadata: Metadata = {
+  title: "Job Details",
+};
+
+const page = () => {
   return (
     <>
-      <JobDetailsView params={params} />
+      <JobDetailsView />
     </>
   );
 };

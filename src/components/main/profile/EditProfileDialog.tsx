@@ -1,27 +1,53 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Badge } from "@/components/ui/badge";
+"use client";
+import WKCheckbox from "@/components/form/WKCheckbox";
+import WkForm from "@/components/form/WkForm";
+import WKInput from "@/components/form/WkInput";
+import WKSelect from "@/components/form/WkSelect";
+import WKTextArea from "@/components/form/WkTextArea";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
+import { Check, FileText, Upload, X } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { useUploadSingleFileMutation } from "../../../redux/feature/upload/uploadApi";
+import ProfileSkillManagement from "./ProfileSkillManagement";
+
+// ========== Types =============>
+interface Skill {
+  skillName: string;
+  experienceYears: number;
+}
+
+interface Preference {
+  jobType: string;
+  expectedSalary: number;
+  preferredLocation: string;
+  remoteWork: boolean;
+  industry: string;
+  workExperience: string;
+}
+
+interface Profile {
+  bio: string;
+  location: string;
+  avatarUrl?: string;
+  coverUrl?: string;
+  resumeUrl?: string;
+  websiteUrl?: string;
+  linkedInUrl?: string;
+  skills: Skill[];
+  preference: Preference;
+}
 
 interface User {
   id: string;
@@ -30,513 +56,501 @@ interface User {
   phone: string;
   role: string;
   isVerified: boolean;
-  profile: {
-    bio: string;
-    location: string;
-    avatarUrl?: string;
-    coverUrl?: string;
-    resumeUrl?: string;
-    websiteUrl?: string;
-    linkedInUrl?: string;
-    skills: Array<{
-      skillName: string;
-      experienceYears: number;
-    }>;
-    preference: {
-      jobType: string;
-      expectedSalary: number;
-      preferredLocation: string;
-      remoteWork: boolean;
-      industry: string;
-      workExperience: string;
-    };
-  };
+  profile: Profile;
 }
 
-interface ProfileEditModalProps {
+interface ProfileFormData {
+  fullName: string;
+  phone: string;
+  bio: string;
+  location: string;
+  websiteUrl?: string;
+  linkedInUrl?: string;
+  resumeUrl?: string;
+  jobType: string;
+  expectedSalary: number;
+  industry: string;
+  workExperience: string;
+  preferredLocation: string;
+  remoteWork: boolean;
+}
+
+interface EditProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
   user: User;
-  onSave: (user: User) => void;
 }
+
+const JOB_TYPE_OPTIONS = [
+  { value: "FULL_TIME", label: "Full Time" },
+  { value: "PART_TIME", label: "Part Time" },
+  { value: "CONTRACT", label: "Contract" },
+  { value: "FREELANCE", label: "Freelance" },
+  { value: "INTERNSHIP", label: "Internship" },
+  { value: "REMOTE", label: "Remote" },
+] as const;
+
+const EXPERIENCE_OPTIONS = [
+  { value: "Entry Level", label: "Entry Level (0-2 years)" },
+  { value: "Mid Level", label: "Mid Level (3-5 years)" },
+  { value: "Senior Level", label: "Senior Level (6-10 years)" },
+  { value: "Executive", label: "Executive (10+ years)" },
+] as const;
+
+// ==================== main component ================>
 
 const EditProfileDialog = ({
   isOpen,
   onClose,
   user,
-  onSave,
-}: ProfileEditModalProps) => {
-  const [formData, setFormData] = useState(user);
-  const [newSkill, setNewSkill] = useState({
-    skillName: "",
-    experienceYears: 1,
-  });
+}: EditProfileDialogProps) => {
+  const [skills, setSkills] = useState<Skill[]>(user?.profile?.skills || []);
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const [avatar, setAvatar] = useState<string | null>(
+    user?.profile?.avatarUrl || null,
+  );
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [uploadedResumeUrl, setUploadedResumeUrl] = useState<string | null>(
+    user?.profile?.resumeUrl || null,
+  );
 
-  const handleSave = () => {
-    onSave(formData);
-    onClose();
+  const [uploadSingleFile, { isLoading: isUploading }] =
+    useUploadSingleFileMutation();
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const updateProfile = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      profile: {
-        ...prev.profile,
-        [field]: value,
-      },
-    }));
-  };
+  const handleAvatarUpload = async (file: File | null) => {
+    if (!file) return;
 
-  const updatePreference = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      profile: {
-        ...prev.profile,
-        preference: {
-          ...prev.profile.preference,
-          [field]: value,
-        },
-      },
-    }));
-  };
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const addSkill = () => {
-    if (newSkill.skillName.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        profile: {
-          ...prev.profile,
-          skills: [...prev.profile.skills, { ...newSkill }],
-        },
-      }));
-      setNewSkill({ skillName: "", experienceYears: 1 });
+    try {
+      const result = await uploadSingleFile(formData).unwrap();
+      setAvatar(result.data.url);
+      toast.success("Avatar uploaded successfully");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload avatar. Please try again.");
     }
   };
 
-  const removeSkill = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      profile: {
-        ...prev.profile,
-        skills: prev.profile.skills.filter((_, i) => i !== index),
-      },
-    }));
+  const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = [".pdf", ".doc", ".docx"];
+      const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
+
+      if (!validTypes.includes(fileExtension)) {
+        toast.error("Please upload a valid resume file (PDF, DOC, DOCX)");
+        return;
+      }
+
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        return;
+      }
+
+      setResumeFile(file);
+      toast.success("Resume file selected");
+    }
   };
 
-  const updateSkill = (index: number, field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      profile: {
-        ...prev.profile,
-        skills: prev.profile.skills.map((skill, i) =>
-          i === index ? { ...skill, [field]: value } : skill,
-        ),
-      },
-    }));
+  const handleRemoveResumeFile = () => {
+    setResumeFile(null);
+    setUploadedResumeUrl(null);
+    toast.success("Resume removed");
   };
+
+  const handleSubmit = async (data: ProfileFormData) => {
+    if (skills.length === 0) {
+      toast.error("Please add at least one skill");
+      return;
+    }
+
+    try {
+      let finalResumeUrl = uploadedResumeUrl;
+
+      // Upload resume file if a new one is selected
+      if (resumeFile) {
+        const formData = new FormData();
+        formData.append("file", resumeFile);
+
+        const resumeResult = await uploadSingleFile(formData).unwrap();
+        if (resumeResult.success) {
+          finalResumeUrl = resumeResult.data.url;
+          setUploadedResumeUrl(finalResumeUrl);
+        }
+      }
+
+      //==================== helper function to convert empty string to null ================>
+      const sanitizeValue = (value: any) => {
+        if (value === "" || value === undefined) return null;
+        return value;
+      };
+
+      const updatePayload = {
+        bio: sanitizeValue(data.bio),
+        phone: sanitizeValue(data.phone),
+        location: sanitizeValue(data.location),
+        websiteUrl: sanitizeValue(data.websiteUrl),
+        avatarUrl: avatar || user.profile.avatarUrl,
+        linkedInUrl: sanitizeValue(data.linkedInUrl),
+        resumeUrl: finalResumeUrl || null,
+        skills: skills,
+        preference: {
+          jobType: data.jobType,
+          expectedSalary:
+            data.expectedSalary && Number(data.expectedSalary) > 0
+              ? Number(data.expectedSalary)
+              : null,
+          industry: sanitizeValue(data.industry),
+          workExperience: sanitizeValue(data.workExperience),
+          preferredLocation: sanitizeValue(data.preferredLocation),
+          remoteWork: Boolean(data.remoteWork),
+        },
+      };
+
+      await updateProfile(updatePayload).unwrap();
+
+      toast.success("Profile updated successfully!");
+      onClose();
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile. Please try again.");
+    }
+  };
+
+  const defaultValues: ProfileFormData = useMemo(
+    () => ({
+      fullName: user?.fullName || "",
+      phone: user?.phone || "",
+      bio: user?.profile?.bio || "",
+      location: user?.profile?.location || "",
+      websiteUrl: user?.profile?.websiteUrl || "",
+      linkedInUrl: user?.profile?.linkedInUrl || "",
+      resumeUrl: user?.profile?.resumeUrl || "",
+      jobType: user?.profile?.preference?.jobType || "FULL_TIME",
+      expectedSalary: user?.profile?.preference?.expectedSalary || 0,
+      industry: user?.profile?.preference?.industry || "",
+      workExperience:
+        user?.profile?.preference?.workExperience || "Entry Level",
+      preferredLocation: user?.profile?.preference?.preferredLocation || "",
+      remoteWork: user?.profile?.preference?.remoteWork || false,
+    }),
+    [user],
+  );
+
+  const handleClose = useCallback(() => {
+    setSkills(user?.profile?.skills || []);
+    setResumeFile(null);
+    setUploadedResumeUrl(user?.profile?.resumeUrl || null);
+    onClose();
+  }, [user, onClose]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[90vh] max-h-[900px] w-[95vw] max-w-4xl p-0">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="bg-card h-[90dvh] max-h-[900px] w-[95dvw] max-w-5xl p-0 md:h-[85dvh]">
         <DialogHeader className="border-border border-b p-6 pb-4">
           <DialogTitle className="text-foreground text-2xl font-bold">
             Edit Profile
           </DialogTitle>
+          <p className="text-muted-foreground text-sm">
+            Update your profile information and preferences
+          </p>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto px-6">
-          <div className="space-y-8 pb-6">
-            <div className="space-y-6">
-              <h3 className="text-foreground flex items-center text-xl font-semibold">
-                Basic Information
-              </h3>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="fullName"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Full Name *
+          <WkForm<ProfileFormData>
+            onSubmit={handleSubmit}
+            defaultValues={defaultValues}
+          >
+            <div className="space-y-8 pb-6">
+              {/* Basic Information */}
+              <section className="space-y-6">
+                <h3 className="text-foreground text-xl font-semibold">
+                  Basic Information
+                </h3>
+                <div>
+                  <Label className="text-foreground text-sm font-medium">
+                    Profile Picture
                   </Label>
-                  <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        fullName: e.target.value,
-                      }))
-                    }
-                    className="w-full"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="phone"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Phone Number
-                  </Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        phone: e.target.value,
-                      }))
-                    }
-                    className="w-full"
-                    placeholder="+1 (555) 123-4567"
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="bio"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Professional Bio
-                </Label>
-                <Textarea
-                  id="bio"
-                  value={formData.profile.bio}
-                  onChange={(e) => updateProfile("bio", e.target.value)}
-                  rows={4}
-                  className="w-full resize-none"
-                  placeholder="Tell us about your professional background, experience, and what you're passionate about..."
-                />
-              </div>
+                  <div className="mt-2 flex items-center gap-4">
+                    {user?.profile?.avatarUrl || avatar ? (
+                      <Image
+                        src={avatar || user.profile.avatarUrl!}
+                        alt={`${user.fullName || "User"} avatar`}
+                        className={`h-16 w-16 rounded-full border object-cover ${isUploading ? "animate-pulse" : ""}`}
+                        width={100}
+                        height={100}
+                      />
+                    ) : (
+                      <div className="bg-muted flex h-20 w-20 items-center justify-center rounded-full text-lg font-semibold">
+                        {user?.fullName
+                          ? user.fullName
+                              .split(" ")
+                              .map((n) => n[0])
+                              .slice(0, 2)
+                              .join("")
+                              .toUpperCase()
+                          : "U"}
+                      </div>
+                    )}
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="location"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Current Location
-                </Label>
-                <Input
-                  id="location"
-                  value={formData.profile.location}
-                  onChange={(e) => updateProfile("location", e.target.value)}
-                  className="w-full"
-                  placeholder="City, State/Country"
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-6">
-              <h3 className="text-foreground text-xl font-semibold">
-                Professional Links & Files
-              </h3>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="website"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Personal Website
-                  </Label>
-                  <Input
-                    id="website"
-                    value={formData.profile.websiteUrl || ""}
-                    onChange={(e) =>
-                      updateProfile("websiteUrl", e.target.value)
-                    }
-                    placeholder="https://yourwebsite.com"
-                    className="w-full"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="linkedin"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    LinkedIn Profile
-                  </Label>
-                  <Input
-                    id="linkedin"
-                    value={formData.profile.linkedInUrl || ""}
-                    onChange={(e) =>
-                      updateProfile("linkedInUrl", e.target.value)
-                    }
-                    placeholder="https://linkedin.com/in/yourprofile"
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="resume"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Resume URL
-                </Label>
-                <Input
-                  id="resume"
-                  value={formData.profile.resumeUrl || ""}
-                  onChange={(e) => updateProfile("resumeUrl", e.target.value)}
-                  placeholder="https://drive.google.com/file/d/your-resume"
-                  className="w-full"
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-6">
-              <h3 className="text-foreground text-xl font-semibold">
-                Skills & Expertise
-              </h3>
-
-              <div className="space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  {formData.profile.skills.map((skill, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-primary text-primary-foreground border-primary flex items-center gap-2 px-3 py-2"
-                    >
-                      <span className="font-medium">{skill.skillName}</span>
-                      <span className="text-xs opacity-90">
-                        ({skill.experienceYears}y)
-                      </span>
-                      <button
-                        onClick={() => removeSkill(index)}
-                        className="hover:text-destructive ml-1 transition-colors"
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="avatarUpload"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-block cursor-pointer rounded-full px-4 py-2 text-sm font-medium"
                       >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="bg-muted/30 border-border grid grid-cols-1 gap-4 rounded-lg border p-4 md:grid-cols-3">
-                  <div className="md:col-span-2">
-                    <Label
-                      htmlFor="newSkill"
-                      className="text-foreground text-sm font-medium"
-                    >
-                      Add New Skill
-                    </Label>
-                    <Input
-                      id="newSkill"
-                      value={newSkill.skillName}
-                      onChange={(e) =>
-                        setNewSkill((prev) => ({
-                          ...prev,
-                          skillName: e.target.value,
-                        }))
-                      }
-                      placeholder="e.g., React, Python, Project Management"
-                      className="mt-1 w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="experience"
-                      className="text-foreground text-sm font-medium"
-                    >
-                      Years of Experience
-                    </Label>
-                    <Input
-                      id="experience"
-                      type="number"
-                      min="0"
-                      max="50"
-                      value={newSkill.experienceYears}
-                      onChange={(e) =>
-                        setNewSkill((prev) => ({
-                          ...prev,
-                          experienceYears: Number(e.target.value),
-                        }))
-                      }
-                      className="mt-1 w-full"
-                    />
-                  </div>
-                  <div className="md:col-span-3">
-                    <Button
-                      type="button"
-                      onClick={addSkill}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
-                      disabled={!newSkill.skillName.trim()}
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Skill
-                    </Button>
+                        Choose Image
+                      </label>
+                      <input
+                        id="avatarUpload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleAvatarUpload(e.target.files?.[0] || null)
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <Separator />
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <WKInput name="fullName" label="Full Name" required />
+                  <WKInput name="phone" label="Phone Number" />
+                </div>
+                <WKTextArea name="bio" label="Professional Bio" rows={4} />
+                <WKInput name="location" label="Current Location" />
+              </section>
 
-            <div className="space-y-6">
-              <h3 className="text-foreground text-xl font-semibold">
-                Job Preferences
-              </h3>
+              <Separator />
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="jobType"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Preferred Job Type
+              {/* Professional Links & Resume */}
+              <section className="space-y-6">
+                <h3 className="text-foreground text-xl font-semibold">
+                  Professional Links & Files
+                </h3>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <WKInput name="websiteUrl" label="Personal Website" />
+                  <WKInput name="linkedInUrl" label="LinkedIn Profile" />
+                </div>
+
+                {/* Resume Upload Section */}
+                <div className="space-y-4">
+                  <Label className="text-foreground text-sm font-medium">
+                    Resume
                   </Label>
-                  <Select
-                    value={formData.profile.preference.jobType}
-                    onValueChange={(value) =>
-                      updatePreference("jobType", value)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="FULL_TIME">Full Time</SelectItem>
-                      <SelectItem value="PART_TIME">Part Time</SelectItem>
-                      <SelectItem value="CONTRACT">Contract</SelectItem>
-                      <SelectItem value="FREELANCE">Freelance</SelectItem>
-                      <SelectItem value="INTERNSHIP">Internship</SelectItem>
-                      <SelectItem value="REMOTE">Remote</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="expectedSalary"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Expected Annual Salary (USD)
-                  </Label>
-                  <Input
-                    id="expectedSalary"
+                  {/* Upload Area */}
+                  {!resumeFile && !uploadedResumeUrl && (
+                    <div className="border-border bg-muted/30 rounded-lg border-2 border-dashed">
+                      <label
+                        htmlFor="resume-upload"
+                        className="flex cursor-pointer flex-col items-center justify-center px-6 py-8"
+                      >
+                        <div className="bg-muted mb-4 rounded-full p-4">
+                          <Upload className="text-muted-foreground h-8 w-8" />
+                        </div>
+
+                        <div className="space-y-2 text-center">
+                          <p className="text-foreground font-medium">
+                            Drop your resume here or{" "}
+                            <span className="text-primary underline">
+                              browse
+                            </span>
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            PDF, DOC, DOCX up to 5MB
+                          </p>
+                        </div>
+
+                        <input
+                          id="resume-upload"
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleResumeFileChange}
+                        />
+                      </label>
+                    </div>
+                  )}
+
+                  {/* Selected File Display */}
+                  {resumeFile && (
+                    <div className="border-primary/20 bg-primary/5 rounded-lg border p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex min-w-0 flex-1 items-start gap-3">
+                          <div className="bg-primary/10 shrink-0 rounded-lg p-2">
+                            <FileText className="text-primary h-6 w-6" />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1 flex items-center gap-2">
+                              <p className="text-foreground truncate font-medium">
+                                {resumeFile.name}
+                              </p>
+                              <Check className="text-primary h-4 w-4 shrink-0" />
+                            </div>
+                            <p className="text-muted-foreground text-sm">
+                              {formatFileSize(resumeFile.size)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRemoveResumeFile}
+                          className="hover:bg-destructive/10 hover:text-destructive shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Existing Resume Display */}
+                  {!resumeFile && uploadedResumeUrl && (
+                    <div className="border-border bg-muted/30 rounded-lg border p-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-muted rounded-lg p-2">
+                            <FileText className="text-muted-foreground h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="text-foreground text-sm font-medium">
+                              Current Resume
+                            </p>
+                            <a
+                              href={uploadedResumeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary text-xs hover:underline"
+                            >
+                              View Resume
+                            </a>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <label htmlFor="resume-upload-replace">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="cursor-pointer"
+                              asChild
+                            >
+                              <span>Replace</span>
+                            </Button>
+                            <input
+                              id="resume-upload-replace"
+                              type="file"
+                              className="hidden"
+                              accept=".pdf,.doc,.docx"
+                              onChange={handleResumeFileChange}
+                            />
+                          </label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleRemoveResumeFile}
+                            className="hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <Separator />
+
+              {/* Skills */}
+              <ProfileSkillManagement
+                skills={skills}
+                onSkillsChange={setSkills}
+              />
+
+              <Separator />
+
+              {/* Job Preferences */}
+              <section className="space-y-6">
+                <h3 className="text-foreground text-xl font-semibold">
+                  Job Preferences
+                </h3>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <WKSelect
+                    name="jobType"
+                    label="Preferred Job Type"
+                    placeholder="Select job type"
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    options={JOB_TYPE_OPTIONS}
+                  />
+                  <WKInput
+                    name="expectedSalary"
+                    label="Expected Annual Salary (USD)"
                     type="number"
-                    min="0"
-                    value={formData.profile.preference.expectedSalary}
-                    onChange={(e) =>
-                      updatePreference("expectedSalary", Number(e.target.value))
-                    }
-                    className="w-full"
-                    placeholder="120000"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="industry"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Preferred Industry
-                  </Label>
-                  <Input
-                    id="industry"
-                    value={formData.profile.preference.industry}
-                    onChange={(e) =>
-                      updatePreference("industry", e.target.value)
-                    }
-                    className="w-full"
-                    placeholder="Technology, Healthcare, Finance, etc."
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <WKInput name="industry" label="Preferred Industry" />
+                  <WKSelect
+                    name="workExperience"
+                    label="Experience Level"
+                    placeholder="Select experience level"
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    options={EXPERIENCE_OPTIONS}
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="workExperience"
-                    className="text-foreground text-sm font-medium"
-                  >
-                    Experience Level
-                  </Label>
-                  <Select
-                    value={formData.profile.preference.workExperience}
-                    onValueChange={(value) =>
-                      updatePreference("workExperience", value)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Entry Level">
-                        Entry Level (0-2 years)
-                      </SelectItem>
-                      <SelectItem value="Mid Level">
-                        Mid Level (3-5 years)
-                      </SelectItem>
-                      <SelectItem value="Senior Level">
-                        Senior Level (6-10 years)
-                      </SelectItem>
-                      <SelectItem value="Executive">
-                        Executive (10+ years)
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                <WKInput
+                  name="preferredLocation"
+                  label="Preferred Work Location"
+                />
+                <div className="bg-primary/5 border-primary/20 rounded-lg border p-4">
+                  <WKCheckbox
+                    name="remoteWork"
+                    label="I'm open to remote work opportunities"
+                  />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="preferredLocation"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Preferred Work Location
-                </Label>
-                <Input
-                  id="preferredLocation"
-                  value={formData.profile.preference.preferredLocation}
-                  onChange={(e) =>
-                    updatePreference("preferredLocation", e.target.value)
-                  }
-                  className="w-full"
-                  placeholder="San Francisco, CA or Remote"
-                />
-              </div>
-
-              <div className="bg-primary/5 border-primary/20 flex items-center space-x-3 rounded-lg border p-4">
-                <Checkbox
-                  id="remoteWork"
-                  checked={formData.profile.preference.remoteWork}
-                  onCheckedChange={(checked) =>
-                    updatePreference("remoteWork", checked)
-                  }
-                  className="border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                />
-                <Label
-                  htmlFor="remoteWork"
-                  className="text-foreground cursor-pointer text-sm font-medium"
-                >
-                  {`I'm`} open to remote work opportunities
-                </Label>
-              </div>
+              </section>
             </div>
-          </div>
-        </div>
 
-        <div className="border-border bg-muted/20 flex flex-col justify-end space-y-3 border-t p-6 sm:flex-row sm:space-y-0 sm:space-x-4">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="order-2 w-full bg-transparent sm:order-1 sm:w-auto"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground order-1 w-full shadow-lg sm:order-2 sm:w-auto"
-          >
-            Save Changes
-          </Button>
+            {/* Footer */}
+            <div className="border-border bg-muted/20 sticky bottom-0 flex flex-col gap-3 border-t p-6 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isLoading}
+                className="hover:bg-destructive! w-full hover:text-white sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading || skills.length === 0}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground w-full shadow-lg sm:w-auto"
+              >
+                {isLoading ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </WkForm>
         </div>
       </DialogContent>
     </Dialog>

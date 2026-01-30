@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const NotFound = () => {
   return (
-    <div className="h-[100dvh] bg-green-50">
+    <div className="bg-primary/10 h-dvh">
       <div className="flex h-[80vh] flex-col items-center justify-center px-4 text-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -28,7 +28,7 @@ const NotFound = () => {
 
         <div className="flex gap-4">
           <Link href="/">
-            <Button className="rounded-full bg-green-400 font-semibold text-black hover:bg-green-500">
+            <Button className="bg-primary hover:bg-primary text-foreground rounded-full font-semibold">
               Go Home
             </Button>
           </Link>

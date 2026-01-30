@@ -9,6 +9,12 @@ const ExperienceLevel = ({
   updateFilters: any;
   filters: any;
 }) => {
+  const experienceLevels = [
+    { label: "Entry Level", value: "Entry Level" },
+    { label: "Intermediate", value: "Intermediate" },
+    { label: "Expert", value: "Expert" },
+  ];
+
   return (
     <div className="space-y-3">
       <Label className="text-sm font-medium">Experience Level</Label>
@@ -16,11 +22,14 @@ const ExperienceLevel = ({
         value={filters.experienceLevel}
         onValueChange={(value) => updateFilters({ experienceLevel: value })}
       >
-        {["Entry Level", "Intermediate", "Expert"].map((level) => (
-          <div key={level} className="flex items-center space-x-2">
-            <RadioGroupItem value={level.toLowerCase()} id={`exp-${level}`} />
-            <Label htmlFor={`exp-${level}`} className="cursor-pointer text-sm">
-              {level}
+        {experienceLevels.map((level) => (
+          <div key={level.value} className="flex items-center space-x-2">
+            <RadioGroupItem value={level.value} id={`exp-${level.value}`} />
+            <Label
+              htmlFor={`exp-${level.value}`}
+              className="cursor-pointer text-sm"
+            >
+              {level.label}
             </Label>
           </div>
         ))}

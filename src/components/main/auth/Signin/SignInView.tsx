@@ -5,8 +5,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLoginUserMutation } from "../../../../redux/feature/auth/authApi";
+import { setCredentials } from "../../../../redux/feature/auth/authSlice";
+import { useAppDispatch } from "../../../../redux/hooks";
 import WkForm from "../../../form/WkForm";
 import WKInput from "../../../form/WkInput";
 import { useAuthDialog } from "../AuthDialogProvider";
@@ -17,25 +23,70 @@ interface SignInFormData {
 }
 
 const SignInView = () => {
-  const { switchView } = useAuthDialog();
+  const { switchView, closeAuth } = useAuthDialog();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginUser, { isLoading }] = useLoginUserMutation();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const defaultValues: SignInFormData = {
     email: "",
     password: "",
   };
 
-  const handleSubmit = (data: SignInFormData) => {
-    console.log(data);
+  const handleSubmit = async (data: SignInFormData) => {
+    try {
+      const response = await loginUser({
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const resData = (response as any).data;
+
+      console.log(response, "resData");
+
+      if (resData?.accessToken && resData?.email) {
+        localStorage.setItem("accessToken", resData.accessToken);
+
+        const decodedToken = jwtDecode(resData.accessToken) as {
+          isVerified: boolean;
+        };
+
+        if (decodedToken) {
+          dispatch(
+            setCredentials({
+              user: {
+                email: resData.email,
+                fullName: resData.fullName,
+                isVerified: decodedToken.isVerified,
+                phone: resData.phone,
+                companyId: resData.companyId,
+              },
+              accessToken: resData.accessToken,
+              refreshToken: null,
+            }),
+          );
+        }
+
+        toast.success("Login successful!");
+        closeAuth();
+        router.push("/jobs");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.data?.errorSources?.message || "Login failed");
+      console.error("Login error:", error);
+    }
   };
 
   return (
     <>
       <DialogHeader className="space-y-3">
-        <DialogTitle className="text-foreground text-center text-2xl font-bold">
+        <DialogTitle className="text-secondary-foreground text-center text-2xl font-bold">
           Welcome Back
         </DialogTitle>
-        <DialogDescription className="text-muted-foreground text-center">
+        <DialogDescription className="text-secondary-foreground text-center">
           Sign in to your Workly_job account to continue your career journey.
         </DialogDescription>
       </DialogHeader>
@@ -67,9 +118,9 @@ const SignInView = () => {
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
-                  <EyeOff className="text-muted-foreground h-4 w-4" />
+                  <EyeOff className="text-secondary-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="text-muted-foreground h-4 w-4" />
+                  <Eye className="text-secondary-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -78,16 +129,17 @@ const SignInView = () => {
           <div className="space-y-4">
             <Button
               type="submit"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 w-full cursor-pointer rounded-full py-3 font-semibold shadow-sm transition-colors duration-200"
+              disabled={isLoading}
+              className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-colors duration-200"
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
 
             <div className="text-center">
               <Button
                 type="button"
                 variant="link"
-                className="text-muted-foreground hover:text-primary cursor-pointer text-sm transition-colors duration-200"
+                className="text-secondary-foreground cursor-pointer text-sm transition-colors duration-200 hover:text-green-400"
                 onClick={() => switchView("forgot")}
               >
                 Forgot your password?
@@ -97,8 +149,8 @@ const SignInView = () => {
         </div>
       </WkForm>
 
-      <div className="border-border mt-6 border-t pt-6">
-        <p className="text-muted-foreground text-center text-sm">
+      <div className="mt-6 border-t border-gray-200 pt-6">
+        <p className="text-secondary-foreground text-center text-sm">
           {`Don't`} have an account?{" "}
           <Button
             variant="link"

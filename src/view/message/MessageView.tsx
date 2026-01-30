@@ -1,5 +1,4 @@
 "use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -16,14 +15,14 @@ import {
   ArrowLeft,
   Info,
   MoreVertical,
-  Phone,
   Send,
   Star,
   Trash2,
-  Video,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
+import ComingSoonAlert from "../../components/temp_components/ComingSoonAlert";
+import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
 
 interface Message {
   id: string;
@@ -55,79 +54,214 @@ const MessageView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
 
+  // fake loading state for skeleton
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // fake data for conversations and messages
   const conversations: Conversation[] = [
     {
       id: "1",
-      participantName: "Sarah Johnson",
-      participantAvatar: "/professional-woman-diverse.png",
-      participantRole: "HR Manager at TechFlow Inc.",
+      participantName: "Aisha Rahman",
+      participantAvatar: "/avatars/aisha-rahman.png",
+      participantRole: "HR Manager at NexGen Technologies",
       lastMessage:
-        "Thank you for your application. We would like to schedule an interview.",
-      lastMessageTime: "2 hours ago",
-      unreadCount: 2,
+        "We’d love to schedule an interview with you next week, Insha’Allah. Are you available?",
+      lastMessageTime: "45 minutes ago",
+      unreadCount: 1,
       isOnline: true,
       messages: [
         {
           id: "1",
-          senderId: "sarah",
-          senderName: "Sarah Johnson",
-          senderAvatar: "/professional-woman-diverse.png",
+          senderId: "aisha",
+          senderName: "Aisha Rahman",
+          senderAvatar: "/avatars/aisha-rahman.png",
           content:
-            "Hi! I reviewed your application for the Frontend Developer position.",
-          timestamp: "10:30 AM",
+            "Assalamu Alaikum! I reviewed your resume and your MERN stack skills are quite impressive.",
+          timestamp: "9:10 AM",
           isRead: true,
         },
         {
           id: "2",
-          senderId: "sarah",
-          senderName: "Sarah Johnson",
-          senderAvatar: "/professional-woman-diverse.png",
+          senderId: "aisha",
+          senderName: "Aisha Rahman",
+          senderAvatar: "/avatars/aisha-rahman.png",
           content:
-            "Thank you for your application. We would like to schedule an interview.",
-          timestamp: "10:32 AM",
+            "We’d love to schedule an interview with you next week, Insha’Allah. Are you available?",
+          timestamp: "9:15 AM",
           isRead: false,
         },
       ],
     },
     {
       id: "2",
-      participantName: "Michael Chen",
-      participantAvatar: "/professional-man.png",
-      participantRole: "Recruiter at DataVision Labs",
-      lastMessage: "Could you please send your portfolio?",
-      lastMessageTime: "1 day ago",
-      unreadCount: 0,
-      isOnline: false,
+      participantName: "Omar Farooq",
+      participantAvatar: "/avatars/omar-farooq.png",
+      participantRole: "Recruiter at CloudAxis Solutions",
+      lastMessage:
+        "Could you please share your GitHub link and a short project summary?",
+      lastMessageTime: "3 hours ago",
+      unreadCount: 2,
+      isOnline: true,
       messages: [
         {
           id: "3",
-          senderId: "michael",
-          senderName: "Michael Chen",
-          senderAvatar: "/professional-man.png",
-          content: "Could you please send your portfolio?",
-          timestamp: "Yesterday",
+          senderId: "omar",
+          senderName: "Omar Farooq",
+          senderAvatar: "/avatars/omar-farooq.png",
+          content:
+            "Salam Muzahid, we’re currently hiring a React Developer for our Dhaka team.",
+          timestamp: "7:20 AM",
           isRead: true,
+        },
+        {
+          id: "4",
+          senderId: "omar",
+          senderName: "Omar Farooq",
+          senderAvatar: "/avatars/omar-farooq.png",
+          content:
+            "Could you please share your GitHub link and a short project summary?",
+          timestamp: "7:25 AM",
+          isRead: false,
         },
       ],
     },
     {
       id: "3",
-      participantName: "Emma Wilson",
-      participantAvatar: "/professional-woman-2.png",
-      participantRole: "CTO at InnovateCorp",
-      lastMessage: "Great to meet you at the networking event!",
-      lastMessageTime: "3 days ago",
+      participantName: "Fatima Noor",
+      participantAvatar: "/avatars/fatima-noor.png",
+      participantRole: "Engineering Manager at CodeVista Labs",
+      lastMessage:
+        "JazakAllah khair for your time yesterday. We’ll follow up soon with feedback.",
+      lastMessageTime: "Yesterday",
+      unreadCount: 0,
+      isOnline: false,
+      messages: [
+        {
+          id: "5",
+          senderId: "fatima",
+          senderName: "Fatima Noor",
+          senderAvatar: "/avatars/fatima-noor.png",
+          content:
+            "It was a pleasure talking about your full-stack experience yesterday. You have strong fundamentals.",
+          timestamp: "Yesterday, 4:10 PM",
+          isRead: true,
+        },
+        {
+          id: "6",
+          senderId: "fatima",
+          senderName: "Fatima Noor",
+          senderAvatar: "/avatars/fatima-noor.png",
+          content:
+            "JazakAllah khair for your time yesterday. We’ll follow up soon with feedback.",
+          timestamp: "Yesterday, 4:15 PM",
+          isRead: true,
+        },
+      ],
+    },
+    {
+      id: "4",
+      participantName: "Ahmad Khan",
+      participantAvatar: "/avatars/ahmad-khan.png",
+      participantRole: "CTO at Crescent Innovations",
+      lastMessage:
+        "Looking forward to reviewing your approach to our dashboard redesign test.",
+      lastMessageTime: "2 days ago",
       unreadCount: 0,
       isOnline: true,
       messages: [
         {
-          id: "4",
-          senderId: "emma",
-          senderName: "Emma Wilson",
-          senderAvatar: "/professional-woman-2.png",
-          content: "Great to meet you at the networking event!",
-          timestamp: "3 days ago",
+          id: "7",
+          senderId: "ahmad",
+          senderName: "Ahmad Khan",
+          senderAvatar: "/avatars/ahmad-khan.png",
+          content:
+            "Hi Muzahid, your UI portfolio is well-crafted — very clean and minimal.",
+          timestamp: "2 days ago, 10:40 AM",
           isRead: true,
+        },
+        {
+          id: "8",
+          senderId: "ahmad",
+          senderName: "Ahmad Khan",
+          senderAvatar: "/avatars/ahmad-khan.png",
+          content:
+            "Looking forward to reviewing your approach to our dashboard redesign test.",
+          timestamp: "2 days ago, 10:45 AM",
+          isRead: true,
+        },
+      ],
+    },
+    {
+      id: "5",
+      participantName: "Maryam Siddiqui",
+      participantAvatar: "/avatars/maryam-siddiqui.png",
+      participantRole: "HR Executive at StellarSoft",
+      lastMessage:
+        "Your application has been shortlisted, Alhamdulillah. Our team will contact you soon.",
+      lastMessageTime: "3 days ago",
+      unreadCount: 0,
+      isOnline: false,
+      messages: [
+        {
+          id: "9",
+          senderId: "maryam",
+          senderName: "Maryam Siddiqui",
+          senderAvatar: "/avatars/maryam-siddiqui.png",
+          content:
+            "Hello! We received your application for the React Developer position at StellarSoft.",
+          timestamp: "3 days ago, 1:50 PM",
+          isRead: true,
+        },
+        {
+          id: "10",
+          senderId: "maryam",
+          senderName: "Maryam Siddiqui",
+          senderAvatar: "/avatars/maryam-siddiqui.png",
+          content:
+            "Your application has been shortlisted, Alhamdulillah. Our team will contact you soon.",
+          timestamp: "3 days ago, 1:55 PM",
+          isRead: true,
+        },
+      ],
+    },
+    {
+      id: "6",
+      participantName: "Yusuf Ali",
+      participantAvatar: "/avatars/yusuf-ali.png",
+      participantRole: "Product Manager at BrightPath Digital",
+      lastMessage:
+        "Can we schedule a short meeting tomorrow to discuss your project availability?",
+      lastMessageTime: "4 days ago",
+      unreadCount: 1,
+      isOnline: false,
+      messages: [
+        {
+          id: "11",
+          senderId: "yusuf",
+          senderName: "Yusuf Ali",
+          senderAvatar: "/avatars/yusuf-ali.png",
+          content:
+            "Salam! Your Redux Toolkit experience is impressive. We might have a project match for you.",
+          timestamp: "4 days ago, 4:30 PM",
+          isRead: true,
+        },
+        {
+          id: "12",
+          senderId: "yusuf",
+          senderName: "Yusuf Ali",
+          senderAvatar: "/avatars/yusuf-ali.png",
+          content:
+            "Can we schedule a short meeting tomorrow to discuss your project availability?",
+          timestamp: "4 days ago, 4:35 PM",
+          isRead: false,
         },
       ],
     },
@@ -160,9 +294,13 @@ const MessageView = () => {
     setSelectedConversation(null);
   };
 
+  if (isLoading) {
+    return <MessageViewSkeleton />;
+  }
+
   return (
-    <div className="min-h-screen bg-white md:bg-gray-50 md:pt-20">
-      {/* Header */}
+    <div className="md:bg-primary/2 bg-background min-h-screen md:pt-20">
+      {/* message header  */}
       <div className="border-border bg-card sticky top-0 z-50 flex w-full justify-start border-b md:hidden">
         <div className="max-w-6xl p-4">
           {showMobileChat && selectedConversation && currentConversation ? (
@@ -253,12 +391,12 @@ const MessageView = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button variant="ghost" size="sm">
+                      {/* <Button variant="ghost" size="sm">
                         <Phone className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
                         <Video className="h-4 w-4" />
-                      </Button>
+                      </Button> */}
                       <Button variant="ghost" size="sm">
                         <Info className="h-4 w-4" />
                       </Button>
@@ -303,7 +441,7 @@ const MessageView = () => {
                                 : ""
                             }`}
                           >
-                            <Avatar className="h-8 w-8 flex-shrink-0">
+                            <Avatar className="h-8 w-8">
                               <AvatarImage
                                 src={message.senderAvatar || "/placeholder.svg"}
                               />
@@ -321,7 +459,7 @@ const MessageView = () => {
                                   : "bg-muted text-foreground"
                               }`}
                             >
-                              <p className="text-sm break-words">
+                              <p className="text-sm wrap-break-word">
                                 {message.content}
                               </p>
                               <p
@@ -380,6 +518,8 @@ const MessageView = () => {
           </div>
         </div>
       </div>
+
+      <ComingSoonAlert />
     </div>
   );
 };

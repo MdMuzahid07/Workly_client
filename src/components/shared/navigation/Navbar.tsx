@@ -3,16 +3,24 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 import { navLinks } from "../../../constants";
+import { useLogoutUserMutation } from "../../../redux/feature/auth/authApi";
+import { logout } from "../../../redux/feature/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ThemeSwitcher from "../ThemeSwitcher";
+import WJLogo from "../WJLogo";
 import ProfileDrop from "./ProfileDrop";
 
 const Navbar = () => {
   const pathname = usePathname();
   const { openAuth } = useAuthDialog();
-  const user = { email: "mdmuzahid.dev@gmail.com" };
-  // const user = false;
+  const { user, isVerified } = useAppSelector((state) => state.auth) || {
+    email: null,
+  };
+  const dispatch = useAppDispatch();
+  const [logoutUser] = useLogoutUserMutation();
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -21,20 +29,39 @@ const Navbar = () => {
     return pathname.startsWith(href);
   };
 
+  const handleLogout = async () => {
+    try {
+      const loadingToast = toast.loading("Logging out...");
+      await logoutUser(undefined).unwrap();
+
+      localStorage.clear();
+      dispatch(logout());
+
+      toast.dismiss(loadingToast);
+      toast.success("Logged out successfully");
+      window.location.href = "/";
+    } catch (error) {
+      toast.error("Failed to logout. Please try again.");
+      console.error("Logout error:", error);
+
+      localStorage.clear();
+      dispatch(logout());
+      window.location.href = "/";
+    }
+  };
+
   return (
     <>
       {/* desktop nav */}
       <motion.nav
-        className="border-border bg-background/90 fixed top-0 right-0 left-0 z-[999999] hidden h-18 border-b backdrop-blur md:flex"
+        className={`border-border fixed top-0 right-0 left-0 z-999999 ${pathname === "/" && !user?.email && isVerified ? "" : "hidden"} bg-primary/5 h-16 border-b backdrop-blur sm:h-18 md:flex`}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
       >
-        <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6">
-          <Link href="/" className="text-foreground text-xl font-bold">
-            Workly_job
-          </Link>
-          {user && user.email ? (
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 sm:h-18">
+          <WJLogo />
+          {user?.email && isVerified ? (
             <div className="hidden items-center gap-8 md:flex">
               {navLinks.map((item, i) => (
                 <Link
@@ -74,13 +101,17 @@ const Navbar = () => {
           ) : (
             ""
           )}
-          <div className="hidden items-center gap-2 md:flex">
+          <div
+            className={`${pathname === "/" ? "flex" : "hidden"} items-center gap-2 md:flex`}
+          >
             <ThemeSwitcher />
-            {user && user.email ? (
-              <ProfileDrop />
+            {user?.email && isVerified ? (
+              <div className="hidden md:block">
+                <ProfileDrop onSignOut={handleLogout} user={user} />
+              </div>
             ) : (
               <Button
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-lg font-semibold shadow-sm transition-colors duration-200"
+                className="bg-primary flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 text-lg font-semibold text-white shadow-sm transition-colors duration-200"
                 onClick={() => openAuth("signIn")}
               >
                 Sign In
@@ -91,9 +122,9 @@ const Navbar = () => {
       </motion.nav>
 
       {/* mobile nav */}
-      {user && user.email ? (
+      {user?.email && isVerified ? (
         <motion.nav
-          className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-[9999999] rounded-full border backdrop-blur-xs md:hidden"
+          className="border-border bg-background/50 fixed right-2 bottom-2 left-2 z-50 rounded-full border backdrop-blur-xs md:hidden"
           initial={{ y: 80 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
@@ -126,7 +157,7 @@ const Navbar = () => {
                 </motion.div>
               </Link>
             ))}
-            <ProfileDrop isMobile={true} />
+            <ProfileDrop onSignOut={handleLogout} isMobile={true} user={user} />
           </div>
         </motion.nav>
       ) : (

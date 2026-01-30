@@ -23,15 +23,15 @@ const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
   };
 
   return (
-    <Card className="border-0 bg-white">
+    <Card className="bg-card border-0">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold">
           Skills & Expertise
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-          {skills.map((skill, index) => {
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          {skills?.map((skill, index) => {
             const skillInfo = getSkillLevel(skill.experienceYears);
             return (
               <div key={index} className="bg-muted/40 space-y-3 rounded-xl p-4">

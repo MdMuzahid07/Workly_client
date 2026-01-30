@@ -8,10 +8,13 @@ import { useFormContext } from "react-hook-form";
 interface WKInputProps {
   size?: "sm" | "md" | "lg";
   required?: boolean;
-  type?: "text" | "email" | "password";
+  type?: "text" | "email" | "password" | "number";
   label: string;
   name: string;
   className?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  labelIcon?: React.ReactNode;
 }
 
 const WKInput = ({
@@ -21,6 +24,9 @@ const WKInput = ({
   label,
   name,
   className,
+  labelIcon,
+  disabled = false,
+  placeholder,
 }: WKInputProps) => {
   const {
     register,
@@ -36,8 +42,9 @@ const WKInput = ({
   const hasError = !!errors[name];
 
   return (
-    <div className="space-y-2">
+    <div className="w-full space-y-2">
       <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
+        {labelIcon && <span className="mr-1 inline-block">{labelIcon}</span>}
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
@@ -47,6 +54,8 @@ const WKInput = ({
         })}
         id={name}
         type={type}
+        placeholder={placeholder}
+        disabled={disabled}
         className={cn(
           sizeClasses[size],
           hasError && "border-destructive focus-visible:ring-destructive",

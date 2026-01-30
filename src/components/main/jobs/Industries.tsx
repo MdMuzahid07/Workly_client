@@ -1,120 +1,65 @@
 "use client";
-import { Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-// import Swiper and modules styles
-import {
-  Award,
-  ChevronLeft,
-  ChevronRight,
-  Code,
-  Globe,
-  Heart,
-  Star,
-  TrendingUp,
-  Users,
-  Zap,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
+import { Autoplay, Navigation } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import getIconComponent from "../../../helper/getIconComponent";
+import IndustriesSkeleton from "../../../skeleton/job/IndustriesSkeleton ";
 import { Button } from "../../ui/button";
 
-const jobCategories = [
-  {
-    id: 1,
-    title: "Technology",
-    icon: Code,
-    count: "2,847 jobs",
-    color: "bg-blue-500",
-    description: "Software, AI, Data Science",
-  },
-  {
-    id: 2,
-    title: "Healthcare",
-    icon: Heart,
-    count: "1,923 jobs",
-    color: "bg-red-500",
-    description: "Medical, Nursing, Research",
-  },
-  {
-    id: 3,
-    title: "Finance",
-    icon: TrendingUp,
-    count: "1,456 jobs",
-    color: "bg-green-500",
-    description: "Banking, Investment, Accounting",
-  },
-  {
-    id: 4,
-    title: "Marketing",
-    icon: Zap,
-    count: "987 jobs",
-    color: "bg-purple-500",
-    description: "Digital, Content, SEO",
-  },
-  {
-    id: 5,
-    title: "Design",
-    icon: Star,
-    count: "743 jobs",
-    color: "bg-pink-500",
-    description: "UI/UX, Graphic, Product",
-  },
-  {
-    id: 6,
-    title: "Sales",
-    icon: Users,
-    count: "1,234 jobs",
-    color: "bg-orange-500",
-    description: "B2B, Retail, Account Management",
-  },
-  {
-    id: 7,
-    title: "Education",
-    icon: Award,
-    count: "654 jobs",
-    color: "bg-indigo-500",
-    description: "Teaching, Training, Research",
-  },
-  {
-    id: 8,
-    title: "Remote",
-    icon: Globe,
-    count: "3,421 jobs",
-    color: "bg-teal-500",
-    description: "Work from anywhere",
-  },
-  {
-    id: 6,
-    title: "Sales",
-    icon: Users,
-    count: "1,234 jobs",
-    color: "bg-orange-500",
-    description: "B2B, Retail, Account Management",
-  },
-  {
-    id: 7,
-    title: "Education",
-    icon: Award,
-    count: "654 jobs",
-    color: "bg-indigo-500",
-    description: "Teaching, Training, Research",
-  },
-  {
-    id: 8,
-    title: "Remote",
-    icon: Globe,
-    count: "3,421 jobs",
-    color: "bg-teal-500",
-    description: "Work from anywhere",
-  },
-];
+export type Category = {
+  id: number;
+  name: string;
+  icon: string;
+  count: string;
+  color: string;
+  description: string;
+};
 
-const Industries = () => {
+export type IndustriesProps = {
+  categories?: Category[];
+  onCategorySelect?: (selectedIds: number[]) => void;
+  multipleSelect?: boolean;
+  className?: string;
+  isLoading?: boolean;
+};
+
+const Industries = ({
+  categories,
+  onCategorySelect,
+  multipleSelect = true,
+  isLoading,
+}: IndustriesProps) => {
+  const [selected, setSelected] = useState<number[]>([]);
+
+  const toggleSelection = (id: number) => {
+    setSelected((prev) => {
+      let newSelected: number[];
+
+      if (multipleSelect) {
+        newSelected = prev.includes(id)
+          ? prev.filter((industryId: number) => industryId !== id)
+          : [...prev, id];
+      } else {
+        newSelected = prev.includes(id) ? [] : [id];
+      }
+
+      onCategorySelect?.(newSelected);
+
+      return newSelected;
+    });
+  };
+
+  if (isLoading) {
+    return <IndustriesSkeleton />;
+  }
+
   return (
     <div className="mx-auto mt-4 max-w-7xl p-4 md:mt-7 xl:p-0">
       <Swiper
-        modules={[Navigation]}
+        modules={[Navigation, Autoplay]}
         spaceBetween={12}
         slidesPerView="auto"
         navigation={{
@@ -123,19 +68,30 @@ const Industries = () => {
         }}
         className="category-slider-2 flex w-full justify-center"
       >
-        {jobCategories.map((category) => (
-          <SwiperSlide key={category.id} className="!w-auto">
-            <Button
-              variant="outline"
-              className="hover:bg-primary group bg-background h-auto cursor-pointer rounded-full px-6 py-2 whitespace-nowrap text-black transition-colors hover:text-white"
-            >
-              {category.title}
-              <p className="ml-2 text-xs text-black group-hover:text-white">
-                {category.count.split(" ")[0]}
-              </p>
-            </Button>
-          </SwiperSlide>
-        ))}
+        {categories?.map((category) => {
+          const isSelected = selected?.includes(category.id);
+          const { icon: CategoryIcon, color } = getIconComponent(category.icon);
+          return (
+            <SwiperSlide key={category.id} className="w-auto!">
+              <Button
+                onClick={() => toggleSelection(category.id)}
+                className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground dark:hover:bg-card hover:bg-white"}`}
+              >
+                <CategoryIcon
+                  className={`h-5 w-5 ${color} rounded-full p-0.5 text-white`}
+                />
+                {category.name}
+                {category.count ? (
+                  <p
+                    className={`text-foreground ml-2 text-xs ${isSelected ? "text-white" : ""}`}
+                  >
+                    {category.count.split(" ")[0]}
+                  </p>
+                ) : null}
+              </Button>
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
 
       <div className="mt-4 flex items-center justify-between">

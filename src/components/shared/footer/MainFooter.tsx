@@ -7,12 +7,12 @@ const MainFooter = () => {
         {/* Brand Section */}
         <div className="col-span-2 md:col-span-3 lg:col-span-2">
           <div className="mb-6 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-400">
+            <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
               <span className="text-lg font-bold text-white">W</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">Workly_job</span>
+            <span className="text-accent text-2xl font-bold">Workly_job</span>
           </div>
-          <p className="mb-6 max-w-sm text-gray-600">
+          <p className="text-secondary-foreground mb-6 max-w-sm">
             The {`world's`} largest professional network. Connect, learn, and
             get hired.
           </p>
@@ -22,7 +22,7 @@ const MainFooter = () => {
               <a
                 key={idx}
                 href={social.href}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-all hover:bg-green-400 hover:text-white"
+                className="hover:bg-primary bg-card flex h-10 w-10 items-center justify-center rounded-full transition-all hover:text-white"
               >
                 {social.icon}
               </a>
@@ -32,13 +32,13 @@ const MainFooter = () => {
 
         {footerLinks.map((section) => (
           <div key={section.title}>
-            <h4 className="mb-4 font-bold text-gray-900">{section.title}</h4>
+            <h4 className="text-accent mb-4 font-bold">{section.title}</h4>
             <ul className="space-y-3">
               {section.links.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-gray-600 transition-colors hover:text-green-600"
+                    className="text-secondary-foreground text-sm transition-colors hover:text-green-600"
                   >
                     {link.name}
                   </a>

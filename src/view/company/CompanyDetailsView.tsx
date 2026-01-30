@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,105 +11,87 @@ import {
   Heart,
   MapPin,
   Share2,
-  Target,
   Users,
 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { CompanyDetails } from "../../app/(main)/companies/[slug]/page";
 import CompanyDetailsSidebar from "../../components/main/company/companyDetails/CompanyDetailsSidebar";
+import getIconComponent from "../../helper/getIconComponent";
 
-// fake data for company details
-const companyData = {
-  id: "1",
-  name: "TechFlow Inc.",
-  logo: "https://mdmuzahid.vercel.app/assets/logo-DuOSblLl.png",
-  industry: "Technology",
-  size: "100-500 employees",
-  location: "San Francisco, CA",
-  website: "techflow.com",
-  founded: "2018",
-  description:
-    "TechFlow Inc. is a leading software development company specializing in web applications and cloud solutions. We're passionate about creating innovative technology that solves real-world problems and helps businesses thrive in the digital age.",
-  mission:
-    "To empower businesses through cutting-edge technology solutions that drive growth and innovation.",
-  values: [
-    "Innovation First",
-    "Customer Success",
-    "Team Collaboration",
-    "Quality Excellence",
-    "Continuous Learning",
-  ],
-  benefits: [
-    "Comprehensive health insurance",
-    "Flexible working hours",
-    "Remote work options",
-    "Professional development budget",
-    "Annual performance bonus",
-    "Stock options",
-    "Unlimited PTO",
-    "Modern office space",
-    "Free meals and snacks",
-    "Gym membership",
-  ],
-  culture:
-    "We foster a collaborative environment where creativity and innovation thrive. Our team values work-life balance, continuous learning, and making a positive impact through technology.",
-  socialLinks: {
-    linkedin: "linkedin.com/company/techflow",
-    twitter: "twitter.com/techflow",
-    github: "github.com/techflow",
-  },
-  stats: {
-    employees: 250,
-    offices: 3,
-    countries: 2,
-    founded: 2018,
-  },
-  openJobs: [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      department: "Engineering",
-      type: "Full-time",
-      location: "San Francisco, CA",
-      salary: "$120,000 - $150,000",
-      posted: "2 days ago",
-    },
-    {
-      id: 2,
-      title: "Product Manager",
-      department: "Product",
-      type: "Full-time",
-      location: "Remote",
-      salary: "$110,000 - $140,000",
-      posted: "1 week ago",
-    },
-    {
-      id: 3,
-      title: "DevOps Engineer",
-      department: "Engineering",
-      type: "Full-time",
-      location: "San Francisco, CA",
-      salary: "$100,000 - $130,000",
-      posted: "3 days ago",
-    },
-    {
-      id: 4,
-      title: "UX Designer",
-      department: "Design",
-      type: "Full-time",
-      location: "Remote",
-      salary: "$85,000 - $110,000",
-      posted: "5 days ago",
-    },
-  ],
-};
+interface CompanyDetailsViewProps {
+  companyDetails: CompanyDetails | null;
+}
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
-  const company = companyData;
+const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
+  console.log(companyDetails, "companyDetails");
+  //* infinite scroll state for jobs start here =============>
+  const [visibleJobsCount, setVisibleJobsCount] = useState(4);
+  const jobsPerLoad = 4;
+  //* infinite scroll state for jobs end here =============<
+
+  const { icon: CategoryIcon } = getIconComponent(
+    companyDetails?.industry?.icon || "Briefcase",
+  );
+
+  if (!companyDetails) {
+    return (
+      <div className="bg-primary/2 min-h-screen md:pt-16">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-secondary-foreground">Company not found.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const foundedYear = new Date(companyDetails.createdAt).getFullYear();
+  const websiteDisplay = companyDetails.websiteUrl?.replace(/^https?:\/\//, "");
+
+  const transformedJobs =
+    companyDetails.jobs?.map((job) => ({
+      id: job.id,
+      title: job.title,
+      department: job.experienceLevel,
+      type: job.jobType,
+      location: job.location,
+      salary:
+        job.salaryMin && job.salaryMax
+          ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} ${job.currency}`
+          : undefined,
+      posted: new Date(job.createdAt).toLocaleDateString(),
+    })) || [];
+
+  const transformedBenefits =
+    companyDetails.benefits?.map((benefit) => benefit.title) || [];
+
+  //* infinite scroll logic start ==========================>
+  const hasMoreJobs = companyDetails.jobs
+    ? visibleJobsCount < companyDetails.jobs.length
+    : false;
+
+  const loadMoreJobs = () => {
+    setVisibleJobsCount((prev) => prev + jobsPerLoad);
+  };
+
+  const visibleJobs =
+    companyDetails.jobs?.slice(0, visibleJobsCount).map((job) => ({
+      id: job.id,
+      title: job.title,
+      department: job.experienceLevel,
+      type: job.jobType,
+      location: job.location,
+      salary:
+        job.salaryMin && job.salaryMax
+          ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} ${job.currency}`
+          : undefined,
+      posted: new Date(job.createdAt).toLocaleDateString(),
+    })) || [];
+
+  //* infinite scroll logic end ==========================<
+
   return (
-    <div className="min-h-screen bg-gray-50 md:pt-16">
+    <div className="bg-primary/2 min-h-screen md:pt-16">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
@@ -120,48 +103,50 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
                   <Image
                     width={100}
                     height={100}
-                    src={company.logo || "/placeholder.svg"}
-                    alt={`${company.name} logo`}
-                    className="h-20 w-20 rounded-full bg-slate-100 object-cover"
+                    src={companyDetails.logoUrl || "/placeholder.svg"}
+                    alt={`${companyDetails.name} logo`}
+                    className="bg-primary h-20 w-20 rounded-full object-cover object-center"
                   />
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <h1 className="text-3xl font-bold text-gray-900">
-                        {company.name}
+                      <h1 className="text-foreground/90 text-3xl font-bold">
+                        {companyDetails.name}
                       </h1>
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-100 text-blue-700"
-                      >
-                        Featured
-                      </Badge>
+                      {companyDetails.isVerified && (
+                        <Badge variant="default">Verified</Badge>
+                      )}
                     </div>
-                    <p className="mb-4 text-lg text-gray-600">
-                      {company.industry}
+                    <p className="text-foreground/60 mb-4 flex items-center gap-2 text-lg">
+                      <CategoryIcon className={`h-5 w-5 text-white`} />
+                      {companyDetails?.industry?.name}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+                    <div className="text-foreground/60 flex flex-wrap items-center gap-6 text-sm">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
-                        <span>{company.location}</span>
+                        <span>{companyDetails.location}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4" />
-                        <span>{company.size}</span>
+                        <span>{companyDetails.size} employees</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        <span>Founded {company.founded}</span>
+                        <span>Founded {foundedYear}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
-                        <a
-                          href={`https://${company.website}`}
-                          className="text-green-600 hover:underline"
-                        >
-                          {company.website}
-                        </a>
-                      </div>
+                      {companyDetails.websiteUrl && (
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4" />
+                          <a
+                            href={companyDetails.websiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-600 hover:underline"
+                          >
+                            {websiteDisplay}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -182,141 +167,129 @@ const CompanyDetailsView = ({ params }: { params: { id: string } }) => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
-                  About {company.name}
+                  About {companyDetails.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="mb-6 leading-relaxed text-gray-700">
-                  {company.description}
+                <p className="text-secondary-foreground mb-6 leading-relaxed">
+                  {companyDetails.description}
                 </p>
-
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="mb-2 font-medium text-gray-900">
-                      Our Mission
-                    </h4>
-                    <p className="text-gray-700">{company.mission}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Company Values */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Our Values
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {company.values.map((value, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
-                    >
-                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                      <span className="font-medium text-gray-900">{value}</span>
-                    </div>
-                  ))}
-                </div>
               </CardContent>
             </Card>
 
             {/* Benefits & Perks */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  Benefits & Perks
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {company.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="mt-2 h-2 w-2 rounded-full bg-green-500"></div>
-                      <span className="text-gray-700">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Company Culture */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Company Culture</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="leading-relaxed text-gray-700">
-                  {company.culture}
-                </p>
-              </CardContent>
-            </Card>
+            {transformedBenefits.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5" />
+                    Benefits & Perks
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {transformedBenefits.map((benefit, index) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <div className="bg-primary mt-2 h-2 w-2 rounded-full"></div>
+                        <span className="text-secondary-foreground">
+                          {benefit}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Open Positions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" />
-                  Open Positions ({company.openJobs.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {company.openJobs.map((job) => (
-                    <div
-                      key={job.id}
-                      className="rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="mb-1 font-medium text-gray-900">
-                            {job.title}
-                          </h4>
-                          <div className="mb-2 flex items-center gap-4 text-sm text-gray-600">
-                            <span>{job.department}</span>
-                            <span>•</span>
-                            <span>{job.type}</span>
-                            <span>•</span>
-                            <span>{job.location}</span>
+            {transformedJobs.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="h-5 w-5" />
+                    Open Positions ({transformedJobs.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <InfiniteScroll
+                    dataLength={visibleJobs.length}
+                    next={loadMoreJobs}
+                    hasMore={hasMoreJobs}
+                    loader={
+                      <div className="mt-4 space-y-4">
+                        {[...Array(2)].map((_, index) => (
+                          <div
+                            key={`loading-${index}`}
+                            className="animate-pulse rounded-lg border border-gray-200 p-4"
+                          >
+                            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
+                            <div className="mb-2 h-3 w-1/2 rounded bg-gray-200"></div>
+                            <div className="h-3 w-1/4 rounded bg-gray-200"></div>
                           </div>
-                          <div className="flex items-center gap-4 text-sm">
-                            <span className="font-medium text-green-600">
-                              {job.salary}
-                            </span>
-                            <span className="text-gray-500">
-                              Posted {job.posted}
-                            </span>
+                        ))}
+                      </div>
+                    }
+                    endMessage={
+                      visibleJobs.length > 0 && (
+                        <div className="py-6 text-center">
+                          <p className="text-sm text-gray-500">
+                            All {companyDetails.jobs.length} jobs loaded
+                          </p>
+                        </div>
+                      )
+                    }
+                    scrollThreshold={0.8}
+                    style={{ overflow: "visible" }}
+                  >
+                    <div className="space-y-4">
+                      {visibleJobs.map((job) => (
+                        <div
+                          key={job.id}
+                          className="hover:bg-primary/2 rounded-lg border border-gray-200 p-4 transition-colors"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="text-secondary-foreground mb-1 font-medium">
+                                {job.title}
+                              </h4>
+                              <div className="text-foreground/60 mb-2 flex items-center gap-4 text-sm">
+                                <span>{job.department}</span>
+                                <span>•</span>
+                                <span>{job.type}</span>
+                                <span>•</span>
+                                <span>{job.location}</span>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm">
+                                {job.salary && (
+                                  <span className="font-medium text-green-600">
+                                    {job.salary}
+                                  </span>
+                                )}
+                                {job.posted && (
+                                  <span className="text-secondary-foreground">
+                                    Posted {job.posted}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-primary hover:bg-primary text-white"
+                            >
+                              Apply
+                            </Button>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          className="bg-green-500 text-white hover:bg-green-600"
-                        >
-                          Apply
-                        </Button>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 text-center">
-                  <Button
-                    variant="outline"
-                    className="border-green-600 bg-transparent text-green-600 hover:bg-green-50"
-                  >
-                    View All Jobs
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  </InfiniteScroll>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
-          <CompanyDetailsSidebar company={company} />
+          <CompanyDetailsSidebar company={companyDetails} />
         </div>
       </div>
     </div>

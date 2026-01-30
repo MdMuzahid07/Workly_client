@@ -1,176 +1,209 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
+import { Suspense, useEffect, useMemo, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
 import { ScrollArea } from "../../components/ui/scroll-area";
+import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
+import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
+import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
 
-// fake data
-const jobs = [
-  {
-    title: "Frontend Developer",
-    company: "TechHive Solutions",
-    location: "Dhaka, Bangladesh",
-    budget: "1200",
-    budgetType: "fixed",
-    timePosted: "2 hours ago",
-    description:
-      "We are looking for a React.js developer to build scalable and interactive web applications.",
-    skills: ["React", "TypeScript", "Tailwind CSS"],
-    isUrgent: true,
-    isFeatured: true,
-  },
-  {
-    title: "Backend Engineer",
-    company: "CloudBridge Ltd",
-    location: "Remote",
-    budget: "25",
-    budgetType: "hourly",
-    timePosted: "1 day ago",
-    description:
-      "Seeking an experienced Node.js developer with expertise in PostgreSQL and Prisma.",
-    skills: ["Node.js", "Prisma", "PostgreSQL", "REST APIs"],
-    isUrgent: false,
-    isFeatured: true,
-  },
-  {
-    title: "UI/UX Designer",
-    company: "PixelCraft Studio",
-    location: "London, UK",
-    budget: "800",
-    budgetType: "fixed",
-    timePosted: "5 hours ago",
-    description:
-      "Design intuitive user experiences for web and mobile platforms.",
-    skills: ["Figma", "Adobe XD", "Wireframing", "Prototyping"],
-    isUrgent: true,
-    isFeatured: false,
-  },
-  {
-    title: "Mobile App Developer",
-    company: "AppNation",
-    location: "San Francisco, USA",
-    budget: "30",
-    budgetType: "hourly",
-    timePosted: "3 days ago",
-    description:
-      "Hiring React Native developers to build cross-platform mobile applications.",
-    skills: ["React Native", "Expo", "Redux", "Firebase"],
-    isUrgent: false,
-    isFeatured: true,
-  },
-  {
-    title: "Full Stack Developer",
-    company: "CodeWave Technologies",
-    location: "Berlin, Germany",
-    budget: "2000",
-    budgetType: "fixed",
-    timePosted: "6 hours ago",
-    description:
-      "We need a full stack engineer to work on a SaaS product using MERN stack.",
-    skills: ["MongoDB", "Express.js", "React", "Node.js"],
-    isUrgent: true,
-    isFeatured: true,
-  },
-  {
-    title: "Data Analyst",
-    company: "Insight Analytics",
-    location: "Toronto, Canada",
-    budget: "20",
-    budgetType: "hourly",
-    timePosted: "12 hours ago",
-    description:
-      "Analyze business data and build visual dashboards for better insights.",
-    skills: ["SQL", "Power BI", "Python", "Excel"],
-    isUrgent: false,
-    isFeatured: false,
-  },
-  {
-    title: "DevOps Engineer",
-    company: "NextGen Cloud",
-    location: "Remote",
-    budget: "1500",
-    budgetType: "fixed",
-    timePosted: "2 days ago",
-    description:
-      "Looking for DevOps experts to optimize CI/CD pipelines and cloud deployments.",
-    skills: ["AWS", "Docker", "Kubernetes", "CI/CD"],
-    isUrgent: true,
-    isFeatured: false,
-  },
-  {
-    title: "QA Tester",
-    company: "QualityWorks",
-    location: "Sydney, Australia",
-    budget: "18",
-    budgetType: "hourly",
-    timePosted: "8 hours ago",
-    description: "Manual and automated testing for web applications.",
-    skills: ["Selenium", "Cypress", "Jest", "Manual Testing"],
-    isUrgent: false,
-    isFeatured: true,
-  },
-  {
-    title: "AI Engineer",
-    company: "NeuralNet Labs",
-    location: "New York, USA",
-    budget: "3000",
-    budgetType: "fixed",
-    timePosted: "1 week ago",
-    description:
-      "Work on cutting-edge AI and ML solutions for real-world problems.",
-    skills: ["Python", "TensorFlow", "PyTorch", "NLP"],
-    isUrgent: true,
-    isFeatured: true,
-  },
-  {
-    title: "Content Writer",
-    company: "WriteRight Media",
-    location: "Mumbai, India",
-    budget: "10",
-    budgetType: "hourly",
-    timePosted: "3 hours ago",
-    description:
-      "We need creative writers for blogs, social media, and product descriptions.",
-    skills: ["SEO", "Copywriting", "Content Strategy", "Research"],
-    isUrgent: false,
-    isFeatured: false,
-  },
-];
+type Filters = {
+  search: string;
+  location: string;
+  budgetRange: [number, number];
+  jobType: string;
+  experienceLevel: string;
+  skills: string[];
+  postedWithin: string;
+  isRemote?: boolean;
+  categories?: number[];
+};
+
+const DEFAULT_FILTERS: Filters = {
+  search: "",
+  location: "",
+  budgetRange: [0, 10000],
+  jobType: "",
+  experienceLevel: "",
+  skills: [],
+  postedWithin: "",
+  isRemote: undefined,
+  categories: [],
+};
+
+const CATEGORY_MAP: Record<number, string> = {
+  1: "Software Development",
+  2: "Healthcare",
+  3: "Finance",
+  4: "Marketing",
+  5: "Design",
+  6: "Sales",
+  7: "Education",
+  8: "Remote",
+};
 
 const JobView = () => {
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allJobs, setAllJobs] = useState<any[]>([]);
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery(undefined);
+
+  const params = useMemo(() => {
+    const p: any = {
+      page: currentPage,
+      limit: 6,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    };
+
+    // =========== search term ==============>
+    if (filters.search) p.search = filters.search;
+
+    // ============== location ============>
+    if (filters.location) p.location = filters.location;
+
+    // =========== job type (backend expects: FULL_TIME, PART_TIME, CONTRACT, etc.) ==========>
+    if (filters.jobType) p.jobType = filters.jobType;
+
+    // ===== experience level ===============>
+    if (filters.experienceLevel) p.experienceLevel = filters.experienceLevel;
+
+    // ======================== posted within (backend expects: 24h, 3d, 1w, 1m) =============>
+    if (filters.postedWithin) p.postedWithin = filters.postedWithin;
+
+    // ============= remote filter =========>
+    if (filters.isRemote !== undefined) p.isRemote = filters.isRemote;
+
+    // ================= skills (send as comma-separated or array) ========>
+    if (filters.skills.length > 0) p.skills = filters.skills.join(",");
+
+    // ========== convert category IDs to industry names ===========>
+    if (filters.categories && filters.categories.length > 0) {
+      const industries = filters.categories
+        .map((id) => CATEGORY_MAP[id])
+        .filter(Boolean);
+      if (industries.length > 0) {
+        p.industry = industries.join(",");
+      }
+    }
+
+    // ================= salary range (only if changed from default) =================>
+    if (filters.budgetRange[0] > 0) p.salaryMin = filters.budgetRange[0];
+    if (filters.budgetRange[1] < 10000) p.salaryMax = filters.budgetRange[1];
+
+    return p;
+  }, [filters, currentPage]);
+
+  const { data, isLoading, error } = useGetJobsQuery(params);
+
+  useEffect(() => {
+    if (data?.data) {
+      if (currentPage === 1) {
+        setAllJobs(data.data);
+      } else {
+        setAllJobs((prev) => [...prev, ...data.data]);
+      }
+    }
+  }, [data, currentPage]);
+
+  const handleSearch = (searchData: { search: string; location: string }) => {
+    setFilters((prev) => ({
+      ...prev,
+      search: searchData.search,
+      location: searchData.location,
+    }));
+    setCurrentPage(1);
+    setAllJobs([]);
+  };
+
+  const loadMore = () => {
+    if (data?.meta && currentPage < data.meta.pages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handleFiltersChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+    setAllJobs([]);
+  };
+
+  const handleCategorySelect = (selectedCategoryIds: number[]) => {
+    setFilters((prev) => ({
+      ...prev,
+      categories: selectedCategoryIds,
+    }));
+    setCurrentPage(1);
+    setAllJobs([]);
+  };
+
   return (
-    <div className="bg-gray-50 pb-12">
-      <Searchbar />
-      <Industries />
+    <div className="bg-primary/2 pb-12">
+      <Searchbar onSearch={handleSearch} />
+      <Industries
+        onCategorySelect={handleCategorySelect}
+        multipleSelect={false}
+        categories={categories?.data}
+        isLoading={categoriesLoading}
+      />
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 pt-5 xl:px-0">
         <div className="col-span-12 md:col-span-4">
           <div className="sticky top-24 hidden md:flex">
-            <ScrollArea className="h-[87dvh] w-full">
+            <ScrollArea className="h-[87dvh] w-full rounded-2xl">
               {
-                //@ts-ignore
-                <SidebarFilter className="w-full" />
+                <SidebarFilter
+                  onFiltersChange={handleFiltersChange}
+                  className="w-full"
+                />
               }
             </ScrollArea>
           </div>
           <div className="flex md:hidden">
-            {
-              //@ts-ignore
-              <Sidebar />
-            }
+            {<Sidebar onFiltersChange={handleFiltersChange} />}
           </div>
         </div>
         <div className="col-span-12 md:col-span-8">
-          <div className="flex flex-col md:gap-4">
-            {jobs.map((job, index) => (
-              //@ts-ignore
-              <JobCard key={index} {...job} />
-            ))}
-          </div>
+          <InfiniteScroll
+            dataLength={allJobs.length}
+            next={loadMore}
+            hasMore={data?.meta ? currentPage < data.meta.pages : false}
+            loader={<JobCardSkeleton />}
+            endMessage={
+              <p className="text-muted-foreground py-4 text-center">
+                {allJobs.length > 0 ? "No more jobs to load" : ""}
+              </p>
+            }
+          >
+            <div className="flex flex-col md:gap-4">
+              {isLoading &&
+                currentPage === 1 &&
+                [...Array(6)].map((_, index) => (
+                  <JobCardSkeleton key={index} />
+                ))}
+
+              {error && (
+                <div className="text-destructive text-center">
+                  Something went wrong, please try again later.
+                </div>
+              )}
+
+              {allJobs.length === 0 && !isLoading && (
+                <div className="text-center">No jobs found.</div>
+              )}
+
+              {allJobs.map((job: any) => (
+                <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
+                  <JobCard key={job?.id} job={job} />
+                </Suspense>
+              ))}
+            </div>
+          </InfiniteScroll>
         </div>
       </div>
     </div>

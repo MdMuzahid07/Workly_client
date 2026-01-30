@@ -3,74 +3,54 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Briefcase, Download, Edit3, Mail, MapPin, Star } from "lucide-react";
+import {
+  Briefcase,
+  Download,
+  Edit3,
+  Mail,
+  MapPin,
+  Star,
+  User,
+} from "lucide-react";
 import { useState } from "react";
 import EditProfileDialog from "../../components/main/profile/EditProfileDialog";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSidebar from "../../components/main/profile/ProfileSidebar";
 import SkillsAndExpertise from "../../components/main/profile/SkillsAndExpertise";
-
-// fake user data based on your schema
-const fakeUser = {
-  id: "1",
-  email: "john.doe@example.com",
-  fullName: "John Doe",
-  phone: "+1 (555) 123-4567",
-  role: "JOB_SEEKER",
-  isVerified: true,
-  profile: {
-    bio: "Passionate full-stack developer with 5+ years of experience building scalable web applications. I love working with modern technologies and solving complex problems.",
-    location: "San Francisco, CA",
-    avatarUrl: "/cat-profile.png", // Changed to cat image
-    coverUrl: "/tech-workspace-background.jpg",
-    resumeUrl: "/resume.pdf",
-    linkedInUrl: "https://linkedin.com/in/johndoe",
-    websiteUrl: "https://johndoe.dev",
-    skills: [
-      { skillName: "React", experienceYears: 4 },
-      { skillName: "Node.js", experienceYears: 5 },
-      { skillName: "TypeScript", experienceYears: 3 },
-      { skillName: "PostgreSQL", experienceYears: 4 },
-      { skillName: "AWS", experienceYears: 2 },
-      { skillName: "Docker", experienceYears: 3 },
-    ],
-    preference: {
-      jobType: "FULL_TIME",
-      expectedSalary: 120000,
-      preferredLocation: "San Francisco, CA",
-      remoteWork: true,
-      industry: "Technology",
-      workExperience: "Senior Level",
-    },
-  },
-};
+import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
+import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
 
 const ProfileView = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [user, setUser] = useState(fakeUser);
+  const { data, isLoading } = useGetProfileQuery(undefined);
+  const user = data?.data;
+
+  if (isLoading && !data) {
+    return <ProfileSkeleton />;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-6xl py-6 md:pt-24">
+    <div className="bg-primary/2 min-h-screen">
+      <div className="mx-auto max-w-6xl px-6 py-6 md:pt-24 xl:px-0">
         <div className="mb-8 lg:hidden">
-          <Card className="from-card to-muted/30 border-0 bg-gradient-to-br">
+          <Card className="from-card to-muted/30 border-0">
             <CardContent className="p-6">
               <div className="flex flex-col items-center space-y-4 text-center">
-                <Avatar className="ring-primary/20 h-24 w-24 ring-4">
+                <Avatar className="ring-primary/20 flex h-32 w-32 overflow-hidden rounded-full shadow-xl ring-4">
                   <AvatarImage
-                    src={user.profile.avatarUrl || "/placeholder.svg"}
-                    alt={user.fullName}
+                    src={user?.profile?.avatarUrl || "/placeholder.svg"}
+                    alt={user?.fullName}
                   />
-                  <AvatarFallback className="bg-primary/10 text-primary rounded-full text-xl font-semibold">
-                    🐱
+                  <AvatarFallback className="bg-primary/10 text-primary flex h-full w-full items-center justify-center rounded-full text-2xl font-semibold">
+                    <User className="size-10" />
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="space-y-2">
                   <h1 className="text-foreground text-2xl font-bold">
-                    {user.fullName}
+                    {user?.fullName}
                   </h1>
-                  {user.isVerified && (
+                  {user?.isVerified && (
                     <Badge
                       variant="secondary"
                       className="bg-primary/10 text-primary border-primary/20"
@@ -84,11 +64,11 @@ const ProfileView = () => {
                 <div className="text-muted-foreground space-y-2 text-sm">
                   <div className="flex items-center justify-center">
                     <MapPin className="text-primary mr-2 h-4 w-4" />
-                    {user.profile.location}
+                    {user?.profile?.location}
                   </div>
                   <div className="flex items-center justify-center">
                     <Mail className="text-primary mr-2 h-4 w-4" />
-                    {user.email}
+                    {user?.email}
                   </div>
                 </div>
 
@@ -114,10 +94,10 @@ const ProfileView = () => {
           <ProfileSidebar user={user} setIsEditModalOpen={setIsEditModalOpen} />
 
           <div className="space-y-6 lg:col-span-8">
-            <SkillsAndExpertise skills={user.profile.skills} />
-            <JobPreference preferences={user.profile.preference} />
+            <SkillsAndExpertise skills={user?.profile?.skills} />
+            <JobPreference preferences={user?.profile?.preference} />
 
-            <Card className="border-0 bg-white">
+            <Card className="bg-card border-0">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center text-xl font-semibold">
                   <Briefcase className="text-primary mr-3 h-6 w-6" />
@@ -126,7 +106,7 @@ const ProfileView = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                  <div className="from-primary/10 to-primary/5 border-primary/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-primary/10 to-primary/5 border-primary/20 rounded-xl border p-6 text-center">
                     <div className="text-primary mb-2 text-3xl font-bold">
                       12
                     </div>
@@ -134,7 +114,7 @@ const ProfileView = () => {
                       Applications
                     </div>
                   </div>
-                  <div className="from-chart-2/10 to-chart-2/5 border-chart-2/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-chart-2/10 to-chart-2/5 border-chart-2/20 rounded-xl border p-6 text-center">
                     <div className="text-chart-2 mb-2 text-3xl font-bold">
                       5
                     </div>
@@ -142,7 +122,7 @@ const ProfileView = () => {
                       Interviews
                     </div>
                   </div>
-                  <div className="from-chart-3/10 to-chart-3/5 border-chart-3/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-chart-3/10 to-chart-3/5 border-chart-3/20 rounded-xl border p-6 text-center">
                     <div className="text-chart-3 mb-2 text-3xl font-bold">
                       23
                     </div>
@@ -150,7 +130,7 @@ const ProfileView = () => {
                       Saved Jobs
                     </div>
                   </div>
-                  <div className="from-chart-4/10 to-chart-4/5 border-chart-4/20 rounded-xl border bg-gradient-to-br p-6 text-center">
+                  <div className="from-chart-4/10 to-chart-4/5 border-chart-4/20 rounded-xl border p-6 text-center">
                     <div className="text-chart-4 mb-2 text-3xl font-bold">
                       156
                     </div>
@@ -169,9 +149,6 @@ const ProfileView = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         user={user}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        onSave={setUser}
       />
     </div>
   );

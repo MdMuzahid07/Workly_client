@@ -10,6 +10,14 @@ const PostedWithin = ({
   updateFilters: any;
   filters: any;
 }) => {
+  //! backend expects: 24h, 3d, 1w, 1m =========>
+  const timeOptions = [
+    { label: "Last 24 hours", value: "24h" },
+    { label: "Last 3 days", value: "3d" },
+    { label: "Last week", value: "1w" },
+    { label: "Last month", value: "1m" },
+  ];
+
   return (
     <div className="space-y-3">
       <Label className="flex items-center gap-2 text-sm font-medium">
@@ -20,19 +28,17 @@ const PostedWithin = ({
         value={filters.postedWithin}
         onValueChange={(value) => updateFilters({ postedWithin: value })}
       >
-        {["Last 24 hours", "Last 3 days", "Last week", "Last month"].map(
-          (time) => (
-            <div key={time} className="flex items-center space-x-2">
-              <RadioGroupItem value={time.toLowerCase()} id={`time-${time}`} />
-              <Label
-                htmlFor={`time-${time}`}
-                className="cursor-pointer text-sm"
-              >
-                {time}
-              </Label>
-            </div>
-          ),
-        )}
+        {timeOptions.map((time) => (
+          <div key={time.value} className="flex items-center space-x-2">
+            <RadioGroupItem value={time.value} id={`time-${time.value}`} />
+            <Label
+              htmlFor={`time-${time.value}`}
+              className="cursor-pointer text-sm"
+            >
+              {time.label}
+            </Label>
+          </div>
+        ))}
       </RadioGroup>
     </div>
   );

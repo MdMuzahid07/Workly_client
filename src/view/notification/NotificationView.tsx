@@ -63,7 +63,7 @@ const getNotificationColor = (type: Notification["type"]) => {
     case "INTERVIEW_SCHEDULED":
       return "bg-orange-50 border-orange-200";
     case "NEW_JOB_MATCH":
-      return "bg-green-50 border-green-200";
+      return "bg-primary/10 border-green-200";
     case "SYSTEM_ANNOUNCEMENT":
       return "bg-yellow-50 border-yellow-200";
     default:
@@ -170,7 +170,7 @@ const NotificationView = () => {
   const deleteNotification = (id: string) => {};
 
   return (
-    <div className="min-h-screen bg-gray-50 md:pt-24">
+    <div className="bg-primary/2 min-h-screen md:pt-24">
       <div className="container mx-auto px-4 py-6">
         <div className="mx-auto max-w-7xl">
           {/* Filter Tabs */}
@@ -210,6 +210,7 @@ const NotificationView = () => {
                   deleteNotification={deleteNotification}
                   markAsRead={markAsRead}
                 />
+                // <NotificationCardSkeleton key={index} />
               ))
             ) : (
               // Fallback for no notifications

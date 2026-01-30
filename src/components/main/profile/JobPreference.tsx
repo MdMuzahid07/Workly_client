@@ -48,7 +48,7 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
   };
 
   return (
-    <Card className="border-0 bg-white">
+    <Card className="bg-card border-0">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold">Job Preferences</CardTitle>
       </CardHeader>
@@ -56,28 +56,28 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           <div className="space-y-4">
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Briefcase className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Briefcase className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Job Type
                 </div>
                 <Badge
                   variant="outline"
-                  className={`text-xs ${getJobTypeColor(preferences.jobType)}`}
+                  className={`text-xs ${getJobTypeColor(preferences?.jobType)}`}
                 >
-                  {preferences.jobType.replace("_", " ")}
+                  {preferences?.jobType.replace("_", " ")}
                 </Badge>
               </div>
             </div>
 
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <DollarSign className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <DollarSign className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Expected Salary
                 </div>
                 <div className="text-foreground text-sm font-medium sm:text-base">
-                  {formatSalary(preferences.expectedSalary)}
+                  {formatSalary(preferences?.expectedSalary)}
                 </div>
               </div>
             </div>
@@ -85,25 +85,25 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
 
           <div className="space-y-4">
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <MapPin className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <MapPin className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Preferred Location
                 </div>
                 <div className="text-foreground truncate text-sm font-medium sm:text-base">
-                  {preferences.preferredLocation}
+                  {preferences?.preferredLocation}
                 </div>
               </div>
             </div>
 
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Building className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Building className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Industry
                 </div>
                 <div className="text-foreground text-sm font-medium sm:text-base">
-                  {preferences.industry}
+                  {preferences?.industry}
                 </div>
               </div>
             </div>
@@ -111,19 +111,19 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
 
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Calendar className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Calendar className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Experience Level
                 </div>
                 <div className="text-foreground text-sm font-medium sm:text-base">
-                  {preferences.workExperience}
+                  {preferences?.workExperience}
                 </div>
               </div>
             </div>
 
             <div className="bg-muted/40 flex items-start space-x-3 rounded-xl p-4">
-              <Wifi className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
+              <Wifi className="text-primary mt-0.5 h-5 w-5" />
               <div className="min-w-0 flex-1">
                 <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
                   Remote Work
@@ -131,12 +131,12 @@ const JobPreference = ({ preferences }: PreferencesSectionProps) => {
                 <Badge
                   variant="outline"
                   className={`text-xs ${
-                    preferences.remoteWork
+                    preferences?.remoteWork
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {preferences.remoteWork
+                  {preferences?.remoteWork
                     ? "Open to Remote"
                     : "Office Preferred"}
                 </Badge>

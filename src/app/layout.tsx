@@ -1,24 +1,28 @@
 import AuthDialogProvider from "@/components/main/auth/AuthDialogProvider";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow } from "next/font/google";
 import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const barlow = Barlow({
+  weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-barlow",
 });
 
 export const metadata: Metadata = {
-  title: "Workly_job",
+  title: {
+    default: "Workly_job",
+    template: "%s | Workly_job",
+  },
   description: "Find the perfect job for you",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
@@ -27,9 +31,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      // fix theme style mismatch
+      suppressHydrationWarning
+    >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={` ${barlow.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
@@ -42,7 +51,14 @@ export default function RootLayout({
             <AuthDialogProvider>{children}</AuthDialogProvider>
           </ReduxProvider>
         </ThemeProvider>
-        <Toaster />
+        <Toaster
+          position="top-center"
+          expand={true}
+          richColors
+          closeButton
+          theme="light"
+          duration={3000}
+        />
       </body>
     </html>
   );

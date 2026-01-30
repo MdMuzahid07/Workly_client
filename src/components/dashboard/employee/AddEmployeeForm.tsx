@@ -43,8 +43,6 @@ const AddEmployeeForm = ({ onClose }: { onClose: () => void }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, this would make an API call
-    console.log("Adding employee:", formData);
     onClose();
   };
 

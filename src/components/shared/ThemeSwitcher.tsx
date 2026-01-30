@@ -85,6 +85,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
       {isMobile ? (
         <div className={cn("pb-3 pl-4", className)}>
           <Button
+            className="dark:hover:text-accent dark:hover:border-accent"
             variant="outline"
             size="sm"
             onClick={cycleTheme}

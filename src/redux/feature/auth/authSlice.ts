@@ -51,6 +51,9 @@ const authSlice = createSlice({
     },
     updateUser: (state, action) => {
       state.user = { ...state.user, ...action.payload };
+      if (action.payload.isVerified !== undefined) {
+        state.isVerified = action.payload.isVerified;
+      }
     },
     logout: (state) => {
       state.user = null;
