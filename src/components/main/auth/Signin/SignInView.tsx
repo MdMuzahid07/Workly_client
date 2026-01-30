@@ -99,7 +99,7 @@ const SignInView = () => {
               label="Email Address"
               type="email"
               required
-              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:outline-none active:border-green-400"
+              className="form-input rounded-full transition-all duration-200"
             />
 
             <div className="relative">
@@ -108,7 +108,7 @@ const SignInView = () => {
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="form-input rounded-full pr-10 transition-all duration-200"
               />
               <Button
                 type="button"
@@ -154,7 +154,7 @@ const SignInView = () => {
           {`Don't`} have an account?{" "}
           <Button
             variant="link"
-            className="h-auto cursor-pointer p-0 font-medium text-green-400 transition-colors duration-200 hover:text-[#00C299]"
+            className="text-primary hover:text-primary/80 h-auto cursor-pointer p-0 font-medium transition-colors duration-200"
             onClick={() => switchView("signUp")}
           >
             Sign up here

@@ -44,7 +44,8 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
+          disableTransitionOnChange={false}
+          storageKey="workly-theme"
         >
           <ReduxProvider>
             <AuthDialogProvider>{children}</AuthDialogProvider>

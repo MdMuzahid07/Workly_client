@@ -40,7 +40,7 @@ const Searchbar = ({
         className="bg-card flex flex-col gap-2 rounded-2xl border border-gray-200 p-2 shadow-sm sm:flex-row sm:rounded-full"
       >
         <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder={placeholder.search}
             value={searchData.search}
@@ -50,9 +50,9 @@ const Searchbar = ({
             className="border-0 bg-transparent pl-10 focus:ring-0 focus:outline-0"
           />
         </div>
-        <div className="w-px bg-gray-200" />
+        <div className="bg-border w-px" />
         <div className="relative flex-1">
-          <MapPin className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <MapPin className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder={placeholder.location}
             value={searchData.location}

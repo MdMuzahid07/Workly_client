@@ -64,8 +64,8 @@ const JobCard = ({ job }: JobProps) => {
             <div className="mb-2 flex items-center gap-2">
               {job?.isFeatured && (
                 <Badge
-                  variant="secondary"
-                  className="rounded-full text-xs font-medium"
+                  variant="default"
+                  className="bg-primary text-primary-foreground rounded-full text-xs font-medium"
                 >
                   Featured
                 </Badge>

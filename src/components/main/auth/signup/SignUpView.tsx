@@ -128,7 +128,7 @@ const SignUpView = () => {
               label="Full Name"
               type="text"
               required
-              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+              className="form-input rounded-full transition-all duration-200"
             />
 
             <WKInput
@@ -136,7 +136,7 @@ const SignUpView = () => {
               label="Email Address"
               type="email"
               required
-              className="rounded-full border-gray-300 bg-white transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+              className="form-input rounded-full transition-all duration-200"
             />
 
             <div className="relative">
@@ -145,7 +145,7 @@ const SignUpView = () => {
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="form-input rounded-full pr-10 transition-all duration-200"
               />
               <Button
                 type="button"
@@ -168,7 +168,7 @@ const SignUpView = () => {
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 required
-                className="rounded-full border-gray-300 bg-white pr-10 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-400"
+                className="form-input rounded-full pr-10 transition-all duration-200"
               />
               <Button
                 type="button"
