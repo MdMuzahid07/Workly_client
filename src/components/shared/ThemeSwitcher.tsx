@@ -89,7 +89,6 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             variant="outline"
             size="sm"
             onClick={cycleTheme}
-            className="w-full justify-start"
           >
             {getCurrentIcon()}
             {showLabel && (
