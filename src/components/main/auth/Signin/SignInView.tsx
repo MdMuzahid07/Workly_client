@@ -52,17 +52,23 @@ const SignInView = () => {
 
         const decodedToken = jwtDecode(resData.accessToken) as {
           isVerified: boolean;
+          userId: string;
+          role: string;
+          companyId?: string;
         };
 
         if (decodedToken) {
           dispatch(
             setCredentials({
               user: {
+                id: decodedToken.userId,
                 email: resData.email,
                 fullName: resData.fullName,
                 isVerified: decodedToken.isVerified,
                 phone: resData.phone,
-                companyId: resData.companyId,
+                companyId: decodedToken.companyId || resData.companyId,
+                role: decodedToken.role === "EMPLOYER" ? 1 : 0,
+                isActive: true,
               },
               accessToken: resData.accessToken,
               refreshToken: null,

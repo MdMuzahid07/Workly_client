@@ -26,17 +26,31 @@ const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
         </div>
       </div>
 
-      <div className="hidden items-center space-x-3 sm:flex">
-        <Button variant="outline" size="sm">
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
-        </Button>
-        <Link
-          href="dashboard/post-job"
-          className="hover:text-primary flex items-center"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Post Job
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link href="/employer/settings" className="sm:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 touch-manipulation"
+          >
+            <Settings className="h-4 w-4" />
+            <span className="sr-only">Settings</span>
+          </Button>
+        </Link>
+        <Link href="/employer/settings" className="hidden sm:block">
+          <Button variant="outline" size="sm" className="touch-manipulation">
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </Button>
+        </Link>
+        <Link href="/employer/post-job">
+          <Button
+            size="sm"
+            className="touch-manipulation active:opacity-70 sm:px-4"
+          >
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Post Job</span>
+          </Button>
         </Link>
       </div>
     </DashboardHeaderContainer>

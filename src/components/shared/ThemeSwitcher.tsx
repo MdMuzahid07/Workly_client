@@ -86,8 +86,9 @@ const ThemeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className={isMobile ? "" : "mt-4"}
+            className={`z-9999 ${isMobile ? "" : ""}`}
             align={isMobile ? "start" : "end"}
+            sideOffset={8}
           >
             <DropdownMenuItem onClick={() => setTheme("light")}>
               <Sun className="mr-2 h-4 w-4" />

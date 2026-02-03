@@ -1,10 +1,7 @@
-const page = () => {
-  return (
-    <>
-      {/* <CompanySettingView /> */}
-      <p>this page undergoing developments</p>
-    </>
-  );
-};
+"use client";
 
-export default page;
+import JobSeekerSettingsView from "../../../../view/dashboard/JobSeekerSettingsView";
+
+export default function DashboardSettingsPage() {
+  return <JobSeekerSettingsView />;
+}
