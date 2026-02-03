@@ -1,11 +1,11 @@
-import ManageCompanyProfileView from "../../../../view/dashboard/ManageCompanyProfileView";
+import DashboardProfileHeader from "../../../../components/dashboard/dashboard-nav/header/DashboardProfileHeader";
+import ProfileView from "../../../../view/profile/ProfileView";
 
-const page = () => {
+export default function JobSeekerProfilePage() {
   return (
     <>
-      <ManageCompanyProfileView />
+      <DashboardProfileHeader />
+      <ProfileView />
     </>
   );
-};
-
-export default page;
+}

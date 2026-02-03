@@ -112,14 +112,12 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
               <span className="sr-only">Toggle theme</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem
-              onClick={() => setTheme("light")}
-              className={cn(
-                "cursor-pointer transition-colors duration-200",
-                theme === "light" && "bg-accent text-accent-foreground",
-              )}
-            >
+          <DropdownMenuContent
+            className={`z-9999 ${isMobile ? "" : ""}`}
+            align={isMobile ? "start" : "end"}
+            sideOffset={8}
+          >
+            <DropdownMenuItem onClick={() => setTheme("light")}>
               <Sun className="mr-2 h-4 w-4" />
               <span>Light</span>
             </DropdownMenuItem>

@@ -85,11 +85,20 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     };
   }, [isOpen, handleClickOutside, handleEscapeKey]);
 
-  const decodedToken = jwtDecode<AuthTokenPayload>(
-    localStorage.getItem("accessToken") || "",
-  );
+  let decodedToken: AuthTokenPayload | null = null;
+  try {
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken")
+        : null;
+    if (token) decodedToken = jwtDecode<AuthTokenPayload>(token);
+  } catch {
+    decodedToken = null;
+  }
   const isEmployer =
-    decodedToken?.role === "EMPLOYER" || user?.role === "EMPLOYER";
+    decodedToken?.role === "EMPLOYER" ||
+    user?.role === "EMPLOYER" ||
+    (user?.role as string) === "EMPLOYER";
   const isAdmin = decodedToken?.role === "ADMIN" || user?.role === "ADMIN";
   const isSuperAdmin =
     decodedToken?.role === "SUPER_ADMIN" || user?.role === "SUPER_ADMIN";
@@ -97,25 +106,39 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
 
   const menuItems: MenuItem[] = [
-    { icon: User, label: "My Profile", href: "/profile" },
+    {
+      icon: User,
+      label: "My Profile",
+      href: isEmployer ? "/profile" : "/dashboard/profile",
+    },
+    ...(!isEmployer
+      ? [{ icon: Briefcase, label: "My Dashboard", href: "/dashboard" }]
+      : []),
     ...(!isEmployer && !hasCompany
       ? [
           {
             icon: Briefcase,
             label: "Applied Jobs",
-            href: "/applied-jobs",
+            href: "/dashboard/applied-jobs",
             badge: 3,
           },
         ]
       : []),
     ...(!isEmployer && hasCompany
-      ? [{ icon: Heart, label: "Saved Jobs", href: "/saved-jobs", badge: 12 }]
+      ? [
+          {
+            icon: Heart,
+            label: "Saved Jobs",
+            href: "/dashboard/saved-jobs",
+            badge: 12,
+          },
+        ]
       : []),
     ...(!hasCompany && isEmployer
       ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
       : []),
     ...((isEmployer && hasCompany) || isAdmin || isSuperAdmin
-      ? [{ icon: FileText, label: "Company Dashboard", href: "/dashboard" }]
+      ? [{ icon: FileText, label: "Company Dashboard", href: "/employer" }]
       : []),
   ];
 
@@ -192,7 +215,6 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             className="flex flex-col items-center sm:gap-1 sm:p-2"
           >
             <User className="h-5 w-5" />
-            <span className="text-[10px] sm:text-xs">Profile</span>
           </motion.div>
         </button>
       )}
@@ -207,7 +229,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
               duration: 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className={`bg-card z-50 overflow-hidden rounded-2xl border drop-shadow-2xl ${
+            className={`bg-card z-9999 overflow-hidden rounded-2xl border drop-shadow-2xl ${
               isMobile
                 ? "absolute right-0 bottom-full mb-4 h-fit min-h-[65vh] w-full max-w-[82.5vw] min-w-[84vw]"
                 : "absolute top-full right-0 mt-8 w-72"
@@ -245,12 +267,12 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                   <p className="text-muted-foreground truncate text-center text-sm sm:text-start">
                     {user?.email}
                   </p>
-                  {/* <div className="mt-1 flex items-center gap-1">
-                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                  <div className="mt-1 flex items-center gap-1">
+                    <div className="bg-primary h-2 w-2 rounded-full"></div>
                     <span className="text-xs font-medium text-green-600">
                       Online
                     </span>
-                  </div> */}
+                  </div>
                 </div>
               </div>
             </div>
