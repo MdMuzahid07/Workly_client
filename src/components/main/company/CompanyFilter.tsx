@@ -1,43 +1,30 @@
-import { Filter } from "lucide-react";
+import { Layers } from "lucide-react";
 import { Badge } from "../../ui/badge";
 
 const fakeTechs = [
-  {
-    id: 1,
-    value: "Technology",
-    label: "Technology",
-  },
-  {
-    id: 2,
-    value: "Startup",
-    label: "Startup",
-  },
-  {
-    id: 3,
-    value: "Remote",
-    label: "Remote",
-  },
-  {
-    id: 4,
-    value: "100+ employees",
-    label: "100+ employees",
-  },
+  { id: 1, value: "Technology", label: "Technology" },
+  { id: 2, value: "Startup", label: "Startup" },
+  { id: 3, value: "Remote", label: "Remote" },
+  { id: 4, value: "Healthcare", label: "Healthcare" },
+  { id: 5, value: "Finance", label: "Finance" },
+  { id: 6, value: "Education", label: "Education" },
+  { id: 7, value: "E-commerce", label: "E-commerce" },
 ];
 
 const CompanyFilter = () => {
   return (
-    <div className="bg-card mx-auto max-w-7xl rounded-lg px-4 py-4 sm:px-6 lg:px-8">
-      <div className="flex items-center gap-6 overflow-x-auto">
-        <div className="text-secondary-foreground flex items-center gap-2">
-          <Filter className="h-4 w-4" />
-          <span className="font-medium">Filters</span>
+    <div className="mx-auto max-w-7xl bg-transparent">
+      <div className="scrollbar-hide flex items-center gap-6 overflow-x-auto pb-2">
+        <div className="text-foreground flex shrink-0 items-center gap-2 text-sm font-bold tracking-wider uppercase">
+          <Layers className="text-primary h-4 w-4" />
+          <span>Filters</span>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {fakeTechs?.map(({ id, label }) => (
             <Badge
               key={id}
-              variant="outline"
-              className="hover:bg-primary/2 cursor-pointer rounded-full"
+              variant="secondary"
+              className="hover:bg-primary hover:border-primary cursor-pointer rounded-full border-gray-100 bg-white px-5 py-2 text-xs font-semibold text-slate-600 shadow-sm transition-all duration-300 hover:text-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400"
             >
               {label}
             </Badge>

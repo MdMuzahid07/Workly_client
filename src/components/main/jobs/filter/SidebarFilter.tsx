@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Filter } from "lucide-react";
 import { useState } from "react";
 import BudgetRange from "./BudgetRange";
 import ExperienceLevel from "./ExperienceLevel";
@@ -104,28 +103,27 @@ const SidebarFilter = ({
 
   return (
     <div className={className}>
-      <Card className="h-fit rounded-2xl">
-        <CardHeader className="pb-4">
+      <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+        <CardHeader className="px-6 py-5">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-              <Filter className="h-5 w-5" />
-              Filters
+            <CardTitle className="text-foreground text-base font-bold tracking-tight uppercase">
+              Refined By
             </CardTitle>
             <Button
               variant="ghost"
               size="sm"
               onClick={clearAllFilters}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-primary hover:bg-primary/5 h-auto p-0 text-xs font-bold transition-colors"
             >
-              Clear All
+              Reset All
             </Button>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 px-6 pb-8">
           <FilterSearch updateFilters={updateFilters} filters={filters} />
 
-          <Separator />
+          <Separator className="bg-gray-100 dark:bg-slate-800" />
 
           <LocationWise
             updateFilters={updateFilters}
@@ -133,23 +131,23 @@ const SidebarFilter = ({
             locationOptions={locationOptions}
           />
 
-          <Separator />
+          <Separator className="bg-gray-100 dark:bg-slate-800" />
 
           <BudgetRange updateFilters={updateFilters} filters={filters} />
 
-          <Separator />
+          <Separator className="bg-gray-100 dark:bg-slate-800" />
 
           <JobType updateFilters={updateFilters} filters={filters} />
 
-          <Separator />
+          <Separator className="bg-gray-100 dark:bg-slate-800" />
 
           <ExperienceLevel updateFilters={updateFilters} filters={filters} />
 
-          <Separator />
+          <Separator className="bg-gray-100 dark:bg-slate-800" />
 
           <PostedWithin updateFilters={updateFilters} filters={filters} />
 
-          <Separator />
+          <Separator className="bg-gray-100 dark:bg-slate-800" />
 
           <FilterBySkill
             filters={filters}

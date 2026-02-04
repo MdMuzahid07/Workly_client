@@ -47,132 +47,149 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+
+  /* Chateau Green Palette */
+  --color-chateau-green-50: #effaf2;
+  --color-chateau-green-100: #d8f3de;
+  --color-chateau-green-200: #b4e6c2;
+  --color-chateau-green-300: #83d29f;
+  --color-chateau-green-400: #4fb877;
+  --color-chateau-green-500: #33b267;
+  --color-chateau-green-600: #1e7d47;
+  --color-chateau-green-700: #18643a;
+  --color-chateau-green-800: #155030;
+  --color-chateau-green-900: #124229;
+  --color-chateau-green-950: #092517;
 }
 
 :root {
   --radius: 0.625rem;
 
   /* Light Theme - Professional Green Design */
-  --background: 0 0% 100%; /* Pure white background */
-  --foreground: 0 0% 3.9%; /* Near black text */
+  --background: hsl(0 0% 100%); /* Pure white background */
+  --foreground: hsl(0 0% 3.9%); /* Near black text */
 
-  --card: 0 0% 100%; /* Pure white cards */
-  --card-foreground: 0 0% 3.9%;
+  --card: hsl(0 0% 100%); /* Pure white cards */
+  --card-foreground: hsl(0 0% 3.9%);
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 3.9%;
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 3.9%);
 
-  /* Primary Green - Your exact brand color #37DF72 */
-  --primary: 142 76% 36%; /* #37DF72 converted to HSL */
-  --primary-foreground: 0 0% 98%;
+  /* Primary Green - Chateau Green 500 */
+  --primary: hsl(
+    145 55% 45%
+  ); /* Roughly #33b267 converted to HSL for consistency with previous system */
+  --primary-foreground: hsl(0 0% 98%);
 
   /* Secondary - Light green accent */
-  --secondary: 142 20% 96%;
-  --secondary-foreground: 142 76% 36%;
+  --secondary: hsl(142 20% 96%);
+  --secondary-foreground: hsl(142 76% 36%);
 
   /* Muted - Subtle green tints */
-  --muted: 142 15% 97%;
-  --muted-foreground: 142 10% 45%;
+  --muted: hsl(142 15% 97%);
+  --muted-foreground: hsl(142 10% 45%);
 
   /* Accent - Vibrant green for highlights */
-  --accent: 142 76% 36%;
-  --accent-foreground: 0 0% 98%;
+  --accent: hsl(142 76% 36%);
+  --accent-foreground: hsl(0 0% 98%);
 
   /* Success - Green success state */
-  --success: 142 76% 36%;
-  --success-foreground: 0 0% 98%;
+  --success: hsl(142 76% 36%);
+  --success-foreground: hsl(0 0% 98%);
 
   /* Warning - Amber for warnings */
-  --warning: 38 92% 50%;
-  --warning-foreground: 0 0% 98%;
+  --warning: hsl(38 92% 50%);
+  --warning-foreground: hsl(0 0% 98%);
 
   /* Destructive - Red for errors */
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 98%);
 
   /* Borders and inputs */
-  --border: 142 15% 90%;
-  --input: 142 15% 95%;
-  --ring: 142 76% 36%; /* Focus ring matches primary */
+  --border: hsl(142 15% 90%);
+  --input: hsl(142 15% 95%);
+  --ring: hsl(142 76% 36%); /* Focus ring matches primary */
 
   /* Charts - Professional green palette */
-  --chart-1: 142 76% 36%; /* Main brand green */
-  --chart-2: 160 60% 45%; /* Teal */
-  --chart-3: 120 50% 40%; /* Forest green */
-  --chart-4: 180 40% 50%; /* Light blue-green */
-  --chart-5: 100 60% 30%; /* Dark green */
+  --chart-1: hsl(142 76% 36%); /* Main brand green */
+  --chart-2: hsl(160 60% 45%); /* Teal */
+  --chart-3: hsl(120 50% 40%); /* Forest green */
+  --chart-4: hsl(180 40% 50%); /* Light blue-green */
+  --chart-5: hsl(100 60% 30%); /* Dark green */
 
   /* Sidebar */
-  --sidebar: 142 15% 98%;
-  --sidebar-foreground: 142 20% 20%;
-  --sidebar-primary: 142 76% 36%;
-  --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 142 20% 94%;
-  --sidebar-accent-foreground: 142 20% 25%;
-  --sidebar-border: 142 15% 90%;
-  --sidebar-ring: 142 76% 36%;
+  --sidebar: hsl(142 15% 98%);
+  --sidebar-foreground: hsl(142 20% 20%);
+  --sidebar-primary: hsl(142 76% 36%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(142 20% 94%);
+  --sidebar-accent-foreground: hsl(142 20% 25%);
+  --sidebar-border: hsl(142 15% 90%);
+  --sidebar-ring: hsl(142 76% 36%);
 }
 
 .dark {
   /* Dark Theme - Professional Green Design */
-  --background: 0 0% 3.9%; /* Very dark background */
-  --foreground: 0 0% 98%; /* Light text */
+  --background: hsl(0 0% 3.9%); /* Very dark background */
+  --foreground: hsl(0 0% 98%); /* Light text */
 
   --card: oklch(17.959% 0.02188 120.952); /* Dark card background */
   --card-foreground: oklch(0.95 0.01 120);
 
-  --popover: 0 0% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: hsl(0 0% 3.9%);
+  --popover-foreground: hsl(0 0% 98%);
 
-  /* Primary - Brighter green for dark mode */
-  --primary: 142 76% 50%; /* Brighter version of brand green */
-  --primary-foreground: 0 0% 3.9%;
+  /* Primary - Chateau Green 400 */
+  --primary: hsl(
+    143 45% 52%
+  ); /* Roughly #4fb877 for slightly brighter primary in dark mode */
+  --primary-foreground: hsl(0 0% 3.9%);
 
   /* Secondary - Dark green accent */
-  --secondary: 142 20% 15%;
-  --secondary-foreground: 142 20% 90%;
+  --secondary: hsl(142 20% 15%);
+  --secondary-foreground: hsl(142 20% 90%);
 
   /* Muted */
-  --muted: 142 15% 15%;
-  --muted-foreground: 142 10% 65%;
+  --muted: hsl(142 15% 15%);
+  --muted-foreground: hsl(142 10% 65%);
 
   /* Accent - Vibrant green */
-  --accent: 142 76% 50%;
-  --accent-foreground: 0 0% 3.9%;
+  --accent: hsl(142 76% 50%);
+  --accent-foreground: hsl(0 0% 3.9%);
 
   /* Success */
-  --success: 142 76% 50%;
-  --success-foreground: 0 0% 3.9%;
+  --success: hsl(142 76% 50%);
+  --success-foreground: hsl(0 0% 3.9%);
 
   /* Warning */
-  --warning: 38 92% 60%;
-  --warning-foreground: 0 0% 3.9%;
+  --warning: hsl(38 92% 60%);
+  --warning-foreground: hsl(0 0% 3.9%);
 
   /* Destructive */
-  --destructive: 0 84% 70%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive: hsl(0 84% 70%);
+  --destructive-foreground: hsl(0 0% 98%);
 
   /* Borders and inputs */
-  --border: 142 15% 20%;
-  --input: 142 15% 15%;
-  --ring: 142 76% 50%;
+  --border: hsl(142 15% 20%);
+  --input: hsl(142 15% 15%);
+  --ring: hsl(142 76% 50%);
 
   /* Charts - Adjusted for dark mode */
-  --chart-1: 142 76% 50%; /* Brighter brand green */
-  --chart-2: 160 60% 55%; /* Brighter teal */
-  --chart-3: 120 50% 50%; /* Brighter forest green */
-  --chart-4: 180 40% 60%; /* Brighter blue-green */
-  --chart-5: 100 60% 40%; /* Brighter dark green */
+  --chart-1: hsl(142 76% 50%); /* Brighter brand green */
+  --chart-2: hsl(160 60% 55%); /* Brighter teal */
+  --chart-3: hsl(120 50% 50%); /* Brighter forest green */
+  --chart-4: hsl(180 40% 60%); /* Brighter blue-green */
+  --chart-5: hsl(100 60% 40%); /* Brighter dark green */
 
   /* Sidebar */
-  --sidebar: 142 15% 8%;
-  --sidebar-foreground: 142 20% 90%;
-  --sidebar-primary: 142 76% 50%;
-  --sidebar-primary-foreground: 0 0% 3.9%;
-  --sidebar-accent: 142 20% 18%;
-  --sidebar-accent-foreground: 142 20% 90%;
-  --sidebar-border: 142 15% 20%;
-  --sidebar-ring: 142 76% 50%;
+  --sidebar: hsl(142 15% 8%);
+  --sidebar-foreground: hsl(142 20% 90%);
+  --sidebar-primary: hsl(142 76% 50%);
+  --sidebar-primary-foreground: hsl(0 0% 3.9%);
+  --sidebar-accent: hsl(142 20% 18%);
+  --sidebar-accent-foreground: hsl(142 20% 90%);
+  --sidebar-border: hsl(142 15% 20%);
+  --sidebar-ring: hsl(142 76% 50%);
 }
 
 @layer base {
