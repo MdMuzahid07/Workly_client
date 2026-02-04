@@ -123,8 +123,8 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
             </div>
           </div>
 
-          <div className="mt-auto flex items-center justify-between gap-2">
-            <div className="text-foreground text-sm font-black">
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
+            <div className="text-foreground text-sm font-bold sm:text-base sm:font-black">
               {job?.currency === "USD" ? "$" : job?.currency}
               {job?.salaryMin?.toLocaleString()} -{" "}
               {job?.salaryMax?.toLocaleString()}
@@ -228,7 +228,7 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
               </HoverHint>
             </div>
 
-            <div className="text-foreground text-xl font-black">
+            <div className="text-foreground text-lg font-bold sm:text-xl sm:font-black">
               {job?.currency === "USD" ? "$" : job?.currency}
               {job?.salaryMin?.toLocaleString()} -{" "}
               {job?.salaryMax?.toLocaleString()}

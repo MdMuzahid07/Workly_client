@@ -94,21 +94,21 @@ const Industries = ({
         })}
       </Swiper>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between sm:mt-6">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="swiper-button-prev-2 cursor-pointer"
+          className="swiper-button-prev-2 border-border/40 hover:bg-primary/5 hover:text-primary h-9 cursor-pointer rounded-full px-4"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
-          Previous
+          <span className="hidden sm:inline">Previous</span>
         </Button>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="swiper-button-next-2 cursor-pointer"
+          className="swiper-button-next-2 border-border/40 hover:bg-primary/5 hover:text-primary h-9 cursor-pointer rounded-full px-4"
         >
-          Next
+          <span className="hidden sm:inline">Next</span>
           <ChevronRight className="ml-1 h-4 w-4" />
         </Button>
       </div>

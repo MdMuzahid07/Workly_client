@@ -13,13 +13,13 @@ const fakeTechs = [
 
 const CompanyFilter = () => {
   return (
-    <div className="mx-auto max-w-7xl bg-transparent">
-      <div className="scrollbar-hide flex items-center gap-6 overflow-x-auto pb-2">
+    <div className="w-full bg-transparent">
+      <div className="scrollbar-hide flex items-center gap-4 overflow-x-auto pb-2 sm:gap-6">
         <div className="text-foreground flex shrink-0 items-center gap-2 text-sm font-bold tracking-wider uppercase">
           <Layers className="text-primary h-4 w-4" />
           <span>Filters</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2 pr-4 sm:pr-0">
           {fakeTechs?.map(({ id, label }) => (
             <Badge
               key={id}

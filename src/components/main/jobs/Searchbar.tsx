@@ -1,11 +1,4 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MapPin, Search } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../../ui/button";
@@ -53,7 +46,7 @@ const Searchbar = ({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-0 rounded-xl border border-gray-100 bg-white p-2 shadow-xl sm:flex-row sm:rounded-lg dark:border-slate-800 dark:bg-slate-900/90"
+        className="flex flex-col items-center gap-3 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl sm:flex-row sm:gap-0 sm:rounded-full dark:border-slate-800 dark:bg-slate-900/90"
       >
         {/* Job Title Field */}
         <div className="relative w-full flex-[1.5] border-b border-gray-100 sm:border-r sm:border-b-0 dark:border-slate-800">
@@ -63,47 +56,27 @@ const Searchbar = ({
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, search: e.target.value }))
             }
-            className="h-14 border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="h-14 rounded-xl border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:rounded-l-full sm:rounded-r-none"
           />
           <Search className="text-primary absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 opacity-60" />
         </div>
 
         {/* Location Field */}
-        <div className="relative w-full flex-1 border-b border-gray-100 sm:border-r sm:border-b-0 dark:border-slate-800">
+        <div className="relative w-full flex-1 border-b border-gray-100 sm:border-b-0 dark:border-slate-800">
           <Input
             placeholder={placeholder.location}
             value={searchData.location}
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, location: e.target.value }))
             }
-            className="h-14 border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="h-14 rounded-xl border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:rounded-none"
           />
           <MapPin className="text-primary absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 opacity-60" />
         </div>
 
-        {/* Category/Sector Field */}
-        <div className="relative w-full flex-1 border-b border-gray-100 sm:border-b-0 dark:border-slate-800">
-          <Select
-            onValueChange={(val) =>
-              setSearchData((prev) => ({ ...prev, category: val }))
-            }
-          >
-            <SelectTrigger className="text-muted-foreground h-14 border-0 bg-transparent text-base focus:ring-0 focus:ring-offset-0">
-              <SelectValue placeholder="Select Sector" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="it">Information Technology</SelectItem>
-              <SelectItem value="healthcare">Healthcare</SelectItem>
-              <SelectItem value="finance">Finance</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="education">Education</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         <Button
           size="lg"
-          className="bg-primary hover:bg-primary/90 h-12 w-full cursor-pointer rounded-lg px-8 text-base font-bold text-white shadow-lg transition-transform active:scale-95 sm:ml-4 sm:w-auto"
+          className="bg-primary hover:bg-primary/90 shadow-full h-14 w-full cursor-pointer rounded-xl px-8 text-base font-bold text-white transition-transform active:scale-95 sm:ml-4 sm:w-auto sm:rounded-full"
         >
           Find Job
         </Button>

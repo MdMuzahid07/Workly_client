@@ -70,10 +70,10 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
           }}
         />
 
-        <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 flex flex-col items-center justify-between gap-6 md:flex-row">
           <CompanyFilter />
 
-          <div className="flex items-center gap-1.5 self-end rounded-lg bg-gray-50 p-1 shadow-inner dark:bg-slate-900">
+          <div className="flex items-center gap-1.5 self-center rounded-lg bg-gray-50 p-1 shadow-inner md:self-end dark:bg-slate-900">
             <Button
               variant={viewType === "list" ? "default" : "ghost"}
               size="icon"
