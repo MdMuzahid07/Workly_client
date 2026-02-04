@@ -169,10 +169,10 @@ const Navbar = () => {
                         className="relative"
                       >
                         <motion.div
-                          className={`relative flex items-center gap-2 rounded-full border p-2.5 text-sm font-medium transition-all duration-200 ${
+                          className={`relative flex items-center gap-2 rounded-full border bg-white p-2.5 text-sm font-medium transition-all duration-200 ${
                             active
                               ? "text-primary"
-                              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                              : "text-muted-foreground hover:text-primary"
                           }`}
                           whileHover={{ y: -1 }}
                           initial={{ opacity: 0, y: 10 }}

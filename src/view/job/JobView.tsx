@@ -183,11 +183,11 @@ const JobView = () => {
             {data?.meta?.total || 0} JOBS FOUND
           </h2>
 
-          <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 p-1 shadow-inner dark:bg-slate-900">
+          <div className="flex items-center gap-1.5 rounded-full border bg-gray-50 p-1 dark:bg-slate-900">
             <Button
               variant={viewType === "list" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-md transition-all sm:h-10 sm:w-10"
+              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("list")}
             >
               <List className="h-5 w-5" />
@@ -195,7 +195,7 @@ const JobView = () => {
             <Button
               variant={viewType === "grid" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-md transition-all sm:h-10 sm:w-10"
+              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("grid")}
             >
               <LayoutGrid className="h-5 w-5" />

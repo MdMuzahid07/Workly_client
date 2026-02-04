@@ -73,11 +73,11 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
         <div className="mt-8 flex flex-col items-center justify-between gap-6 md:flex-row">
           <CompanyFilter />
 
-          <div className="flex items-center gap-1.5 self-center rounded-lg bg-gray-50 p-1 shadow-inner md:self-end dark:bg-slate-900">
+          <div className="flex items-center gap-1.5 self-center rounded-full border bg-gray-50 p-1 md:self-end dark:bg-slate-900">
             <Button
               variant={viewType === "list" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-md transition-all sm:h-10 sm:w-10"
+              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("list")}
             >
               <List className="h-5 w-5" />
@@ -85,7 +85,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
             <Button
               variant={viewType === "grid" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-md transition-all sm:h-10 sm:w-10"
+              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("grid")}
             >
               <LayoutGrid className="h-5 w-5" />
