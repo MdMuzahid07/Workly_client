@@ -167,6 +167,7 @@ const Navbar = () => {
                         key={item.name}
                         href={item.href}
                         className="relative"
+                        title={item.name || ""}
                       >
                         <motion.div
                           className={`relative flex items-center gap-2 rounded-full border bg-white p-2.5 text-sm font-medium transition-all duration-200 ${

@@ -30,8 +30,8 @@ const ProfileView = () => {
   }
 
   return (
-    <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-6xl px-6 py-6 md:pt-24 xl:px-0">
+    <div className="bg-primary/2">
+      <div className="px-6 py-6 md:pt-24 xl:px-0">
         <div className="mb-8 lg:hidden">
           <Card className="from-card to-muted/30 border-0">
             <CardContent className="p-6">

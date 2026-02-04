@@ -170,9 +170,9 @@ const NotificationView = () => {
   const deleteNotification = (id: string) => {};
 
   return (
-    <div className="bg-primary/2 min-h-screen md:pt-24">
+    <div className="bg-primary/2 min-h-screen md:pt-20">
       <div className="container mx-auto px-4 py-6">
-        <div className="mx-auto max-w-7xl">
+        <div>
           {/* Filter Tabs */}
           <Tabs
             value={activeTab}

@@ -68,7 +68,7 @@ export default function JobSeekerDashboardView() {
       <DashboardJobSeekerHeader />
       <div className="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-          <Card className="bg-card transition-shadow hover:shadow-md">
+          <Card className="bg-card border transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Profile completion
@@ -93,7 +93,7 @@ export default function JobSeekerDashboardView() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
+          <Card className="bg-card border transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Applications
@@ -118,7 +118,7 @@ export default function JobSeekerDashboardView() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
+          <Card className="bg-card border transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Saved jobs
@@ -143,7 +143,7 @@ export default function JobSeekerDashboardView() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
+          <Card className="bg-card border transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 Recommended
@@ -167,7 +167,7 @@ export default function JobSeekerDashboardView() {
         </div>
 
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-          <Card className="bg-card transition-shadow hover:shadow-md">
+          <Card className="bg-card border transition-shadow">
             <CardHeader>
               <CardTitle className="text-base sm:text-lg">
                 Quick actions
@@ -204,7 +204,7 @@ export default function JobSeekerDashboardView() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
+          <Card className="bg-card border transition-shadow">
             <CardHeader>
               <CardTitle className="text-base sm:text-lg">
                 Recent activity
