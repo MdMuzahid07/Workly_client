@@ -51,9 +51,9 @@ const ChatAreaSkeleton = () => (
               <Skeleton className="mt-1 h-2 w-24" />
             </div>
           </div>
-          <div className="flex space-x-3">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-8 w-8 rounded-md" />
+          <div className="flex space-x-2">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-9 w-9 rounded-md" />
             ))}
           </div>
         </div>
@@ -85,7 +85,9 @@ const ChatAreaSkeleton = () => (
       </CardContent>
 
       <div className="border-border flex items-center space-x-2 border-t p-4">
-        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-10 w-10 rounded-md" />
+        <Skeleton className="h-10 flex-1 rounded-md" />
+        <Skeleton className="h-10 w-10 rounded-md" />
         <Skeleton className="h-10 w-10 rounded-md" />
       </div>
     </Card>
@@ -96,12 +98,12 @@ const MessageViewSkeleton = () => {
   return (
     <div className="md:bg-primary/2 bg-background min-h-screen md:pt-20">
       <div className="border-border bg-card sticky top-0 z-50 flex w-full border-b md:hidden">
-        <div className="max-w-6xl p-4">
+        <div className="p-4">
           <Skeleton className="h-6 w-40" />
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="mx-auto px-4 py-6">
         <div className="grid h-[calc(100vh-200px)] grid-cols-1 gap-6 lg:grid-cols-12">
           <ConversationSidebarSkeleton />
           <ChatAreaSkeleton />
