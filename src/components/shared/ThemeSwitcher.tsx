@@ -112,7 +112,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className={`z-9999 ${isMobile ? "" : ""}`}
+            className={`z-9999 mt-6 ${isMobile ? "" : ""}`}
             align={isMobile ? "start" : "end"}
             sideOffset={8}
           >
