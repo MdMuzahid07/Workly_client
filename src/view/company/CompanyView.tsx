@@ -13,7 +13,7 @@ import CompanyCardSkeleton from "../../skeleton/company/CompanyCardSkeleton";
 
 const CompanyView = ({ companies }: { companies?: any[] }) => {
   const [visibleCompaniesCount, setVisibleCompaniesCount] = useState(12);
-  const [viewType, setViewType] = useState<"grid" | "list">("grid"); // Companies often look better in grid initially
+  const [viewType, setViewType] = useState<"grid" | "list">("grid");
   const companiesPerLoad = 6;
 
   const handleSearch = (searchData: { search: string; location: string }) => {
@@ -77,7 +77,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
             <Button
               variant={viewType === "list" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
+              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("list")}
             >
               <List className="h-5 w-5" />
@@ -85,7 +85,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
             <Button
               variant={viewType === "grid" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
+              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("grid")}
             >
               <LayoutGrid className="h-5 w-5" />

@@ -1,168 +1,290 @@
-import { Briefcase, ExternalLink, MapPin, Users } from "lucide-react";
+"use client";
+
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Bookmark,
+  Building2,
+  MapPin,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { startTransition, useOptimistic } from "react";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
-import { Card, CardContent } from "../../ui/card";
+import { Card } from "../../ui/card";
 
-interface CompanyCardProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  company: any;
-  viewType?: "grid" | "list";
+interface Company {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string | null;
+  description?: string | null;
+  location: string;
+  size?: string | null;
+  openJobs: number;
+  featured?: boolean;
+  industry?: {
+    name: string;
+  } | null;
 }
 
-const CompanyCard = ({ company, viewType = "list" }: CompanyCardProps) => {
-  const slug = company.slug || "";
+interface CompanyCardProps {
+  company: Company;
+  viewType?: "grid" | "list";
+  onBookmark?: (companyId: string) => Promise<void>;
+  isBookmarked?: boolean;
+}
 
+export function CompanyCard({
+  company,
+  viewType = "list",
+  onBookmark,
+  isBookmarked = false,
+}: CompanyCardProps) {
+  // Use optimistic UI for bookmark state
+  const [optimisticBookmarked, setOptimisticBookmarked] =
+    useOptimistic(isBookmarked);
+
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!onBookmark) return;
+
+    // Optimistically update UI
+    startTransition(() => {
+      setOptimisticBookmarked(!optimisticBookmarked);
+    });
+
+    try {
+      await onBookmark(company.id);
+    } catch (error) {
+      console.error("Failed to bookmark company:", error);
+    }
+  };
+
+  // Grid View Card
   if (viewType === "grid") {
     return (
-      <Card className="group hover:border-primary/20 relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50">
-        <CardContent className="flex flex-1 flex-col items-center p-0 text-center">
-          <div className="mb-5 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gray-50 p-3 shadow-inner transition-transform duration-500 group-hover:scale-105 dark:bg-slate-800">
-            <Image
-              src={company.logo || "/placeholder.svg"}
-              alt={`${company.name} logo`}
-              className="h-full w-full object-contain"
-              width={80}
-              height={80}
-            />
-          </div>
-
-          <div className="mb-2">
-            <Link
-              href={`/companies/${slug}`}
-              className="hover:text-primary transition-colors"
-            >
-              <h3 className="text-foreground line-clamp-1 text-lg font-bold">
-                {company.name}
-              </h3>
-            </Link>
-            {company.featured && (
-              <Badge
-                variant="default"
-                className="bg-primary/10 text-primary hover:bg-primary/20 mx-auto mt-1 w-fit rounded-md border-0 py-0 text-[10px] font-bold tracking-wider uppercase"
-              >
-                Featured
-              </Badge>
-            )}
-          </div>
-
-          <div className="text-primary mb-4 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight uppercase opacity-80">
-            <Briefcase className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">
-              {company.industry?.name || "Industry"}
-            </span>
-          </div>
-
-          <div className="text-muted-foreground mb-6 w-full space-y-2 text-xs">
-            <div className="flex items-center justify-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 opacity-70" />
-              <span>{company.location}</span>
+      <Card className="group hover:border-primary/50 from-primary/25 via-primary/8 to-primary/15 relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+        <Link
+          href={`/companies/${company.slug}`}
+          className="relative flex h-full flex-col"
+          prefetch={false}
+        >
+          {/* Top section: Logo, Title, Featured */}
+          <div className="mb-4 flex gap-3">
+            <div className="border-border/30 relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm dark:bg-slate-800">
+              {company.logo ? (
+                <Image
+                  src={company.logo}
+                  alt={`${company.name} logo`}
+                  fill
+                  sizes="56px"
+                  className="object-contain p-2"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Building2 className="text-primary/40 h-7 w-7" />
+                </div>
+              )}
             </div>
-            <div className="flex items-center justify-center gap-1.5">
-              <Users className="h-3.5 w-3.5 opacity-70" />
-              <span>{company.size} employees</span>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-foreground line-clamp-2 text-base leading-tight font-bold">
+                    {company.name}
+                  </h3>
+                </div>
+                {company.featured && (
+                  <Badge className="bg-primary shrink-0 text-xs whitespace-nowrap text-white">
+                    Featured
+                  </Badge>
+                )}
+              </div>
+              <p className="text-primary mt-1 text-xs font-medium">
+                {company.industry?.name ?? "Industry"}
+              </p>
             </div>
           </div>
 
-          <div className="mt-auto w-full border-t border-gray-50 pt-4 dark:border-slate-800">
-            <div className="text-primary bg-primary/5 mx-auto mb-4 w-fit rounded-full px-3 py-1 text-xs font-bold">
-              {company.openJobs} Jobs Available
+          {/* Description */}
+          <p className="text-muted-foreground mb-4 line-clamp-2 flex-1 text-sm leading-relaxed">
+            {company.description ?? "No description available"}
+          </p>
+
+          {/* Info pills */}
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Badge variant="outline" className="gap-1.5">
+              <MapPin className="h-3 w-3" />
+              <span className="text-xs">{company.location}</span>
+            </Badge>
+            <Badge variant="outline" className="gap-1.5">
+              <Users className="h-3 w-3" />
+              <span className="text-xs">{company.size ?? "N/A"} employees</span>
+            </Badge>
+          </div>
+
+          {/* Footer */}
+          <div className="border-border/20 flex items-center justify-between gap-3 border-t pt-3">
+            <div>
+              {company.openJobs > 0 ? (
+                <span className="text-primary inline-flex items-center gap-1 text-xs font-semibold">
+                  <span className="bg-primary h-2 w-2 rounded-full" />
+                  {company.openJobs}{" "}
+                  {company.openJobs === 1 ? "Opening" : "Openings"}
+                </span>
+              ) : (
+                <span className="text-muted-foreground text-xs">
+                  No openings
+                </span>
+              )}
             </div>
-            <Link href={`/companies/${slug}`} className="block">
+            <div className="flex items-center gap-2">
               <Button
-                variant="outline"
                 size="sm"
-                className="hover:border-primary hover:bg-primary/5 hover:text-primary w-full rounded-full border-gray-100 font-bold transition-all"
+                variant="outline"
+                className="group/btn gap-1.5 bg-transparent"
+                asChild
               >
-                View Profile
+                <span>
+                  Visit
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                </span>
               </Button>
-            </Link>
+            </div>
           </div>
-        </CardContent>
+        </Link>
       </Card>
     );
   }
 
   return (
-    <Card className="group hover:border-primary/20 relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50">
-      <CardContent className="p-0">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          {/* Left: Company Logo */}
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-50 p-1 shadow-inner dark:bg-slate-800">
-            <Image
-              src={company.logo || "/placeholder.svg"}
-              alt={`${company.name} logo`}
-              className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
-              width={64}
-              height={64}
-            />
-          </div>
+    <Card className="group hover:border-primary/50 from-primary/15 via-primary/8 to-primary/15 relative overflow-hidden rounded-xl border border-gray-100 bg-linear-to-r transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+      <div className="relative flex items-start justify-between gap-3 p-3 sm:gap-5 sm:p-5">
+        {/* Left section */}
+        <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-4">
+          {/* Logo */}
+          <Link
+            href={`/companies/${company.slug}`}
+            className="border-border/20 relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm sm:h-16 sm:w-16 dark:bg-slate-800"
+            prefetch={false}
+          >
+            {company.logo ? (
+              <Image
+                src={company.logo}
+                alt={`${company.name} logo`}
+                fill
+                sizes="(max-width: 640px) 40px, 64px"
+                className="object-contain p-1 sm:p-1.5"
+                loading="lazy"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <Building2 className="text-primary/40 h-5 w-5 sm:h-8 sm:w-8" />
+              </div>
+            )}
+          </Link>
 
-          {/* Middle: Company Info */}
+          {/* Info */}
           <div className="min-w-0 flex-1">
-            <div className="mb-1 flex items-center gap-2">
-              <Link
-                href={`/companies/${slug}`}
-                className="hover:text-primary transition-colors"
-              >
-                <h3 className="text-foreground truncate text-lg font-bold">
-                  {company.name}
-                </h3>
-              </Link>
-              {company.featured && (
-                <Badge
-                  variant="default"
-                  className="bg-primary/10 text-primary hover:bg-primary/20 rounded-md border-0 py-0 text-[10px] font-bold tracking-wider uppercase"
+            <div className="mb-0.5 flex items-start gap-1.5 sm:mb-1 sm:gap-2">
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/companies/${company.slug}`}
+                  className="hover:text-primary transition-colors"
+                  prefetch={false}
                 >
+                  <h3 className="text-foreground line-clamp-1 text-sm font-bold sm:text-base">
+                    {company.name}
+                  </h3>
+                </Link>
+              </div>
+              {company.featured && (
+                <Badge className="bg-primary shrink-0 text-[9px] whitespace-nowrap text-white sm:text-xs">
                   Featured
                 </Badge>
               )}
             </div>
 
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <div className="flex items-center gap-1.5 font-medium capitalize">
-                <Briefcase className="text-primary h-3.5 w-3.5 opacity-70" />
-                <span>{company.industry?.name || "Industry"}</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-medium">
-                <MapPin className="text-primary h-3.5 w-3.5 opacity-70" />
-                <span>{company.location}</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-medium">
-                <Users className="text-primary h-3.5 w-3.5 opacity-70" />
-                <span>{company.size} employees</span>
-              </div>
-            </div>
-
-            <p className="text-muted-foreground mt-2 line-clamp-1 text-xs">
-              {company.description}
+            <p className="text-primary mb-1 text-[10px] font-semibold sm:mb-2 sm:text-xs">
+              {company.industry?.name ?? "Industry"}
             </p>
-          </div>
 
-          {/* Right: Open Jobs & Action */}
-          <div className="flex shrink-0 flex-col items-end gap-3 sm:text-right">
-            <div className="flex items-center gap-2">
-              <span className="text-primary bg-primary/5 border-primary/10 rounded-full border px-3 py-1 text-xs font-bold tracking-tighter uppercase shadow-sm">
-                {company.openJobs} Jobs Available
+            <p className="text-muted-foreground mb-1.5 line-clamp-1 text-[11px] sm:mb-2.5 sm:line-clamp-2 sm:text-sm">
+              {company.description ?? "No description available"}
+            </p>
+
+            <div className="text-muted-foreground flex flex-wrap gap-2 text-[10px] sm:gap-3 sm:text-xs">
+              <span className="flex items-center gap-0.5 sm:gap-1">
+                <MapPin
+                  className="h-3 w-3 sm:h-3.5 sm:w-3.5"
+                  aria-hidden="true"
+                />
+                <span className="truncate">{company.location}</span>
+              </span>
+              <span className="flex items-center gap-0.5 sm:gap-1">
+                <Users
+                  className="h-3 w-3 sm:h-3.5 sm:w-3.5"
+                  aria-hidden="true"
+                />
+                {company.size ?? "N/A"} emp
               </span>
             </div>
-
-            <Link href={`/companies/${slug}`}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="hover:border-primary hover:bg-primary/5 hover:text-primary rounded-full border-gray-100 px-6 font-bold shadow-sm transition-all"
-              >
-                View Profile
-                <ExternalLink className="ml-2 h-3 w-3" />
-              </Button>
-            </Link>
           </div>
         </div>
-      </CardContent>
+
+        {/* Right section: Status + Actions */}
+        <div className="flex shrink-0 flex-col items-end gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {company.openJobs > 0 && (
+              <Badge
+                variant="secondary"
+                className="bg-primary/10 text-primary text-[9px] sm:text-xs"
+              >
+                {company.openJobs} Open
+              </Badge>
+            )}
+            {onBookmark && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 sm:h-8 sm:w-8"
+                aria-label={
+                  optimisticBookmarked ? "Remove bookmark" : "Bookmark company"
+                }
+                onClick={handleBookmark}
+                type="button"
+              >
+                <Bookmark
+                  className={`h-3.5 w-3.5 transition-colors sm:h-4 sm:w-4 ${
+                    optimisticBookmarked
+                      ? "fill-primary text-primary"
+                      : "text-muted-foreground"
+                  }`}
+                />
+              </Button>
+            )}
+          </div>
+
+          <Button
+            size="icon"
+            className="group/btn h-7 w-7 sm:h-8 sm:w-auto sm:gap-1.5 sm:px-3"
+            asChild
+          >
+            <Link href={`/companies/${company.slug}`} prefetch={false}>
+              <span className="hidden sm:inline sm:text-xs">View</span>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1 sm:h-3.5 sm:w-3.5" />
+            </Link>
+          </Button>
+        </div>
+      </div>
     </Card>
   );
-};
+}
 
 export default CompanyCard;
