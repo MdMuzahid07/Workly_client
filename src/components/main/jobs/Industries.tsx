@@ -57,7 +57,7 @@ const Industries = ({
   }
 
   return (
-    <div className="mx-auto mt-4 max-w-7xl p-4 md:mt-7 xl:p-0">
+    <div className="mx-auto mt-4 max-w-7xl md:mt-7 xl:p-0">
       <Swiper
         modules={[Navigation, Autoplay]}
         spaceBetween={12}

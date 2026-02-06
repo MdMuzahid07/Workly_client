@@ -145,11 +145,11 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
   }
 
   return (
-    <Card className="group hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 relative overflow-hidden rounded-xl border border-gray-100 bg-linear-to-r px-12 py-14 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+    <Card className="group hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 relative overflow-hidden rounded-xl border border-gray-100 bg-linear-to-r px-3 py-5 transition-all duration-300 md:px-12 md:py-14 dark:border-slate-800 dark:bg-slate-900/50">
       <CardContent className="p-0">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        <div className="flex flex-row gap-2 sm:items-center sm:gap-5">
           {/* Left: Company Logo/Icon */}
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gray-50 p-2 dark:bg-slate-800">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 p-2 sm:h-16 sm:w-16 dark:bg-slate-800">
             {job?.company?.logo ? (
               <Image
                 src={job.company.logo}
@@ -165,27 +165,27 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
 
           {/* Middle: Job Info */}
           <div className="min-w-0 flex-1">
-            <div className="mb-1 flex items-center gap-2">
+            <div className="mb-1 flex items-center gap-1 sm:gap-2">
               <Link
                 href={`/jobs/${job?.id}`}
                 className="hover:text-primary transition-colors"
               >
-                <h3 className="text-foreground truncate text-lg font-bold">
+                <h3 className="text-foreground truncate text-sm font-bold sm:text-lg">
                   {job?.title}
                 </h3>
               </Link>
             </div>
 
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <div className="flex items-center gap-1.5">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <MapPin className="text-primary h-3.5 w-3.5 opacity-70" />
                 <span>{job?.location}</span>
               </div>
-              <div className="flex items-center gap-1.5 capitalize">
+              <div className="flex items-center gap-1 capitalize sm:gap-1.5">
                 <Clock className="text-primary h-3.5 w-3.5 opacity-70" />
                 <span>{job?.jobType.replace("_", " ").toLowerCase()}</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <Briefcase className="text-primary h-3.5 w-3.5 opacity-70" />
                 <span>
                   Published {new Date(job?.createdAt).toLocaleDateString()}
@@ -193,7 +193,7 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
               </div>
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-1 sm:gap-2">
               {job?.isFeatured && (
                 <Badge
                   variant="default"
@@ -214,7 +214,7 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
           </div>
 
           {/* Right: Salary & Actions */}
-          <div className="flex flex-col items-end gap-3 sm:text-right">
+          <div className="flex flex-col items-end gap-1 sm:gap-3 sm:text-right">
             <div className="flex items-center gap-2">
               <HoverHint hint="Save job">
                 <Button
@@ -228,7 +228,7 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
               </HoverHint>
             </div>
 
-            <div className="text-foreground text-lg font-bold sm:text-xl sm:font-black">
+            <div className="text-foreground text-xs font-bold sm:text-xl sm:font-black">
               {job?.currency === "USD" ? "$" : job?.currency}
               {job?.salaryMin?.toLocaleString()} -{" "}
               {job?.salaryMax?.toLocaleString()}

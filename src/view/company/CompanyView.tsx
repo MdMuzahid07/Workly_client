@@ -33,7 +33,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[250px] w-full overflow-hidden bg-slate-950 md:h-[300px]">
+      <div className="relative h-[250px] w-full overflow-hidden bg-slate-900 md:h-[300px]">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
@@ -42,7 +42,7 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
             width={1440}
             height={300}
           />
-          <div className="absolute inset-0 bg-linear-to-b from-slate-950/50 via-slate-950/80 to-slate-950" />
+          <div className="absolute inset-0 bg-linear-to-b from-slate-900/40 via-slate-900/60 to-slate-900" />
         </div>
 
         <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 text-center">

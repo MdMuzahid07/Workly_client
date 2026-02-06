@@ -150,7 +150,7 @@ const JobView = () => {
 
         <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 text-center">
           <h1 className="mb-4 text-3xl font-bold text-white md:text-5xl">
-            Browse Job Filter List
+            Find Your Next Job
           </h1>
 
           <nav className="flex items-center gap-2 text-sm text-gray-300">
@@ -158,9 +158,7 @@ const JobView = () => {
               Home
             </Link>
             <ChevronRight className="h-4 w-4" />
-            <span className="font-medium text-white">
-              Browse Job Filter List
-            </span>
+            <span className="font-medium text-white">Find Your Next Job</span>
           </nav>
         </div>
       </div>
@@ -178,16 +176,16 @@ const JobView = () => {
           />
         </div>
 
-        <div className="mt-12 mb-6 flex items-center justify-between">
+        <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
           <h2 className="text-foreground text-xl font-bold tracking-tight uppercase">
             {data?.meta?.total || 0} JOBS FOUND
           </h2>
 
-          <div className="flex items-center gap-1.5 rounded-full border bg-gray-50 p-1 dark:bg-slate-900">
+          <div className="flex items-center gap-1 rounded-full border bg-gray-50 p-1 sm:gap-1.5 dark:bg-slate-900">
             <Button
               variant={viewType === "list" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
+              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("list")}
             >
               <List className="h-5 w-5" />
@@ -195,7 +193,7 @@ const JobView = () => {
             <Button
               variant={viewType === "grid" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9 rounded-full transition-all sm:h-10 sm:w-10"
+              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
               onClick={() => setViewType("grid")}
             >
               <LayoutGrid className="h-5 w-5" />
@@ -207,7 +205,7 @@ const JobView = () => {
           {/* Sidebar - only show if list view or desktop */}
           <div className="col-span-12 lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 hidden lg:block">
-              <ScrollArea className="h-[calc(100vh-120px)] w-full rounded-2xl">
+              <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-2xl border bg-white">
                 <SidebarFilter
                   onFiltersChange={handleFiltersChange}
                   className="w-full"
