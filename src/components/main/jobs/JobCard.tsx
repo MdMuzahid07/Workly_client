@@ -50,10 +50,10 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
 
   if (viewType === "grid") {
     return (
-      <Card className="group hover:border-primary/20 relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50">
+      <Card className="group hover:border-primary/50 from-primary/30 via-primary/10 to-primary/20 relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
         <CardContent className="flex flex-1 flex-col p-0">
           <div className="mb-4 flex items-start justify-between">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-50 p-2 shadow-inner dark:bg-slate-800">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-50 p-2 dark:bg-slate-800">
               {job?.company?.logo ? (
                 <Image
                   src={job.company.logo}
@@ -145,11 +145,11 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
   }
 
   return (
-    <Card className="group hover:border-primary/20 relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50">
+    <Card className="group hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 relative overflow-hidden rounded-xl border border-gray-100 bg-linear-to-r px-12 py-14 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
       <CardContent className="p-0">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           {/* Left: Company Logo/Icon */}
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gray-50 p-2 shadow-inner dark:bg-slate-800">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gray-50 p-2 dark:bg-slate-800">
             {job?.company?.logo ? (
               <Image
                 src={job.company.logo}

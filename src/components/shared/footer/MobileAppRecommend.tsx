@@ -1,5 +1,4 @@
 "use client";
-
 import { Apple, Play } from "lucide-react";
 import { motion } from "motion/react";
 import HoverHint from "../HoverHint";
