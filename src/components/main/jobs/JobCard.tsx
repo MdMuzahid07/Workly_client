@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Briefcase, Clock, Heart, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,9 +26,10 @@ interface JobProps {
     isRemote: boolean;
   };
   viewType?: "grid" | "list";
+  inDashboard?: boolean;
 }
 
-const JobCard = ({ job, viewType = "list" }: JobProps) => {
+const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [toggleSaveUnsaveJobMutation, { isLoading: isSaving }] =
     useToggleSaveUnsaveJobMutation();
@@ -50,7 +52,14 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
 
   if (viewType === "grid") {
     return (
-      <Card className="group hover:border-primary/50 from-primary/30 via-primary/10 to-primary/20 relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+      <Card
+        className={cn(
+          "group relative flex h-full flex-col overflow-hidden rounded-xl border p-5 transition-all duration-300",
+          inDashboard
+            ? "bg-card border-border/50"
+            : "hover:border-primary/50 from-primary/30 via-primary/10 to-primary/20 border-gray-100 bg-white bg-linear-to-r dark:border-slate-800 dark:bg-slate-900/50",
+        )}
+      >
         <CardContent className="flex flex-1 flex-col p-0">
           <div className="mb-4 flex items-start justify-between">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-50 p-2 dark:bg-slate-800">
@@ -145,7 +154,14 @@ const JobCard = ({ job, viewType = "list" }: JobProps) => {
   }
 
   return (
-    <Card className="group hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 relative overflow-hidden rounded-xl border border-gray-100 bg-linear-to-r px-3 py-5 transition-all duration-300 md:px-12 md:py-14 dark:border-slate-800 dark:bg-slate-900/50">
+    <Card
+      className={cn(
+        "group relative overflow-hidden rounded-xl border transition-all duration-300",
+        inDashboard
+          ? "bg-card border-border p-6"
+          : "hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 border-gray-100 bg-linear-to-r px-3 py-5 md:px-12 md:py-14 dark:border-slate-800 dark:bg-slate-900/50",
+      )}
+    >
       <CardContent className="p-0">
         <div className="flex flex-row gap-2 sm:items-center sm:gap-5">
           {/* Left: Company Logo/Icon */}

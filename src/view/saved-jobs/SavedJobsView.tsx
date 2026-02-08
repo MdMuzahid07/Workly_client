@@ -92,7 +92,7 @@ const SavedJobsView = () => {
         <StatsCards totalSaved={stats.total} expiringSoon={stats.expiring} />
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-2xl border shadow-sm transition-shadow hover:shadow-md">
+        <Card className="bg-card rounded-xl border">
           <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
             <div className="group relative max-w-md flex-1">
               <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
@@ -100,7 +100,7 @@ const SavedJobsView = () => {
                 placeholder="Search job title or company..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-muted/20 border-border/40 focus:bg-background h-11 rounded-xl pl-9 transition-all"
+                className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
               />
             </div>
 
@@ -109,12 +109,16 @@ const SavedJobsView = () => {
                 value={selectedCompany}
                 onValueChange={setSelectedCompany}
               >
-                <SelectTrigger className="h-10 w-[180px] rounded-xl font-semibold">
+                <SelectTrigger className="border-border h-10 w-[180px] cursor-pointer rounded-full font-semibold">
                   <SelectValue placeholder="All Companies" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   {companies.map((c) => (
-                    <SelectItem key={c} value={c}>
+                    <SelectItem
+                      className="cursor-pointer rounded-lg"
+                      key={c}
+                      value={c}
+                    >
                       {c === "all" ? "All Companies" : c}
                     </SelectItem>
                   ))}
@@ -125,7 +129,7 @@ const SavedJobsView = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearFilters}
-                className="hover:bg-destructive/5 hover:text-destructive h-10 rounded-xl px-4 font-bold transition-colors"
+                className="hover:bg-destructive/5 hover:text-destructive h-10 cursor-pointer rounded-full px-4 font-bold transition-colors"
                 disabled={searchTerm === "" && selectedCompany === "all"}
               >
                 Clear Filters
@@ -140,7 +144,7 @@ const SavedJobsView = () => {
             <TabsList className="bg-muted/20 h-11 rounded-xl p-1">
               <TabsTrigger
                 value="active"
-                className="data-[state=active]:bg-background h-9 rounded-lg px-6 font-bold data-[state=active]:shadow-sm"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold data-[state=active]:border"
               >
                 Active
                 <Badge
@@ -152,7 +156,7 @@ const SavedJobsView = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="closed"
-                className="data-[state=active]:bg-background h-9 rounded-lg px-6 font-bold data-[state=active]:shadow-sm"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold data-[state=active]:border"
               >
                 Closed
                 <Badge
@@ -165,17 +169,23 @@ const SavedJobsView = () => {
             </TabsList>
 
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="text-muted-foreground/60 text-[10px] font-black tracking-widest uppercase">
+              <span className="text-muted-foreground mt-1 text-xs leading-relaxed">
                 Limit:
               </span>
               <Select value={limit} onValueChange={setLimit}>
-                <SelectTrigger className="border-muted/40 h-8 w-[70px] rounded-lg text-xs font-bold">
+                <SelectTrigger className="border-border h-8 w-[70px] cursor-pointer rounded-full text-xs font-bold">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem className="cursor-pointer rounded-lg" value="10">
+                    10
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer rounded-lg" value="20">
+                    20
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer rounded-lg" value="50">
+                    50
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -191,14 +201,19 @@ const SavedJobsView = () => {
                   className="grid grid-cols-1 gap-4"
                 >
                   {pagedActiveJobs.map((job) => (
-                    <JobCard key={job.id} job={job} viewType="list" />
+                    <JobCard
+                      inDashboard={true}
+                      key={job.id}
+                      job={job}
+                      viewType="list"
+                    />
                   ))}
                 </motion.div>
               ) : (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-card rounded-2xl border border-dashed py-24 text-center"
+                  className="bg-card rounded-xl border border-dashed py-24 text-center"
                 >
                   <div className="flex flex-col items-center gap-6">
                     <div className="bg-muted/20 rounded-full p-8">
@@ -238,11 +253,16 @@ const SavedJobsView = () => {
             {closedJobs.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 opacity-75">
                 {closedJobs.map((job) => (
-                  <JobCard key={job.id} job={job} viewType="list" />
+                  <JobCard
+                    inDashboard={true}
+                    key={job.id}
+                    job={job}
+                    viewType="list"
+                  />
                 ))}
               </div>
             ) : (
-              <div className="bg-muted/5 rounded-2xl border border-dashed py-24 text-center">
+              <div className="bg-muted/5 rounded-xl border border-dashed py-24 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <FilterX className="text-muted-foreground/20 h-12 w-12" />
                   <p className="text-muted-foreground font-medium">

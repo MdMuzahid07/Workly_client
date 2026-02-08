@@ -109,7 +109,7 @@ const MyAppliedJobsView = () => {
         <ApplicationStats stats={stats} />
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-2xl border">
+        <Card className="bg-card rounded-xl border">
           <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
             <div className="group relative max-w-md flex-1">
               <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
@@ -219,7 +219,7 @@ const MyAppliedJobsView = () => {
         </Card>
 
         {/* Results Table Section */}
-        <Card className="bg-card overflow-hidden rounded-2xl border">
+        <Card className="bg-card overflow-hidden rounded-xl border">
           <CardHeader className="bg-muted/5 border-b px-6 py-5">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
