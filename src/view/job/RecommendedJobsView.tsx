@@ -56,7 +56,7 @@ const RecommendedJobsView = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="from-primary/10 via-background relative overflow-hidden rounded-2xl border bg-linear-to-br to-amber-500/5 p-6 sm:p-8"
+          className="from-primary/10 via-background relative overflow-hidden rounded-xl border bg-linear-to-br to-amber-500/5 p-6 sm:p-8"
         >
           <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div className="space-y-3">
@@ -87,7 +87,7 @@ const RecommendedJobsView = () => {
         </motion.div>
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-2xl border shadow-sm transition-shadow hover:shadow-md">
+        <Card className="bg-card rounded-xl border">
           <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
             <div className="group relative max-w-md flex-1">
               <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
@@ -95,7 +95,7 @@ const RecommendedJobsView = () => {
                 placeholder="Search recommended roles..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-muted/20 border-border/40 focus:bg-background h-11 rounded-xl pl-9 transition-all"
+                className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
               />
             </div>
 
@@ -104,12 +104,16 @@ const RecommendedJobsView = () => {
                 Show:
               </span>
               <Select value={limit} onValueChange={setLimit}>
-                <SelectTrigger className="w-20px bg-muted/20 h-10 rounded-xl border-none font-bold">
+                <SelectTrigger className="w-20px bg-muted/20 border-border h-10 cursor-pointer rounded-full font-bold">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem className="cursor-pointer rounded-lg" value="10">
+                    10
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer rounded-lg" value="20">
+                    20
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -131,7 +135,7 @@ const RecommendedJobsView = () => {
                 </motion.div>
               ))
             ) : (
-              <div className="bg-card flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed py-24 text-center">
+              <div className="bg-card flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
                 <div className="bg-muted/20 rounded-full p-6">
                   <Sparkles className="text-muted-foreground/20 h-10 w-10" />
                 </div>
@@ -158,7 +162,7 @@ const RecommendedJobsView = () => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RecommendedJobCard = ({ job }: { job: any }) => (
-  <Card className="group bg-card hover:border-primary/50 relative overflow-hidden rounded-2xl border transition-all hover:shadow-lg">
+  <Card className="group bg-card relative overflow-hidden rounded-xl border transition-all">
     <CardContent className="p-5 sm:p-6 md:p-8">
       <div className="flex flex-col gap-6 md:flex-row md:items-center">
         {/* Company Logo */}
