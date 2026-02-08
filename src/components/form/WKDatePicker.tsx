@@ -12,6 +12,7 @@ interface WKDatePickerProps {
   className?: string;
   min?: string;
   max?: string;
+  disabled?: boolean;
 }
 
 const WKDatePicker = ({
@@ -21,6 +22,7 @@ const WKDatePicker = ({
   className,
   min,
   max,
+  disabled,
 }: WKDatePickerProps) => {
   const {
     control,
@@ -46,6 +48,7 @@ const WKDatePicker = ({
             type="date"
             min={min}
             max={max}
+            disabled={disabled}
             className={cn(
               "h-10",
               hasError && "border-destructive focus-visible:ring-destructive",

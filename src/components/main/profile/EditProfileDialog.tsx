@@ -3,8 +3,6 @@
 import WKCheckbox from "@/components/form/WKCheckbox";
 import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
-import WKSelect from "@/components/form/WkSelect";
-import WKTextArea from "@/components/form/WkTextArea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,6 +18,8 @@ import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useUploadSingleFileMutation } from "../../../redux/feature/upload/uploadApi";
+import WKSelect from "../../form/WkSelect";
+import WKTextArea from "../../form/WkTextArea";
 import ProfileSkillManagement from "./ProfileSkillManagement";
 
 // ========== Types =============>
@@ -328,7 +328,7 @@ const EditProfileDialog = ({
                   <WKInput name="fullName" label="Full Name" required />
                   <WKInput name="phone" label="Phone Number" />
                 </div>
-                <WKTextArea name="bio" label="Professional Bio" rows={4} />
+                <WKTextArea name="bio" label="Professional Bio" />
                 <WKInput name="location" label="Current Location" />
               </section>
 

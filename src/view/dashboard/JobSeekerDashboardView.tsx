@@ -1,5 +1,7 @@
 "use client";
 
+import { JobApplicationsChart } from "@/components/dashboard/charts/JobApplicationsChart";
+import { ProfileViewsChart } from "@/components/dashboard/charts/ProfileViewsChart";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -64,7 +66,7 @@ export default function JobSeekerDashboardView() {
   const appliedCount = applications.length;
 
   return (
-    <div className="min-h-screen">
+    <div className="mt-16 min-h-screen">
       <DashboardJobSeekerHeader />
       <div className="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
@@ -164,6 +166,11 @@ export default function JobSeekerDashboardView() {
               </Link>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+          <ProfileViewsChart />
+          <JobApplicationsChart />
         </div>
 
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
