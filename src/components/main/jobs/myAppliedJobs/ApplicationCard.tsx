@@ -1,57 +1,69 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Application, ApplicationStatus } from "@/data/mockApplications";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
+  ArrowRight,
+  Building2,
   Calendar,
   CheckCircle,
   Clock,
   DollarSign,
   MapPin,
+  MoreVertical,
   XCircle,
 } from "lucide-react";
-import { Badge } from "../../../ui/badge";
-import { Button } from "../../../ui/button";
-import { Card, CardContent } from "../../../ui/card";
+import Image from "next/image";
 
-export interface Application {
-  id: string;
-  title: string;
-  company: {
-    name: string;
-  };
-  location: string;
-  salaryMin: number;
-  salaryMax: number;
-  currency: string;
-  jobType: string;
-  createdAt: string;
-  requirements: string;
-  JobSkill: Array<{ id: string; skillName: string }>;
-  appliedDate: string;
-  status: "pending" | "under_review" | "accepted" | "rejected";
-}
-
-const getStatusConfig = (status: string) => {
+const getStatusConfig = (status: ApplicationStatus) => {
   switch (status) {
     case "pending":
       return {
-        badge: "bg-warning/10 text-warning border-warning/30",
+        badge:
+          "bg-yellow-500/10 text-yellow-600 border-yellow-200/50 dark:border-yellow-900/30",
         icon: Clock,
         label: "Pending",
       };
     case "under_review":
       return {
-        badge: "bg-primary/10 text-primary border-primary/30",
+        badge:
+          "bg-blue-500/10 text-blue-600 border-blue-200/50 dark:border-blue-900/30",
         icon: AlertCircle,
         label: "Under Review",
       };
+    case "interviewing":
+      return {
+        badge:
+          "bg-purple-500/10 text-purple-600 border-purple-200/50 dark:border-purple-900/30",
+        icon: Clock,
+        label: "Interviewing",
+      };
+    case "offer":
+      return {
+        badge:
+          "bg-green-500/10 text-green-600 border-green-200/50 dark:border-green-900/30",
+        icon: CheckCircle,
+        label: "Offer Received",
+      };
     case "accepted":
       return {
-        badge: "bg-success/10 text-success border-success/30",
+        badge:
+          "bg-emerald-500/10 text-emerald-600 border-emerald-200/50 dark:border-emerald-900/30",
         icon: CheckCircle,
         label: "Accepted",
       };
     case "rejected":
       return {
-        badge: "bg-destructive/10 text-destructive border-destructive/30",
+        badge:
+          "bg-red-500/10 text-red-600 border-red-200/50 dark:border-red-900/30",
         icon: XCircle,
         label: "Rejected",
       };
@@ -64,86 +76,157 @@ const getStatusConfig = (status: string) => {
   }
 };
 
-const ApplicationCard = ({ app }: { app: Application }) => {
+const ApplicationCard = ({
+  app,
+  index = 0,
+}: {
+  app: Application;
+  index?: number;
+}) => {
   const statusConfig = getStatusConfig(app.status);
   const StatusIcon = statusConfig.icon;
 
   return (
-    <Card className="bg-card border-border transition-all">
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex-1">
-              <h3 className="text-foreground line-clamp-2 text-lg font-semibold">
-                {app.title}
-              </h3>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {app.company.name}
-              </p>
-            </div>
-            <Badge
-              variant="outline"
-              className={`w-fit shrink-0 gap-1.5 border text-xs sm:text-sm ${statusConfig.badge}`}
-            >
-              <StatusIcon className="h-3.5 w-3.5" />
-              {statusConfig.label}
-            </Badge>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+    >
+      <Card className="group hover:shadow-primary/10 border-border/40 bg-card/60 relative overflow-hidden backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+        <div className="from-primary/5 absolute inset-0 bg-linear-to-br via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-          <div className="text-muted-foreground flex flex-wrap gap-4 text-xs sm:text-sm">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" />
-              <span>{app.location}</span>
+        <CardContent className="relative p-6">
+          <div className="flex flex-col gap-6">
+            {/* Header Section */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="from-muted/50 to-muted border-border/60 group-hover:border-primary/40 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border bg-linear-to-br p-2 shadow-inner transition-colors duration-300">
+                    {app.company.logo ? (
+                      <Image
+                        src={app.company.logo}
+                        alt={app.company.name}
+                        className="h-full w-full object-contain"
+                        fill
+                      />
+                    ) : (
+                      <Building2 className="text-muted-foreground/60 h-7 w-7" />
+                    )}
+                  </div>
+                  <div className="border-background bg-card absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 shadow-sm">
+                    <StatusIcon
+                      className={statusConfig.badge.split(" ")[1] + " h-3 w-3"}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="text-foreground group-hover:text-primary text-xl leading-tight font-bold tracking-tight transition-colors">
+                    {app.title}
+                  </h3>
+                  <p className="text-muted-foreground flex items-center gap-1.5 text-sm font-semibold tracking-wider uppercase">
+                    {app.company.name}
+                  </p>
+                </div>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-muted/60 h-9 w-9 rounded-xl transition-colors"
+                  >
+                    <MoreVertical className="text-muted-foreground/50 h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="border-border/60 w-56 rounded-xl p-2 backdrop-blur-xl"
+                >
+                  <DropdownMenuItem className="h-10 rounded-lg font-medium">
+                    View Application
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="h-10 rounded-lg font-medium">
+                    Company Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive focus:text-destructive h-10 rounded-lg font-medium">
+                    Withdraw
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-medium">{app.jobType}</span>
+
+            {/* Infographic Divider */}
+            <div className="flex items-center gap-4 px-1">
+              <div className="from-border/10 via-border/50 to-border/10 h-px flex-1 bg-linear-to-r" />
             </div>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4" />
-              <span>
-                {new Date(app.appliedDate).toLocaleDateString("en-US", {
+
+            {/* Meta Information */}
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-[13px]">
+              <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
+                <div className="bg-muted/30 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <MapPin className="h-4 w-4" />
+                </div>
+                {app.location}
+              </div>
+              <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
+                <div className="bg-muted/30 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
+                  <DollarSign className="h-4 w-4" />
+                </div>
+                <span className="text-foreground/90 font-bold">
+                  ${app.salaryMax / 1000}k
+                </span>
+                <span className="text-muted-foreground text-[10px] opacity-50">
+                  /yr
+                </span>
+              </div>
+              <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
+                <div className="bg-muted/30 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <Clock className="h-4 w-4" />
+                </div>
+                {app.jobType}
+              </div>
+              <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
+                <div className="bg-muted/30 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <Calendar className="h-4 w-4" />
+                </div>
+                {new Date(app.appliedDate).toLocaleDateString(undefined, {
                   month: "short",
                   day: "numeric",
                 })}
-              </span>
+              </div>
+            </div>
+
+            {/* Status \u0026 Action */}
+            <div className="border-border/40 mt-2 flex items-center justify-between border-t pt-6">
+              <div
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold shadow-sm transition-all",
+                  statusConfig.badge,
+                )}
+              >
+                <div
+                  className={cn(
+                    "h-1.5 w-1.5 animate-pulse rounded-full",
+                    statusConfig.badge.split(" ")[1],
+                  )}
+                />
+                {statusConfig.label}
+              </div>
+
+              <Button
+                variant="outline"
+                className="border-primary/20 hover:bg-primary/5 hover:border-primary/40 group/btn h-10 gap-2 rounded-xl px-5 text-xs font-bold transition-all"
+              >
+                View Details
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </Button>
             </div>
           </div>
-
-          <div className="border-border flex items-center gap-2 border-t py-3">
-            <DollarSign className="text-primary h-4 w-4" />
-            <span className="text-foreground font-semibold">
-              {app.currency} {app.salaryMin.toLocaleString()} -{" "}
-              {app.salaryMax.toLocaleString()}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {app.JobSkill?.map((skill) => (
-              <Badge
-                key={skill.id}
-                variant="outline"
-                className="bg-muted/50 hover:bg-muted rounded-full text-xs"
-              >
-                {skill.skillName}
-              </Badge>
-            ))}
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <Button size="sm" className="flex-1 rounded-full font-medium">
-              View Application
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="flex-1 rounded-full bg-transparent"
-            >
-              View Job
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

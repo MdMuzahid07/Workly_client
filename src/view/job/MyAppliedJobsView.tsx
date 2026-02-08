@@ -1,203 +1,343 @@
 "use client";
+
+import DashboardAppliedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAppliedJobsHeader";
+import { ApplicationRow } from "@/components/main/jobs/myAppliedJobs/ApplicationRow";
+import { ApplicationStats } from "@/components/main/jobs/myAppliedJobs/ApplicationStats";
+import PaginationBar from "@/components/shared/PaginationBar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
-import ApplicationCard, {
-  Application,
-} from "../../components/main/jobs/myAppliedJobs/ApplicationCard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ApplicationStatus, mockApplications } from "@/data/mockApplications";
+import debounce from "debounce";
+import { AnimatePresence } from "framer-motion";
+import { FilterX, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Loader2 } from "lucide-react";
-import ErrorState from "../../components/main/jobs/myAppliedJobs/ErrorState";
-import { useGetMyApplicationsQuery } from "../../redux/feature/application/applicationApi";
-import MyAppliedJobsSkeleton from "../../skeleton/job/MyAppliedJobsSkeleton ";
-
-type ApplicationStatus =
-  | "pending"
-  | "under_review"
-  | "accepted"
-  | "rejected"
-  | null;
+export type DateFilter = "all" | "today" | "last_7_days" | "this_month";
 
 const MyAppliedJobsView = () => {
+  // Query States
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus>(null);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
+    "all",
+  );
+  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
 
-  // debounce search input
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState("10");
+
+  // UI State for search
+  const [searchValue, setSearchValue] = useState("");
+
+  const debouncedSearch = useMemo(
+    () => debounce((value: string) => setSearchTerm(value), 500),
+    [],
+  );
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-    }, 500);
+    debouncedSearch(searchValue);
+    return () => debouncedSearch.clear();
+  }, [searchValue, debouncedSearch]);
 
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+  // Total results (Mocking backend total)
+  const totalResults = mockApplications.length;
+  const jobsLimit = parseInt(limit);
+  const totalPages = Math.ceil(totalResults / jobsLimit);
 
-  const { data, isLoading, isFetching, error } = useGetMyApplicationsQuery({
-    search: debouncedSearch,
-    status: statusFilter,
-  });
-
-  const applications = data?.data || [];
-  const stats = data?.stats || {
-    total: 0,
-    pending: 0,
-    accepted: 0,
-    rejected: 0,
+  // Pagination Meta for shared component
+  const paginationMeta = {
+    page: currentPage,
+    limit: jobsLimit,
+    total: totalResults,
+    pages: totalPages,
   };
 
-  const handleStatusFilter = (status: ApplicationStatus) => {
-    setStatusFilter(status);
+  // Handle current data based on pagination (visual mock only)
+  const currentJobs = useMemo(() => {
+    const start = (currentPage - 1) * jobsLimit;
+    return mockApplications.slice(start, start + jobsLimit);
+  }, [currentPage, jobsLimit]);
+
+  const handleClearFilters = () => {
+    setSearchValue("");
+    setSearchTerm("");
+    setStatusFilter("all");
+    setDateFilter("all");
+    setCurrentPage(1);
   };
 
-  if (isLoading && !error) {
-    return <MyAppliedJobsSkeleton />;
-  }
+  const handleLimitChange = (val: string) => {
+    setLimit(val);
+    setCurrentPage(1);
+  };
 
-  if (error) {
-    return <ErrorState onRetry={() => window.location.reload()} />;
-  }
+  const stats = useMemo(() => {
+    return {
+      total: mockApplications.length,
+      pending: mockApplications.filter((app) => app.status === "pending")
+        .length,
+      interviewing: mockApplications.filter(
+        (app) => app.status === "interviewing",
+      ).length,
+      offer: mockApplications.filter((app) => app.status === "offer").length,
+    };
+  }, []);
 
   return (
-    <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-foreground mb-2 text-3xl font-bold sm:text-4xl">
-            Applied Jobs
-          </h1>
-          <p className="text-muted-foreground">
-            Track all your job applications and their status
-          </p>
-        </div>
+    <div className="min-h-screen pt-16">
+      <DashboardAppliedJobsHeader />
 
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <p className="text-foreground text-2xl font-bold sm:text-3xl">
-                {stats.total}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-                Total
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <p className="text-warning text-2xl font-bold sm:text-3xl">
-                {stats.pending}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-                Pending
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <p className="text-success text-2xl font-bold sm:text-3xl">
-                {stats.accepted}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-                Accepted
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <p className="text-destructive text-2xl font-bold sm:text-3xl">
-                {stats.rejected}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-                Rejected
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="container mx-auto space-y-6 px-4 sm:px-6 sm:py-8">
+        <ApplicationStats stats={stats} />
 
-        <div className="mb-8 space-y-4">
-          <div className="bg-card relative rounded-full">
-            <Search className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
-            {isFetching && !isLoading && (
-              <Loader2 className="text-primary absolute top-3 right-3 h-4 w-4 animate-spin" />
-            )}
-            <Input
-              placeholder="Search by job title or company..."
-              className="bg-muted/40 border-border focus:bg-card focus:border-primary rounded-full pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        {/* Filter Bar */}
+        <Card className="bg-card rounded-2xl border">
+          <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+            <div className="group relative max-w-md flex-1">
+              <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
+              <Input
+                placeholder="Search job title or company..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Select
+                value={dateFilter}
+                onValueChange={(v) => setDateFilter(v as DateFilter)}
+              >
+                <SelectTrigger className="h-10 w-40 cursor-pointer rounded-full font-semibold">
+                  <SelectValue placeholder="All Time" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem className="cursor-pointer rounded-lg" value="all">
+                    All Time
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="today"
+                  >
+                    Today
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="last_7_days"
+                  >
+                    Last 7 Days
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="this_month"
+                  >
+                    This Month
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={statusFilter}
+                onValueChange={(v) =>
+                  setStatusFilter(v as ApplicationStatus | "all")
+                }
+              >
+                <SelectTrigger className="h-10 w-[170px] cursor-pointer rounded-full font-semibold">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem className="cursor-pointer rounded-lg" value="all">
+                    All Statuses
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="pending"
+                  >
+                    Pending
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="under_review"
+                  >
+                    Under Review
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="interviewing"
+                  >
+                    Interviewing
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="offer"
+                  >
+                    Offer Received
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="accepted"
+                  >
+                    Accepted
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="rejected"
+                  >
+                    Rejected
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="hover:bg-destructive/5 hover:text-destructive h-10 rounded-full px-4 font-bold transition-colors"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results Table Section */}
+        <Card className="bg-card overflow-hidden rounded-2xl border">
+          <CardHeader className="bg-muted/5 border-b px-6 py-5">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-black tracking-tight">
+                  Applications List
+                </CardTitle>
+                <p className="text-muted-foreground text-[10px] font-black tracking-[0.2em] uppercase opacity-60">
+                  Manage your active job journey
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+                    Show:
+                  </span>
+                  <Select value={limit} onValueChange={handleLimitChange}>
+                    <SelectTrigger className="h-8 w-[70px] rounded-full text-xs font-bold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem
+                        className="cursor-pointer rounded-lg"
+                        value="10"
+                      >
+                        10
+                      </SelectItem>
+                      <SelectItem
+                        className="cursor-pointer rounded-lg"
+                        value="20"
+                      >
+                        20
+                      </SelectItem>
+                      <SelectItem
+                        className="cursor-pointer rounded-lg"
+                        value="50"
+                      >
+                        50
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/5 text-primary border-primary/10 rounded-full border px-3 py-2 text-[10px] font-black tracking-widest uppercase"
+                >
+                  {totalResults} Applied
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/10">
+                  <TableRow className="border-b hover:bg-transparent">
+                    <TableHead className="text-muted-foreground/70 py-4 pl-6 text-[10px] font-black tracking-[0.2em] uppercase">
+                      Company & Role
+                    </TableHead>
+                    <TableHead className="text-muted-foreground/70 hidden py-4 text-[10px] font-black tracking-[0.2em] uppercase md:table-cell">
+                      Location
+                    </TableHead>
+                    <TableHead className="text-muted-foreground/70 py-4 text-center text-[10px] font-black tracking-[0.2em] uppercase">
+                      Status
+                    </TableHead>
+                    <TableHead className="text-muted-foreground/70 hidden py-4 text-right text-[10px] font-black tracking-[0.2em] uppercase md:table-cell">
+                      Date Applied
+                    </TableHead>
+                    <TableHead className="text-muted-foreground/70 py-4 pr-6 text-right text-[10px] font-black tracking-[0.2em] uppercase">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-border/30 divide-y">
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {currentJobs.length > 0 ? (
+                      currentJobs.map((app) => (
+                        <ApplicationRow key={app.id} app={app} />
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="py-24 text-center">
+                          <div className="flex flex-col items-center gap-6">
+                            <div className="bg-muted/20 ring-muted/5 rounded-full p-8 ring-8">
+                              <FilterX className="text-muted-foreground/30 h-10 w-10" />
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xl font-black tracking-tight">
+                                Search results found nothing
+                              </p>
+                              <p className="text-muted-foreground mx-auto max-w-xs text-sm font-medium">
+                                Try broadening your search terms or resetting
+                                the filters entirely.
+                              </p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              onClick={handleClearFilters}
+                              className="h-11 rounded-xl px-6 font-bold"
+                            >
+                              Clear All Filters
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Shared Pagination Bar */}
+            <PaginationBar
+              meta={paginationMeta}
+              onPageChange={setCurrentPage}
+              className="bg-muted/5 border-t px-6 py-6"
             />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={statusFilter === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter(null)}
-              className="rounded-full"
-            >
-              All
-            </Button>
-            <Button
-              variant={statusFilter === "pending" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("pending")}
-              className="rounded-full"
-            >
-              Pending
-            </Button>
-            <Button
-              variant={statusFilter === "under_review" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("under_review")}
-              className="rounded-full"
-            >
-              Under Review
-            </Button>
-            <Button
-              variant={statusFilter === "accepted" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("accepted")}
-              className="rounded-full"
-            >
-              Accepted
-            </Button>
-            <Button
-              variant={statusFilter === "rejected" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStatusFilter("rejected")}
-              className="rounded-full"
-            >
-              Rejected
-            </Button>
-          </div>
-        </div>
-
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-            {applications.length > 0 ? (
-              applications.map((app: Application) => (
-                <ApplicationCard key={app.id} app={app} />
-              ))
-            ) : (
-              <Card className="bg-card border-border col-span-full">
-                <CardContent className="py-12 text-center">
-                  <p className="text-foreground font-semibold">
-                    No applications found
-                  </p>
-                  <p className="text-muted-foreground mt-2 text-sm">
-                    {searchTerm || statusFilter
-                      ? "Try adjusting your filters"
-                      : "You haven't applied to any jobs yet"}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

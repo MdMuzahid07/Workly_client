@@ -1,5 +1,19 @@
-import { BookmarkCheck, Clock } from "lucide-react";
-import { Card, CardContent } from "../../ui/card";
+"use client";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { BookmarkCheck, LucideIcon, Timer } from "lucide-react";
+
+interface StatItemProps {
+  label: string;
+  value: number;
+  icon: LucideIcon;
+  iconColor: string;
+  iconBg: string;
+  trend?: string;
+  delay?: number;
+}
 
 const StatsCards = ({
   totalSaved,
@@ -7,36 +21,73 @@ const StatsCards = ({
 }: {
   totalSaved: number;
   expiringSoon: number;
-}) => (
-  <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-muted-foreground text-sm font-medium">
-              Total Saved
-            </p>
-            <p className="text-2xl font-bold">{totalSaved}</p>
-          </div>
-          <BookmarkCheck className="text-primary h-8 w-8" />
-        </div>
-      </CardContent>
-    </Card>
+}) => {
+  return (
+    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6">
+      <StatItem
+        label="Total Saved Jobs"
+        value={totalSaved}
+        icon={BookmarkCheck}
+        iconColor="text-primary"
+        iconBg="bg-primary/10"
+        trend="Keep tracking"
+        delay={0.1}
+      />
+      <StatItem
+        label="Expiring Soon"
+        value={expiringSoon}
+        icon={Timer}
+        iconColor="text-amber-500"
+        iconBg="bg-amber-50 dark:bg-amber-500/10"
+        trend="Act fast"
+        delay={0.2}
+      />
+    </div>
+  );
+};
 
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-muted-foreground text-sm font-medium">
-              Expiring Soon
-            </p>
-            <p className="text-2xl font-bold">{expiringSoon}</p>
+const StatItem = ({
+  label,
+  value,
+  icon: Icon,
+  iconColor,
+  iconBg,
+  trend,
+  delay,
+}: StatItemProps) => (
+  <motion.div
+    initial={{ opacity: 0, y: 15 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay }}
+  >
+    <Card className="bg-card relative overflow-hidden border transition-all">
+      <CardContent>
+        <div className="flex items-start justify-between">
+          <div
+            className={cn(
+              "flex items-center justify-center rounded-xl p-3 transition-transform hover:scale-105",
+              iconBg,
+            )}
+          >
+            <Icon className={cn("h-6 w-6", iconColor)} />
           </div>
-          <Clock className="h-8 w-8 text-amber-600" />
+          {trend && (
+            <div className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+              {trend}
+            </div>
+          )}
+        </div>
+        <div className="mt-6">
+          <h3 className="text-primary text-xl font-bold sm:text-2xl">
+            {value}
+          </h3>
+          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+            {label}
+          </p>
         </div>
       </CardContent>
     </Card>
-  </div>
+  </motion.div>
 );
 
 export default StatsCards;
