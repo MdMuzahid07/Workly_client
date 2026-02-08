@@ -105,7 +105,7 @@ const MyAppliedJobsView = () => {
     <div className="min-h-screen pt-16">
       <DashboardAppliedJobsHeader />
 
-      <div className="container mx-auto space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         <ApplicationStats stats={stats} />
 
         {/* Filter Bar */}

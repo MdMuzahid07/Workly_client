@@ -51,7 +51,7 @@ const RecommendedJobsView = () => {
     <div className="min-h-screen pt-16">
       <DashboardRecommendedJobsHeader />
 
-      <div className="container mx-auto space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         {/* Intro Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
