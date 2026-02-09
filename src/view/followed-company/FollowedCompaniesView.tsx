@@ -22,7 +22,6 @@ const FollowedCompaniesView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // Extract industries for the dropdown UI
   const industries = useMemo(() => {
     const allIndustries = mockFollowedCompanies.map((c) => c.industry);
     return ["all", ...Array.from(new Set(allIndustries))];
