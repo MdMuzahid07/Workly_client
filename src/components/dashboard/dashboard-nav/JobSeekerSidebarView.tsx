@@ -228,7 +228,9 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
       {/* Header */}
       <div className="flex h-14 items-center justify-between px-4 sm:h-16">
         <WJLogo />
-        <ThemeToggleButtonCompact />
+        <span className="pr-10 lg:pr-0">
+          <ThemeToggleButtonCompact />
+        </span>
       </div>
 
       <Separator className="opacity-50" />
@@ -456,7 +458,7 @@ export default function JobSeekerSidebarView({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-background/80 hover:bg-background fixed top-3 left-4 z-50 h-10 w-10 rounded-full shadow-sm backdrop-blur-md transition-all"
+            className="bg-background/80 hover:bg-background fixed top-1 right-4 z-999 h-10 w-10 rounded-full border transition-all"
             aria-label="Open sidebar"
           >
             <Menu className="h-5 w-5" />
@@ -464,7 +466,7 @@ export default function JobSeekerSidebarView({
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="w-[280px] max-w-[85vw] border-r p-0 sm:w-[320px]"
+          className="z-9999 w-[280px] max-w-[85vw] border-r p-0 sm:w-[320px]"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Job Seeker Menu</SheetTitle>

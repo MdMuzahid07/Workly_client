@@ -63,12 +63,16 @@ export const SkillsManager = ({
                 Skill <span className="text-destructive">*</span>
               </label>
               <Select value={selectedSkill} onValueChange={setSelectedSkill}>
-                <SelectTrigger className="bg-background">
+                <SelectTrigger className="bg-background border-border cursor-pointer rounded-full">
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
                   {AVAILABLE_SKILLS.map((skill) => (
-                    <SelectItem key={skill} value={skill}>
+                    <SelectItem
+                      className="cursor-pointer"
+                      key={skill}
+                      value={skill}
+                    >
                       {skill}
                     </SelectItem>
                   ))}
@@ -80,14 +84,22 @@ export const SkillsManager = ({
                 Expertise Level <span className="text-destructive">*</span>
               </label>
               <Select value={experience} onValueChange={setExperience}>
-                <SelectTrigger className="bg-background">
+                <SelectTrigger className="bg-background border-border cursor-pointer rounded-full">
                   <SelectValue placeholder="Level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                  <SelectItem value="Expert">Expert</SelectItem>
+                  <SelectItem className="cursor-pointer" value="Beginner">
+                    Beginner
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer" value="Intermediate">
+                    Intermediate
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer" value="Advanced">
+                    Advanced
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer" value="Expert">
+                    Expert
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
