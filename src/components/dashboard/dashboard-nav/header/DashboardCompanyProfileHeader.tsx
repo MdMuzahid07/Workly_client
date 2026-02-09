@@ -24,7 +24,7 @@ const DashboardCompanyProfileHeader = ({
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-4">
-          <Avatar className="bg-primary h-10 w-10 overflow-hidden rounded-full sm:h-12 sm:w-12">
+          <Avatar className="bg-primary h-8 w-8 overflow-hidden rounded-full sm:h-10 sm:w-10 md:h-12 md:w-12">
             <AvatarImage
               src={currentProfile.logoUrl || "/placeholder.svg"}
               alt={currentProfile.name}
@@ -39,7 +39,7 @@ const DashboardCompanyProfileHeader = ({
           </Avatar>
           <div className="space-y-1">
             <div className="space-y-2">
-              <h1 className="text-foreground text-2xl font-bold">
+              <h1 className="text-foreground text-sm font-bold tracking-tight sm:text-lg md:text-xl lg:text-2xl">
                 {currentProfile.name}
               </h1>
               {currentProfile.isVerified && (

@@ -7,16 +7,17 @@ const DashboardJobViewHistoryHeader = () => {
   return (
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="bg-primary/10 ring-primary/5 rounded-lg p-2 ring-4">
-            <Clock className="text-primary h-6 w-6" />
+            <Clock className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
           </div>
           <div>
-            <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl">
+            <h1 className="text-foreground text-sm font-bold tracking-tight sm:text-xl md:text-2xl">
               Job View History
             </h1>
-            <p className="text-muted-foreground text-sm font-medium opacity-80">
-              Keep track of titles {`you've`} explored recently.
+            <p className="text-muted-foreground inline-flex text-xs font-medium opacity-80 sm:text-sm">
+              Keep track of titles {`you've`}
+              <span className="hidden sm:block">&nbsp;explored recently.</span>
             </p>
           </div>
         </div>

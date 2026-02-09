@@ -17,10 +17,10 @@ const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
           <AvatarFallback>TF</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <h1 className="text-foreground truncate text-lg font-bold sm:text-xl lg:text-2xl">
+          <h1 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-lg md:text-xl lg:text-2xl">
             {companyData.name}
           </h1>
-          <p className="text-muted-foreground truncate text-sm">
+          <p className="text-muted-foreground truncate text-xs font-medium opacity-80 sm:text-sm">
             {companyData.industry}
           </p>
         </div>
