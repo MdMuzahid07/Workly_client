@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-
+import DashboardNotificationHeader from "@/components/dashboard/dashboard-nav/header/DashboardNotificationHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  AlertCircle,
   Bell,
   BellRing,
   Briefcase,
@@ -47,7 +45,7 @@ const getNotificationIcon = (type: Notification["type"]) => {
     case "NEW_JOB_MATCH":
       return <BellRing className="h-5 w-5 text-green-500" />;
     case "SYSTEM_ANNOUNCEMENT":
-      return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+      return <BellRing className="h-5 w-5 text-yellow-500" />;
     default:
       return <Bell className="text-muted-foreground h-5 w-5" />;
   }
@@ -163,43 +161,49 @@ const NotificationView = () => {
     return true;
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const markAsRead = (id: string) => {};
-
-  const markAllAsRead = () => {};
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteNotification = (id: string) => {};
 
   return (
-    <div className="bg-primary/2 min-h-screen md:pt-20">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen pt-16">
+      <DashboardNotificationHeader />
+
+      <div className="space-y-6 px-4 py-8 sm:px-6">
         <div>
           {/* Filter Tabs */}
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="mb-6 overflow-x-auto"
-          >
-            <TabsList className="grid w-full min-w-[400px] grid-cols-4 lg:w-auto lg:grid-cols-4">
-              <TabsTrigger value="all" className="cursor-pointer text-sm">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+            <TabsList className="bg-muted/20 border-border inline-flex h-11 w-full items-center justify-start rounded-full border p-1 sm:w-auto">
+              <TabsTrigger
+                value="all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+              >
                 All ({notifications.length})
               </TabsTrigger>
-              <TabsTrigger value="unread" className="cursor-pointer text-sm">
+              <TabsTrigger
+                value="unread"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+              >
                 Unread ({unreadCount})
               </TabsTrigger>
               <TabsTrigger
                 value="applications"
-                className="cursor-pointer text-sm"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
               >
                 Applications
               </TabsTrigger>
-              <TabsTrigger value="messages" className="cursor-pointer text-sm">
+              <TabsTrigger
+                value="messages"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+              >
                 Messages
               </TabsTrigger>
             </TabsList>
           </Tabs>
 
           {/* Notifications List */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filteredNotifications.length > 0 ? (
               filteredNotifications.map((notification) => (
                 <NotificationCard
@@ -210,19 +214,17 @@ const NotificationView = () => {
                   deleteNotification={deleteNotification}
                   markAsRead={markAsRead}
                 />
-                // <NotificationCardSkeleton key={index} />
               ))
             ) : (
-              // Fallback for no notifications
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-                    <Bell className="text-muted-foreground h-8 w-8" />
+              <Card className="bg-card rounded-xl border-2 border-dashed py-24 text-center">
+                <CardContent className="flex flex-col items-center gap-4 p-0">
+                  <div className="bg-muted/20 rounded-full p-6">
+                    <Bell className="text-muted-foreground/20 h-10 w-10" />
                   </div>
-                  <h3 className="text-foreground mb-2 text-lg font-semibold">
+                  <h3 className="text-foreground text-lg font-black tracking-tight">
                     No notifications
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground text-sm font-medium opacity-80">
                     {activeTab === "unread"
                       ? "You're all caught up! No unread notifications."
                       : "You don't have any notifications yet."}

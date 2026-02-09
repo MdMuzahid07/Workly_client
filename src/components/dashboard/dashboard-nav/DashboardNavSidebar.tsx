@@ -135,11 +135,6 @@ const DashboardSidebar = () => {
       hasDropdown: true,
       badge: "3",
     },
-    // {
-    //   icon: Settings,
-    //   label: "Settings",
-    //   href: "/dashboard/settings",
-    // },
   ];
 
   const handleItemClick = () => {
