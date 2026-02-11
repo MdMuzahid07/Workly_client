@@ -1,4 +1,5 @@
 "use client";
+
 import DashboardCompanyJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardCompanyJobsHeader";
 import JobFiltersAndSearch from "@/components/dashboard/job/JobFiltersAndSearch";
 import JobManagementTabs from "@/components/dashboard/job/JobManagementTabs";
@@ -152,53 +153,49 @@ const DashboardJobManagementView = () => {
   });
 
   return (
-    <>
+    <div className="min-h-screen pt-16">
       <DashboardCompanyJobsHeader
         onClose={() => setIsCreateModalOpen(false)}
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
       />
-      <div className="min-h-screen">
-        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <JobStatusCards jobs={jobs} />
+      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
+        <JobStatusCards jobs={jobs} />
 
-          <Card className="border-border bg-card">
-            <div className="border-border border-b p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-foreground text-lg font-semibold">
-                    All Job Postings
-                  </h2>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    Manage and track your job listings
-                  </p>
-                </div>
-              </div>
+        <Card className="bg-card rounded-xl border">
+          <div className="border-border border-b p-6">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-foreground text-lg font-bold tracking-tight sm:text-xl">
+                All Job Postings
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium opacity-80">
+                Manage and track your job listings
+              </p>
             </div>
+          </div>
 
-            <div className="p-6">
-              <JobFiltersAndSearch
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                selectedType={selectedType}
-                setSelectedType={setSelectedType}
-                selectedExperience={selectedExperience}
-                setSelectedExperience={setSelectedExperience}
-                selectedLocation={selectedLocation}
-                setSelectedLocation={setSelectedLocation}
-              />
+          <div className="p-6">
+            <JobFiltersAndSearch
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedType={selectedType}
+              setSelectedType={setSelectedType}
+              selectedExperience={selectedExperience}
+              setSelectedExperience={setSelectedExperience}
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+            />
 
-              <JobManagementTabs
-                jobs={jobs}
-                filteredJobs={filteredJobs}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-              />
-            </div>
-          </Card>
-        </div>
+            <JobManagementTabs
+              jobs={jobs}
+              filteredJobs={filteredJobs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+          </div>
+        </Card>
       </div>
-    </>
+    </div>
   );
 };
 

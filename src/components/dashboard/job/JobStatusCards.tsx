@@ -62,7 +62,7 @@ const JobStatusCards = ({ jobs }: JobStatusCardsProps) => {
   return (
     <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, index) => (
-        <Card key={index} className="bg-card">
+        <Card key={index} className="bg-card rounded-xl border">
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
