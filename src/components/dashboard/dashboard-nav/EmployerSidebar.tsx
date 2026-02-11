@@ -210,7 +210,7 @@ const EmployerSidebar = ({
           type="button"
           onClick={handleSignOut}
           className={cn(
-            "text-destructive hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20 focus-visible:ring-ring inline-flex min-h-[40px] w-full cursor-pointer touch-manipulation items-center justify-start gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all outline-none focus-visible:ring-2 [&_svg]:size-5",
+            "text-destructive hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20 focus-visible:ring-ring inline-flex min-h-10 w-full cursor-pointer touch-manipulation items-center justify-start gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all outline-none focus-visible:ring-2 [&_svg]:size-5",
           )}
         >
           <Icon className="h-5 w-5 shrink-0" />
@@ -223,7 +223,7 @@ const EmployerSidebar = ({
       <Link
         href={href}
         className={cn(
-          "min-h-[40px] w-full touch-manipulation justify-start gap-3 px-3 py-2 text-[13px] font-normal",
+          "min-h-10 w-full touch-manipulation justify-start gap-3 px-3 py-2 text-[13px] font-normal",
           isActive &&
             "bg-primary text-primary-foreground hover:bg-primary font-medium",
           !isActive &&
@@ -341,11 +341,11 @@ const EmployerSidebar = ({
           <Button
             variant="outline"
             size="icon"
-            className="bg-background/95 border-border fixed top-4 left-4 z-50 hidden h-11 w-11 shadow-lg backdrop-blur-sm"
+            className="bg-primary/10 hover:bg-background fixed top-1 right-4 z-999 h-10 w-10 rounded-lg border transition-all sm:top-2"
             aria-label="Open sidebar"
             id="employer-sidebar-trigger"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="text-primary h-5 w-5" />
           </Button>
         </SheetTrigger>
         <SheetContent

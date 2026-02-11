@@ -458,10 +458,10 @@ export default function JobSeekerSidebarView({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-background/80 hover:bg-background fixed top-1 right-4 z-999 h-10 w-10 rounded-full border transition-all"
+            className="bg-primary/10 hover:bg-background fixed top-1 right-4 z-999 h-10 w-10 rounded-lg border transition-all sm:top-2"
             aria-label="Open sidebar"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="text-primary h-5 w-5" />
           </Button>
         </SheetTrigger>
         <SheetContent

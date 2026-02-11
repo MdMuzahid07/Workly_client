@@ -1,5 +1,5 @@
-import CompanyDashboardView from "../../../view/dashboard/CompanyDashboardView";
+import EmployerDashboardView from "../../../view/dashboard/EmployerDashboardView";
 
 export default function EmployerDashboardPage() {
-  return <CompanyDashboardView />;
+  return <EmployerDashboardView />;
 }
