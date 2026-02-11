@@ -54,7 +54,7 @@ const JobFiltersAndSearch = ({
           placeholder="Search jobs by title, location, or type..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border-border pl-10"
+          className="border-border rounded pl-10"
         />
       </div>
 

@@ -46,7 +46,7 @@ const ApplicationStatusCards = ({
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.label} className="bg-card">
+          <Card key={stat.label} className="bg-card border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
                 {stat.label}

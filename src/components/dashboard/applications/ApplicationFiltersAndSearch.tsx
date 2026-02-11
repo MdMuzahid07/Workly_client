@@ -31,45 +31,69 @@ const ApplicationFiltersAndSearch = ({
   onClearFilters,
 }: ApplicationFiltersAndSearchProps) => {
   return (
-    <div className="bg-card flex flex-col gap-4 rounded-2xl p-4 md:flex-row md:items-center md:justify-between">
+    <div className="bg-card flex flex-col gap-4 rounded-2xl border p-4 md:flex-row md:items-center md:justify-between md:p-6">
       <div className="relative max-w-md flex-1">
         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder="Search by applicant name, email, or job..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9"
+          className="border-border rounded-full pl-9"
         />
       </div>
       <div className="flex flex-wrap gap-2">
         <Select value={selectedJob} onValueChange={onJobChange}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="border-border w-[180px] cursor-pointer rounded-full">
             <SelectValue placeholder="All Jobs" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Jobs</SelectItem>
-            <SelectItem value="senior-frontend">
+            <SelectItem className="cursor-pointer" value="all">
+              All Jobs
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="senior-frontend">
               Senior Frontend Developer
             </SelectItem>
-            <SelectItem value="backend-engineer">Backend Engineer</SelectItem>
-            <SelectItem value="product-manager">Product Manager</SelectItem>
-            <SelectItem value="ux-designer">UX Designer</SelectItem>
+            <SelectItem className="cursor-pointer" value="backend-engineer">
+              Backend Engineer
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="product-manager">
+              Product Manager
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="ux-designer">
+              UX Designer
+            </SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={selectedStatus} onValueChange={onStatusChange}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="border-border w-[180px] cursor-pointer rounded-full">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="submitted">Submitted</SelectItem>
-            <SelectItem value="reviewing">Reviewing</SelectItem>
-            <SelectItem value="shortlisted">Shortlisted</SelectItem>
-            <SelectItem value="interviewed">Interviewed</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-            <SelectItem value="offered">Offered</SelectItem>
-            <SelectItem value="accepted">Accepted</SelectItem>
+            <SelectItem className="cursor-pointer" value="all">
+              All Statuses
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="submitted">
+              Submitted
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="reviewing">
+              Reviewing
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="shortlisted">
+              Shortlisted
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="interviewed">
+              Interviewed
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="rejected">
+              Rejected
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="offered">
+              Offered
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="accepted">
+              Accepted
+            </SelectItem>
           </SelectContent>
         </Select>
 

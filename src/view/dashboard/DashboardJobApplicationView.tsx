@@ -113,10 +113,10 @@ const DashboardJobApplicationView = () => {
   const filteredApplications = getApplicationsByStatus(activeTab);
 
   return (
-    <div className="min-h-screen">
+    <div className="mt-16 min-h-screen">
       <DashboardApplicationsHeader />
 
-      <div className="container mx-auto space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         <ApplicationStatusCards
           totalApplications={156}
           newThisWeek={12}
@@ -135,167 +135,173 @@ const DashboardJobApplicationView = () => {
           onClearFilters={handleClearFilters}
         />
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-card w-full">
-            <TabsTrigger value="all">
-              All ({mockApplications.length})
-            </TabsTrigger>
-            <TabsTrigger value="submitted">
-              Submitted ({getApplicationsByStatus("submitted").length})
-            </TabsTrigger>
-            <TabsTrigger value="reviewing">
-              Reviewing ({getApplicationsByStatus("reviewing").length})
-            </TabsTrigger>
-            <TabsTrigger value="shortlisted">
-              Shortlisted ({getApplicationsByStatus("shortlisted").length})
-            </TabsTrigger>
-            <TabsTrigger value="interviewed">
-              Interviewed ({getApplicationsByStatus("interviewed").length})
-            </TabsTrigger>
-            <TabsTrigger value="rejected">
-              Rejected ({getApplicationsByStatus("rejected").length})
-            </TabsTrigger>
-          </TabsList>
+        <div className="rounded-2xl border px-4 py-6 md:px-6 md:py-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="bg-card w-full border p-0">
+              <TabsTrigger className="py-3" value="all">
+                All ({mockApplications.length})
+              </TabsTrigger>
+              <TabsTrigger className="py-3" value="submitted">
+                Submitted ({getApplicationsByStatus("submitted").length})
+              </TabsTrigger>
+              <TabsTrigger className="py-3" value="reviewing">
+                Reviewing ({getApplicationsByStatus("reviewing").length})
+              </TabsTrigger>
+              <TabsTrigger className="py-3" value="shortlisted">
+                Shortlisted ({getApplicationsByStatus("shortlisted").length})
+              </TabsTrigger>
+              <TabsTrigger className="py-3" value="interviewed">
+                Interviewed ({getApplicationsByStatus("interviewed").length})
+              </TabsTrigger>
+              <TabsTrigger className="py-3" value="rejected">
+                Rejected ({getApplicationsByStatus("rejected").length})
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value={activeTab} className="mt-6">
-            <Card className="bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">
-                  Application List
-                </CardTitle>
-                <CardDescription>
-                  {filteredApplications.length} applications found
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="border-b">
-                      <tr>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Applicant
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Job Title
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Location
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Applied Date
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                          Status
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-right text-xs font-medium tracking-wider uppercase">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {filteredApplications.length === 0 ? (
+            <TabsContent value={activeTab} className="mt-6">
+              <Card className="bg-card">
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl">
+                    Application List
+                  </CardTitle>
+                  <CardDescription>
+                    {filteredApplications.length} applications found
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="border-b">
                         <tr>
-                          <td colSpan={6} className="px-4 py-12 text-center">
-                            <div className="flex flex-col items-center gap-2">
-                              <FileText className="text-muted-foreground/50 h-12 w-12" />
-                              <p className="text-muted-foreground text-sm">
-                                No applications found
-                              </p>
-                            </div>
-                          </td>
+                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
+                            Applicant
+                          </th>
+                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
+                            Job Title
+                          </th>
+                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
+                            Location
+                          </th>
+                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
+                            Applied Date
+                          </th>
+                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
+                            Status
+                          </th>
+                          <th className="text-muted-foreground px-4 py-3 text-right text-xs font-medium tracking-wider uppercase">
+                            Actions
+                          </th>
                         </tr>
-                      ) : (
-                        filteredApplications.map((application) => {
-                          const initials = application.applicantName
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase();
+                      </thead>
+                      <tbody className="divide-y">
+                        {filteredApplications.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="px-4 py-12 text-center">
+                              <div className="flex flex-col items-center gap-2">
+                                <FileText className="text-muted-foreground/50 h-12 w-12" />
+                                <p className="text-muted-foreground text-sm">
+                                  No applications found
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredApplications.map((application) => {
+                            const initials = application.applicantName
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase();
 
-                          return (
-                            <tr
-                              key={application.id}
-                              className="hover:bg-muted/50"
-                            >
-                              <td className="px-4 py-4 whitespace-nowrap">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="h-10 w-10">
-                                    <AvatarImage
-                                      src={
-                                        application.applicantAvatar ||
-                                        "/placeholder.svg" ||
-                                        "/placeholder.svg"
-                                      }
-                                    />
-                                    <AvatarFallback>{initials}</AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <p className="font-medium">
-                                      {application.applicantName}
-                                    </p>
-                                    <p className="text-muted-foreground text-sm">
-                                      {application.applicantEmail}
-                                    </p>
+                            return (
+                              <tr
+                                key={application.id}
+                                className="hover:bg-muted/50"
+                              >
+                                <td className="px-4 py-4 whitespace-nowrap">
+                                  <div className="flex items-center gap-3">
+                                    <Avatar className="h-10 w-10">
+                                      <AvatarImage
+                                        src={
+                                          application.applicantAvatar ||
+                                          "/placeholder.svg" ||
+                                          "/placeholder.svg"
+                                        }
+                                      />
+                                      <AvatarFallback>
+                                        {initials}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <p className="font-medium">
+                                        {application.applicantName}
+                                      </p>
+                                      <p className="text-muted-foreground text-sm">
+                                        {application.applicantEmail}
+                                      </p>
+                                    </div>
                                   </div>
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <p className="font-medium">
-                                  {application.jobTitle}
-                                </p>
-                              </td>
-                              <td className="px-4 py-4">
-                                <p className="text-sm">
-                                  {application.jobLocation}
-                                </p>
-                              </td>
-                              <td className="px-4 py-4">
-                                <p className="text-sm">
-                                  {application.appliedDate}
-                                </p>
-                              </td>
-                              <td className="px-4 py-4">
-                                <Badge
-                                  variant="outline"
-                                  className={getStatusColor(application.status)}
-                                >
-                                  {application.status}
-                                </Badge>
-                              </td>
-                              <td className="px-4 py-4 text-right">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>
-                                      <Eye className="mr-2 h-4 w-4" />
-                                      View Details
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                      <CheckCircle className="mr-2 h-4 w-4" />
-                                      Move to Next Stage
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">
-                                      <XCircle className="mr-2 h-4 w-4" />
-                                      Reject Application
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <p className="font-medium">
+                                    {application.jobTitle}
+                                  </p>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <p className="text-sm">
+                                    {application.jobLocation}
+                                  </p>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <p className="text-sm">
+                                    {application.appliedDate}
+                                  </p>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <Badge
+                                    variant="outline"
+                                    className={getStatusColor(
+                                      application.status,
+                                    )}
+                                  >
+                                    {application.status}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-4 text-right">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="sm">
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem>
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        View Details
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem>
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        Move to Next Stage
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem className="text-destructive">
+                                        <XCircle className="mr-2 h-4 w-4" />
+                                        Reject Application
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
