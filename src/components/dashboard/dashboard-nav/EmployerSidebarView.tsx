@@ -2,7 +2,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -14,23 +13,22 @@ import {
 import { cn } from "@/lib/utils";
 import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
-import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
-  BarChart3,
   Bell,
-  Bookmark,
   Briefcase,
   Building2,
-  Clock,
-  Eye,
-  FileText,
+  Heart,
+  LayoutDashboard,
   LogOut,
   Menu,
   MessageCircle,
-  Search,
+  Package,
+  Pencil,
+  Plus,
+  Receipt,
   Settings,
-  User,
+  UserCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -51,33 +49,7 @@ interface SidebarGroupProps {
   items: SidebarItemProps[];
 }
 
-function computeProfileCompletion(
-  data:
-    | {
-        profile?: {
-          bio?: string | null;
-          location?: string | null;
-          avatarUrl?: string | null;
-          resumeUrl?: string | null;
-        };
-        fullName?: string;
-      }
-    | undefined,
-): number {
-  if (!data) return 0;
-  const { profile } = data;
-  const fields = [
-    !!data.fullName,
-    !!profile?.bio,
-    !!profile?.location,
-    !!profile?.avatarUrl,
-    !!profile?.resumeUrl,
-  ];
-  const filled = fields.filter(Boolean).length;
-  return Math.min(100, Math.round((filled / fields.length) * 100));
-}
-
-const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
+const EmployerSidebarItem = memo(function EmployerSidebarItem({
   icon: Icon,
   label,
   href,
@@ -95,7 +67,7 @@ const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
   const normalizedHref = href.replace(/\/$/, "");
   const isExact = normalizedPath === normalizedHref;
   const isSection =
-    normalizedHref !== "/dashboard" &&
+    normalizedHref !== "/employer" &&
     normalizedPath.startsWith(normalizedHref + "/");
   const isActive = isExact || isSection;
 
@@ -144,13 +116,11 @@ const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
   );
 });
 
-const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
+const EmployerSidebarContent = memo(function EmployerSidebarContent({
   navGroups,
   bottomItems,
   pathname,
   user,
-  profile,
-  profileCompletion,
   onSignOut,
   onItemClick,
 }: {
@@ -158,8 +128,6 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   bottomItems: SidebarItemProps[];
   pathname: string;
   user: { fullName?: string; avatar?: string } | null;
-  profile: { avatarUrl?: string | null } | undefined;
-  profileCompletion: number;
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
@@ -175,41 +143,33 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
 
       <Separator className="opacity-50" />
 
-      {/* Profile Section */}
-      <div className="px-4 py-6">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
-            <AvatarImage
-              src={profile?.avatarUrl || user?.avatar}
-              alt={user?.fullName}
-            />
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+      {/* Company Profile Section */}
+      <div className="px-4 py-4">
+        <Link
+          href="/employer/company-profile"
+          className="group border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 flex items-center gap-3 rounded-lg border p-3 transition-all hover:shadow-sm"
+        >
+          <Avatar className="h-10 w-10 shrink-0 sm:h-11 sm:w-11">
+            <AvatarImage src={user?.avatar} alt={user?.fullName} />
+            <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
               {user?.fullName
                 ?.split(" ")
                 .map((n) => n[0])
                 .join("")
                 .toUpperCase()
-                .slice(0, 2) || "U"}
+                .slice(0, 2) || <Building2 className="h-5 w-5" />}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="text-foreground truncate text-sm font-semibold">
-              {user?.fullName || "User"}
+              {user?.fullName || "Company Name"}
             </p>
-            <div className="mt-1.5 flex items-center gap-2">
-              <Progress value={profileCompletion} className="h-1.5 flex-1" />
-              <span className="text-muted-foreground text-[10px] font-medium">
-                {profileCompletion}%
-              </span>
-            </div>
-            <Link
-              href="/dashboard/profile"
-              className="text-muted-foreground hover:text-primary mt-0.5 block truncate text-[10px] transition-colors"
-            >
-              Complete your profile
-            </Link>
+            <p className="text-muted-foreground truncate text-xs">
+              Employer Account
+            </p>
           </div>
-        </div>
+          <Pencil className="text-muted-foreground h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+        </Link>
       </div>
 
       {/* Navigation */}
@@ -224,7 +184,7 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => (
-                  <JobSeekerSidebarItem
+                  <EmployerSidebarItem
                     key={item.href}
                     {...item}
                     pathname={pathname}
@@ -243,7 +203,7 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
         <Separator className="mb-3 opacity-50" />
         <nav className="space-y-1">
           {bottomItems.map((item) => (
-            <JobSeekerSidebarItem
+            <EmployerSidebarItem
               key={item.href}
               {...item}
               pathname={pathname}
@@ -272,7 +232,7 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   );
 });
 
-export default function JobSeekerSidebarView({
+export default function EmployerSidebarView({
   isOpen: controlledIsOpen,
   onOpenChange,
 }: {
@@ -288,11 +248,6 @@ export default function JobSeekerSidebarView({
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
-  const { data: profileData } = useGetProfileQuery(undefined, {
-    skip: !user?.id,
-  });
-  const profile = profileData?.data?.profile;
-  const profileCompletion = computeProfileCompletion(profileData?.data);
 
   const handleSignOut = async () => {
     try {
@@ -316,62 +271,52 @@ export default function JobSeekerSidebarView({
 
   const navGroups: SidebarGroupProps[] = [
     {
-      title: "Overview",
+      title: "Job Posting & Management",
       items: [
-        { icon: BarChart3, label: "Dashboard", href: "/dashboard" },
-        { icon: User, label: "My Profile", href: "/dashboard/profile" },
-        { icon: Eye, label: "Profile Views", href: "/dashboard/profile-views" },
+        { icon: LayoutDashboard, label: "Dashboard", href: "/employer" },
+        { icon: Plus, label: "New Job Post", href: "/employer/post-job" },
+        { icon: Briefcase, label: "Posted Jobs", href: "/employer/jobs" },
       ],
     },
     {
-      title: "Job Applications",
+      title: "Talent & Candidates",
       items: [
         {
-          icon: FileText,
-          label: "Applied Jobs",
-          href: "/dashboard/applied-jobs",
+          icon: Heart,
+          label: "Saved Profiles",
+          href: "/employer/saved-profiles",
         },
-        { icon: Bookmark, label: "Saved Jobs", href: "/dashboard/saved-jobs" },
         {
-          icon: Clock,
-          label: "History",
-          href: "/dashboard/job-view-history",
+          icon: UserCheck,
+          label: "Talent Management",
+          href: "/employer/talent",
         },
+        { icon: MessageCircle, label: "Messages", href: "/employer/messages" },
       ],
     },
     {
-      title: "Discover",
+      title: "Company & Billing",
       items: [
-        { icon: Search, label: "Find Jobs", href: "/dashboard/find-jobs" },
-        {
-          icon: Briefcase,
-          label: "Recommended",
-          href: "/dashboard/recommended-jobs",
-        },
         {
           icon: Building2,
-          label: "Companies",
-          href: "/dashboard/followed-company",
+          label: "Company Profile",
+          href: "/employer/company-profile",
         },
-      ],
-    },
-    {
-      title: "Account",
-      items: [
-        { icon: FileText, label: "CV Manager", href: "/dashboard/cv-manager" },
-        { icon: MessageCircle, label: "Messages", href: "/dashboard/messages" },
-        {
-          icon: Bell,
-          label: "Notifications",
-          href: "/dashboard/notifications",
-        },
-        { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+        { icon: Package, label: "Pricing Packages", href: "/employer/pricing" },
+        { icon: Receipt, label: "Billing Details", href: "/employer/billing" },
       ],
     },
   ];
 
   const bottomItems: SidebarItemProps[] = [
-    { icon: LogOut, label: "Sign Out", href: "/", signOut: true },
+    {
+      icon: Bell,
+      label: "Notification",
+      href: "/employer/notifications",
+      badge: "3",
+    },
+    { icon: Settings, label: "Settings", href: "/employer/settings" },
+    { icon: LogOut, label: "Logout", href: "/", signOut: true },
   ];
 
   return (
@@ -379,13 +324,11 @@ export default function JobSeekerSidebarView({
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
         <div className="border-sidebar-border bg-sidebar flex flex-1 flex-col border-r shadow-sm">
-          <JobSeekerSidebarContent
+          <EmployerSidebarContent
             navGroups={navGroups}
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
-            profile={profile}
-            profileCompletion={profileCompletion}
             onSignOut={handleSignOut}
             onItemClick={handleItemClick}
           />
@@ -409,15 +352,13 @@ export default function JobSeekerSidebarView({
           className="z-9999 w-[280px] max-w-[85vw] border-r p-0 sm:w-[320px]"
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Job Seeker Menu</SheetTitle>
+            <SheetTitle>Employer Menu</SheetTitle>
           </SheetHeader>
-          <JobSeekerSidebarContent
+          <EmployerSidebarContent
             navGroups={navGroups}
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
-            profile={profile}
-            profileCompletion={profileCompletion}
             onSignOut={handleSignOut}
             onItemClick={handleItemClick}
           />
