@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { JwtPayload, jwtDecode } from "jwt-decode";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 import { useGetCategoriesQuery } from "../../../redux/feature/category/categoryApi";
-import { useCreateJobMutation } from "../../../redux/feature/job/jobApi";
-import { useAppSelector } from "../../../redux/hooks";
 import WKCheckbox from "../../form/WKCheckbox";
 import WKDatePicker from "../../form/WKDatePicker";
 import WkForm from "../../form/WkForm";
@@ -15,39 +14,57 @@ import WKInput from "../../form/WkInput";
 import WKSelect from "../../form/WkSelect";
 import WKTextArea from "../../form/WkTextArea";
 import { Button } from "../../ui/button";
-import CreateJobFromSkillSection, {
-  SkillRequired,
-} from "./CreateJobFromSkillSection";
+import CreateJobFromSkillSection from "./CreateJobFromSkillSection";
 import StringArrayField from "./StringArrayField";
 
-export interface JobFormData {
-  title: string;
-  discipline: string;
-  industryId: string;
-  jobType: string;
-  experienceLevel: string;
-  location: string;
-  isRemote: boolean;
-  salaryMin: number;
-  salaryMax: number;
-  currency: string;
-  description: string;
-  requirements: string[];
-  benefits: string[];
-  contactEmail: string;
-  applicationDeadline: string;
-  maxApplications: number;
-  isFeatured: boolean;
-  autoCloseApplications: boolean;
-  skillsRequired: SkillRequired[];
-}
+const jobSchema = z
+  .object({
+    title: z.string().min(3, "Job title must be at least 3 characters"),
+    discipline: z.string().min(1, "Discipline is required"),
+    industryId: z.string().min(1, "Industry is required"),
+    jobType: z.string().min(1, "Job type is required"),
+    experienceLevel: z.string().min(1, "Experience level is required"),
+    location: z.string().min(1, "Location is required"),
+    isRemote: z.boolean().default(false),
+    salaryMin: z.coerce.number().min(0, "Minimum salary must be 0 or more"),
+    salaryMax: z.coerce.number().min(0, "Maximum salary must be 0 or more"),
+    currency: z.string().min(1, "Currency is required"),
+    description: z
+      .string()
+      .min(20, "Description must be at least 20 characters"),
+    requirements: z
+      .array(z.string())
+      .min(1, "At least one requirement is required"),
+    benefits: z.array(z.string()).optional().default([]),
+    contactEmail: z.string().email("Invalid email address"),
+    applicationDeadline: z.string().min(1, "Application deadline is required"),
+    maxApplications: z.coerce
+      .number()
+      .min(1, "Max applications must be at least 1"),
+    isFeatured: z.boolean().default(false),
+    autoCloseApplications: z.boolean().default(true),
+    skillsRequired: z
+      .array(
+        z.object({
+          skillId: z.string(),
+          experienceYears: z.coerce.number(),
+          level: z.string(),
+        }),
+      )
+      .optional()
+      .default([]),
+  })
+  .refine((data) => data.salaryMax >= data.salaryMin, {
+    message: "Maximum salary must be greater than or equal to minimum salary",
+    path: ["salaryMax"],
+  });
 
-interface AuthTokenPayload extends JwtPayload {
-  companyId?: string | number;
-}
+export type JobFormData = z.infer<typeof jobSchema>;
 
 interface CreateNewJobFormProps {
   onClose?: () => void;
+  currentStep: number;
+  onStepChange: (step: number) => void;
 }
 
 const SubcategorySelect = ({ categories }: { categories: any }) => {
@@ -83,43 +100,41 @@ const SubcategorySelect = ({ categories }: { categories: any }) => {
   );
 };
 
-const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
-  const [createJob, { isLoading }] = useCreateJobMutation();
+const CreateNewJobForm = ({
+  onClose,
+  currentStep,
+  onStepChange,
+}: CreateNewJobFormProps) => {
   const { data: categories, isLoading: categoriesLoading } =
     useGetCategoriesQuery(undefined);
-  const user = useAppSelector((state) => state.auth.user);
-  const decodedToken = jwtDecode<AuthTokenPayload>(
-    localStorage.getItem("accessToken") || "",
-  );
 
-  const userCompanyId = decodedToken?.companyId || user?.companyId;
+  const handleSubmit = (data: JobFormData) => {
+    console.log("=== Job Form Submitted ===");
+    console.log("Form Data:", data);
+    console.log("Step:", currentStep);
+    console.log("========================");
 
-  const handleSubmit = async (data: JobFormData) => {
-    try {
-      const payload = {
-        ...data,
-        companyId: userCompanyId,
-        salaryMin: Number(data.salaryMin),
-        salaryMax: Number(data.salaryMax),
-        maxApplications: Number(data.maxApplications),
-        isActive: true,
-        applicationDeadline: new Date(data.applicationDeadline).toISOString(),
-        skillsRequired: data.skillsRequired.map((skill) => ({
-          ...skill,
-          experienceYears: Number(skill.experienceYears),
-        })),
-      };
+    // Show success message
+    toast.success("Job form data logged to console!");
 
-      const response = await createJob(payload).unwrap();
-      toast.success(response?.message ?? "Job created successfully");
-      onClose?.();
-    } catch (error) {
-      const errorMessage =
-        (error as { data?: { message?: string }; message?: string })?.data
-          ?.message ??
-        (error as { message?: string })?.message ??
-        "Failed to create job";
-      toast.error(errorMessage);
+    // Reset to first step
+    onStepChange(1);
+
+    // Close modal if provided
+    onClose?.();
+  };
+
+  const handleNext = () => {
+    if (currentStep < 4) {
+      onStepChange(currentStep + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      onStepChange(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -149,11 +164,6 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
       "Strong work ethic and professional attitude",
       "Willingness to learn and develop new skills",
       "Ability to handle multiple tasks simultaneously",
-      "Good interpersonal skills",
-      "Critical thinking and analytical skills",
-      "Positive attitude and enthusiasm",
-      "Collaborative mindset",
-      "Ability to work under pressure",
     ],
     benefits: [
       "Performance bonuses and yearly increments",
@@ -164,22 +174,6 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
       "Transportation or conveyance allowance",
       "Lunch or meal allowance",
       "Paid time off and sick leave",
-      "Casual leave and earned leave",
-      "Public holiday observance",
-      "Prayer break facilities",
-      "Training and skill development programs",
-      "Online course subscriptions",
-      "Mentorship programs",
-      "Professional certification support",
-      "Annual health checkups",
-      "Gym membership or wellness programs",
-      "Mental health support",
-      "Ergonomic workspace setup",
-      "Health and safety equipment",
-      "Annual team outings or trips",
-      "Free snacks and beverages",
-      "Employee recognition programs",
-      "Performance-based stock options",
     ],
     contactEmail: "",
     applicationDeadline: "",
@@ -190,171 +184,259 @@ const CreateNewJobForm = ({ onClose }: CreateNewJobFormProps) => {
   };
 
   return (
-    <WkForm<JobFormData> onSubmit={handleSubmit} defaultValues={defaultValues}>
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WKInput
-              name="title"
-              label="Job Title"
-              placeholder="Write job title"
-              required
-            />
+    <WkForm<JobFormData>
+      onSubmit={handleSubmit}
+      defaultValues={defaultValues}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      resolver={zodResolver(jobSchema)}
+    >
+      <div className="space-y-8">
+        {/* Step 1: Basic Information */}
+        {currentStep === 1 && (
+          <div className="animate-in fade-in-50 space-y-6 duration-300">
+            <div>
+              <h2 className="text-foreground text-lg font-semibold">
+                Basic Information
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {`Let's`} start with the essential details about this position
+              </p>
+            </div>
 
-            <WKSelect
-              name="jobType"
-              label="Job Type"
-              placeholder="Select type"
-              className="w-full"
-              required
-              options={[
-                { value: "FULL_TIME", label: "Full-time" },
-                { value: "PART_TIME", label: "Part-time" },
-                { value: "CONTRACT", label: "Contract" },
-                { value: "INTERNSHIP", label: "Internship" },
-              ]}
-            />
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <WKInput
+                  name="title"
+                  label="Job Title"
+                  placeholder="e.g., Senior Software Engineer"
+                  required
+                />
+
+                <WKSelect
+                  name="jobType"
+                  label="Job Type"
+                  placeholder="Select type"
+                  className="w-full"
+                  required
+                  options={[
+                    { value: "FULL_TIME", label: "Full-time" },
+                    { value: "PART_TIME", label: "Part-time" },
+                    { value: "CONTRACT", label: "Contract" },
+                    { value: "INTERNSHIP", label: "Internship" },
+                  ]}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <WKSelect
+                  className="w-full"
+                  name="experienceLevel"
+                  label="Experience Level"
+                  placeholder="Select level"
+                  required
+                  options={[
+                    { value: "Entry", label: "Entry Level" },
+                    { value: "Mid", label: "Mid-level" },
+                    { value: "Senior", label: "Senior" },
+                    { value: "Lead", label: "Lead" },
+                  ]}
+                />
+
+                <WKInput
+                  name="location"
+                  label="Location"
+                  placeholder="e.g., Dhaka, Bangladesh"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <WKSelect
+                  className="w-full"
+                  name="industryId"
+                  label="Industry"
+                  placeholder={
+                    categoriesLoading ? "Loading..." : "Select Industry"
+                  }
+                  required
+                  options={
+                    categories?.data?.map((cat: any) => ({
+                      value: cat.id,
+                      label: cat.name,
+                    })) || []
+                  }
+                />
+                <SubcategorySelect categories={categories} />
+              </div>
+
+              <WKCheckbox name="isRemote" label="This is a remote position" />
+            </div>
           </div>
+        )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WKSelect
-              className="w-full"
-              name="experienceLevel"
-              label="Experience Level"
-              placeholder="Select level"
-              required
-              options={[
-                { value: "Entry", label: "Entry Level" },
-                { value: "Mid", label: "Mid-level" },
-                { value: "Senior", label: "Senior" },
-                { value: "Lead", label: "Lead" },
-              ]}
-            />
+        {/* Step 2: Job Details */}
+        {currentStep === 2 && (
+          <div className="animate-in fade-in-50 space-y-6 duration-300">
+            <div>
+              <h2 className="text-foreground text-lg font-semibold">
+                Job Details
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Describe the role and what {`you're`} looking for
+              </p>
+            </div>
 
-            <WKInput
-              name="location"
-              label="Location"
-              placeholder="Add company location"
-              required
-            />
+            <div className="space-y-4">
+              <WKTextArea
+                name="description"
+                label="Job Description"
+                placeholder="Provide a detailed description of the role, responsibilities, and what makes this opportunity unique..."
+                required
+                rows={6}
+              />
+
+              <StringArrayField
+                fieldName="requirements"
+                label="Requirements"
+                placeholder="Enter a requirement..."
+                required
+              />
+
+              <CreateJobFromSkillSection />
+            </div>
           </div>
+        )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WKSelect
-              className="w-full"
-              name="industryId"
-              label="Industry"
-              placeholder={categoriesLoading ? "Loading..." : "Select Industry"}
-              required
-              options={
-                categories?.data?.map((cat: any) => ({
-                  value: cat.id,
-                  label: cat.name,
-                })) || []
-              }
-            />
-            <SubcategorySelect categories={categories} />
+        {/* Step 3: Compensation & Benefits */}
+        {currentStep === 3 && (
+          <div className="animate-in fade-in-50 space-y-6 duration-300">
+            <div>
+              <h2 className="text-foreground text-lg font-semibold">
+                Compensation & Benefits
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Define the salary range and benefits package
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <WKInput
+                  name="salaryMin"
+                  label="Minimum Salary"
+                  type="text"
+                  placeholder="e.g., 50000"
+                  required
+                />
+
+                <WKInput
+                  name="salaryMax"
+                  label="Maximum Salary"
+                  type="text"
+                  placeholder="e.g., 80000"
+                  required
+                />
+
+                <WKSelect
+                  className="w-full"
+                  name="currency"
+                  label="Currency"
+                  placeholder="Select"
+                  required
+                  options={[
+                    { value: "BDT", label: "BDT" },
+                    { value: "USD", label: "USD" },
+                    { value: "EUR", label: "EUR" },
+                  ]}
+                />
+              </div>
+
+              <StringArrayField
+                fieldName="benefits"
+                label="Benefits"
+                placeholder="Enter a benefit..."
+              />
+            </div>
           </div>
+        )}
 
-          <WKCheckbox name="isRemote" label="Remote position" />
+        {/* Step 4: Application Settings */}
+        {currentStep === 4 && (
+          <div className="animate-in fade-in-50 space-y-6 duration-300">
+            <div>
+              <h2 className="text-foreground text-lg font-semibold">
+                Application Settings
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Configure how candidates can apply
+              </p>
+            </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            <WKInput
-              name="salaryMin"
-              label="Minimum Salary"
-              type="text"
-              required
-            />
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <WKInput
+                  name="contactEmail"
+                  label="Contact Email"
+                  type="email"
+                  placeholder="hr@company.com"
+                  required
+                />
 
-            <WKInput
-              name="salaryMax"
-              label="Maximum Salary"
-              type="text"
-              required
-            />
+                <WKDatePicker
+                  name="applicationDeadline"
+                  label="Application Deadline"
+                  required
+                  min={getTodayDate()}
+                />
+              </div>
 
-            <WKSelect
-              className="w-full"
-              name="currency"
-              label="Currency"
-              placeholder="Select"
-              required
-              options={[
-                { value: "BDT", label: "BDT" },
-                { value: "USD", label: "USD" },
-                { value: "EUR", label: "EUR" },
-              ]}
-            />
+              <WKInput
+                name="maxApplications"
+                label="Maximum Applications"
+                type="text"
+                placeholder="e.g., 100"
+              />
+
+              <div className="bg-muted/30 space-y-3 rounded-lg border p-4">
+                <p className="text-foreground text-sm font-medium">
+                  Additional Options
+                </p>
+                <WKCheckbox
+                  name="isFeatured"
+                  label="Mark as featured job (appears at the top of listings)"
+                />
+                <WKCheckbox
+                  name="autoCloseApplications"
+                  label="Automatically close applications when maximum is reached"
+                />
+              </div>
+            </div>
           </div>
+        )}
 
-          <WKTextArea
-            name="description"
-            label="Job Description"
-            placeholder="Write job description..."
-            required
-            rows={5}
-          />
-
-          <StringArrayField
-            fieldName="requirements"
-            label="Requirements"
-            placeholder="Enter a requirement..."
-            required
-          />
-
-          <StringArrayField
-            fieldName="benefits"
-            label="Benefits"
-            placeholder="Enter a benefit..."
-          />
-
-          <CreateJobFromSkillSection />
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WKInput
-              name="contactEmail"
-              label="Contact Email"
-              type="email"
-              placeholder="Add contact email"
-              required
-            />
-
-            <WKDatePicker
-              name="applicationDeadline"
-              label="Application Deadline"
-              required
-              min={getTodayDate()}
-            />
-          </div>
-
-          <WKInput
-            name="maxApplications"
-            label="Maximum Applications"
-            type="text"
-          />
-
-          <div className="space-y-2">
-            <WKCheckbox name="isFeatured" label="Mark as featured job" />
-            <WKCheckbox
-              name="autoCloseApplications"
-              label="Auto-close when max applications reached"
-            />
-          </div>
-        </div>
-
-        <div className="border-primary/10 flex justify-end gap-3 border-t pt-6">
+        {/* Navigation Buttons */}
+        <div className="border-border flex items-center justify-between gap-3 border-t pt-6">
           <Button
             type="button"
             variant="outline"
-            onClick={onClose ? onClose : undefined}
-            className="bg-transparent"
-            disabled={isLoading}
+            onClick={currentStep === 1 ? onClose : handlePrevious}
+            className="min-w-24"
           >
-            Cancel
+            {currentStep === 1 ? "Cancel" : "Previous"}
           </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Creating..." : "Create Job Posting"}
-          </Button>
+
+          <div className="flex gap-2">
+            {currentStep < 4 ? (
+              <Button type="button" onClick={handleNext} className="min-w-24">
+                Next Step
+              </Button>
+            ) : (
+              <Button type="submit" className="min-w-32">
+                Create Job Posting
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </WkForm>

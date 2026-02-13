@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Briefcase, Plus } from "lucide-react";
+import { useState } from "react";
 import CreateNewJobForm from "../../job/CreateNewJobForm";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
@@ -24,6 +25,7 @@ const DashboardCompanyJobsHeader = ({
   isCreateModalOpen,
   setIsCreateModalOpen,
 }: DashboardCompanyJobsHeaderProps) => {
+  const [currentStep, setCurrentStep] = useState(1);
   return (
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -54,7 +56,11 @@ const DashboardCompanyJobsHeader = ({
                 Fill in the details below to create a new job posting
               </DialogDescription>
             </DialogHeader>
-            <CreateNewJobForm onClose={onClose} />
+            <CreateNewJobForm
+              onClose={onClose}
+              currentStep={currentStep}
+              onStepChange={setCurrentStep}
+            />
           </DialogContent>
         </Dialog>
       </div>

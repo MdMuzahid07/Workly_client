@@ -27,6 +27,8 @@ const CreateJobFromSkillSection = () => {
       priority: "MEDIUM",
       description: "",
     };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     setValue("skillsRequired", [...skills, newSkill]);
   };
 
