@@ -1,0 +1,74 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Package, TrendingUp } from "lucide-react";
+
+interface SubscriptionStatusCardProps {
+  currentPlan: string;
+  jobPostsUsed: number;
+  jobPostsLimit: number;
+  renewalDate: string;
+}
+
+export default function SubscriptionStatusCard({
+  currentPlan,
+  jobPostsUsed,
+  jobPostsLimit,
+  renewalDate,
+}: SubscriptionStatusCardProps) {
+  const usagePercentage = Math.round((jobPostsUsed / jobPostsLimit) * 100);
+
+  return (
+    <Card className="border-primary/10 from-primary/5 overflow-hidden bg-linear-to-br via-transparent to-transparent">
+      <CardContent className="p-6">
+        <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-2xl">
+              <Package className="h-6 w-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-foreground text-lg font-bold">
+                  Active Subscription
+                </h3>
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary hover:bg-primary/20 border-none px-2 py-0"
+                >
+                  {currentPlan}
+                </Badge>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Your plan renews on{" "}
+                <span className="text-foreground font-semibold">
+                  {renewalDate}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex max-w-md flex-1 flex-col gap-2">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-1.5 font-medium">
+                <TrendingUp className="h-4 w-4 text-emerald-500" />
+                <span>Job Posts Usage</span>
+              </div>
+              <span className="text-muted-foreground">
+                <span className="text-foreground font-bold">
+                  {jobPostsUsed}
+                </span>{" "}
+                / {jobPostsLimit} slots used
+              </span>
+            </div>
+            <Progress value={usagePercentage} className="h-2" />
+            <p className="text-muted-foreground/60 text-[10px] font-bold tracking-wider uppercase">
+              {100 - usagePercentage}% of your monthly quota remains
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
