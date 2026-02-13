@@ -1,5 +1,4 @@
 "use client";
-
 import DashboardEmployerPricingHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerPricingHeader";
 import FeatureComparisonTable from "@/components/dashboard/pricing/FeatureComparisonTable";
 import PricingFAQ from "@/components/dashboard/pricing/PricingFAQ";

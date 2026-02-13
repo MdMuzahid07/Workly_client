@@ -16,8 +16,11 @@ export default function DashboardEmployerBillingHeader() {
               Billing Details
             </h1>
             <p className="text-muted-foreground inline-flex truncate text-xs font-medium opacity-80 sm:text-sm">
-              Invoices, payment history,
-              <span className="hidden sm:block">&nbsp;and payment methods</span>
+              View and download your
+              <span className="hidden sm:block">
+                &nbsp;invoice history and transaction details
+              </span>
+              <span className="sm:hidden">&nbsp;billing history</span>
             </p>
           </div>
         </div>

@@ -52,7 +52,7 @@ export default function SubscriptionStatusCard({
           <div className="flex max-w-md flex-1 flex-col gap-2">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-1.5 font-medium">
-                <TrendingUp className="h-4 w-4 text-emerald-500" />
+                <TrendingUp className="text-primary h-4 w-4" />
                 <span>Job Posts Usage</span>
               </div>
               <span className="text-muted-foreground">
