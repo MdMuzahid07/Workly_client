@@ -1,124 +1,148 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import WKTextArea from "@/components/form/WkTextArea";
+import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Label } from "@/components/ui/label";
 import { TabsContent } from "@radix-ui/react-tabs";
 import {
-  Check,
-  Globe,
   Heart,
+  Lightbulb,
   Plus,
   Shield,
+  Sparkles,
   Star,
   Target,
   Users,
   X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
-// ====== predefined values with icons for suggestions ====>
 const VALUE_OPTIONS = [
   {
     value: "Innovation",
     icon: Zap,
     color: "text-blue-500",
     bgColor: "bg-blue-50 dark:bg-blue-950/30",
+    borderColor: "border-blue-200 dark:border-blue-900/50",
   },
   {
     value: "Collaboration",
     icon: Users,
-    color: "text-green-500",
-    bgColor: "bg-green-50 dark:bg-green-950/30",
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+    borderColor: "border-emerald-200 dark:border-emerald-900/50",
   },
   {
     value: "Customer First",
     icon: Heart,
-    color: "text-red-500",
-    bgColor: "bg-red-50 dark:bg-red-950/30",
+    color: "text-rose-500",
+    bgColor: "bg-rose-50 dark:bg-rose-950/30",
+    borderColor: "border-rose-200 dark:border-rose-900/50",
   },
   {
     value: "Excellence",
     icon: Star,
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-50 dark:bg-yellow-950/30",
+    color: "text-amber-500",
+    bgColor: "bg-amber-50 dark:bg-amber-950/30",
+    borderColor: "border-amber-200 dark:border-amber-900/50",
   },
   {
     value: "Integrity",
     icon: Shield,
-    color: "text-purple-500",
-    bgColor: "bg-purple-50 dark:bg-purple-950/30",
-  },
-  {
-    value: "Sustainability",
-    icon: Globe,
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-  },
-  {
-    value: "Diversity",
-    icon: Users,
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-  },
-  {
-    value: "Accountability",
-    icon: Target,
-    color: "text-orange-500",
-    bgColor: "bg-orange-50 dark:bg-orange-950/30",
-  },
-  {
-    value: "Transparency",
-    icon: Shield,
-    color: "text-cyan-500",
-    bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
+    color: "text-violet-500",
+    bgColor: "bg-violet-50 dark:bg-violet-950/30",
+    borderColor: "border-violet-200 dark:border-violet-900/50",
   },
   {
     value: "Agility",
-    icon: Zap,
-    color: "text-pink-500",
-    bgColor: "bg-pink-50 dark:bg-pink-950/30",
+    icon: Sparkles,
+    color: "text-cyan-500",
+    bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
+    borderColor: "border-cyan-200 dark:border-cyan-900/50",
+  },
+  {
+    value: "Impact",
+    icon: Target,
+    color: "text-orange-500",
+    bgColor: "bg-orange-50 dark:bg-orange-950/30",
+    borderColor: "border-orange-200 dark:border-orange-900/50",
+  },
+  {
+    value: "Growth",
+    icon: RocketIcon,
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
+    borderColor: "border-indigo-200 dark:border-indigo-900/50",
   },
 ] as const;
 
-interface CompanyProfileCultureValuesTabProps {
-  currentProfile: any;
-  isEditing: boolean;
-  onMissionChange?: (mission: string) => void;
-  onValuesChange?: (values: string[]) => void;
-  initialValues?: string[];
+function RocketIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
+      <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
+    </svg>
+  );
 }
 
 const CompanyProfileCultureValuesTab = ({
   currentProfile,
   isEditing,
   onMissionChange,
+  onCultureSummaryChange,
   onValuesChange,
   initialValues = [],
-}: CompanyProfileCultureValuesTabProps) => {
+}: {
+  currentProfile: any;
+  isEditing: boolean;
+  onMissionChange?: (mission: string) => void;
+  onCultureSummaryChange?: (cultureSummary: string) => void;
+  onValuesChange?: (values: string[]) => void;
+  initialValues?: string[];
+}) => {
   const [newValue, setNewValue] = useState("");
   const [selectedValues, setSelectedValues] = useState<string[]>(
     initialValues || currentProfile.values || [],
   );
-  const [mission, setMission] = useState(currentProfile.mission || "");
 
-  // Get values from current profile
-  const values = currentProfile.values || [];
+  const methods = useForm({
+    mode: "onChange",
+    values: {
+      mission: currentProfile.mission || "",
+      cultureSummary: currentProfile.cultureSummary || "",
+    },
+  });
+
+  useEffect(() => {
+    const subscription = methods.watch((value, { name }) => {
+      if (name === "mission" && value.mission !== undefined) {
+        onMissionChange?.(value.mission);
+      }
+      if (name === "cultureSummary" && value.cultureSummary !== undefined) {
+        onCultureSummaryChange?.(value.cultureSummary);
+      }
+    });
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [methods, onMissionChange]);
 
   const handleAddValue = (valueToAdd: string) => {
     if (valueToAdd.trim() && !selectedValues.includes(valueToAdd.trim())) {
@@ -137,378 +161,245 @@ const CompanyProfileCultureValuesTab = ({
     onValuesChange?.(updatedValues);
   };
 
-  const handleMissionChange = (newMission: string) => {
-    setMission(newMission);
-    onMissionChange?.(newMission);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const getValueIcon = (valueName: string) => {
+  const getValueMetadata = (valueName: string) => {
     const option = VALUE_OPTIONS.find(
-      (opt) =>
-        opt.value.toLowerCase() === valueName.toLowerCase() ||
-        valueName.toLowerCase().includes(opt.value.toLowerCase()),
-    );
-    return option?.icon || Target;
-  };
-
-  const getValueColor = (valueName: string) => {
-    const option = VALUE_OPTIONS.find(
-      (opt) =>
-        opt.value.toLowerCase() === valueName.toLowerCase() ||
-        valueName.toLowerCase().includes(opt.value.toLowerCase()),
+      (opt) => opt.value.toLowerCase() === valueName.toLowerCase(),
     );
     return {
       icon: option?.icon || Target,
-      color: option?.color || "text-gray-500",
-      bgColor: option?.bgColor || "bg-gray-50 dark:bg-gray-950/30",
+      color: option?.color || "text-primary",
+      bgColor: option?.bgColor || "bg-primary/5",
+      borderColor: option?.borderColor || "border-primary/10",
     };
   };
 
   return (
-    <TabsContent value="culture" className="space-y-6">
-      {/* Mission Statement Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Mission Statement
-          </CardTitle>
-          <CardDescription>
-            Define your {`company's`} purpose and what you strive to achieve
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <div className="space-y-4">
-              <Textarea
-                placeholder="Describe your company's mission..."
-                value={mission}
-                onChange={(e) => handleMissionChange(e.target.value)}
-                className="min-h-[120px] resize-none"
-              />
-              <div className="text-muted-foreground flex items-center justify-between text-sm">
-                <span>Be clear and inspirational</span>
-                <span>{mission.length}/500 characters</span>
-              </div>
-              <div className="text-muted-foreground space-y-1 text-sm">
-                <p className="font-medium">
-                  Tips for a great mission statement:
-                </p>
-                <ul className="list-disc space-y-1 pl-5">
-                  <li>Start with your purpose</li>
-                  <li>Keep it concise and memorable</li>
-                  <li>Focus on impact and values</li>
-                  <li>Make it aspirational but achievable</li>
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {currentProfile.mission ? (
-                <div className="bg-muted/30 rounded-lg p-6">
-                  <p className="text-lg leading-relaxed">
-                    {currentProfile.mission}
-                  </p>
-                </div>
-              ) : (
-                <div className="border-muted rounded-lg border-2 border-dashed p-8 text-center">
-                  <Target className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                  <h3 className="mb-2 text-lg font-semibold">
-                    No mission statement added
-                  </h3>
-                  <p className="text-muted-foreground">
-                    A mission statement helps communicate your {`company's`}{" "}
-                    purpose
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Company Values Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5" />
-            Company Values
-          </CardTitle>
-          <CardDescription>
-            The principles that guide your {`company's`} culture and decisions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <TabsContent value="culture" className="space-y-10 focus:outline-none">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Mission Statement */}
+        <SectionCard
+          title="Mission Statement"
+          isCompleted={!!currentProfile.mission}
+          className="h-full"
+        >
           <div className="space-y-6">
-            {/* View Mode */}
-            {!isEditing && (
-              <div>
-                {values.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {values.map((value: string, index: number) => {
-                      const {
-                        icon: Icon,
-                        color,
-                        bgColor,
-                      } = getValueColor(value);
+            <div className="flex items-start gap-4">
+              <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                <Target className="text-primary h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-foreground text-sm font-semibold">
+                  Purpose & Strategic Intent
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Define what your company exists to achieve.
+                </p>
+              </div>
+            </div>
+
+            {isEditing ? (
+              <div className="space-y-4">
+                <FormProvider {...methods}>
+                  <WKTextArea
+                    name="mission"
+                    label="Mission Statement"
+                    placeholder="Our mission is to..."
+                    className="min-h-[200px] resize-none"
+                  />
+                </FormProvider>
+                <div className="bg-muted/30 rounded-xl border border-dashed p-4">
+                  <p className="text-muted-foreground mb-3 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
+                    <Lightbulb className="h-3 w-3" /> Expert Design Tips
+                  </p>
+                  <ul className="text-muted-foreground list-inside list-disc space-y-2 text-xs">
+                    <li>Focus on the specific problem you solve.</li>
+                    <li>Keep it under 30 words for maximum impact.</li>
+                    <li>Use active verbs and avoid jargon.</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-primary/5 border-primary/10 group relative overflow-hidden rounded-2xl border p-8">
+                <div className="relative z-10">
+                  {currentProfile.mission ? (
+                    <p className="text-foreground/90 text-lg leading-relaxed font-medium italic">
+                      &quot;{currentProfile.mission}&quot;
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground text-center italic">
+                      No mission statement defined yet.
+                    </p>
+                  )}
+                </div>
+                <Target className="text-primary/5 absolute -right-6 -bottom-6 h-32 w-32 rotate-12 transition-transform duration-500 group-hover:scale-110" />
+              </div>
+            )}
+          </div>
+        </SectionCard>
+
+        {/* Company Values */}
+        <SectionCard
+          title="Core Values"
+          isCompleted={selectedValues.length > 0}
+          className="h-full"
+        >
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
+                <Heart className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-foreground text-sm font-semibold">
+                  Culture & Principles
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  The beliefs that guide your {`team's`} conduct.
+                </p>
+              </div>
+            </div>
+
+            {isEditing && (
+              <div className="space-y-4">
+                <div className="mb-6 flex gap-2">
+                  <Input
+                    placeholder="Enter custom value..."
+                    value={newValue}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setNewValue(e.target.value)
+                    }
+                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                      e.key === "Enter" && handleAddValue(newValue)
+                    }
+                    className="h-10"
+                  />
+                  <Button
+                    onClick={() => handleAddValue(newValue)}
+                    disabled={!newValue.trim()}
+                    className="shrink-0"
+                  >
+                    <Plus className="mr-2 h-4 w-4" /> Add
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  <Label className="text-muted-foreground decoration-primary/30 text-xs font-semibold tracking-wider uppercase underline underline-offset-4">
+                    Values Selection
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {VALUE_OPTIONS.map((opt) => {
+                      const isSelected = selectedValues.includes(opt.value);
                       return (
-                        <div
-                          key={index}
-                          className={`${bgColor} border-border rounded-lg border p-4 transition-transform hover:scale-[1.02]`}
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() =>
+                            isSelected
+                              ? handleRemoveValue(opt.value)
+                              : handleAddValue(opt.value)
+                          }
+                          className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-all ${
+                            isSelected
+                              ? "bg-primary/10 border-primary ring-primary/20 scale-95 ring-2"
+                              : "bg-muted/50 hover:border-muted-foreground/30 border-transparent"
+                          }`}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`${color} rounded-lg p-2`}>
-                              <Icon className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <h4 className="font-semibold">{value}</h4>
-                              <p className="text-muted-foreground mt-1 text-sm">
-                                Guides our decisions and actions
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+                          <opt.icon className={`h-5 w-5 ${opt.color}`} />
+                          <span className="text-[10px] font-bold tracking-tight uppercase">
+                            {opt.value}
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
+                </div>
+
+                {selectedValues.length > 0 && (
+                  <div className="flex flex-wrap gap-2 border-t pt-4">
+                    {selectedValues.map((val) => (
+                      <Badge
+                        key={val}
+                        variant="secondary"
+                        className="bg-primary/10 text-primary gap-2 rounded-full border-none px-3 py-1.5 text-xs"
+                      >
+                        {val}
+                        <X
+                          className="hover:text-destructive h-3 w-3 cursor-pointer"
+                          onClick={() => handleRemoveValue(val)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!isEditing && (
+              <div className="grid grid-cols-1 gap-4">
+                {selectedValues.length > 0 ? (
+                  selectedValues.map((val) => {
+                    const meta = getValueMetadata(val);
+                    return (
+                      <div
+                        key={val}
+                        className={`group dark:hover:bg-muted/20 flex items-center gap-4 rounded-2xl border p-4 transition-all hover:bg-white ${meta.bgColor} ${meta.borderColor}`}
+                      >
+                        <div
+                          className={`rounded-xl bg-white p-3 shadow-sm transition-transform group-hover:scale-110 dark:bg-black/20`}
+                        >
+                          <meta.icon className={`h-5 w-5 ${meta.color}`} />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-foreground font-bold tracking-tight">
+                            {val}
+                          </h4>
+                          <p className="text-muted-foreground text-xs">
+                            Fundamental principle driving our culture.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
                 ) : (
-                  <div className="border-muted rounded-lg border-2 border-dashed p-8 text-center">
-                    <Heart className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                    <h3 className="mb-2 text-lg font-semibold">
-                      No values defined
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Define your company values to build a strong culture
+                  <div className="text-muted-foreground flex flex-col items-center justify-center rounded-3xl border-2 border-dashed py-12">
+                    <Heart className="mb-3 h-12 w-12 opacity-20" />
+                    <p className="text-sm">
+                      No values specified for this profile.
                     </p>
                   </div>
                 )}
               </div>
             )}
-
-            {/* Edit Mode */}
-            {isEditing && (
-              <div className="space-y-6">
-                {/* Current Values Display */}
-                {selectedValues.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium">
-                      Selected Values ({selectedValues.length})
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedValues.map((value, index) => {
-                        const { icon: Icon, color } = getValueColor(value);
-                        return (
-                          <Badge
-                            key={index}
-                            variant="secondary"
-                            className="gap-1.5 py-1.5 pr-2 pl-2.5 text-sm"
-                          >
-                            <Icon className={`h-3.5 w-3.5 ${color}`} />
-                            {value}
-                            <button
-                              onClick={() => handleRemoveValue(value)}
-                              className="text-muted-foreground hover:text-foreground hover:bg-muted ml-1.5 rounded-full p-0.5"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Add Value Input */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium">Add New Value</h3>
-                    <span className="text-muted-foreground text-xs">
-                      {newValue.length}/50 characters
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter a company value..."
-                      value={newValue}
-                      onChange={(e) => setNewValue(e.target.value)}
-                      maxLength={50}
-                      className="flex-1"
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter" && newValue.trim()) {
-                          e.preventDefault();
-                          handleAddValue(newValue);
-                        }
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => handleAddValue(newValue)}
-                      disabled={!newValue.trim()}
-                      className="gap-1.5"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Value Suggestions */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium">
-                    Common Value Suggestions
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
-                    {VALUE_OPTIONS.map((option) => {
-                      const Icon = option.icon;
-                      const isSelected = selectedValues.includes(option.value);
-                      return (
-                        <TooltipProvider key={option.value}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={() => {
-                                  if (isSelected) {
-                                    handleRemoveValue(option.value);
-                                  } else {
-                                    handleAddValue(option.value);
-                                  }
-                                }}
-                                disabled={isSelected}
-                                className={`${option.bgColor} border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 rounded-lg border p-3 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100`}
-                              >
-                                <Icon className={`h-5 w-5 ${option.color}`} />
-                                <span className="text-xs font-medium">
-                                  {option.value}
-                                </span>
-                                {isSelected && (
-                                  <div className="absolute -top-1 -right-1">
-                                    <Badge className="h-5 w-5 rounded-full p-0">
-                                      <Check className="h-3 w-3" />
-                                    </Badge>
-                                  </div>
-                                )}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                Click to {isSelected ? "remove" : "add"} value
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Value Guidelines */}
-                <div className="bg-muted/30 rounded-lg p-4">
-                  <h4 className="mb-2 font-semibold">Value Guidelines</h4>
-                  <ul className="text-muted-foreground space-y-1.5 text-sm">
-                    <li className="flex items-start gap-2">
-                      <div className="bg-primary mt-0.5 h-1.5 w-1.5 rounded-full" />
-                      <span>Choose 3-7 core values for maximum impact</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="bg-primary mt-0.5 h-1.5 w-1.5 rounded-full" />
-                      <span>
-                        Values should be authentic and practiced daily
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="bg-primary mt-0.5 h-1.5 w-1.5 rounded-full" />
-                      <span>Make values specific and actionable</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="bg-primary mt-0.5 h-1.5 w-1.5 rounded-full" />
-                      <span>Involve your team in defining shared values</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
           </div>
-        </CardContent>
-      </Card>
+        </SectionCard>
+      </div>
 
-      {/* Culture Overview Card (Non-Editable) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Culture Overview
-          </CardTitle>
-          <CardDescription>
-            How your values translate into daily company culture
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="bg-muted/30 rounded-lg p-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-primary/10 text-primary rounded-lg p-2">
-                      <Users className="h-5 w-5" />
-                    </div>
-                    <h4 className="font-semibold">Team Environment</h4>
-                  </div>
-                  <p className="text-muted-foreground text-sm">
-                    Our values foster collaboration, respect, and mutual support
-                    among team members.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-primary/10 text-primary rounded-lg p-2">
-                      <Zap className="h-5 w-5" />
-                    </div>
-                    <h4 className="font-semibold">Decision Making</h4>
-                  </div>
-                  <p className="text-muted-foreground text-sm">
-                    Values guide our choices, ensuring alignment with company
-                    principles and long-term goals.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-primary/10 text-primary rounded-lg p-2">
-                      <Star className="h-5 w-5" />
-                    </div>
-                    <h4 className="font-semibold">Recognition</h4>
-                  </div>
-                  <p className="text-muted-foreground text-sm">
-                    We celebrate team members who exemplify our values through
-                    their actions and achievements.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {!isEditing && values.length > 0 && (
-              <div className="rounded-lg border p-4">
-                <h4 className="mb-3 font-semibold">Values in Action</h4>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {values.slice(0, 4).map((value: string, index: number) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="bg-primary mt-0.5 h-2 w-2 rounded-full" />
-                      <div>
-                        <span className="font-medium">{value}:</span>
-                        <span className="text-muted-foreground ml-2 text-sm">
-                          Actively practiced in our daily operations
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+      {/* Culture Summary Section */}
+      <div className="from-primary/5 to-primary/5 rounded-3xl border border-white/10 bg-linear-to-r via-transparent p-8 backdrop-blur-sm">
+        <div className="mx-auto max-w-3xl space-y-6 text-center">
+          <div className="bg-primary/10 text-primary mb-2 inline-flex rounded-2xl p-3">
+            <Users className="h-6 w-6" />
           </div>
-        </CardContent>
-      </Card>
+          <h3 className="text-2xl font-bold tracking-tight">
+            Our Living Culture
+          </h3>
+
+          {isEditing ? (
+            <FormProvider {...methods}>
+              <WKTextArea
+                name="cultureSummary"
+                label="Culture Summary"
+                placeholder="Culture isn't just what we say; it's what we do..."
+                className="min-h-[150px] resize-none border-white/10 bg-white/5 text-center"
+              />
+            </FormProvider>
+          ) : (
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              {currentProfile.cultureSummary ||
+                "Culture isn't just what we say; it's what we do. By defining our mission and values, we create a compass that guides every hire, every meeting, and every line of code."}
+            </p>
+          )}
+        </div>
+      </div>
     </TabsContent>
   );
 };

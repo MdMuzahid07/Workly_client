@@ -1,10 +1,10 @@
 "use client";
 
 import { Building2, Edit3, Save, Shield, X } from "lucide-react";
-import { CompanyProfile } from "../../../../view/dashboard/ManageCompanyProfileView";
 import { Badge } from "../../../ui/badge";
 import { Button } from "../../../ui/button";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
+import { CompanyProfile } from "../../../../types/company-profile";
 
 const DashboardCompanyProfileHeader = ({
   setIsEditing,

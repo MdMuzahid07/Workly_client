@@ -1,15 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+import { SectionCard } from "@/components/main/profile/SectionCard";
 import { TabsContent } from "@radix-ui/react-tabs";
 import {
+  Briefcase,
+  Calendar,
   Facebook,
   Github,
   Globe,
+  Info as InfoIcon,
   Instagram,
   Link as LinkIcon,
   Linkedin,
+  Mail,
+  MapPin,
+  Phone,
   Plus,
   Trash2,
   Twitter,
+  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -18,17 +27,10 @@ import WKDatePicker from "../../form/WKDatePicker";
 import WKInput from "../../form/WkInput";
 import WKSelect from "../../form/WkSelect";
 import { Button } from "../../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../ui/card";
+import { CardDescription } from "../../ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -54,11 +56,10 @@ const CompanyProfileDetailsTab = ({
     links: Array<{ id?: string; platform: string; url: string }>,
   ) => void;
 }) => {
-  // ======= fetch categories/industries from API ====>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: categories, isLoading: categoriesLoading } =
     useGetCategoriesQuery(undefined);
 
-  //  ====== extract industry ID for form (handles both object and string formats) ====>
   const getIndustryId = (industry: any): string => {
     if (!industry) return "";
     if (typeof industry === "object" && industry.id) return industry.id;
@@ -66,25 +67,14 @@ const CompanyProfileDetailsTab = ({
     return "";
   };
 
-  // ======== initialize form with proper industry ID ===>
   const methods = useForm({
     mode: "onChange",
-    defaultValues: {
+    values: {
       ...editedProfile,
       industry: getIndustryId(editedProfile.industry),
     },
   });
 
-  // ======== sync form values when editedProfile changes ====>
-  useEffect(() => {
-    methods.reset({
-      ...editedProfile,
-      industry: getIndustryId(editedProfile.industry),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editedProfile]);
-
-  // ===== watch form changes and sync with parent =====>
   useEffect(() => {
     const subscription = methods.watch((value, { name }) => {
       if (name && value[name] !== undefined) {
@@ -94,7 +84,6 @@ const CompanyProfileDetailsTab = ({
     return () => subscription.unsubscribe();
   }, [methods, updateField]);
 
-  // ====== get industry display name for view mode ====>
   const getIndustryDisplayName = (industry: any): string => {
     if (!industry) return "Not specified";
     if (typeof industry === "object" && industry.name) return industry.name;
@@ -105,7 +94,6 @@ const CompanyProfileDetailsTab = ({
     return industry;
   };
 
-  // ====== format date for display ===>
   const formatDateDisplay = (date: string): string => {
     if (!date) return "Not specified";
     try {
@@ -119,7 +107,6 @@ const CompanyProfileDetailsTab = ({
     }
   };
 
-  // ===== create options for industry select ====>
   const industryOptions = useMemo(() => {
     if (!categories?.data) return [];
     return categories.data.map((category: any) => ({
@@ -128,7 +115,6 @@ const CompanyProfileDetailsTab = ({
     }));
   }, [categories]);
 
-  // ===== create options for company size select ======>
   const companySizeOptions = [
     { value: "1-10", label: "1-10 employees" },
     { value: "11-50", label: "11-50 employees" },
@@ -139,196 +125,258 @@ const CompanyProfileDetailsTab = ({
   ];
 
   return (
-    <TabsContent value="details" className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Information</CardTitle>
-          <CardDescription>Basic details about your company</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <FormProvider {...methods}>
-            {/* company name & industry */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-2">
+    <TabsContent value="details" className="space-y-10 focus:outline-none">
+      <FormProvider {...methods}>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* Identity & Presence */}
+          <SectionCard
+            title="Identity & Presence"
+            isCompleted={
+              !!currentProfile.logoUrl && !!currentProfile.websiteUrl
+            }
+          >
+            <div className="space-y-6">
+              {isEditing ? (
+                <WKInput
+                  name="name"
+                  label="Company Legal Name"
+                  placeholder="Enter legal entity name"
+                  required
+                />
+              ) : (
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                    Company Name
+                  </Label>
+                  <p className="text-foreground text-lg font-semibold">
+                    {currentProfile.name || "Not specified"}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {isEditing ? (
                   <WKInput
-                    name="name"
-                    label="Company Name"
-                    placeholder="Enter company name"
-                    required
+                    name="location"
+                    label="Headquarters"
+                    placeholder="City, Country"
                   />
                 ) : (
-                  <>
-                    <Label>Company Name</Label>
-                    <p className="text-muted-foreground text-sm">
-                      {currentProfile.name || "Not specified"}
-                    </p>
-                  </>
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                      Location
+                    </Label>
+                    <div className="text-foreground flex items-center gap-2 font-medium">
+                      <MapPin className="text-primary h-4 w-4" />
+                      {currentProfile.location || "Not specified"}
+                    </div>
+                  </div>
                 )}
-              </div>
 
-              <div className="space-y-2">
                 {isEditing ? (
-                  <WKSelect
-                    name="industry"
-                    label="Industry"
-                    placeholder={
-                      categoriesLoading
-                        ? "Loading industries..."
-                        : "Select industry"
-                    }
-                    options={industryOptions}
-                    disabled={categoriesLoading}
-                    required
+                  <WKInput
+                    name="websiteUrl"
+                    label="Official Website"
+                    placeholder="https://..."
                   />
                 ) : (
-                  <>
-                    <Label>Industry</Label>
-                    <p className="text-muted-foreground text-sm">
-                      {getIndustryDisplayName(currentProfile.industry)}
-                    </p>
-                  </>
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                      Website
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Globe className="text-primary h-4 w-4" />
+                      {currentProfile.websiteUrl ? (
+                        <a
+                          href={currentProfile.websiteUrl}
+                          target="_blank"
+                          className="text-primary font-medium hover:underline"
+                        >
+                          {currentProfile.websiteUrl.replace(
+                            /^https?:\/\//,
+                            "",
+                          )}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground text-sm font-medium">
+                          Not specified
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
+          </SectionCard>
 
-            {/* company size & founded */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-2">
+          {/* Operational Details */}
+          <SectionCard
+            title="Operational Details"
+            isCompleted={!!currentProfile.industry && !!currentProfile.size}
+          >
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {isEditing ? (
+                  <WKSelect
+                    name="industry"
+                    label="Industry Sector"
+                    options={industryOptions}
+                    required
+                  />
+                ) : (
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                      Industry
+                    </Label>
+                    <div className="text-foreground flex items-center gap-2 font-medium">
+                      <Briefcase className="text-primary h-4 w-4" />
+                      {getIndustryDisplayName(currentProfile.industry)}
+                    </div>
+                  </div>
+                )}
+
                 {isEditing ? (
                   <WKSelect
                     name="size"
-                    label="Company Size"
-                    placeholder="Select company size"
+                    label="Company Scale"
                     options={companySizeOptions}
                     required
                   />
                 ) : (
-                  <>
-                    <Label>Company Size</Label>
-                    <p className="text-muted-foreground text-sm">
-                      {currentProfile.size
-                        ? `${currentProfile.size} employees`
-                        : "Not specified"}
-                    </p>
-                  </>
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                      Scale
+                    </Label>
+                    <div className="text-foreground flex items-center gap-2 font-medium">
+                      <Users className="text-primary h-4 w-4" />
+                      {currentProfile.size || "Not specified"}
+                    </div>
+                  </div>
                 )}
               </div>
 
-              <div className="space-y-2">
-                {isEditing ? (
-                  <WKDatePicker name="founded" label="Founded" required />
-                ) : (
-                  <>
-                    <Label>Founded</Label>
-                    <p className="text-muted-foreground text-sm">
-                      {formatDateDisplay(currentProfile.founded)}
-                    </p>
-                  </>
-                )}
-              </div>
+              {isEditing ? (
+                <WKDatePicker name="founded" label="Founding Date" required />
+              ) : (
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                    Founded
+                  </Label>
+                  <div className="text-foreground flex items-center gap-2 font-medium">
+                    <Calendar className="text-primary h-4 w-4" />
+                    {formatDateDisplay(currentProfile.founded)}
+                  </div>
+                </div>
+              )}
             </div>
+          </SectionCard>
 
-            {/* location & website */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-2">
-                {isEditing ? (
-                  <WKInput
-                    name="location"
-                    label="Location"
-                    placeholder="e.g., Dhaka, Bangladesh"
-                  />
-                ) : (
-                  <>
-                    <Label>Location</Label>
-                    <p className="text-muted-foreground text-sm">
-                      {currentProfile.location || "Not specified"}
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                {isEditing ? (
-                  <WKInput
-                    name="websiteUrl"
-                    label="Website"
-                    type="text"
-                    placeholder="https://example.com"
-                  />
-                ) : (
-                  <>
-                    <Label>Website</Label>
-                    {currentProfile.websiteUrl ? (
-                      <a
-                        href={currentProfile.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary text-sm hover:underline"
-                      >
-                        {currentProfile.websiteUrl}
-                      </a>
-                    ) : (
-                      <p className="text-muted-foreground text-sm">
-                        Not specified
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* contact email & phone */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-2">
+          {/* Contact Information */}
+          <SectionCard
+            title="Contact Information"
+            isCompleted={!!currentProfile.contactEmail}
+          >
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {isEditing ? (
                   <WKInput
                     name="contactEmail"
-                    label="Contact Email"
+                    label="Business Email"
                     type="email"
-                    placeholder="contact@company.com"
                     required
                   />
                 ) : (
-                  <>
-                    <Label>Contact Email</Label>
-                    <p className="text-muted-foreground text-sm">
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                      Email
+                    </Label>
+                    <div className="text-foreground flex items-center gap-2 font-medium">
+                      <Mail className="text-primary h-4 w-4" />
                       {currentProfile.contactEmail || "Not specified"}
-                    </p>
-                  </>
+                    </div>
+                  </div>
+                )}
+
+                {isEditing ? (
+                  <WKInput name="contactPhone" label="Main Phone" />
+                ) : (
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs tracking-wider uppercase">
+                      Phone
+                    </Label>
+                    <div className="text-foreground flex items-center gap-2 font-medium">
+                      <Phone className="text-primary h-4 w-4" />
+                      {currentProfile.contactPhone || "Not specified"}
+                    </div>
+                  </div>
                 )}
               </div>
-
-              <div className="space-y-2">
-                {isEditing ? (
-                  <WKInput
-                    name="contactPhone"
-                    label="Contact Phone"
-                    type="text"
-                    placeholder="+880 1XXX-XXXXXX"
-                  />
-                ) : (
-                  <>
-                    <Label>Contact Phone</Label>
-                    <p className="text-muted-foreground text-sm">
-                      {currentProfile.contactPhone || "Not specified"}
-                    </p>
-                  </>
-                )}
+              <div className="bg-primary/5 text-muted-foreground flex gap-3 rounded-xl p-4 text-sm">
+                <InfoIcon className="text-primary h-5 w-5 shrink-0" />
+                <p>
+                  These contact details will be primarily used for candidate
+                  inquiries and platform notifications.
+                </p>
               </div>
             </div>
-          </FormProvider>
-        </CardContent>
-      </Card>
+          </SectionCard>
 
-      {isEditing && (
-        <SocialLinksManager
-          socialLinks={socialLinks || []}
-          onSocialLinksChange={onSocialLinksChange}
-        />
-      )}
+          {/* Social Presence */}
+          <SectionCard
+            title="Social Presence"
+            isCompleted={socialLinks && socialLinks.length > 0}
+          >
+            {isEditing ? (
+              <SocialLinksManager
+                socialLinks={socialLinks || []}
+                onSocialLinksChange={onSocialLinksChange}
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {socialLinks && socialLinks.length > 0 ? (
+                  socialLinks.map((link, idx) => (
+                    <a
+                      key={idx}
+                      href={link.url}
+                      target="_blank"
+                      className="bg-card hover:bg-muted/50 group flex items-center gap-3 rounded-xl border p-3 transition-colors"
+                    >
+                      <div className="bg-primary/10 group-hover:bg-primary/20 rounded-lg p-2 transition-colors">
+                        {getSocialIcon(link.platform)}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold capitalize">
+                          {link.platform}
+                        </span>
+                        <span className="text-muted-foreground max-w-[150px] truncate text-xs">
+                          {link.url.replace(/^https?:\/\//, "")}
+                        </span>
+                      </div>
+                    </a>
+                  ))
+                ) : (
+                  <div className="text-muted-foreground col-span-2 py-6 text-center text-sm font-medium italic">
+                    No social profiles linked.
+                  </div>
+                )}
+              </div>
+            )}
+          </SectionCard>
+        </div>
+      </FormProvider>
     </TabsContent>
   );
+};
+
+const getSocialIcon = (platform: string): React.ReactNode => {
+  const p = platform.toLowerCase();
+  if (p.includes("linkedin")) return <Linkedin className="h-4 w-4" />;
+  if (p.includes("twitter") || p.includes("x"))
+    return <Twitter className="h-4 w-4" />;
+  if (p.includes("github")) return <Github className="h-4 w-4" />;
+  if (p.includes("facebook")) return <Facebook className="h-4 w-4" />;
+  if (p.includes("instagram")) return <Instagram className="h-4 w-4" />;
+  return <LinkIcon className="h-4 w-4" />;
 };
 
 const SocialLinksManager = ({
@@ -341,54 +389,31 @@ const SocialLinksManager = ({
   ) => void;
 }) => {
   const [isAddSocialOpen, setIsAddSocialOpen] = useState(false);
+  const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
 
-  const getIconForPlatform = (platform: string): React.ReactNode => {
-    const platformLower = platform.toLowerCase();
-    if (platformLower.includes("linkedin"))
-      return <Linkedin className="h-4 w-4" />;
-    if (platformLower.includes("twitter") || platformLower.includes("x"))
-      return <Twitter className="h-4 w-4" />;
-    if (platformLower.includes("github")) return <Github className="h-4 w-4" />;
-    if (platformLower.includes("facebook"))
-      return <Facebook className="h-4 w-4" />;
-    if (platformLower.includes("instagram"))
-      return <Instagram className="h-4 w-4" />;
-    if (platformLower.includes("website") || platformLower.includes("web"))
-      return <Globe className="h-4 w-4" />;
-    return <LinkIcon className="h-4 w-4" />;
+  useEffect(() => {
+    setSocialLinks(initialSocialLinks);
+  }, [initialSocialLinks]);
+
+  const removeSocialLink = (id: string) => {
+    const updated = socialLinks.filter((l) => l.id !== id);
+    setSocialLinks(updated);
+    onSocialLinksChange?.(updated);
   };
 
-  const [socialLinks, setSocialLinks] = useState<
-    Array<{
-      id?: string;
-      platform: string;
-      url: string;
-      icon?: React.ReactNode;
-    }>
-  >(() => {
-    return initialSocialLinks.map((link) => ({
-      ...link,
-      icon: getIconForPlatform(link.platform),
-    }));
-  });
+  const updateSocialLink = (id: string, url: string) => {
+    const updated = socialLinks.map((l) => (l.id === id ? { ...l, url } : l));
+    setSocialLinks(updated);
+    onSocialLinksChange?.(updated);
+  };
 
-  // ===== create unique key for dependency tracking =====>
-  const linksKey = useMemo(
-    () =>
-      initialSocialLinks
-        .map((link) => `${link.id || ""}-${link.platform}-${link.url}`)
-        .join(","),
-    [initialSocialLinks],
-  );
-
-  // ===== sync with parent when initialSocialLinks changes =====>
-  useEffect(() => {
-    const mappedLinks = initialSocialLinks.map((link) => ({
-      ...link,
-      icon: getIconForPlatform(link.platform),
-    }));
-    setSocialLinks(mappedLinks);
-  }, [linksKey, initialSocialLinks]);
+  const addSocialLink = (platform: string, url: string) => {
+    const newLink = { id: Date.now().toString(), platform, url };
+    const updated = [...socialLinks, newLink];
+    setSocialLinks(updated);
+    onSocialLinksChange?.(updated);
+    setIsAddSocialOpen(false);
+  };
 
   const availablePlatforms = [
     { name: "LinkedIn", icon: <Linkedin className="h-4 w-4" /> },
@@ -399,124 +424,58 @@ const SocialLinksManager = ({
     { name: "Website", icon: <Globe className="h-4 w-4" /> },
   ];
 
-  const addSocialLink = (platform: string, url: string) => {
-    const platformData = availablePlatforms.find((p) => p.name === platform);
-    if (platformData && url.trim()) {
-      const newLink = {
-        id: Date.now().toString(),
-        platform,
-        url: url.trim(),
-        icon: platformData.icon,
-      };
-      const updatedLinks = [...socialLinks, newLink];
-      setSocialLinks(updatedLinks);
-      // ===== remove icon before sending to parent ======>
-      onSocialLinksChange?.(
-        updatedLinks.map(({ id, platform, url }) => ({ id, platform, url })),
-      );
-      setIsAddSocialOpen(false);
-    }
-  };
-
-  const removeSocialLink = (id: string) => {
-    const updatedLinks = socialLinks.filter((link) => link.id !== id);
-    setSocialLinks(updatedLinks);
-    onSocialLinksChange?.(
-      updatedLinks.map(({ id, platform, url }) => ({ id, platform, url })),
-    );
-  };
-
-  const updateSocialLink = (id: string, url: string) => {
-    const updatedLinks = socialLinks.map((link) =>
-      link.id === id ? { ...link, url } : link,
-    );
-    setSocialLinks(updatedLinks);
-    onSocialLinksChange?.(
-      updatedLinks.map(({ id, platform, url }) => ({ id, platform, url })),
-    );
-  };
-
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle className="flex items-center">
-              <LinkIcon className="mr-2 h-5 w-5" />
-              Social Media Links
-            </CardTitle>
-            <CardDescription>
-              Add your {`company's`} social media profiles
-            </CardDescription>
-          </div>
-          <Dialog open={isAddSocialOpen} onOpenChange={setIsAddSocialOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full sm:w-auto">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Link
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-card mx-4 max-w-md">
-              <DialogHeader>
-                <DialogTitle>Add Social Media Link</DialogTitle>
-                <DialogDescription>
-                  Add a new social media profile for your company
-                </DialogDescription>
-              </DialogHeader>
-              <AddCompanySocialLink
-                onAdd={addSocialLink}
-                availablePlatforms={availablePlatforms}
+    <div className="space-y-6 pt-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardDescription>
+          Add social media profiles to increase brand visibility.
+        </CardDescription>
+        <Dialog open={isAddSocialOpen} onOpenChange={setIsAddSocialOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline" className="gap-2">
+              <Plus className="h-4 w-4" /> Add Link
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add Social Link</DialogTitle>
+            </DialogHeader>
+            <AddCompanySocialLink
+              onAdd={addSocialLink}
+              availablePlatforms={availablePlatforms}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="space-y-4">
+        {socialLinks.map((link) => (
+          <div
+            key={link.id}
+            className="bg-muted/30 flex items-center gap-4 rounded-xl border border-dashed p-3"
+          >
+            <div className="bg-primary/10 rounded-lg p-2">
+              {getSocialIcon(link.platform)}
+            </div>
+            <div className="flex-1">
+              <Input
+                value={link.url}
+                onChange={(e) => updateSocialLink(link.id!, e.target.value)}
+                className="h-9 text-sm"
               />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {socialLinks?.map((link) => (
-            <div
-              key={link.id}
-              className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:gap-4"
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => removeSocialLink(link.id!)}
+              className="text-destructive h-9 w-9 p-0"
             >
-              <div className="flex items-center space-x-3">
-                {link.icon}
-                <span className="font-medium">{link.platform}</span>
-              </div>
-              <div className="flex-1">
-                <Input
-                  value={link.url}
-                  onChange={(e) =>
-                    updateSocialLink(link.id || "", e.target.value)
-                  }
-                  placeholder={`Enter ${link.platform} URL`}
-                  className="h-10"
-                />
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeSocialLink(link.id || "")}
-                className="text-destructive hover:text-destructive w-full sm:w-auto"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          {socialLinks.length === 0 && (
-            <div className="py-8 text-center">
-              <LinkIcon className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-              <h3 className="text-foreground mb-2 text-lg font-medium">
-                No social links added
-              </h3>
-              <p className="text-muted-foreground">
-                Add your {`company's`} social media profiles to increase
-                visibility
-              </p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

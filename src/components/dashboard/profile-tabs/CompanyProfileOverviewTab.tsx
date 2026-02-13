@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+import { SectionCard } from "@/components/main/profile/SectionCard";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { Building2, Eye, Users } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
-import { Textarea } from "../../ui/textarea";
+import { Briefcase, Eye, Rocket, Target, Users } from "lucide-react";
+import { useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import WKTextArea from "../../form/WkTextArea";
 
 const CompanyProfileOverviewTab = ({
   currentProfile,
@@ -12,116 +15,162 @@ const CompanyProfileOverviewTab = ({
 }: {
   currentProfile: any;
   isEditing: boolean;
-  updateField: any;
+  updateField: (field: string, value: any) => void;
   editedProfile: any;
 }) => {
+  const methods = useForm({
+    mode: "onChange",
+    values: {
+      description: editedProfile.description,
+      mission: editedProfile.mission,
+    },
+  });
+
+  const stats = useMemo(
+    () => [
+      {
+        label: "Total Jobs",
+        value: currentProfile.stats?.totalJobs || 0,
+        icon: Briefcase,
+        color: "from-blue-500/20 to-indigo-500/20",
+        iconColor: "text-blue-600",
+      },
+      {
+        label: "Applications",
+        value: currentProfile.stats?.totalApplications || 0,
+        icon: Target,
+        color: "from-emerald-500/20 to-teal-500/20",
+        iconColor: "text-emerald-600",
+      },
+      {
+        label: "Employees",
+        value: currentProfile.stats?.totalEmployees || 0,
+        icon: Users,
+        color: "from-orange-500/20 to-rose-500/20",
+        iconColor: "text-orange-600",
+      },
+      {
+        label: "Profile Views",
+        value: currentProfile.stats?.profileViews || 0,
+        icon: Eye,
+        color: "from-purple-500/20 to-pink-500/20",
+        iconColor: "text-purple-600",
+      },
+    ],
+    [currentProfile.stats],
+  );
+
   return (
-    <TabsContent value="overview" className="space-y-6">
-      {/* Company Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  Total Jobs
-                </p>
-                <p className="text-primary text-2xl font-bold">
-                  {currentProfile.stats.totalJobs}
-                </p>
+    <TabsContent value="overview" className="space-y-10 focus:outline-none">
+      {/* Premium Stats Grid */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, index) => (
+          <div
+            key={index}
+            className={`bg-linear-to-br ${stat.color} relative overflow-hidden rounded-2xl border border-white/20 p-6 backdrop-blur-md dark:border-white/5`}
+          >
+            <div className="relative z-10 flex flex-col gap-3">
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded-xl bg-white/80 shadow-sm backdrop-blur-sm dark:bg-black/20 ${stat.iconColor}`}
+              >
+                <stat.icon className="h-6 w-6" />
               </div>
-              <Building2 className="text-muted-foreground h-8 w-8" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  Applications
+                <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                  {stat.label}
                 </p>
-                <p className="text-primary text-2xl font-bold">
-                  {currentProfile.stats.totalApplications}
-                </p>
+                <h4 className="text-foreground mt-1 text-3xl font-bold tracking-tight">
+                  {stat.value.toLocaleString()}
+                </h4>
               </div>
-              <Users className="text-muted-foreground h-8 w-8" />
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  Employees
-                </p>
-                <p className="text-primary text-2xl font-bold">
-                  {currentProfile.stats.totalEmployees}
-                </p>
-              </div>
-              <Users className="text-muted-foreground h-8 w-8" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  Profile Views
-                </p>
-                <p className="text-primary text-2xl font-bold">
-                  {currentProfile.stats.profileViews}
-                </p>
-              </div>
-              <Eye className="text-muted-foreground h-8 w-8" />
-            </div>
-          </CardContent>
-        </Card>
+            {/* Decorative background shape */}
+            <div className="bg-primary/5 absolute -right-4 -bottom-4 h-24 w-24 rounded-full blur-2xl" />
+          </div>
+        ))}
       </div>
 
-      {/* Company Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle>About {currentProfile.name}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <Textarea
-              value={editedProfile.description}
-              onChange={(e) => updateField("description", e.target.value)}
-              rows={4}
-              placeholder="Describe your company..."
-            />
-          ) : (
-            <p className="text-muted-foreground leading-relaxed">
-              {currentProfile.description}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <FormProvider {...methods}>
+          <SectionCard
+            title="About the Company"
+            isCompleted={!!currentProfile.description}
+            className="h-full"
+          >
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                  <Rocket className="text-primary h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-foreground text-sm font-semibold">
+                    Company Story & Vision
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    Share your {`company's`} history, goals, and what makes it
+                    unique.
+                  </p>
+                </div>
+              </div>
 
-      {/* Mission Statement */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Our Mission</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <Textarea
-              value={editedProfile.mission}
-              onChange={(e) => updateField("mission", e.target.value)}
-              rows={3}
-              placeholder="What is your company's mission?"
-            />
-          ) : (
-            <p className="text-muted-foreground leading-relaxed">
-              {currentProfile.mission}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+              {isEditing ? (
+                <WKTextArea
+                  name="description"
+                  placeholder="Tell potential candidates who you are..."
+                  className="min-h-[250px] resize-none"
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  //@ts-ignore
+                  onChange={(e: any) =>
+                    updateField("description", e.target.value)
+                  }
+                />
+              ) : (
+                <div className="text-muted-foreground bg-muted/30 min-h-[150px] rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap">
+                  {currentProfile.description || "No description provided yet."}
+                </div>
+              )}
+            </div>
+          </SectionCard>
+
+          <SectionCard
+            title="Our Mission Statement"
+            isCompleted={!!currentProfile.mission}
+            className="h-full"
+          >
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Target className="h-5 w-5 text-emerald-600" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-foreground text-sm font-semibold">
+                    Purpose & Values
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    What drives your team every day? Define your core mission.
+                  </p>
+                </div>
+              </div>
+
+              {isEditing ? (
+                <WKTextArea
+                  name="mission"
+                  placeholder="What is your company's core mission?"
+                  className="min-h-[250px] resize-none"
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  //@ts-ignore
+                  onChange={(e: any) => updateField("mission", e.target.value)}
+                />
+              ) : (
+                <div className="text-muted-foreground bg-muted/30 min-h-[150px] rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap">
+                  {currentProfile.mission ||
+                    "Mission statement hasn't been defined."}
+                </div>
+              )}
+            </div>
+          </SectionCard>
+        </FormProvider>
+      </div>
     </TabsContent>
   );
 };

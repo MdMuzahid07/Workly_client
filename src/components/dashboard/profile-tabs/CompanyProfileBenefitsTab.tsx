@@ -3,33 +3,32 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { CompanyBenefit } from "@/types/company-benefit";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { Award, Edit2, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import {
+  Award,
+  Briefcase,
+  Clock,
+  Coffee,
+  Edit2,
+  Heart,
+  Home,
+  Shield,
+  Smile,
+  Trash2,
+  Zap,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 
 import WKCheckbox from "@/components/form/WKCheckbox";
 import WkForm from "@/components/form/WkForm";
+import { SectionCard } from "@/components/main/profile/SectionCard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -40,193 +39,60 @@ import WKInput from "../../form/WkInput";
 import WKSelect from "../../form/WkSelect";
 import WKTextArea from "../../form/WkTextArea";
 
-interface CompanyProfileBenefitsTabProps {
-  currentProfile: any;
-  isEditing: boolean;
-  onBenefitsChange: (benefits: CompanyBenefit[]) => void;
-}
-
-// Define the form schema with proper types
 const benefitFormSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(255, "Title cannot exceed 255 characters"),
-  description: z
-    .string()
-    .max(500, "Description cannot exceed 500 characters")
-    .optional(),
+  title: z.string().min(1, "Title is required").max(60, "Title too long"),
+  description: z.string().max(300, "Description too long").optional(),
   category: z.string().optional(),
   icon: z.string().optional(),
   isActive: z.boolean(),
 });
 
-// Manually define the form data type to avoid Zod inference issues
-interface BenefitFormData {
-  title: string;
-  description?: string;
-  category?: string;
-  icon?: string;
-  isActive: boolean;
-}
+type BenefitFormData = z.infer<typeof benefitFormSchema>;
 
-interface BenefitFormProps {
-  initialData?: Partial<BenefitFormData>;
-  onSubmit: (data: BenefitFormData) => void;
-  onCancel?: () => void;
-  isLoading?: boolean;
-}
-
-const BenefitForm = ({
-  initialData,
-  onSubmit,
-  onCancel,
-  isLoading = false,
-}: BenefitFormProps) => {
-  const defaultValues: BenefitFormData = {
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    category: initialData?.category || "",
-    icon: initialData?.icon || "award",
-    isActive: initialData?.isActive ?? true,
-  };
-
-  // Create a handler that ensures proper typing
-  const handleFormSubmit = (data: z.infer<typeof benefitFormSchema>) => {
-    // Convert the Zod-inferred type to our manually defined type
-    const formData: BenefitFormData = {
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      icon: data.icon,
-      isActive: data.isActive,
-    };
-    onSubmit(formData);
-  };
-
-  return (
-    <WkForm<z.infer<typeof benefitFormSchema>>
-      defaultValues={defaultValues}
-      resolver={zodResolver(benefitFormSchema)}
-      onSubmit={handleFormSubmit}
-    >
-      <div className="space-y-6 p-1">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <WKInput
-            name="title"
-            label="Benefit Title"
-            placeholder="e.g., Health Insurance, Flexible Hours"
-            required
-            size="lg"
-            className="rounded-full"
-          />
-
-          <WKSelect
-            name="category"
-            label="Category"
-            placeholder="Select category"
-            options={benefitCategories}
-            size="lg"
-            className="rounded-full"
-          />
-        </div>
-
-        <WKTextArea
-          name="description"
-          label="Description"
-          placeholder="Describe the benefit details..."
-          rows={3}
-          size="lg"
-        />
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <WKSelect
-            name="icon"
-            label="Icon"
-            placeholder="Select an icon"
-            options={benefitIcons}
-            className="rounded-full"
-            size="lg"
-          />
-
-          <div className="pt-8">
-            <WKCheckbox
-              name="isActive"
-              label="Active Benefit"
-              description="Show this benefit to employees and job seekers"
-              className="rounded-full"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-3 pt-4">
-          {onCancel && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : initialData?.title ? "Update" : "Add"}{" "}
-            Benefit
-          </Button>
-        </div>
-      </div>
-    </WkForm>
-  );
+const ICON_MAP: Record<string, any> = {
+  award: Award,
+  heart: Heart,
+  zap: Zap,
+  coffee: Coffee,
+  home: Home,
+  smile: Smile,
+  clock: Clock,
+  shield: Shield,
+  briefcase: Briefcase,
 };
 
 const CompanyProfileBenefitsTab = ({
   currentProfile,
   isEditing,
   onBenefitsChange,
-}: CompanyProfileBenefitsTabProps) => {
+}: {
+  currentProfile: any;
+  isEditing: boolean;
+  onBenefitsChange: (benefits: CompanyBenefit[]) => void;
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBenefit, setEditingBenefit] = useState<CompanyBenefit | null>(
     null,
   );
   const [isFormLoading, setIsFormLoading] = useState(false);
 
-  // Parse benefits from current profile
-  const benefits: CompanyBenefit[] =
-    currentProfile.benefits
-      ?.filter((b: any) => b && (typeof b === "object" ? b.title : b))
-      .map((benefit: any) => {
-        if (typeof benefit === "string") {
-          return {
-            id: `temp-${Date.now()}-${benefit}`,
-            title: benefit,
-            description: "",
-            isActive: true,
-          };
-        }
-        return {
-          id: benefit.id || `temp-${Date.now()}-${benefit.title}`,
-          title: benefit.title || "",
-          description: benefit.description || "",
-          category: benefit.category || "",
-          icon: benefit.icon || "award",
-          isActive: benefit.isActive ?? true,
-        };
-      }) || [];
+  const benefits: CompanyBenefit[] = useMemo(() => {
+    return (currentProfile.benefits || []).map((b: any) => {
+      if (typeof b === "string")
+        return { id: Math.random().toString(), title: b, isActive: true };
+      return {
+        id: b.id || Math.random().toString(),
+        title: b.title || "",
+        description: b.description || "",
+        category: b.category || "",
+        icon: b.icon || "award",
+        isActive: b.isActive ?? true,
+      };
+    });
+  }, [currentProfile.benefits]);
 
-  const getCategoryLabel = (categoryValue?: string) => {
-    if (!categoryValue) return "Uncategorized";
-    const category = benefitCategories.find(
-      (cat) => cat.value === categoryValue,
-    );
-    return category?.label || categoryValue;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const getIconComponent = (iconName?: string) => {
-    //*TODO:   map icon names to actual Lucide components
-    return Award;
-  };
+  const activeBenefits = benefits.filter((b) => b.isActive);
+  const inactiveBenefits = benefits.filter((b) => !b.isActive);
 
   const handleAddBenefit = async (data: BenefitFormData) => {
     setIsFormLoading(true);
@@ -235,12 +101,10 @@ const CompanyProfileBenefitsTab = ({
         ...data,
         id: editingBenefit?.id || `temp-${Date.now()}`,
       };
-
-      const updatedBenefits = editingBenefit
+      const updated = editingBenefit
         ? benefits.map((b) => (b.id === editingBenefit.id ? newBenefit : b))
         : [...benefits, newBenefit];
-
-      onBenefitsChange(updatedBenefits);
+      onBenefitsChange(updated);
       setIsDialogOpen(false);
       setEditingBenefit(null);
     } finally {
@@ -248,260 +112,240 @@ const CompanyProfileBenefitsTab = ({
     }
   };
 
-  const handleEditBenefit = (benefit: CompanyBenefit) => {
-    setEditingBenefit(benefit);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteBenefit = (benefitId: string) => {
-    const updatedBenefits = benefits.filter((b) => b.id !== benefitId);
-    onBenefitsChange(updatedBenefits);
-  };
-
-  const handleCancelEdit = () => {
-    setIsDialogOpen(false);
-    setEditingBenefit(null);
-  };
-
-  const activeBenefits = benefits.filter((b) => b.isActive);
-  const inactiveBenefits = benefits.filter((b) => !b.isActive);
-
   return (
-    <>
-      <TabsContent value="benefits" className="space-y-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+    <TabsContent value="benefits" className="space-y-10 focus:outline-none">
+      <SectionCard
+        title="Employee Perks & Benefits"
+        isCompleted={activeBenefits.length > 0}
+        onAdd={
+          isEditing
+            ? () => {
+                setEditingBenefit(null);
+                setIsDialogOpen(true);
+              }
+            : undefined
+        }
+      >
+        <div className="space-y-8">
+          <div className="bg-primary/5 border-primary/20 flex items-center gap-4 rounded-2xl border border-dashed p-6">
+            <div className="bg-primary/10 text-primary rounded-full p-3">
+              <Zap className="h-6 w-6" />
+            </div>
             <div>
-              <CardTitle>Company Benefits</CardTitle>
-              <CardDescription>
-                Showcase the benefits you offer to attract top talent
-              </CardDescription>
+              <h4 className="text-foreground font-bold">Talent Magnet</h4>
+              <p className="text-muted-foreground text-sm">
+                Comprehensive benefits packages increase candidate application
+                rates by up to 40%.
+              </p>
             </div>
-            {isEditing && (
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    onClick={() => setEditingBenefit(null)}
-                    className="gap-2"
+          </div>
+
+          {activeBenefits.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {activeBenefits.map((benefit) => {
+                const Icon = ICON_MAP[benefit.icon || "award"] || Award;
+                return (
+                  <div
+                    key={benefit.id}
+                    className="group bg-card relative overflow-hidden rounded-2xl border p-6"
                   >
-                    <Plus className="h-4 w-4" />
-                    Add Benefit
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
-            )}
-          </CardHeader>
-
-          <CardContent className="space-y-8">
-            {/* Active Benefits Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  Active Benefits ({activeBenefits.length})
-                </h3>
-              </div>
-
-              {activeBenefits.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {activeBenefits.map((benefit) => {
-                    const Icon = getIconComponent(benefit.icon);
-                    return (
-                      <Card
-                        key={benefit.id}
-                        className="border-border hover:border-primary/20 transition-all hover:shadow-sm"
-                      >
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start gap-3">
-                              <div className="bg-primary/10 text-primary rounded-lg p-2">
-                                <Icon className="h-5 w-5" />
-                              </div>
-                              <div className="space-y-1">
-                                <h4 className="leading-tight font-semibold">
-                                  {benefit.title}
-                                </h4>
-                                {benefit.category && (
-                                  <span className="text-muted-foreground text-xs font-medium">
-                                    {getCategoryLabel(benefit.category)}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {isEditing && (
-                              <div className="flex gap-1">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() =>
-                                          handleEditBenefit(benefit)
-                                        }
-                                        className="h-8 w-8"
-                                      >
-                                        <Edit2 className="h-3.5 w-3.5" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Edit benefit</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() =>
-                                          handleDeleteBenefit(benefit.id!)
-                                        }
-                                        className="text-destructive hover:text-destructive h-8 w-8"
-                                      >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Delete benefit</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
-                            )}
-                          </div>
-
-                          {benefit.description && (
-                            <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-                              {benefit.description}
-                            </p>
-                          )}
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              ) : (
-                <Card className="border-border bg-muted/30 border-2 border-dashed">
-                  <CardContent className="flex flex-col items-center justify-center p-8 text-center">
-                    <Award className="text-muted-foreground mb-4 h-12 w-12" />
-                    <h3 className="mb-2 text-lg font-semibold">
-                      No benefits added yet
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Add benefits to make your company more attractive to
-                      candidates
-                    </p>
-                    {isEditing && (
-                      <Button
-                        onClick={() => setIsDialogOpen(true)}
-                        className="gap-2"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add Your First Benefit
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            {/* Inactive Benefits Section */}
-            {inactiveBenefits.length > 0 && isEditing && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-muted-foreground text-lg font-semibold">
-                    Inactive Benefits ({inactiveBenefits.length})
-                  </h3>
-                </div>
-
-                <div className="bg-muted/30 rounded-lg p-4">
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {inactiveBenefits.map((benefit) => {
-                      const Icon = getIconComponent(benefit.icon);
-                      return (
-                        <div
-                          key={benefit.id}
-                          className="border-border bg-card rounded-lg border p-4"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="text-muted-foreground rounded-lg p-2">
-                                <Icon className="h-4 w-4" />
-                              </div>
-                              <div>
-                                <h4 className="text-muted-foreground font-medium">
-                                  {benefit.title}
-                                </h4>
-                                {benefit.category && (
-                                  <span className="text-muted-foreground/70 text-xs">
-                                    {getCategoryLabel(benefit.category)}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  const updatedBenefits = benefits.map((b) =>
-                                    b.id === benefit.id
-                                      ? { ...b, isActive: true }
-                                      : b,
-                                  );
-                                  onBenefitsChange(updatedBenefits);
-                                }}
-                                className="h-7 w-7"
-                              >
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDeleteBenefit(benefit.id!)}
-                                className="text-destructive hover:text-destructive h-7 w-7"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
+                    <div className="absolute top-0 right-0 p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                      {isEditing && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditingBenefit(benefit);
+                              setIsDialogOpen(true);
+                            }}
+                            className="hover:bg-primary/10 hover:text-primary h-8 w-8"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              onBenefitsChange(
+                                benefits.filter((b) => b.id !== benefit.id),
+                              )
+                            }
+                            className="hover:bg-destructive/10 hover:text-destructive h-8 w-8"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                      );
-                    })}
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <div className="bg-primary/10 text-primary w-fit rounded-xl p-3 transition-transform group-hover:scale-110">
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-foreground group-hover:text-primary mb-1 font-bold transition-colors">
+                          {benefit.title}
+                        </h4>
+                        <p className="text-muted-foreground mb-3 text-xs font-bold tracking-widest uppercase">
+                          {benefit.category || "General"}
+                        </p>
+                        <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed">
+                          {benefit.description ||
+                            "Exciting perk for our amazing team members."}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </TabsContent>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-muted-foreground bg-muted/20 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed py-20">
+              <Award className="mb-4 h-16 w-16 opacity-10" />
+              <p className="text-lg font-medium">No perks listed yet.</p>
+              <p className="text-sm opacity-60">
+                Add some benefits to stand out!
+              </p>
+            </div>
+          )}
 
-      {/* Add/Edit Benefit Dialog */}
+          {inactiveBenefits.length > 0 && isEditing && (
+            <div className="space-y-4 border-t pt-8">
+              <h3 className="text-muted-foreground flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
+                <Clock className="h-3 w-3" /> Draft / Hidden Benefits
+              </h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {inactiveBenefits.map((benefit) => (
+                  <div
+                    key={benefit.id}
+                    className="bg-muted/30 flex items-center justify-between rounded-xl border border-dashed p-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="bg-muted rounded-lg p-2">
+                        <Award className="text-muted-foreground h-4 w-4" />
+                      </div>
+                      <span className="text-muted-foreground text-sm font-medium">
+                        {benefit.title}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          onBenefitsChange(
+                            benefits.map((b) =>
+                              b.id === benefit.id
+                                ? { ...b, isActive: true }
+                                : b,
+                            ),
+                          )
+                        }
+                        className="text-primary text-xs font-bold"
+                      >
+                        Activate
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          onBenefitsChange(
+                            benefits.filter((b) => b.id !== benefit.id),
+                          )
+                        }
+                        className="text-destructive h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </SectionCard>
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-card sm:max-w-[500px]">
+        <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingBenefit ? "Edit Benefit" : "Add New Benefit"}
+            <DialogTitle className="text-2xl font-bold">
+              {editingBenefit ? "Refine Benefit" : "New Company Perk"}
             </DialogTitle>
             <DialogDescription>
-              {editingBenefit
-                ? "Update the benefit details below."
-                : "Add a new benefit to showcase to employees and candidates."}
+              Define the details of this offering to attract candidates.
             </DialogDescription>
           </DialogHeader>
-
           <BenefitForm
-            initialData={editingBenefit || undefined}
+            initialValues={editingBenefit || undefined}
             onSubmit={handleAddBenefit}
-            onCancel={handleCancelEdit}
+            onCancel={() => setIsDialogOpen(false)}
             isLoading={isFormLoading}
           />
         </DialogContent>
       </Dialog>
-    </>
+    </TabsContent>
+  );
+};
+
+const BenefitForm = ({ initialValues, onSubmit, onCancel, isLoading }: any) => {
+  return (
+    <WkForm<BenefitFormData>
+      defaultValues={
+        initialValues || {
+          title: "",
+          description: "",
+          category: "Health & Wellness",
+          icon: "award",
+          isActive: true,
+        }
+      }
+      resolver={zodResolver(benefitFormSchema)}
+      onSubmit={onSubmit}
+    >
+      <div className="space-y-6 pt-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <WKInput
+            name="title"
+            label="Benefit Name"
+            placeholder="e.g. Health Coverage"
+            required
+          />
+          <WKSelect
+            name="category"
+            label="Category"
+            placeholder=""
+            options={benefitCategories}
+            required
+          />
+        </div>
+        <WKTextArea
+          name="description"
+          label="Detailed Description"
+          placeholder="Explain what this benefit includes..."
+          rows={3}
+        />
+        <div className="grid grid-cols-1 items-end gap-6 sm:grid-cols-2">
+          <WKSelect
+            placeholder=""
+            name="icon"
+            label="Visual Icon"
+            options={benefitIcons}
+          />
+          <div className="pb-2">
+            <WKCheckbox name="isActive" label="Make publicly visible" />
+          </div>
+        </div>
+        <div className="flex justify-end gap-3 pt-4">
+          <Button variant="outline" type="button" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Processing..." : "Save Benefit"}
+          </Button>
+        </div>
+      </div>
+    </WkForm>
   );
 };
 
