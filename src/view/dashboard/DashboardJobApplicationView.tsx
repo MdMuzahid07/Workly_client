@@ -137,7 +137,7 @@ const DashboardJobApplicationView = () => {
 
         <div className="rounded-2xl border px-4 py-6 md:px-6 md:py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-card w-full border p-0">
+            <TabsList className="bg-card h-10 w-full border p-0">
               <TabsTrigger className="py-3" value="all">
                 All ({mockApplications.length})
               </TabsTrigger>

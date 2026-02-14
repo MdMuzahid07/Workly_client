@@ -73,7 +73,7 @@ const ManageCompanyProfileView = () => {
         >
           {/* Tab list */}
           <div className="scrollbar-none -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-            <TabsList className="bg-muted/40 border-border h-fit w-full justify-start rounded-full border p-0">
+            <TabsList className="bg-muted/40 border-border h-10 w-full justify-start rounded-full border p-0">
               {PROFILE_TABS.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
