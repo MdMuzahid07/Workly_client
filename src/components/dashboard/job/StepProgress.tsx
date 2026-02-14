@@ -81,7 +81,7 @@ export default function StepProgress({
                     {/* Step Label */}
                     <div
                       className="absolute top-12 w-32 text-center"
-                      style={{ left: "50%", transform: "translateX(-50%)" }}
+                      style={{ left: "4.5%", transform: "translateX(-50%)" }}
                     >
                       <p
                         className={cn(

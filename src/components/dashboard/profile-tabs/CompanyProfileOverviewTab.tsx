@@ -32,28 +32,28 @@ const CompanyProfileOverviewTab = ({
         label: "Total Jobs",
         value: currentProfile.stats?.totalJobs || 0,
         icon: Briefcase,
-        color: "from-blue-500/20 to-indigo-500/20",
+        color: "",
         iconColor: "text-blue-600",
       },
       {
         label: "Applications",
         value: currentProfile.stats?.totalApplications || 0,
         icon: Target,
-        color: "from-emerald-500/20 to-teal-500/20",
+        color: "",
         iconColor: "text-emerald-600",
       },
       {
         label: "Employees",
         value: currentProfile.stats?.totalEmployees || 0,
         icon: Users,
-        color: "from-orange-500/20 to-rose-500/20",
+        color: "",
         iconColor: "text-orange-600",
       },
       {
         label: "Profile Views",
         value: currentProfile.stats?.profileViews || 0,
         icon: Eye,
-        color: "from-purple-500/20 to-pink-500/20",
+        color: "",
         iconColor: "text-purple-600",
       },
     ],
@@ -67,11 +67,11 @@ const CompanyProfileOverviewTab = ({
         {stats.map((stat, index) => (
           <div
             key={index}
-            className={`bg-linear-to-br ${stat.color} relative overflow-hidden rounded-2xl border border-white/20 p-6 backdrop-blur-md dark:border-white/5`}
+            className={`bg-card relative overflow-hidden rounded-xl border p-6 backdrop-blur-md`}
           >
             <div className="relative z-10 flex flex-col gap-3">
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-xl bg-white/80 shadow-sm backdrop-blur-sm dark:bg-black/20 ${stat.iconColor}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl border bg-white/80 backdrop-blur-sm dark:bg-black/20`}
               >
                 <stat.icon className="h-6 w-6" />
               </div>
