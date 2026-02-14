@@ -174,28 +174,28 @@ const NotificationView = () => {
         <div>
           {/* Filter Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="bg-muted/20 border-border inline-flex h-11 w-full items-center justify-start rounded-full border p-1 sm:w-auto">
+            <TabsList className="bg-muted/20 border-border inline-flex h-10 w-full items-center justify-start rounded-full border p-0 sm:w-auto">
               <TabsTrigger
                 value="all"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
               >
                 All ({notifications.length})
               </TabsTrigger>
               <TabsTrigger
                 value="unread"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
               >
                 Unread ({unreadCount})
               </TabsTrigger>
               <TabsTrigger
                 value="applications"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
               >
                 Applications
               </TabsTrigger>
               <TabsTrigger
                 value="messages"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 rounded-full px-6 text-sm font-bold transition-all"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
               >
                 Messages
               </TabsTrigger>

@@ -1,244 +1,399 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import BillingSettingTab from "../../components/dashboard/company-settings/settings-tabs/BillingSettingTab";
-import JobPostingManagementTab from "../../components/dashboard/company-settings/settings-tabs/JobPostingManagementTab";
-import NotificationSettingTab from "../../components/dashboard/company-settings/settings-tabs/NotificationSettingTab";
-import PrivacySettingTab from "../../components/dashboard/company-settings/settings-tabs/PrivacySettingTab";
-import SocialLinkSettingTab from "../../components/dashboard/company-settings/settings-tabs/SocialLinkSettingTab";
+
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
+import { logout } from "@/redux/feature/auth/authSlice";
+import { useAppDispatch } from "@/redux/hooks";
+import {
+  BellRing,
+  ChevronRight,
+  Eye,
+  Globe,
+  Lock,
+  LogOut,
+  Mail,
+  ShieldCheck,
+  Smartphone,
+  Trash2,
+  User,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
 import DashboardCompanySettingsHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanySettingsHeader";
 import {
   useGetMyCompanyQuery,
   useUpdateCompanySettingsMutation,
 } from "../../redux/feature/company/companyApi";
+import CompanyPersonalInformationView from "./CompanyPersonalInformationView";
+import CompanySecurityView from "./CompanySecurityView";
 
-interface CompanySettings {
-  notifications: {
-    emailNotifications: boolean;
-    applicationAlerts: boolean;
-    jobExpiryReminders: boolean;
-    weeklyReports: boolean;
-  };
-  privacy: {
-    profileVisibility: "public" | "private";
-    showEmployeeCount: boolean;
-    showSalaryRanges: boolean;
-    allowDirectMessages: boolean;
-  };
-  jobPosting: {
-    autoExpireJobs: boolean;
-    jobExpiryDays: number;
-    requireApproval: boolean;
-    maxActiveJobs: number;
-  };
-  billing: {
-    plan: string;
-    billingEmail: string;
-    autoRenew: boolean;
-  };
+interface SettingItem {
+  id: string;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  enabled?: boolean;
 }
 
-const CompanySettingsView = () => {
-  const [activeTab, setActiveTab] = useState("general");
-  const [companyId, setCompanyId] = useState<string | null>(null);
+const notificationSettingsSeed: SettingItem[] = [
+  {
+    id: "emailNotifications",
+    label: "Email Notifications",
+    description: "Receive updates and alerts via email",
+    icon: <Mail className="h-5 w-5" />,
+    enabled: true,
+  },
+  {
+    id: "applicationAlerts",
+    label: "Application Alerts",
+    description: "Get notified when new candidates apply",
+    icon: <Zap className="h-5 w-5" />,
+    enabled: true,
+  },
+  {
+    id: "jobExpiryReminders",
+    label: "Job Expiry Reminders",
+    description: "Notifications before your job posts expire",
+    icon: <Smartphone className="h-5 w-5" />,
+    enabled: true,
+  },
+  {
+    id: "weeklyReports",
+    label: "Weekly Reports",
+    description: "Receive a summary of hiring activity",
+    icon: <BellRing className="h-5 w-5" />,
+    enabled: false,
+  },
+];
 
-  const {
-    data: companyData,
-    isLoading: isLoadingCompany,
-    error: companyError,
-  } = useGetMyCompanyQuery(undefined, {
-    skip: false,
-  });
+const privacySettingsSeed: SettingItem[] = [
+  {
+    id: "profileVisibility",
+    label: "Profile Visibility",
+    description: "Allow candidates to see your company profile",
+    icon: <Globe className="h-5 w-5" />,
+    enabled: true,
+  },
+  {
+    id: "showEmployeeCount",
+    label: "Show Employee Count",
+    description: "Display your size on your public profile",
+    icon: <Eye className="h-5 w-5" />,
+    enabled: true,
+  },
+  {
+    id: "allowDirectMessages",
+    label: "Allow Direct Messages",
+    description: "Let candidates message your company contact",
+    icon: <ShieldCheck className="h-5 w-5" />,
+    enabled: true,
+  },
+];
+
+const CompanySettingsView = () => {
+  const dispatch = useAppDispatch();
+  const [logoutUser] = useLogoutUserMutation();
+  const [activeSection, setActiveSection] = useState<
+    "main" | "personal" | "security"
+  >("main");
+
+  const { data: companyData, isLoading: isLoadingCompany } =
+    useGetMyCompanyQuery(undefined);
 
   const [updateCompanySettings, { isLoading: isSaving }] =
     useUpdateCompanySettingsMutation();
 
-  const [settings, setSettings] = useState<CompanySettings>({
-    notifications: {
-      emailNotifications: true,
-      applicationAlerts: true,
-      jobExpiryReminders: true,
-      weeklyReports: false,
-    },
-    privacy: {
-      profileVisibility: "public",
-      showEmployeeCount: true,
-      showSalaryRanges: false,
-      allowDirectMessages: true,
-    },
-    jobPosting: {
-      autoExpireJobs: true,
-      jobExpiryDays: 30,
-      requireApproval: false,
-      maxActiveJobs: 10,
-    },
-    billing: {
-      plan: "Professional",
-      billingEmail: "",
-      autoRenew: true,
-    },
-  });
+  const [notifications, setNotifications] = useState(notificationSettingsSeed);
+  const [privacy, setPrivacy] = useState(privacySettingsSeed);
 
-  const [socialLinks, setSocialLinks] = useState<any[]>([]);
+  const toggleNotification = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, enabled: !item.enabled } : item,
+      ),
+    );
+  };
 
-  // ====== load company data when it's fetched =====>
-  useEffect(() => {
-    if (companyData?.data) {
-      const company = companyData.data;
-      setCompanyId(company.id);
-
-      // ==== map company data to settings =======>
-      setSettings((prev) => ({
-        ...prev,
-        billing: {
-          ...prev.billing,
-          billingEmail: company.contactEmail || "",
-        },
-        //  ====== you can add more mappings here when settings are stored in the database =====>
-      }));
-
-      // ==== set social links ====>
-      if (company.socialLinks) {
-        setSocialLinks(company.socialLinks);
-      }
-    }
-  }, [companyData]);
+  const togglePrivacy = (id: string) => {
+    setPrivacy((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, enabled: !item.enabled } : item,
+      ),
+    );
+  };
 
   const handleSaveSettings = async () => {
-    if (!companyId) {
-      toast.error("Company not found");
-      return;
-    }
-
+    if (!companyData?.data?.id) return;
     try {
-      // ======= strip React elements (icons) from socialLinks before sending to API =====>
-      const socialLinksData = socialLinks.map(({ id, platform, url }) => ({
-        id,
-        platform,
-        url,
-      }));
-
       await updateCompanySettings({
-        companyId,
-        ...settings,
-        socialLinks: socialLinksData,
+        companyId: companyData.data.id,
+        notifications: notifications.reduce((acc: any, item) => {
+          acc[item.id] = item.enabled;
+          return acc;
+        }, {}),
+        privacy: privacy.reduce((acc: any, item) => {
+          acc[item.id] = item.enabled;
+          return acc;
+        }, {}),
       }).unwrap();
-
-      toast.success("Settings saved successfully");
-    } catch (error: any) {
-      toast.error(
-        error?.data?.message ||
-          error?.data?.errorSources?.message ||
-          "Failed to save settings",
-      );
+    } catch {
+      // toast usually handled by API hook or in component
     }
   };
 
-  const handleSocialLinksChange = (links: any[]) => {
-    setSocialLinks(links);
-  };
-
-  const updateSettings = (
-    section: keyof CompanySettings,
-    key: string,
-    value: any,
-  ) => {
-    setSettings((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [key]: value,
-      },
-    }));
+  const handleSignOut = async () => {
+    try {
+      await logoutUser(undefined).unwrap();
+    } catch {
+      // ignore
+    } finally {
+      dispatch(logout());
+      window.location.href = "/";
+    }
   };
 
   if (isLoadingCompany) {
     return (
-      <div className="bg-primary/2 flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="text-muted-foreground">
-            Loading company settings...
-          </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground animate-pulse font-medium">
+          Loading settings...
         </div>
       </div>
     );
   }
 
-  if (companyError || !companyData?.data) {
+  if (activeSection === "personal") {
     return (
-      <div className="bg-primary/2 flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="text-destructive mb-2">
-            Failed to load company settings
-          </div>
-          <div className="text-muted-foreground text-sm">
-            {companyError ? "Please try again later" : "Company not found"}
-          </div>
-        </div>
-      </div>
+      <CompanyPersonalInformationView onBack={() => setActiveSection("main")} />
     );
+  }
+
+  if (activeSection === "security") {
+    return <CompanySecurityView onBack={() => setActiveSection("main")} />;
   }
 
   return (
-    <div className="bg-primary/2 min-h-screen">
+    <div className="bg-background min-h-screen">
       <DashboardCompanySettingsHeader
         handleSaveSettings={handleSaveSettings}
         isSaving={isSaving}
       />
 
-      <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-6"
-        >
-          <div className="w-full overflow-x-auto">
-            <TabsList className="grid w-full min-w-[600px] grid-cols-5 sm:min-w-0">
-              <TabsTrigger value="general" className="text-xs sm:text-sm">
-                General
-              </TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm">
-                Notifications
-              </TabsTrigger>
-              <TabsTrigger value="privacy" className="text-xs sm:text-sm">
-                Privacy
-              </TabsTrigger>
-              <TabsTrigger value="social" className="text-xs sm:text-sm">
-                Social Links
-              </TabsTrigger>
-              <TabsTrigger value="billing" className="text-xs sm:text-sm">
-                Billing
-              </TabsTrigger>
-            </TabsList>
-          </div>
+      <div className="mt-16 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl space-y-10">
+          {/* Account */}
+          <section>
+            <div className="mb-6">
+              <h2 className="text-lg font-black tracking-tight sm:text-xl">
+                Account
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium opacity-80">
+                Manage your company contact information and security
+              </p>
+            </div>
 
-          <JobPostingManagementTab
-            updateSettings={updateSettings}
-            settings={settings}
-          />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div onClick={() => setActiveSection("personal")}>
+                <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border p-5 transition-all duration-300">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:ring-primary/5 flex h-12 w-12 items-center justify-center rounded-lg ring-4 ring-transparent transition-all">
+                        <User className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold tracking-tight">
+                          Account Profile
+                        </h3>
+                        <p className="text-muted-foreground text-xs font-medium opacity-70">
+                          Your login identity and personal user info
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="text-muted-foreground group-hover:text-primary h-5 w-5 transition-all group-hover:translate-x-1" />
+                  </div>
+                </Card>
+              </div>
 
-          <NotificationSettingTab
-            updateSettings={updateSettings}
-            settings={settings}
-          />
+              <div onClick={() => setActiveSection("security")}>
+                <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border p-5 transition-all duration-300">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:ring-primary/5 flex h-12 w-12 items-center justify-center rounded-lg ring-4 ring-transparent transition-all">
+                        <Lock className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold tracking-tight">
+                          Password & Security
+                        </h3>
+                        <p className="text-muted-foreground text-xs font-medium opacity-70">
+                          Change password, session security
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="text-muted-foreground group-hover:text-primary h-5 w-5 transition-all group-hover:translate-x-1" />
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </section>
 
-          <PrivacySettingTab
-            updateSettings={updateSettings}
-            settings={settings}
-          />
+          <Separator className="opacity-50" />
 
-          <SocialLinkSettingTab
-            socialLinks={socialLinks}
-            onSocialLinksChange={handleSocialLinksChange}
-          />
+          {/* Notifications */}
+          <section>
+            <div className="mb-6">
+              <h2 className="text-lg font-black tracking-tight sm:text-xl">
+                Notification Preferences
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium opacity-80">
+                Control how your company receives updates and alerts
+              </p>
+            </div>
 
-          <BillingSettingTab
-            updateSettings={updateSettings}
-            settings={settings}
-          />
-        </Tabs>
+            <div className="grid gap-3">
+              {notifications.map((item) => (
+                <Card
+                  key={item.id}
+                  className="bg-card hover:border-primary/20 rounded-xl border p-5 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 text-primary ring-primary/5 flex h-10 w-10 items-center justify-center rounded-lg ring-2">
+                        {item.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold tracking-tight">
+                          {item.label}
+                        </h3>
+                        <p className="text-muted-foreground text-xs font-medium opacity-70">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={!!item.enabled}
+                      onCheckedChange={() => toggleNotification(item.id)}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          <Separator className="opacity-50" />
+
+          {/* Privacy */}
+          <section>
+            <div className="mb-6">
+              <h2 className="text-lg font-black tracking-tight sm:text-xl">
+                Privacy & Visibility
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium opacity-80">
+                Manage your company profile visibility and data display
+              </p>
+            </div>
+
+            <div className="grid gap-3">
+              {privacy.map((item) => (
+                <Card
+                  key={item.id}
+                  className="bg-card hover:border-primary/20 rounded-xl border p-5 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 text-primary ring-primary/5 flex h-10 w-10 items-center justify-center rounded-lg ring-2">
+                        {item.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold tracking-tight">
+                          {item.label}
+                        </h3>
+                        <p className="text-muted-foreground text-xs font-medium opacity-70">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={!!item.enabled}
+                      onCheckedChange={() => togglePrivacy(item.id)}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          <Separator className="opacity-50" />
+
+          {/* Danger Zone */}
+          <section className="pb-12">
+            <div className="mb-6">
+              <h2 className="text-destructive text-lg font-black tracking-tight sm:text-xl">
+                Danger Zone
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium opacity-80">
+                Critical company account actions
+              </p>
+            </div>
+
+            <div className="grid gap-3">
+              <Card className="bg-card hover:border-destructive/20 rounded-xl border p-5 transition-all duration-300">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-destructive/10 text-destructive ring-destructive/5 flex h-10 w-10 items-center justify-center rounded-lg ring-2">
+                      <LogOut className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold tracking-tight">
+                        Sign Out
+                      </h3>
+                      <p className="text-muted-foreground text-xs font-medium opacity-70">
+                        Exit your current hiring session
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="border-destructive/20 text-destructive hover:bg-destructive hover:text-destructive-foreground w-full bg-transparent font-bold sm:w-auto"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="border-destructive/30 bg-destructive/5 hover:border-destructive rounded-xl border-2 p-5 transition-all duration-300">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-destructive text-destructive-foreground shadow-destructive/20 flex h-12 w-12 items-center justify-center rounded-xl shadow-lg">
+                      <Trash2 className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-destructive font-bold tracking-tight">
+                        Delete Company Account
+                      </h3>
+                      <p className="text-muted-foreground text-xs font-medium opacity-70">
+                        Permanently remove all company data and job posts
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full font-bold sm:w-auto"
+                  >
+                    Delete Account
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );

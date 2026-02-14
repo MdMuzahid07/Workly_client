@@ -141,10 +141,10 @@ const SavedJobsView = () => {
         {/* Tabs System */}
         <Tabs defaultValue="active" className="w-full space-y-6">
           <div className="flex items-center justify-between">
-            <TabsList className="bg-muted/20 h-11 rounded-xl p-1">
+            <TabsList className="bg-muted/20 h-10 rounded-full border p-0">
               <TabsTrigger
                 value="active"
-                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold data-[state=active]:border"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold"
               >
                 Active
                 <Badge
@@ -156,7 +156,7 @@ const SavedJobsView = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="closed"
-                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold data-[state=active]:border"
+                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold"
               >
                 Closed
                 <Badge

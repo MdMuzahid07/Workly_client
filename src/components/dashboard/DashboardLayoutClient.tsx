@@ -1,8 +1,10 @@
 "use client";
 
+import { UserRole } from "@/redux/feature/auth/authSlice";
 import { useAppSelector } from "@/redux/hooks";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
+import AdminSidebar from "./dashboard-nav/AdminSidebar";
 import EmployerSidebar from "./dashboard-nav/EmployerSidebar";
 import JobSeekerSidebar from "./dashboard-nav/JobSeekerSidebar";
 
@@ -21,13 +23,18 @@ export default function DashboardLayoutClient({
     setIsMounted(true);
   }, []);
 
-  const isEmployer = user?.role === "EMPLOYER" || (user?.role as number) === 1;
+  const isEmployer =
+    user?.role === UserRole.EMPLOYER || (user?.role as number) === 1;
+  const isAdmin = user?.role === UserRole.ADMIN || (user?.role as number) === 2;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isJobSeeker =
-    user?.role === "JOB_SEEKER" || (user?.role as number) === 0 || !isEmployer;
+    user?.role === UserRole.JOB_SEEKER ||
+    (user?.role as number) === 0 ||
+    (!isEmployer && !isAdmin);
 
   const isEmployerPath = pathname?.startsWith("/employer");
   const isDashboardPath = pathname?.startsWith("/dashboard");
+  const isAdminPath = pathname?.startsWith("/admin");
 
   useEffect(() => {
     if (!isMounted) return;
@@ -49,11 +56,15 @@ export default function DashboardLayoutClient({
     // If user exists, handle role-based redirects
     if (hasUser) {
       if (isEmployerPath && !isEmployer) {
-        router.replace("/dashboard");
+        router.replace(isAdmin ? "/admin" : "/dashboard");
         return;
       }
-      if (isDashboardPath && isEmployer) {
-        router.replace("/employer");
+      if (isDashboardPath && (isEmployer || isAdmin)) {
+        router.replace(isEmployer ? "/employer" : "/admin");
+        return;
+      }
+      if (isAdminPath && !isAdmin) {
+        router.replace(isEmployer ? "/employer" : "/dashboard");
         return;
       }
     }
@@ -68,6 +79,8 @@ export default function DashboardLayoutClient({
     isEmployerPath,
     isDashboardPath,
     router,
+    isAdmin,
+    isAdminPath,
   ]);
 
   // Timeout fallback: if we've been loading for more than 3 seconds and no user, redirect
@@ -125,6 +138,17 @@ export default function DashboardLayoutClient({
           isOpen={isSidebarOpen}
           onOpenChange={setIsSidebarOpen}
         />
+        <div className="bg-background lg:pl-64">
+          <main className="min-h-screen w-full">{children}</main>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAdminPath) {
+    return (
+      <div className="bg-background min-h-screen">
+        <AdminSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
         <div className="bg-background lg:pl-64">
           <main className="min-h-screen w-full">{children}</main>
         </div>

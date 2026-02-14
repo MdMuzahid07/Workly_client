@@ -151,7 +151,7 @@ const ProfileView = () => {
 
         {/* Tabs Navigation */}
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="mb-6 h-auto w-full justify-start overflow-x-auto border border-b bg-transparent p-0">
+          <TabsList className="mb-6 h-10 w-full justify-start overflow-x-auto border border-b bg-transparent p-0">
             <TabsTrigger
               value="personal"
               className="data-[state=active]:bg-primary/10 py-3"

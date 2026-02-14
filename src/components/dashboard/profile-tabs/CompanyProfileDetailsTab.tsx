@@ -271,9 +271,9 @@ const CompanyProfileDetailsTab = ({
             </div>
           </SectionCard>
 
-          {/* Contact Information */}
+          {/* Public Contact Details */}
           <SectionCard
-            title="Contact Information"
+            title="Public Contact Details"
             isCompleted={!!currentProfile.contactEmail}
           >
             <div className="space-y-6">
@@ -314,8 +314,8 @@ const CompanyProfileDetailsTab = ({
               <div className="bg-primary/5 text-muted-foreground flex gap-3 rounded-xl p-4 text-sm">
                 <InfoIcon className="text-primary h-5 w-5 shrink-0" />
                 <p>
-                  These contact details will be primarily used for candidate
-                  inquiries and platform notifications.
+                  These contact details are **public** and will be visible on
+                  your company profile for candidate inquiries.
                 </p>
               </div>
             </div>
