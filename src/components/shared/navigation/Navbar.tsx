@@ -27,7 +27,6 @@ import { navLinks } from "../../../constants";
 import { useLogoutUserMutation } from "../../../redux/feature/auth/authApi";
 import { logout } from "../../../redux/feature/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { useAuthDialog } from "../../main/auth/AuthDialogProvider";
 import ThemeSwitcher from "../ThemeSwitcher";
 import WJLogo from "../WJLogo";
 import NotificationDropdown from "./NotificationDropdown";
@@ -40,7 +39,6 @@ interface AuthTokenPayload extends JwtPayload {
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { openAuth } = useAuthDialog();
   const { user, isVerified } = useAppSelector((state) => state.auth) || {
     email: null,
   };
@@ -217,10 +215,10 @@ const Navbar = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button
+                  asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-full px-6 py-2.5 text-base font-semibold shadow-md transition-all duration-200 hover:shadow-lg"
-                  onClick={() => openAuth("signIn")}
                 >
-                  Sign In
+                  <Link href="/login">Sign In</Link>
                 </Button>
               </motion.div>
             )}

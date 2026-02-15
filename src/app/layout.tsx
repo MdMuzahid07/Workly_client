@@ -1,4 +1,3 @@
-import AuthDialogProvider from "@/components/main/auth/AuthDialogProvider";
 import type { Metadata } from "next";
 import { Barlow } from "next/font/google";
 import { Toaster } from "sonner";
@@ -47,9 +46,7 @@ export default function RootLayout({
           disableTransitionOnChange={false}
           storageKey="workly-theme"
         >
-          <ReduxProvider>
-            <AuthDialogProvider>{children}</AuthDialogProvider>
-          </ReduxProvider>
+          <ReduxProvider>{children}</ReduxProvider>
         </ThemeProvider>
         <Toaster
           position="top-center"

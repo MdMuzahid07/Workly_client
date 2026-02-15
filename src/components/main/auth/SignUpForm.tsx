@@ -1,23 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
-import { useRegisterUserMutation } from "../../../../redux/feature/auth/authApi";
-import { setCredentials } from "../../../../redux/feature/auth/authSlice";
-import { useAppDispatch } from "../../../../redux/hooks";
-import WkForm from "../../../form/WkForm";
-import WKInput from "../../../form/WkInput";
-import { useAuthDialog } from "../AuthDialogProvider";
-import { GoogleLoginButton } from "../GoogleLoginButton";
+import { useRegisterUserMutation } from "../../../redux/feature/auth/authApi";
+import { setCredentials } from "../../../redux/feature/auth/authSlice";
+import { useAppDispatch } from "../../../redux/hooks";
+import WkForm from "../../form/WkForm";
+import WKInput from "../../form/WkInput";
+import { GoogleLoginButton } from "./GoogleLoginButton";
 
 interface SignUpFormData {
   fullName: string;
@@ -49,8 +45,7 @@ const signUpSchema = z
     path: ["confirmPassword"],
   });
 
-const SignUpView = () => {
-  const { switchView } = useAuthDialog();
+const SignUpForm = () => {
   const dispatch = useAppDispatch();
   const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +53,7 @@ const SignUpView = () => {
   const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
     "JOB_SEEKER",
   );
+  const router = useRouter();
 
   const defaultValues: SignUpFormData = {
     fullName: "",
@@ -97,7 +93,7 @@ const SignUpView = () => {
         );
 
         toast.success("Please verify your email!");
-        switchView("verificationEmailSent");
+        router.push("/verify-email");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -108,21 +104,19 @@ const SignUpView = () => {
 
   return (
     <>
-      <DialogHeader className="space-y-3">
-        <DialogTitle className="text-secondary-foreground text-center text-2xl font-bold">
-          Join Workly_job
-        </DialogTitle>
-        <DialogDescription className="text-secondary-foreground text-center">
+      <div className="mb-8 space-y-2 text-center">
+        <h1 className="text-3xl font-bold tracking-tight">Join Workly_job</h1>
+        <p className="text-muted-foreground text-sm">
           Create your account and start your career journey today.
-        </DialogDescription>
-      </DialogHeader>
+        </p>
+      </div>
 
       <WkForm
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         resolver={zodResolver(signUpSchema)}
       >
-        <div className="mt-6 space-y-6">
+        <div className="space-y-6">
           <div className="space-y-4">
             <WKInput
               name="fullName"
@@ -156,9 +150,9 @@ const SignUpView = () => {
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? (
-                  <EyeOff className="text-secondary-foreground h-4 w-4" />
+                  <EyeOff className="text-muted-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="text-secondary-foreground h-4 w-4" />
+                  <Eye className="text-muted-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -179,9 +173,9 @@ const SignUpView = () => {
                 onClick={() => setShowConfirmPassword((v) => !v)}
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="text-secondary-foreground h-4 w-4" />
+                  <EyeOff className="text-muted-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="text-secondary-foreground h-4 w-4" />
+                  <Eye className="text-muted-foreground h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -192,8 +186,8 @@ const SignUpView = () => {
                 variant={selectedRole === "EMPLOYER" ? "default" : "outline"}
                 className={`hover:bg-primary flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
                   selectedRole === "EMPLOYER"
-                    ? "bg-primary border-green-400 text-white"
-                    : "border-slate-300 text-green-400"
+                    ? "bg-primary border-primary text-white"
+                    : "border-border text-muted-foreground hover:text-white"
                 }`}
                 onClick={() => setSelectedRole("EMPLOYER")}
               >
@@ -205,8 +199,8 @@ const SignUpView = () => {
                 variant={selectedRole === "JOB_SEEKER" ? "default" : "outline"}
                 className={`hover:bg-primary flex-1 rounded-full border-2 py-3 font-semibold transition-colors duration-200 ${
                   selectedRole === "JOB_SEEKER"
-                    ? "bg-primary border-green-400 text-white"
-                    : "border-slate-300 text-green-400"
+                    ? "bg-primary border-primary text-white"
+                    : "border-border text-muted-foreground hover:text-white"
                 }`}
                 onClick={() => setSelectedRole("JOB_SEEKER")}
               >
@@ -227,21 +221,31 @@ const SignUpView = () => {
         </div>
       </WkForm>
 
-      <div className="mt-6 border-t border-gray-200 pt-6">
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background text-muted-foreground px-2">
+            Or continue with
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-4">
         <GoogleLoginButton role={selectedRole} />
-        <p className="text-secondary-foreground mt-3 text-center text-sm">
+        <p className="text-muted-foreground text-center text-sm">
           Already have an account?{" "}
-          <Button
-            variant="link"
-            className="h-auto cursor-pointer p-0 font-medium text-green-400 transition-colors delay-150 duration-300 hover:text-[#00C299]"
-            onClick={() => switchView("signIn")}
+          <Link
+            href="/login"
+            className="text-primary hover:text-primary/80 cursor-pointer font-medium transition-colors duration-200"
           >
             Sign in here
-          </Button>
+          </Link>
         </p>
       </div>
     </>
   );
 };
 
-export default SignUpView;
+export default SignUpForm;

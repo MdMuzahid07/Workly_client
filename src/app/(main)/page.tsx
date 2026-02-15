@@ -7,11 +7,7 @@ export const metadata: Metadata = {
 };
 
 const page = () => {
-  return (
-    <>
-      <LandingView />
-    </>
-  );
+  return <LandingView />;
 };
 
 export default page;
