@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { memo, useState } from "react";
+import SignOutModal from "../../shared/SignOutModal";
 import ThemeToggleButtonCompact from "../../shared/ThemeToggleButtonCompact";
 import WJLogo from "../../shared/WJLogo";
 
@@ -93,14 +94,16 @@ const AdminSidebarItem = memo(function AdminSidebarItem({
         "group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none",
         isActive
           ? "bg-primary/10 text-primary border-primary rounded-r-none border-r-2"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+          : "text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary rounded-r-none hover:border-r-2",
       )}
       onClick={onItemClick}
     >
       <Icon
         className={cn(
           "h-4 w-4 shrink-0 transition-transform group-hover:scale-105",
-          isActive ? "text-primary" : "text-muted-foreground/70",
+          isActive
+            ? "text-primary"
+            : "text-muted-foreground/70 group-hover:text-primary",
         )}
       />
       <span className="flex-1 truncate text-left">{label}</span>
@@ -218,10 +221,16 @@ export default function AdminSidebarView({
   const setIsOpen = onOpenChange || setInternalIsOpen;
 
   const dispatch = useAppDispatch();
-  const [logoutUser] = useLogoutUserMutation();
+  const [logoutUser, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
 
-  const handleSignOut = async () => {
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+
+  const handleSignOutClick = () => {
+    setIsSignOutModalOpen(true);
+  };
+
+  const handleConfirmSignOut = async () => {
     try {
       await logoutUser(undefined).unwrap();
     } catch (error) {
@@ -301,7 +310,7 @@ export default function AdminSidebarView({
       badge: 8,
     },
     { icon: Settings, label: "Settings", href: "/admin/settings" },
-    { icon: LogOut, label: "Logout", href: "/", signOut: true },
+    { icon: LogOut, label: "Logout", href: "#", signOut: true },
   ];
 
   return (
@@ -313,7 +322,7 @@ export default function AdminSidebarView({
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
-            onSignOut={handleSignOut}
+            onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
           />
         </div>
@@ -338,13 +347,20 @@ export default function AdminSidebarView({
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
-            onSignOut={handleSignOut}
+            onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
           />
         </SheetContent>
       </Sheet>
 
       <div className="hidden lg:block lg:w-64" />
+
+      <SignOutModal
+        open={isSignOutModalOpen}
+        onOpenChange={setIsSignOutModalOpen}
+        onConfirm={handleConfirmSignOut}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 }
