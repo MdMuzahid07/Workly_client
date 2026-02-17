@@ -157,7 +157,7 @@ const Navbar = () => {
           >
             {user?.email && isVerified ? (
               <>
-                <div className="hidden items-center gap-3 md:flex">
+                <div className="hidden items-center gap-3 md:flex xl:gap-4">
                   {navLinks.map((item, i) => {
                     const active = isActive(item.href);
                     return (

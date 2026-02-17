@@ -69,7 +69,7 @@ const Searchbar = ({
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, location: e.target.value }))
             }
-            className="h-14 rounded-xl border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:rounded-none"
+            className="h-14 rounded-xl border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:rounded-full sm:rounded-l-none"
           />
           <MapPin className="text-primary absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 opacity-60" />
         </div>
