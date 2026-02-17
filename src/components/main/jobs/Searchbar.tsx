@@ -46,7 +46,7 @@ const Searchbar = ({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-3 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl sm:flex-row sm:gap-0 sm:rounded-full dark:border-slate-800 dark:bg-slate-900/90"
+        className="flex flex-col items-center gap-3 rounded-2xl border bg-white p-2 sm:flex-row sm:gap-0 sm:rounded-full dark:border-slate-800 dark:bg-slate-900/90"
       >
         {/* Job Title Field */}
         <div className="relative w-full flex-[1.5] border-b border-gray-100 sm:border-r sm:border-b-0 dark:border-slate-800">
@@ -76,7 +76,7 @@ const Searchbar = ({
 
         <Button
           size="lg"
-          className="bg-primary hover:bg-primary/90 shadow-full h-14 w-full cursor-pointer rounded-xl px-8 text-base font-bold text-white transition-transform active:scale-95 sm:ml-4 sm:w-auto sm:rounded-full"
+          className="bg-primary hover:bg-primary/90 h-14 w-full cursor-pointer rounded-xl px-8 text-base font-bold text-white transition-transform active:scale-95 sm:ml-4 sm:w-auto sm:rounded-full"
         >
           Find Job
         </Button>
