@@ -3,13 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { GlobeConfig } from "@/components/ui/globe";
-import {
-  Briefcase,
-  Building2,
-  Sparkles,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { Briefcase, Building2, Compass, TrendingUp, Users } from "lucide-react";
 import { motion } from "motion/react";
 import type { ComponentType } from "react";
 import { Suspense } from "react";
@@ -107,7 +101,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
               className="mb-8 inline-flex"
             >
               <Badge className="group border-primary/20 bg-primary/5 text-foreground hover:border-primary/30 hover:bg-primary/10 gap-2 border px-4 py-2.5 text-sm font-medium backdrop-blur-sm transition-all">
-                <Sparkles className="fill-primary/50 text-primary h-4 w-4" />
+                <Compass className="text-primary h-4 w-4" />
                 <span className="from-primary to-primary/80 bg-linear-to-r bg-clip-text text-transparent">
                   Discover Your Dream Career Today
                 </span>

@@ -226,7 +226,7 @@ const JobView = () => {
               endMessage={
                 <p className="text-muted-foreground py-8 text-center font-medium italic">
                   {allJobs.length > 0
-                    ? "You've reached the end of the list ✨"
+                    ? "You've reached the end of the list"
                     : ""}
                 </p>
               }

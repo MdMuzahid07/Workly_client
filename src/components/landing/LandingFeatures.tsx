@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
+import { Zap } from "lucide-react";
 import { motion } from "motion/react";
 import { features } from "../../constants";
 import { Card } from "../ui/card";
@@ -31,7 +31,7 @@ const LandingFeatures = () => {
             className="mb-6 inline-flex"
           >
             <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
-              <Sparkles className="fill-primary/20 h-4 w-4" />
+              <Zap className="fill-primary/20 h-4 w-4" />
               Platform Superpowers
             </Badge>
           </motion.div>

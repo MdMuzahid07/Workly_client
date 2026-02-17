@@ -160,11 +160,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           ref={buttonRef}
           onClick={toggleDropdown}
           variant="ghost"
-          size="sm"
-          className={`group ring-primary/50 bg-card relative flex cursor-pointer items-center gap-2 rounded-full border-none p-1 ring-2 transition-all duration-200 ${
+          className={`group bg-background hover:bg-accent/50 relative flex h-10 cursor-pointer items-center gap-2 rounded-full border px-2 transition-all duration-200 ${
             isOpen
-              ? "focus:ring-primary hover:bg-primary hover:text-card bg-card focus:ring-2"
-              : ""
+              ? "border-primary/20 text-primary"
+              : "text-muted-foreground hover:text-foreground border-transparent"
           }`}
           aria-expanded={isOpen}
           aria-haspopup="true"

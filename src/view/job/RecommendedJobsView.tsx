@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { mockRecommendedJobs } from "@/data/mockRecommendedJobs";
 import { AnimatePresence, motion } from "framer-motion";
-import { Briefcase, MapPin, Search, Sparkles, Wand2 } from "lucide-react";
+import { Briefcase, MapPin, Search, Target } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -61,7 +61,6 @@ const RecommendedJobsView = () => {
           <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div className="space-y-3">
               <div className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase">
-                <Wand2 className="h-3 w-3" />
                 AI-Powered Matching
               </div>
               <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
@@ -137,7 +136,7 @@ const RecommendedJobsView = () => {
             ) : (
               <div className="bg-card flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
                 <div className="bg-muted/20 rounded-full p-6">
-                  <Sparkles className="text-muted-foreground/20 h-10 w-10" />
+                  <Search className="text-muted-foreground/20 h-10 w-10" />
                 </div>
                 <p className="text-muted-foreground text-sm font-bold italic">
                   No recommendations match your search.
@@ -179,9 +178,7 @@ const RecommendedJobCard = ({ job }: { job: any }) => (
             <Briefcase className="text-muted-foreground/40 h-8 w-8" />
           )}
           {job.matchScore >= 95 && (
-            <div className="ring-background absolute -top-1.5 -right-1.5 animate-pulse rounded-full bg-amber-500 p-1 shadow-lg ring-2">
-              <Sparkles className="h-2.5 w-2.5 text-white" />
-            </div>
+            <div className="ring-background absolute -top-1.5 -right-1.5 animate-pulse rounded-full bg-amber-500 p-1 shadow-lg ring-2"></div>
           )}
         </div>
 
@@ -258,19 +255,13 @@ const RecommendedJobCard = ({ job }: { job: any }) => (
             <Button className="shadow-primary/10 h-11 flex-1 rounded-xl px-6 font-bold shadow-lg md:flex-none">
               Apply now
             </Button>
-            <Button
-              variant="outline"
-              className="h-11 w-11 shrink-0 rounded-xl p-0"
-            >
-              <Sparkles className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
 
       {/* Reason Pill */}
       <div className="bg-muted/30 border-border/20 mt-6 flex items-start gap-3 rounded-xl border px-4 py-3">
-        <Wand2 className="text-primary mt-0.5 h-4 w-4 shrink-0 opacity-50" />
+        <Target className="text-muted-foreground/60 mt-0.5 h-4 w-4 opacity-70" />
         <p className="text-muted-foreground/80 text-[11px] leading-relaxed font-medium italic">
           {job.matchReason}
         </p>

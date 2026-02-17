@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Plus, Sparkles, X } from "lucide-react";
+import { AlertCircle, Award, Plus, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -101,7 +101,7 @@ const ProfileSkillManagement = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-foreground flex items-center text-xl font-semibold">
-          <Sparkles className="text-primary mr-2 h-5 w-5" />
+          <Award className="text-primary mr-2 h-5 w-5" />
           Skills & Expertise
         </h3>
         <Badge variant="secondary" className="text-xs">

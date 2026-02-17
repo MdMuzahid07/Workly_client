@@ -12,7 +12,6 @@ import {
   Lightbulb,
   Plus,
   Shield,
-  Sparkles,
   Star,
   Target,
   Users,
@@ -60,7 +59,7 @@ const VALUE_OPTIONS = [
   },
   {
     value: "Agility",
-    icon: Sparkles,
+    icon: Zap,
     color: "text-cyan-500",
     bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
     borderColor: "border-cyan-200 dark:border-cyan-900/50",

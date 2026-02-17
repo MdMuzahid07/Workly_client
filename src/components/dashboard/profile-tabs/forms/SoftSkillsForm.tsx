@@ -4,7 +4,7 @@ import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Sparkles } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import { SoftSkillFormData, softSkillSchema } from "./profile.validation";
 
 interface SoftSkillsFormProps {
@@ -29,7 +29,7 @@ export const SoftSkillsForm = ({
           label="Soft Skill"
           placeholder="e.g. Leadership, Communication"
           required
-          labelIcon={<Sparkles className="h-4 w-4 text-purple-500" />}
+          labelIcon={<Lightbulb className="text-primary h-4 w-4" />}
         />
         <p className="text-muted-foreground text-xs">
           Soft skills highlight your personal attributes and interpersonal

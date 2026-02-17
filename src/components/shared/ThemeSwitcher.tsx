@@ -34,10 +34,10 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   if (!mounted) {
     return (
       <Button
-        variant="outline"
+        variant="ghost"
         size={isMobile ? "sm" : "icon"}
         disabled
-        className={className}
+        className={cn("rounded-full border border-transparent", className)}
       >
         <Sun className="h-[1.2rem] w-[1.2rem]" />
         <span className="sr-only">Loading theme</span>
@@ -100,10 +100,10 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               className={cn(
-                "hover:bg-accent hover:text-accent-foreground transition-all duration-200",
+                "hover:bg-accent/50 hover:text-foreground text-muted-foreground bg-background rounded-full border border-transparent transition-all duration-200",
                 className,
               )}
             >
