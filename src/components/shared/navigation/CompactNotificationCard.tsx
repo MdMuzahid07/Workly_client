@@ -25,13 +25,13 @@ const CompactNotificationCard = ({
     <motion.div
       whileHover={{ scale: 1.01 }}
       onClick={onClick}
-      className={`group hover:border-primary/50 hover:bg-accent/50 cursor-pointer rounded-lg border p-3 transition-all ${
+      className={`group hover:border-primary/50 hover:bg-accent/50 cursor-pointer rounded-2xl border p-3 transition-all ${
         !isRead ? "bg-primary/5 border-primary/20" : "bg-card"
       }`}
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div className="mt-0.5 flex-shrink-0">{icon}</div>
+        <div className="mt-0.5 shrink-0">{icon}</div>
 
         {/* Content */}
         <div className="min-w-0 flex-1">
@@ -44,7 +44,7 @@ const CompactNotificationCard = ({
               {title}
             </h4>
             {!isRead && (
-              <div className="bg-primary mt-1.5 h-2 w-2 flex-shrink-0 rounded-full"></div>
+              <div className="bg-primary mt-1.5 h-2 w-2 shrink-0 rounded-full"></div>
             )}
           </div>
           <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">

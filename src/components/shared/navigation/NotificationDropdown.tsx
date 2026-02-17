@@ -173,7 +173,7 @@ const NotificationDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="z-9999 mt-6 w-80 p-0 sm:w-96"
+        className="z-9999 mt-6 w-80 rounded-2xl p-0 sm:w-96"
         sideOffset={8}
       >
         <div className="border-b p-4">

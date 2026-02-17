@@ -205,7 +205,7 @@ const JobView = () => {
           {/* Sidebar - only show if list view or desktop */}
           <div className="col-span-12 lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 hidden lg:block">
-              <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-2xl border bg-white">
+              <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white">
                 <SidebarFilter
                   onFiltersChange={handleFiltersChange}
                   className="w-full"

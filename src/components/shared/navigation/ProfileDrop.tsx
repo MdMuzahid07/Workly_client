@@ -243,13 +243,13 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                     <Image
                       src={user?.avatar}
                       alt={user?.fullName}
-                      className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-sm sm:h-12 sm:w-12"
+                      className="h-20 w-20 rounded-full border-2 border-white object-cover sm:h-12 sm:w-12"
                       width={48}
                       height={48}
                       priority
                     />
                   ) : (
-                    <div className="from-primary/50 border-primary/20 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full border text-lg font-semibold shadow-sm sm:h-12 sm:w-12">
+                    <div className="from-primary/50 border-primary/20 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full border text-lg font-semibold sm:h-12 sm:w-12">
                       {user?.fullName
                         .split(" ")
                         .map((n) => n[0])
@@ -286,8 +286,8 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                   onClick={() => setIsOpen(false)}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="group-hover:text-muted-foreground text-primary h-4 w-4 transition-colors" />
-                    <span className="text-muted-foreground text-xs font-medium group-hover:text-white">
+                    <item.icon className="group-hover:text-primary dark:group-hover:text-muted-foreground text-primary h-4 w-4 transition-colors" />
+                    <span className="text-muted-foreground group-hover:text-primary text-xs font-medium dark:group-hover:text-white">
                       {item.label}
                     </span>
                   </div>

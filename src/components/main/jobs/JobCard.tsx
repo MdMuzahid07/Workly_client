@@ -54,7 +54,7 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
     return (
       <Card
         className={cn(
-          "group relative flex h-full flex-col overflow-hidden rounded-xl border p-5 transition-all duration-300",
+          "group relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 transition-all duration-300",
           inDashboard
             ? "bg-card border-border/50"
             : "hover:border-primary/50 from-primary/30 via-primary/10 to-primary/20 border-gray-100 bg-white bg-linear-to-r dark:border-slate-800 dark:bg-slate-900/50",
@@ -156,7 +156,7 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden rounded-xl border transition-all duration-300",
+        "group relative overflow-hidden rounded-3xl border transition-all duration-300",
         inDashboard
           ? "bg-card border-border p-6"
           : "hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 border-gray-100 bg-linear-to-r px-3 py-5 md:px-12 md:py-14 dark:border-slate-800 dark:bg-slate-900/50",

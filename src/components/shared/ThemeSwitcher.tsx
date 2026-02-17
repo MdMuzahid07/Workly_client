@@ -112,32 +112,35 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className={`z-9999 mt-6 ${isMobile ? "" : ""}`}
+            className={`z-9999 mt-6 ${isMobile ? "" : ""} rounded-2xl`}
             align={isMobile ? "start" : "end"}
             sideOffset={8}
           >
-            <DropdownMenuItem onClick={() => setTheme("light")}>
-              <Sun className="mr-2 h-4 w-4" />
+            <DropdownMenuItem
+              className="group cursor-pointer rounded-lg"
+              onClick={() => setTheme("light")}
+            >
+              <Sun className="group-hover:text-accent-foreground mr-2 h-4 w-4" />
               <span>Light</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setTheme("dark")}
               className={cn(
-                "cursor-pointer transition-colors duration-200",
+                "group cursor-pointer rounded-lg transition-colors duration-200",
                 theme === "dark" && "bg-accent text-accent-foreground",
               )}
             >
-              <Moon className="mr-2 h-4 w-4" />
+              <Moon className="group-hover:text-accent-foreground mr-2 h-4 w-4" />
               <span>Dark</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setTheme("system")}
               className={cn(
-                "cursor-pointer transition-colors duration-200",
+                "group cursor-pointer rounded-lg transition-colors duration-200",
                 theme === "system" && "bg-accent text-accent-foreground",
               )}
             >
-              <Monitor className="mr-2 h-4 w-4" />
+              <Monitor className="group-hover:text-accent-foreground mr-2 h-4 w-4" />
               <span>System</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
