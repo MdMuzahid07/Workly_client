@@ -1,6 +1,6 @@
 "use client";
 
-import { setCredentials } from "@/redux/feature/auth/authSlice";
+import { setCredentials, UserRole } from "@/redux/feature/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { jwtDecode } from "jwt-decode";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -43,7 +43,7 @@ export default function GoogleAuthCallbackPage() {
             email: userData.email,
             fullName: userData.fullName,
             phone: userData.phone,
-            role: userData.role === "EMPLOYER" ? 1 : 0, // Map to UserRole enum
+            role: (userData.role || decodedToken.role) as UserRole, // Map to UserRole enum
             isVerified: decodedToken.isVerified ?? userData.isVerified ?? true,
             isActive: userData.isActive ?? true,
             profileId: userData.profileId,

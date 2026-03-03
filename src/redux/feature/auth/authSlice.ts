@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export enum UserRole {
-  JOB_SEEKER,
-  EMPLOYER,
-  ADMIN,
+  JOB_SEEKER = "JOB_SEEKER",
+  EMPLOYER = "EMPLOYER",
+  ADMIN = "ADMIN",
 }
 
 export interface IUser {

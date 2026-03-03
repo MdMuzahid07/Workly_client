@@ -23,14 +23,11 @@ export default function DashboardLayoutClient({
     setIsMounted(true);
   }, []);
 
-  const isEmployer =
-    user?.role === UserRole.EMPLOYER || (user?.role as number) === 1;
-  const isAdmin = user?.role === UserRole.ADMIN || (user?.role as number) === 2;
+  const isEmployer = user?.role === UserRole.EMPLOYER;
+  const isAdmin = user?.role === UserRole.ADMIN;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isJobSeeker =
-    user?.role === UserRole.JOB_SEEKER ||
-    (user?.role as number) === 0 ||
-    (!isEmployer && !isAdmin);
+    user?.role === UserRole.JOB_SEEKER || (!isEmployer && !isAdmin);
 
   const isEmployerPath = pathname?.startsWith("/employer");
   const isDashboardPath = pathname?.startsWith("/dashboard");

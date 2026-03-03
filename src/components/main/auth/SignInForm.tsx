@@ -8,7 +8,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLoginUserMutation } from "../../../redux/feature/auth/authApi";
-import { setCredentials } from "../../../redux/feature/auth/authSlice";
+import {
+  setCredentials,
+  UserRole,
+} from "../../../redux/feature/auth/authSlice";
 import { useAppDispatch } from "../../../redux/hooks";
 import WkForm from "../../form/WkForm";
 import WKInput from "../../form/WkInput";
@@ -62,7 +65,7 @@ const SignInForm = () => {
                 isVerified: decodedToken.isVerified,
                 phone: resData.phone,
                 companyId: decodedToken.companyId || resData.companyId,
-                role: decodedToken.role === "EMPLOYER" ? 1 : 0,
+                role: decodedToken.role as UserRole,
                 isActive: true,
               },
               accessToken: resData.accessToken,
