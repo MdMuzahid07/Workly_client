@@ -15,6 +15,7 @@ import {
 import { useAppDispatch } from "../../../redux/hooks";
 import WkForm from "../../form/WkForm";
 import WKInput from "../../form/WkInput";
+import DevLoginShortcuts from "./DevLoginShortcuts";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 
 interface SignInFormData {
@@ -86,12 +87,14 @@ const SignInForm = () => {
 
   return (
     <>
-      <div className="mb-8 space-y-2 text-center">
+      <div className="mb-6 space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Welcome Back</h1>
         <p className="text-muted-foreground text-sm">
           Sign in to your Workly_job account to continue your career journey.
         </p>
       </div>
+
+      <DevLoginShortcuts />
 
       <WkForm defaultValues={defaultValues} onSubmit={handleSubmit}>
         <div className="space-y-6">

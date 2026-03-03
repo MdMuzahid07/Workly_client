@@ -103,34 +103,44 @@ const Navbar = () => {
       label: "My Profile",
       href: isEmployer ? "/profile" : "/dashboard/profile",
     },
-    ...(!isEmployer
-      ? [{ icon: Briefcase, label: "My Dashboard", href: "/dashboard" }]
+    // Admin Items
+    ...(isAdmin || isSuperAdmin
+      ? [{ icon: Building2, label: "Admin Dashboard", href: "/admin" }]
       : []),
-    ...(!isEmployer && !hasCompany
+    // Employer Items
+    ...(isEmployer
+      ? hasCompany
+        ? [{ icon: FileText, label: "Company Dashboard", href: "/employer" }]
+        : [
+            {
+              icon: Building2,
+              label: "Create Company",
+              href: "/create-company",
+            },
+          ]
+      : []),
+    // Seeker Items (Only if not Admin and not Employer)
+    ...(!isEmployer && !isAdmin && !isSuperAdmin
       ? [
-          {
-            icon: Briefcase,
-            label: "Applied Jobs",
-            href: "/dashboard/applied-jobs",
-            badge: 3,
-          },
+          { icon: Briefcase, label: "My Dashboard", href: "/dashboard" },
+          ...(hasCompany
+            ? [
+                {
+                  icon: Heart,
+                  label: "Saved Jobs",
+                  href: "/dashboard/saved-jobs",
+                  badge: 12,
+                },
+              ]
+            : [
+                {
+                  icon: Briefcase,
+                  label: "Applied Jobs",
+                  href: "/dashboard/applied-jobs",
+                  badge: 3,
+                },
+              ]),
         ]
-      : []),
-    ...(!isEmployer && hasCompany
-      ? [
-          {
-            icon: Heart,
-            label: "Saved Jobs",
-            href: "/dashboard/saved-jobs",
-            badge: 12,
-          },
-        ]
-      : []),
-    ...(!hasCompany && isEmployer
-      ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
-      : []),
-    ...((isEmployer && hasCompany) || isAdmin || isSuperAdmin
-      ? [{ icon: FileText, label: "Company Dashboard", href: "/employer" }]
       : []),
   ];
 
