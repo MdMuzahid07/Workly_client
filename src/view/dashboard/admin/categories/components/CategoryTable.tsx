@@ -1,0 +1,229 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Briefcase,
+  Camera,
+  Code,
+  Edit,
+  Globe,
+  Heart,
+  LayoutGrid,
+  MoreVertical,
+  Plus,
+  Power,
+  PowerOff,
+  Tag,
+  Trash2,
+  TrendingUp,
+} from "lucide-react";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  active: boolean;
+  subcategories: string[];
+  jobCount: number;
+}
+
+interface CategoryTableProps {
+  categories: Category[];
+  onAddSubcategory: (cat: { id: string; name: string }) => void;
+}
+
+const getIcon = (iconName: string) => {
+  switch (iconName) {
+    case "Code":
+      return <Code className="h-4 w-4" />;
+    case "Heart":
+      return <Heart className="h-4 w-4" />;
+    case "TrendingUp":
+      return <TrendingUp className="h-4 w-4" />;
+    case "Camera":
+      return <Camera className="h-4 w-4" />;
+    case "Globe":
+      return <Globe className="h-4 w-4" />;
+    default:
+      return <Tag className="h-4 w-4" />;
+  }
+};
+
+export function CategoryTable({
+  categories,
+  onAddSubcategory,
+}: CategoryTableProps) {
+  return (
+    <div className="bg-card overflow-hidden rounded-xl border">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader className="bg-muted/40 border-b-2">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="h-12 w-[300px] text-[10px] font-bold tracking-widest uppercase opacity-70">
+                Industry Name
+              </TableHead>
+              <TableHead className="h-12 text-[10px] font-bold tracking-widest uppercase opacity-70">
+                Sub-Categories
+              </TableHead>
+              <TableHead className="h-12 text-[10px] font-bold tracking-widest uppercase opacity-70">
+                Job Count
+              </TableHead>
+              <TableHead className="h-12 text-[10px] font-bold tracking-widest uppercase opacity-70">
+                Status
+              </TableHead>
+              <TableHead className="h-12 pr-8 text-right text-[10px] font-bold tracking-widest uppercase opacity-70">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {categories.map((cat) => (
+              <TableRow
+                key={cat.id}
+                className="group hover:bg-muted/20 border-b transition-all last:border-0"
+              >
+                <TableCell className="py-5">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary/5 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors">
+                      {getIcon(cat.icon)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-bold">{cat.name}</p>
+                      <p className="text-muted-foreground text-[10px] font-medium opacity-70">
+                        /{cat.slug}
+                      </p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.subcategories.map((sub, i) => (
+                      <Badge
+                        key={i}
+                        variant="secondary"
+                        className="bg-muted/50 hover:bg-muted border-none px-2 py-0.5 text-[10px] font-bold transition-colors"
+                      >
+                        {sub}
+                      </Badge>
+                    ))}
+                    <button
+                      className="bg-primary shadow-primary/20 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg text-white shadow-lg transition-transform hover:scale-110"
+                      onClick={() =>
+                        onAddSubcategory({ id: cat.id, name: cat.name })
+                      }
+                      title="Add Node"
+                    >
+                      <Plus className="h-3.5 w-3.5" strokeWidth={4} />
+                    </button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold">{cat.jobCount}</span>
+                    <Briefcase className="text-muted-foreground h-3 w-3 opacity-40" />
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    className={`rounded-full border px-3 py-0.5 text-[9px] font-bold tracking-widest uppercase ${
+                      cat.active
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-600"
+                        : "bg-muted text-muted-foreground border-transparent opacity-70"
+                    }`}
+                    variant="outline"
+                  >
+                    {cat.active ? "Active" : "Inactive"}
+                  </Badge>
+                </TableCell>
+                <TableCell className="pr-6 text-right">
+                  <div className="flex items-center justify-end gap-3">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="hover:text-primary h-8 w-8 rounded-lg"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="hover:bg-muted h-8 w-8 rounded-lg"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-52 rounded-xl border p-2 shadow-lg"
+                      >
+                        <DropdownMenuLabel className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase opacity-50">
+                          Taxonomy Control
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem className="cursor-pointer rounded-lg py-2 font-bold">
+                          {cat.active ? (
+                            <>
+                              <PowerOff className="text-destructive mr-2 h-4 w-4" />
+                              Deactivate
+                            </>
+                          ) : (
+                            <>
+                              <Power className="mr-2 h-4 w-4 text-emerald-600" />
+                              Activate
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer rounded-lg py-2 font-bold">
+                          <Edit className="mr-2 h-4 w-4" />
+                          Modify slug
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="my-1 border-dashed" />
+                        <DropdownMenuItem className="text-destructive cursor-pointer rounded-lg py-2 font-bold">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {categories.length === 0 && (
+        <div className="bg-muted/5 flex flex-col items-center justify-center py-24 text-center">
+          <div className="bg-primary/10 text-primary/40 mb-6 rounded-4xl p-8 shadow-inner">
+            <LayoutGrid className="h-12 w-12" strokeWidth={1} />
+          </div>
+          <h3 className="text-xl font-bold tracking-tight">
+            No categories found
+          </h3>
+          <p className="text-muted-foreground mx-auto mt-2 max-w-sm font-medium opacity-60">
+            Excellent! The category list is currently clear or matches no
+            criteria.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

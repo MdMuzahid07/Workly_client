@@ -1,4 +1,4 @@
-import AdminCategoriesManagementView from "@/view/dashboard/AdminCategoriesManagementView";
+import AdminCategoriesManagementView from "@/view/dashboard/admin/categories/AdminCategoriesManagementView";
 
 const AdminCategoriesPage = () => {
   return <AdminCategoriesManagementView />;
