@@ -23,7 +23,6 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  MessageSquare,
   Package,
   Settings,
   ShieldCheck,
@@ -250,10 +249,7 @@ export default function AdminSidebarView({
   const navGroups: SidebarGroupProps[] = [
     {
       title: "System Control",
-      items: [
-        { icon: LayoutDashboard, label: "Overview", href: "/admin" },
-        { icon: MessageSquare, label: "All Messages", href: "/admin/messages" },
-      ],
+      items: [{ icon: LayoutDashboard, label: "Overview", href: "/admin" }],
     },
     {
       title: "User Management",
