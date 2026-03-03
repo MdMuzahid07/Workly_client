@@ -15,7 +15,7 @@ import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useUpdateCategoryMutation } from "../../../redux/feature/category/categoryApi";
-import WKIconPicker from "../../form/WKIconPicker ";
+import WKIconPicker from "../../form/WKIconPicker";
 import WkForm from "../../form/WkForm";
 import WkInput from "../../form/WkInput";
 import WkTextArea from "../../form/WkTextArea";

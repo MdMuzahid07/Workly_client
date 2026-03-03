@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { useCreateCategoryMutation } from "../../../redux/feature/category/categoryApi";
 import WkForm from "../../form/WkForm";
-import WKIconPicker from "../../form/WKIconPicker ";
+import WKIconPicker from "../../form/WKIconPicker";
 import WkInput from "../../form/WkInput";
 import WkTextArea from "../../form/WkTextArea";
 import SubcategoriesArrayField from "./SubcategoriesArrayField";
