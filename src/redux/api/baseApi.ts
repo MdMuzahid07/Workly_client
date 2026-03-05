@@ -3,10 +3,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredentials } from "../feature/auth/authSlice";
 import { RootState } from "../store";
 
-const url =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === "production"
-    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`
-    : "http://localhost:5000/api/v1";
+const url = process.env.NEXT_PUBLIC_BACKEND_URL
+  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`
+  : "http://localhost:5000/api/v1";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: url,

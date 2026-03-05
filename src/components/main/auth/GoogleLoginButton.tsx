@@ -11,13 +11,8 @@ export const GoogleLoginButton = ({
 }: GoogleLoginButtonProps) => {
   const handleGoogleLogin = () => {
     // Get base URL - handle both cases: with or without /api/v1
-    let serverUrl: string;
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "production") {
-      serverUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-    } else {
-      serverUrl = "http://localhost:5000";
-    }
+    const serverUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
     // Remove /api/v1 if it exists to avoid duplication, then add it back
     const cleanServerUrl = serverUrl.replace(/\/api\/v1\/?$/, "");
