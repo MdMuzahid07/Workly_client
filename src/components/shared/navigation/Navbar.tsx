@@ -148,7 +148,7 @@ const Navbar = () => {
     <>
       {/* Desktop Navbar */}
       <motion.nav
-        className={`fixed top-0 right-0 left-0 z-999999 ${pathname === "/" && !user?.email && isVerified ? "" : "hidden"} border-border bg-background/80 h-16 border-b shadow-sm backdrop-blur-md sm:h-18 md:flex`}
+        className={`fixed top-0 right-0 left-0 z-999999 ${pathname === "/" && !user?.email && isVerified ? "" : ""} border-border bg-background/80 h-16 border-b shadow-sm backdrop-blur-md sm:h-18`}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
