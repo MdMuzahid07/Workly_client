@@ -15,7 +15,7 @@ const STEPS: Step[] = [
   { id: 1, title: "Basic Info", description: "Job details" },
   { id: 2, title: "Job Details", description: "Description & skills" },
   { id: 3, title: "Compensation", description: "Salary & benefits" },
-  { id: 4, title: "Settings", description: "Application details" },
+  { id: 4, title: "Final Settings", description: "Application details" },
 ];
 
 const PostAJobView = () => {

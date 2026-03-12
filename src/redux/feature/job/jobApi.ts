@@ -8,6 +8,7 @@ const jobApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["jobs"],
     }),
 
     getJobs: builder.query({
