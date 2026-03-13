@@ -1,10 +1,19 @@
-import { Separator } from "@radix-ui/react-select";
-import { ExternalLink } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ExternalLink,
+  Facebook,
+  Github,
+  Globe,
+  Instagram,
+  Linkedin,
+  Mail,
+  Phone,
+  Twitter,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "../../../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CompanyDetailsSidebar = ({ company }: { company: any }) => {
   return (
     <div className="space-y-6">
@@ -26,66 +35,127 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-secondary-foreground">Employees</span>
-            <span className="font-medium">{company?.stats?.employees}</span>
+            <span className="font-medium">
+              {company?._count?.employees || 0}
+            </span>
           </div>
-          <Separator />
+          <div className="bg-border/20 h-px w-full" />
           <div className="flex items-center justify-between">
-            <span className="text-secondary-foreground">Offices</span>
-            <span className="font-medium">{company?.stats?.offices}</span>
+            <span className="text-secondary-foreground">Open Jobs</span>
+            <span className="font-medium">{company?._count?.jobs || 0}</span>
           </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-secondary-foreground">Countries</span>
-            <span className="font-medium">{company?.stats?.countries}</span>
-          </div>
-          <Separator />
+          <div className="bg-border/20 h-px w-full" />
           <div className="flex items-center justify-between">
             <span className="text-secondary-foreground">Founded</span>
-            <span className="font-medium">{company?.stats?.founded}</span>
+            <span className="font-medium">
+              {company?.founded || "Not specified"}
+            </span>
+          </div>
+          <div className="bg-border/20 h-px w-full" />
+          <div className="flex items-center justify-between">
+            <span className="text-secondary-foreground">Company Size</span>
+            <span className="font-medium">
+              {company?.size || "Not specified"}
+            </span>
           </div>
         </CardContent>
       </Card>
+
+      {(company?.contactEmail || company?.contactPhone) && (
+        <Card className="bg-primary/5 border">
+          <CardHeader>
+            <CardTitle>Contact Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {company?.contactEmail && (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <Mail className="text-primary h-4 w-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                    Email
+                  </span>
+                  <a
+                    href={`mailto:${company.contactEmail}`}
+                    className="text-foreground hover:text-primary text-sm font-medium transition-colors"
+                  >
+                    {company.contactEmail}
+                  </a>
+                </div>
+              </div>
+            )}
+            {company?.contactPhone && (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                  <Phone className="text-primary h-4 w-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                    Phone
+                  </span>
+                  <a
+                    href={`tel:${company.contactPhone}`}
+                    className="text-foreground hover:text-primary text-sm font-medium transition-colors"
+                  >
+                    {company.contactPhone}
+                  </a>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-primary/5 border">
         <CardHeader>
           <CardTitle>Connect With Us</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {company?.socialLinks?.linkedin && (
-            <a
-              href={`https://${company?.socialLinks?.linkedin}`}
-              className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-600">
-                <span className="text-xs font-bold text-white">in</span>
-              </div>
-              <span className="text-secondary-foreground">LinkedIn</span>
-              <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
-            </a>
-          )}
-          {company?.socialLinks?.twitter && (
-            <a
-              href={`https://${company?.socialLinks?.twitter}`}
-              className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-400">
-                <span className="text-xs font-bold text-white">𝕏</span>
-              </div>
-              <span className="text-secondary-foreground">Twitter</span>
-              <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
-            </a>
-          )}
-          {company?.socialLinks?.github && (
-            <a
-              href={`https://${company?.socialLinks?.github}`}
-              className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-900">
-                <span className="text-xs font-bold text-white">GH</span>
-              </div>
-              <span className="text-secondary-foreground">GitHub</span>
-              <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
-            </a>
+          {company?.socialLinks?.length > 0 ? (
+            company.socialLinks.map((link: any) => {
+              const platformMetaData: Record<
+                string,
+                { icon: any; color: string }
+              > = {
+                linkedin: { icon: Linkedin, color: "bg-[#0A66C2]" },
+                twitter: { icon: Twitter, color: "bg-[#1DA1F2]" },
+                github: { icon: Github, color: "bg-[#333]" },
+                facebook: { icon: Facebook, color: "bg-[#1877F2]" },
+                instagram: { icon: Instagram, color: "bg-[#E4405F]" },
+                website: { icon: Globe, color: "bg-primary" },
+              };
+
+              const meta = platformMetaData[link.platform.toLowerCase()] || {
+                icon: ExternalLink,
+                color: "bg-gray-600",
+              };
+              const Icon = meta.icon;
+
+              return (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
+                >
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded ${meta.color}`}
+                  >
+                    <Icon className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-secondary-foreground font-medium capitalize">
+                    {link.platform}
+                  </span>
+                  <ExternalLink className="ml-auto h-4 w-4 text-gray-400" />
+                </a>
+              );
+            })
+          ) : (
+            <p className="text-muted-foreground text-center text-sm italic">
+              No social links provided.
+            </p>
           )}
         </CardContent>
       </Card>

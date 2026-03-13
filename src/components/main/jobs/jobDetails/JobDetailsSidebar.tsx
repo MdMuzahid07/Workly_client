@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Building2, Calendar, Eye, FileText, Users } from "lucide-react";
+import { Building2, Calendar, Eye, FileText, Heart, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
@@ -9,6 +8,7 @@ import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 interface Company {
   id: string;
   name: string;
+  slug: string;
   industry?: { name: string };
   size?: string;
   description?: string;
@@ -26,6 +26,7 @@ interface Job {
   postedTime?: string;
   viewCount?: number;
   applyCount?: number;
+  isSaved?: boolean;
 }
 
 interface JobDetailsSidebarProps {
@@ -52,14 +53,18 @@ const StatItem = ({
   icon: React.ComponentType<{ className?: string }>;
 }) => (
   <>
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <Icon className="text-foreground/50 h-4 w-4" />
-        <span className="text-foreground/60">{label}</span>
+    <div className="flex items-center justify-between py-1">
+      <div className="flex items-center gap-3">
+        <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+          <Icon className="text-primary h-4 w-4" />
+        </div>
+        <span className="text-muted-foreground text-sm font-medium">
+          {label}
+        </span>
       </div>
-      <span className="text-foreground/90 font-medium">{value}</span>
+      <span className="text-foreground font-bold">{value}</span>
     </div>
-    <Separator />
+    <div className="bg-border/20 h-px w-full" />
   </>
 );
 
@@ -71,11 +76,11 @@ const CompanyInfoItem = ({
   value: string;
 }) => (
   <>
-    <div className="flex items-center justify-between">
-      <span className="text-foreground/60">{label}</span>
-      <span className="text-foreground/90 font-medium">{value}</span>
+    <div className="flex items-center justify-between py-1">
+      <span className="text-muted-foreground text-sm font-medium">{label}</span>
+      <span className="text-foreground font-bold">{value}</span>
     </div>
-    <Separator />
+    <div className="bg-border/20 h-px w-full" />
   </>
 );
 
@@ -147,41 +152,45 @@ const JobDetailsSidebar = ({
 
   const handleViewCompany = () => {
     onViewCompany?.();
-    // router.push(`/companies/${job.company?.id}`);
-    router.push(`/companies/1`);
+    if (job.company?.slug) {
+      router.push(`/companies/${job.company.slug}`);
+    }
   };
 
   return (
     <aside className="space-y-6">
-      <Card className="sticky top-22">
+      <Card className="border-primary/10 bg-background/50 sticky top-24 border backdrop-blur-sm">
         <CardContent className="p-6">
-          <div className="space-y-3">
-            <Link href={`/jobs/${job?.id}/apply`}>
+          <div className="space-y-4">
+            <Link href={`/jobs/${job?.id}/apply`} className="block w-full">
               <Button
-                className="bg-primary text-card w-full py-2.5 font-medium"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 w-full text-lg font-bold shadow-lg transition-all hover:scale-[1.02]"
                 onClick={handleApply}
-                size="lg"
               >
                 Apply Now
               </Button>
             </Link>
             <Button
               variant="outline"
-              className="hover:bg-primary/10 hover:text-foreground w-full border-gray-300 font-medium"
+              className="hover:bg-primary/5 hover:text-primary border-primary/20 h-12 w-full text-lg font-bold transition-all"
               onClick={handleSave}
-              size="lg"
               disabled={isSaving}
             >
-              {isSaving ? "Loading..." : "Save Job"}
+              <Heart
+                className={`mr-2 h-5 w-5 ${job.isSaved ? "fill-primary text-primary" : ""}`}
+              />
+              {isSaving ? "Saving..." : job.isSaved ? "Saved" : "Save Job"}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Building2 className="text-foreground/60 h-5 w-5" />
+            <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+              <Building2 className="text-primary h-4 w-4" />
+            </div>
             About {companyName}
           </CardTitle>
         </CardHeader>
@@ -192,7 +201,7 @@ const JobDetailsSidebar = ({
 
           <Button
             variant="outline"
-            className="dark:hover:bg-primary text-foreground dark:text-light mt-4 w-full border-gray-300"
+            className="hover:bg-primary/5 hover:text-primary border-primary/20 mt-4 w-full font-bold transition-all"
             onClick={handleViewCompany}
           >
             <Users className="mr-2 h-4 w-4" />
@@ -201,7 +210,7 @@ const JobDetailsSidebar = ({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg">Job Statistics</CardTitle>
         </CardHeader>
@@ -217,7 +226,7 @@ const JobDetailsSidebar = ({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg">Similar Jobs</CardTitle>
         </CardHeader>

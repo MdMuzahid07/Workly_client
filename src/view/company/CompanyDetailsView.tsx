@@ -10,8 +10,13 @@ import {
   Globe,
   Heart,
   MapPin,
+  Rocket,
   Share2,
+  Shield,
+  Star,
+  Target,
   Users,
+  Zap,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -35,6 +40,78 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
     companyDetails?.industry?.icon || "Briefcase",
   );
 
+  const VALUE_OPTIONS = [
+    {
+      value: "Innovation",
+      icon: Zap,
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
+      borderColor: "border-blue-200 dark:border-blue-900/50",
+    },
+    {
+      value: "Collaboration",
+      icon: Users,
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+      borderColor: "border-emerald-200 dark:border-emerald-900/50",
+    },
+    {
+      value: "Customer First",
+      icon: Heart,
+      color: "text-rose-500",
+      bgColor: "bg-rose-50 dark:bg-rose-950/30",
+      borderColor: "border-rose-200 dark:border-rose-900/50",
+    },
+    {
+      value: "Excellence",
+      icon: Star,
+      color: "text-amber-500",
+      bgColor: "bg-amber-50 dark:bg-amber-950/30",
+      borderColor: "border-amber-200 dark:border-amber-900/50",
+    },
+    {
+      value: "Integrity",
+      icon: Shield,
+      color: "text-violet-500",
+      bgColor: "bg-violet-50 dark:bg-violet-950/30",
+      borderColor: "border-violet-200 dark:border-violet-900/50",
+    },
+    {
+      value: "Agility",
+      icon: Zap,
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
+      borderColor: "border-cyan-200 dark:border-cyan-900/50",
+    },
+    {
+      value: "Impact",
+      icon: Target,
+      color: "text-orange-500",
+      bgColor: "bg-orange-50 dark:bg-orange-950/30",
+      borderColor: "border-orange-200 dark:border-orange-900/50",
+    },
+    {
+      value: "Growth",
+      icon: Rocket,
+      color: "text-indigo-500",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
+      borderColor: "border-indigo-200 dark:border-indigo-900/50",
+    },
+  ] as const;
+
+  const getValueMetadata = (valueName: string) => {
+    const option = VALUE_OPTIONS.find(
+      (opt) => opt.value.toLowerCase() === valueName.toLowerCase(),
+    );
+    return {
+      icon: option?.icon || Target,
+      color: option?.color || "text-emerald-500",
+      bgColor: option?.bgColor || "bg-emerald-50 dark:bg-emerald-950/30",
+      borderColor:
+        option?.borderColor || "border-emerald-200 dark:border-emerald-900/50",
+    };
+  };
+
   if (!companyDetails) {
     return (
       <div className="bg-primary/2 min-h-screen md:pt-16">
@@ -45,7 +122,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
     );
   }
 
-  const foundedYear = new Date(companyDetails.createdAt).getFullYear();
+  // const foundedYear = new Date(companyDetails.createdAt).getFullYear();
   const websiteDisplay = companyDetails.websiteUrl?.replace(/^https?:\/\//, "");
 
   const transformedJobs =
@@ -88,88 +165,91 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
   //* infinite scroll logic end ==========================<
 
   return (
-    <div className="bg-primary/2 min-h-screen md:pt-16">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Company Banner */}
-        <div className="relative mb-8 h-48 w-full overflow-hidden rounded-2xl md:h-64 lg:h-80">
-          <Image
-            src={companyDetails.coverUrl || "/placeholder.svg"}
-            alt={`${companyDetails.name} banner`}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-        </div>
+    <div className="bg-background min-h-screen">
+      {/* Dynamic Banner Section */}
+      <div className="relative h-64 w-full overflow-hidden lg:h-80">
+        <Image
+          src={companyDetails.coverUrl || "/placeholder-banner.jpg"}
+          alt={`${companyDetails.name} banner`}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="from-background via-background/40 absolute inset-0 bg-linear-to-t to-transparent" />
+      </div>
 
+      <div className="relative mx-auto -mt-32 max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
-            {/* Company Header */}
-            <Card className="border-white/10 bg-white/5 backdrop-blur-md">
-              <CardHeader className="p-6 sm:p-8">
-                <div className="flex flex-col gap-6 md:flex-row md:items-start">
-                  <div className="relative h-24 w-24 shrink-0 sm:h-32 sm:w-32">
-                    <Image
-                      fill
-                      src={companyDetails.logoUrl || "/placeholder.svg"}
-                      alt={`${companyDetails.name} logo`}
-                      className="bg-primary rounded-3xl object-cover shadow-2xl"
-                    />
-                  </div>
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <div className="mb-2 flex flex-wrap items-center gap-3">
-                        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                          {companyDetails.name}
-                        </h1>
-                        {companyDetails.isVerified && (
-                          <Badge
-                            variant="default"
-                            className="border-emerald-500/20 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                          >
-                            Verified
-                          </Badge>
+            {/* Premium Header Card */}
+            <Card className="border-primary/10 bg-background/60 overflow-hidden border backdrop-blur-xl">
+              <CardHeader className="p-8">
+                <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                  <div className="flex flex-col gap-6 md:flex-row">
+                    <div className="bg-card border-primary/10 relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border p-2 shadow-2xl sm:h-32 sm:w-32">
+                      <Image
+                        src={companyDetails.logoUrl || "/placeholder-logo.png"}
+                        alt={`${companyDetails.name} logo`}
+                        fill
+                        className="rounded-2xl object-contain p-2"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <div className="mb-2 flex flex-wrap items-center gap-3">
+                          <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                            {companyDetails.name}
+                          </h1>
+                          {companyDetails.isVerified && (
+                            <Badge className="border-none bg-emerald-500/10 text-emerald-600">
+                              Verified
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground flex items-center gap-2 text-lg font-medium">
+                          <CategoryIcon
+                            className={`h-5 w-5 ${iconBgColor.replace("bg-", "text-")}`}
+                          />
+                          {companyDetails?.industry?.name}
+                        </p>
+                      </div>
+
+                      <div className="text-muted-foreground flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          <span>{companyDetails.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          <span>
+                            {companyDetails._count?.employees || 0} Employees
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            Founded {companyDetails.founded || "Not specified"}
+                          </span>
+                        </div>
+                        {companyDetails.websiteUrl && (
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4" />
+                            <a
+                              href={companyDetails.websiteUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80 transition-colors hover:underline"
+                            >
+                              {websiteDisplay}
+                            </a>
+                          </div>
                         )}
                       </div>
-                      <p className="text-foreground/70 flex items-center gap-2 text-lg font-medium">
-                        <CategoryIcon
-                          className={`h-5 w-5 ${iconBgColor.replace("bg-", "text-")}`}
-                        />
-                        {companyDetails?.industry?.name}
-                      </p>
-                    </div>
-
-                    <div className="text-foreground/60 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        <span>{companyDetails.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        <span>{companyDetails.size} employees</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Founded {foundedYear}</span>
-                      </div>
-                      {companyDetails.websiteUrl && (
-                        <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4" />
-                          <a
-                            href={companyDetails.websiteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80 transition-colors hover:underline"
-                          >
-                            {websiteDisplay}
-                          </a>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 self-start">
+                  <div className="flex items-center gap-2 self-start md:shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -197,12 +277,87 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                   About {companyDetails.name}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-secondary-foreground mb-6 leading-relaxed">
-                  {companyDetails.description}
-                </p>
+              <CardContent className="space-y-8">
+                {companyDetails.description && (
+                  <div>
+                    <h4 className="text-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
+                      Company Overview
+                    </h4>
+                    <p className="text-secondary-foreground leading-relaxed">
+                      {companyDetails.description}
+                    </p>
+                  </div>
+                )}
+
+                {companyDetails.mission && (
+                  <div>
+                    <h4 className="text-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
+                      Mission Statement
+                    </h4>
+                    <div className="bg-primary/5 border-primary/10 group relative overflow-hidden rounded-2xl border p-6">
+                      <div className="relative z-10">
+                        <p className="text-foreground/90 font-italic text-lg leading-relaxed italic">
+                          &quot;{companyDetails.mission}&quot;
+                        </p>
+                      </div>
+                      <Target className="text-primary/5 absolute -right-4 -bottom-4 h-24 w-24 rotate-12 transition-transform duration-500 group-hover:scale-110" />
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Core Values */}
+            {companyDetails.values && companyDetails.values.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Heart className="h-5 w-5 text-rose-500" />
+                      Core Values
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="border-none bg-emerald-500/10 text-emerald-600"
+                    >
+                      Culture & Principles
+                    </Badge>
+                  </CardTitle>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    The beliefs that guide our {`team's`} conduct every day.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-4">
+                    {companyDetails.values.map((val) => {
+                      const meta = getValueMetadata(val);
+                      const Icon = meta.icon;
+                      return (
+                        <div
+                          key={val}
+                          className={`group flex items-center gap-4 rounded-2xl border p-4 transition-all hover:shadow-md ${meta.bgColor} ${meta.borderColor}`}
+                        >
+                          <div
+                            className={`rounded-xl bg-white p-3 shadow-sm transition-transform group-hover:scale-110 dark:bg-black/20`}
+                          >
+                            <Icon className={`h-6 w-6 ${meta.color}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-foreground text-lg font-bold tracking-tight">
+                              {val}
+                            </h4>
+                            <p className="text-muted-foreground text-sm">
+                              Fundamental principle driving our culture and how
+                              we build products.
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Benefits & Perks */}
             {companyDetails.benefits && companyDetails.benefits.length > 0 && (

@@ -4,20 +4,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Bookmark,
+  Award,
   Building,
   Clock,
   DollarSign,
-  Eye,
   FileText,
+  Globe,
   Heart,
   MapPin,
   Share2,
+  Shield,
+  Target,
   Users,
 } from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import JobDetailsSidebar from "../../components/main/jobs/jobDetails/JobDetailsSidebar";
+import getIconComponent from "../../helper/getIconComponent";
 import getTimeAgo from "../../helper/getTimeAgo";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
 import { useToggleSaveUnsaveJobMutation } from "../../redux/feature/profile/profileApi";
@@ -84,254 +88,323 @@ const JobDetailsView = () => {
   const job = response.data || {};
 
   return (
-    <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
+    <div className="bg-background min-h-screen">
+      {/* Dynamic Banner Section */}
+      <div className="relative h-64 w-full overflow-hidden lg:h-80">
+        <Image
+          src={job.company?.coverUrl || "/placeholder-banner.jpg"}
+          alt={job.title}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="from-background via-background/40 absolute inset-0 bg-linear-to-t to-transparent" />
+      </div>
+
+      <div className="relative mx-auto -mt-32 max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="mb-2 flex items-center gap-2">
-                      {job.isFeatured && (
-                        <Badge variant="default">Featured</Badge>
-                      )}
-                      {job.isRemote && (
-                        <Badge variant="destructive">Remote</Badge>
-                      )}
+            {/* Premium Header Card */}
+            <Card className="border-primary/10 bg-background/60 overflow-hidden border backdrop-blur-xl">
+              <CardHeader className="p-8">
+                <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                  <div className="flex flex-col gap-6 md:flex-row">
+                    <div className="bg-card border-primary/10 relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border p-2 shadow-2xl md:h-24 md:w-24">
+                      <Image
+                        src={job.company?.logoUrl || "/placeholder-logo.png"}
+                        alt={job.company?.name}
+                        fill
+                        className="rounded-2xl object-contain p-2"
+                      />
                     </div>
-                    <CardTitle className="text-foreground mb-2 text-2xl font-bold">
-                      {job.title}
-                    </CardTitle>
-                    <div className="text-foreground mb-4 flex flex-wrap items-center gap-2">
-                      <div className="flex items-center">
-                        <Building className="mr-2 h-4 w-4" />
-                        <span className="font-medium">
-                          {job.company?.name || "Company"}
-                        </span>
+                    <div className="flex-1 space-y-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {job.isFeatured && (
+                          <Badge className="border-none bg-amber-500/10 text-amber-600">
+                            Featured
+                          </Badge>
+                        )}
+                        <Badge
+                          variant="secondary"
+                          className="bg-primary/10 text-primary border-none"
+                        >
+                          {job.jobType?.replace(/_/g, " ").toLowerCase() ||
+                            "Full Time"}
+                        </Badge>
+                        {job.isRemote && (
+                          <Badge
+                            variant="destructive"
+                            className="border-none bg-rose-500/10 text-rose-600"
+                          >
+                            Remote
+                          </Badge>
+                        )}
                       </div>
-                      <span className="hidden sm:inline">•</span>
-                      <div className="flex items-center">
-                        <MapPin className="mr-1 h-4 w-4" />
-                        <span>{job.location}</span>
-                      </div>
-                      <span className="hidden sm:inline">•</span>
-                      <div className="flex items-center">
-                        <Clock className="mr-1 h-4 w-4" />
-                        <span>{getTimeAgo(job.createdAt)}</span>
-                      </div>
-                    </div>
-                    <div className="text-foreground/80 flex flex-wrap items-center gap-4 text-sm">
-                      {job.salaryMin && job.salaryMax && (
-                        <div className="flex items-center">
-                          <DollarSign className="mr-1 h-4 w-4" />
-                          <span className="text-foreground/80 text-lg font-semibold">
-                            {job.currency || "$"}
-                            {job.salaryMin.toLocaleString()} -{" "}
-                            {job.salaryMax.toLocaleString()}
+                      <h1 className="text-foreground text-3xl font-bold tracking-tight md:text-4xl">
+                        {job.title}
+                      </h1>
+                      <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <Building className="h-4 w-4" />
+                          <span className="text-foreground font-semibold">
+                            {job.company?.name}
                           </span>
                         </div>
-                      )}
-                      <div className="flex items-center">
-                        <Users className="mr-1 h-4 w-4" />
-                        <span className="capitalize">
-                          {job.jobType.replace(/_/g, " ").toLowerCase()}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="h-4 w-4" />
+                          <span>{job.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="h-4 w-4" />
+                          <span>{getTimeAgo(job.createdAt)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Heart className="h-4 w-4" />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-xl border-gray-200"
+                      onClick={handleJobSave}
+                      disabled={isSaving}
+                    >
+                      <Heart
+                        className={`h-5 w-5 ${job.isSaved ? "fill-rose-500 text-rose-500" : "text-gray-400"}`}
+                      />
                     </Button>
-                    <Button variant="outline" size="sm">
-                      <Bookmark className="h-4 w-4" />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-xl border-gray-200"
+                    >
+                      <Share2 className="h-5 w-5 text-gray-400" />
                     </Button>
-                    <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid grid-cols-1 gap-4 border-t border-gray-100 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="bg-primary/5 flex items-center gap-3 rounded-2xl p-4">
+                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                      <DollarSign className="text-primary h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                        Salary Range
+                      </p>
+                      <p className="text-foreground font-bold">
+                        {job.currency || "$"}
+                        {job.salaryMin?.toLocaleString()} -{" "}
+                        {job.salaryMax?.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-primary/5 flex items-center gap-3 rounded-2xl p-4">
+                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                      <Users className="text-primary h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                        Experience
+                      </p>
+                      <p className="text-foreground font-bold">
+                        {job.experienceLevel || "Not specified"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-primary/5 flex items-center gap-3 rounded-2xl p-4">
+                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                      <FileText className="text-primary h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                        Deadline
+                      </p>
+                      <p className="text-foreground font-bold">
+                        {job.applicationDeadline
+                          ? new Date(
+                              job.applicationDeadline,
+                            ).toLocaleDateString()
+                          : "N/A"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
-                  {job.requirements}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Benefits</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
-                  {job.benefits && job.benefits.length > 0 ? (
-                    job.benefits.map((benefit: string, index: number) => (
-                      <ul key={index} className="mb-2 flex items-start">
-                        <li className="mr-2">{index + 1}.</li>
-                        <li>{benefit.trim()}</li>
-                      </ul>
-                    ))
-                  ) : (
-                    <p className="text-foreground/60">
-                      No benefits information available
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              {job.discipline && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Discipline</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Badge variant="outline" className="text-base">
-                      {job.discipline}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              )}
-
-              {job.experienceLevel && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Experience Level</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-foreground/80">{job.experienceLevel}</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Requirements</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
-                  {job.requirements && job.requirements.length > 0 ? (
-                    job.requirements.map((benefit: string, index: number) => (
-                      <ul key={index} className="mb-2 flex items-start">
-                        <li className="mr-2">{index + 1}.</li>
-                        <li>{benefit.trim()}</li>
-                      </ul>
-                    ))
-                  ) : (
-                    <p className="text-foreground/60">
-                      No requirements information available
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {job.JobSkill && job.JobSkill.length > 0 && (
-              <Card>
+            {/* Job Content Sections */}
+            <div className="space-y-6">
+              {/* Description */}
+              <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Required Skills</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="text-primary h-5 w-5" />
+                    Job Description
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {job.JobSkill.map((skill: any) => (
-                      <Badge
-                        key={skill.id}
-                        variant={skill.isRequired ? "default" : "secondary"}
-                        className={
-                          skill.isRequired
-                            ? "bg-primary text-card"
-                            : "text-foreground/80"
-                        }
-                      >
-                        {skill.skillName}
-                        {skill.experienceYears > 0 && (
-                          <span className="ml-1 text-xs opacity-80">
-                            ({skill.experienceYears}+ yrs)
-                          </span>
-                        )}
-                      </Badge>
-                    ))}
+                  <div className="text-foreground/80 leading-relaxed wrap-break-word whitespace-pre-line">
+                    {job.description}
                   </div>
                 </CardContent>
               </Card>
-            )}
 
-            {job.Benefits && job.Benefits.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Benefits & Perks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {job.Benefits.map((benefit: any) => (
-                      <li key={benefit.id} className="flex items-start">
-                        <span className="bg-primary mt-2 mr-3 h-2 w-2 rounded-full"></span>
-                        <div className="flex-1">
-                          <p className="text-foreground/90 font-medium">
-                            {benefit.title}
-                          </p>
-                          {benefit.description && (
-                            <p className="text-foreground/60 mt-1 text-sm">
-                              {benefit.description}
-                            </p>
+              {/* Requirements */}
+              {job.requirements && job.requirements.length > 0 && (
+                <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="text-primary h-5 w-5" />
+                      Requirements & Responsibilities
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      {job.requirements.map((req: string, index: number) => (
+                        <li
+                          key={index}
+                          className="bg-primary/5 flex items-start gap-3 rounded-xl p-4"
+                        >
+                          <div className="bg-primary/20 mt-1 flex h-2 w-2 shrink-0 rounded-full" />
+                          <span className="text-foreground/80 text-sm leading-relaxed wrap-break-word">
+                            {req}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Required Skills */}
+              {job.JobSkill && job.JobSkill.length > 0 && (
+                <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="text-primary h-5 w-5" />
+                      Required Skills
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-3">
+                      {job.JobSkill.map((skill: any) => (
+                        <div
+                          key={skill.id}
+                          className={`flex items-center gap-2 rounded-xl border px-4 py-2 transition-all hover:shadow-md ${
+                            skill.isRequired
+                              ? "bg-primary/10 border-primary/20 text-primary"
+                              : "bg-secondary/50 border-secondary-foreground/10 text-muted-foreground"
+                          }`}
+                        >
+                          <span className="font-semibold">
+                            {skill.skillName}
+                          </span>
+                          {skill.experienceYears > 0 && (
+                            <Badge
+                              variant="outline"
+                              className="h-5 border-current/20 bg-current/5 px-1.5 text-[10px] lowercase"
+                            >
+                              {skill.experienceYears}+ years
+                            </Badge>
                           )}
                         </div>
-                      </li>
-                    ))}
-                  </ul>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Benefits & Perks */}
+              {(job.Benefits?.length > 0 || job.benefits?.length > 0) && (
+                <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Award className="text-primary h-5 w-5" />
+                      Benefits & Perks
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      {job.Benefits?.length > 0
+                        ? job.Benefits.map((benefit: any) => {
+                            const { icon: Icon, color } = getIconComponent(
+                              benefit.icon,
+                            );
+                            return (
+                              <div
+                                key={benefit.id}
+                                className="bg-primary/5 hover:bg-primary/10 flex items-start gap-4 rounded-2xl p-4 transition-all"
+                              >
+                                <div
+                                  className={`${color} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white`}
+                                >
+                                  <Icon className="h-5 w-5" />
+                                </div>
+                                <div>
+                                  <h4 className="text-foreground leading-tight font-bold">
+                                    {benefit.title}
+                                  </h4>
+                                  <p className="text-muted-foreground mt-1 text-xs">
+                                    {benefit.description}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })
+                        : job.benefits.map((benefit: string, index: number) => (
+                            <div
+                              key={index}
+                              className="bg-primary/5 flex items-start gap-3 rounded-xl p-4"
+                            >
+                              <div className="bg-primary/20 mt-1 flex h-2 w-2 shrink-0 rounded-full" />
+                              <span className="text-foreground/80 text-sm">
+                                {benefit}
+                              </span>
+                            </div>
+                          ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* About Company Summary */}
+              <Card className="border-primary/10 bg-background/50 overflow-hidden border backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="text-primary h-5 w-5" />
+                    About the Company
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-foreground/80 line-clamp-3 leading-relaxed wrap-break-word">
+                    {job.company?.description ||
+                      "High-growth company looking for exceptional talent."}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4">
+                    {job.company?._count?.employees && (
+                      <div className="flex items-center gap-1.5 text-sm font-medium">
+                        <Users className="text-primary h-4 w-4" />
+                        <span>{job.company._count.employees}+ Employees</span>
+                      </div>
+                    )}
+                    {job.company?.websiteUrl && (
+                      <div className="flex items-center gap-1.5 text-sm font-medium">
+                        <Globe className="text-primary h-4 w-4" />
+                        <a
+                          href={job.company.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-primary transition-colors"
+                        >
+                          Website
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
-            )}
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Application Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {job.contactEmail && (
-                  <p className="text-foreground/70">
-                    <span className="font-medium">Contact Email:</span>{" "}
-                    <a
-                      href={`mailto:${job.contactEmail}`}
-                      className="text-primary hover:underline"
-                    >
-                      {job.contactEmail}
-                    </a>
-                  </p>
-                )}
-                {job.applicationDeadline && (
-                  <p className="text-foreground/70">
-                    <span className="font-medium">Application Deadline:</span>{" "}
-                    {new Date(job.applicationDeadline).toLocaleDateString()}
-                  </p>
-                )}
-                {job.maxApplications && (
-                  <p className="text-foreground/60 text-sm">
-                    Maximum applications: {job.maxApplications}
-                  </p>
-                )}
-                <div className="text-foreground/60 mt-4 flex items-center gap-2 text-sm">
-                  <span className="flex items-center gap-0.5">
-                    <Eye className="mr-1 h-4 w-4" /> {job.viewCount || 0} views
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-0.5">
-                    <FileText className="mr-1 h-4 w-4" /> {job.applyCount || 0}{" "}
-                    applications
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            </div>
           </div>
 
           <JobDetailsSidebar

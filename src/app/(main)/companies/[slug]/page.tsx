@@ -12,6 +12,8 @@ export type CompanyDetails = {
   logoUrl: string;
   coverUrl: string;
   location: string;
+  mission: string;
+  values: string[];
   industry: {
     id: string;
     name: string;
@@ -21,6 +23,7 @@ export type CompanyDetails = {
   contactEmail: string;
   contactPhone: string;
   isVerified: boolean;
+  founded: string;
   socialLinks: Array<{
     id: string;
     platform: string;
