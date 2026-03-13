@@ -299,7 +299,7 @@ export default function EmployerSidebarView({
         {
           icon: UserCheck,
           label: "Talent Management",
-          href: "/employer/talent",
+          href: "/employer/applications",
         },
         { icon: MessageCircle, label: "Messages", href: "/employer/messages" },
       ],
