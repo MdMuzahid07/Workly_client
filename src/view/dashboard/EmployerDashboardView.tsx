@@ -210,16 +210,13 @@ const EmployerDashboardView = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link href="/employer/new-job-post" className="w-full sm:w-auto">
+            <Link href="/employer/post-job" className="w-full sm:w-auto">
               <Button className="w-full rounded-full font-bold shadow-sm sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Post New Job
               </Button>
             </Link>
-            <Link
-              href="/employer/talent-management"
-              className="w-full sm:w-auto"
-            >
+            <Link href="/employer/applications" className="w-full sm:w-auto">
               <Button
                 variant="outline"
                 className="w-full rounded-full font-bold sm:w-auto"

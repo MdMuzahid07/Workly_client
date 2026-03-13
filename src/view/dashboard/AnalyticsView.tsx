@@ -14,33 +14,47 @@ const AnalyticsView = () => {
   const [timeRange, setTimeRange] = useState("30d");
 
   return (
-    <div className="min-h-screen">
+    <div className="mt-16 min-h-screen">
       <DashboardAnalyticsHeader
         timeRange={timeRange}
         setTimeRange={setTimeRange}
       />
-      <div className="container mx-auto space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         <AnalyticsOverview timeRange={timeRange} />
 
-        <Tabs defaultValue="applications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-4">
-            <TabsTrigger value="applications">
-              <FileText className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Applications</span>
-            </TabsTrigger>
-            <TabsTrigger value="jobs">
-              <Briefcase className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Jobs</span>
-            </TabsTrigger>
-            <TabsTrigger value="departments">
-              <Users className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Departments</span>
-            </TabsTrigger>
-            <TabsTrigger value="funnel">
-              <TrendingUp className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Funnel</span>
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="applications" className="space-y-8">
+          <div className="scrollbar-none text-foreground -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <TabsList className="bg-muted/40 border-border grid h-10 w-full grid-cols-2 rounded-full border p-0 sm:grid-cols-4">
+              <TabsTrigger
+                value="applications"
+                className="data-[state=active]:bg-primary/10 group data-[state=active]:text-primary flex items-center justify-center gap-2.5 rounded-full px-4 py-2 text-sm font-bold tracking-tight transition-all duration-300"
+              >
+                <FileText className="text-muted-foreground group-data-[state=active]:text-primary h-4.5 w-4.5 transition-colors" />
+                <span>Applications</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="jobs"
+                className="data-[state=active]:bg-primary/10 group data-[state=active]:text-primary flex items-center justify-center gap-2.5 rounded-full px-4 py-2 text-sm font-bold tracking-tight transition-all duration-300"
+              >
+                <Briefcase className="text-muted-foreground group-data-[state=active]:text-primary h-4.5 w-4.5 transition-colors" />
+                <span>Jobs</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="departments"
+                className="data-[state=active]:bg-primary/10 group data-[state=active]:text-primary flex items-center justify-center gap-2.5 rounded-full px-4 py-2 text-sm font-bold tracking-tight transition-all duration-300"
+              >
+                <Users className="text-muted-foreground group-data-[state=active]:text-primary h-4.5 w-4.5 transition-colors" />
+                <span>Departments</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="funnel"
+                className="data-[state=active]:bg-primary/10 group data-[state=active]:text-primary flex items-center justify-center gap-2.5 rounded-full px-4 py-2 text-sm font-bold tracking-tight transition-all duration-300"
+              >
+                <TrendingUp className="text-muted-foreground group-data-[state=active]:text-primary h-4.5 w-4.5 transition-colors" />
+                <span>Funnel</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="applications">
             <AnalyticsApplicationTrendsChart timeRange={timeRange} />

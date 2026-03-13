@@ -15,6 +15,7 @@ import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+  BarChart2,
   Bell,
   Briefcase,
   Building2,
@@ -313,6 +314,12 @@ export default function EmployerSidebarView({
         },
         { icon: Package, label: "Pricing Packages", href: "/employer/pricing" },
         { icon: Receipt, label: "Billing Details", href: "/employer/billing" },
+      ],
+    },
+    {
+      title: "Analytics",
+      items: [
+        { icon: BarChart2, label: "Analytics", href: "/employer/analytics" },
       ],
     },
   ];

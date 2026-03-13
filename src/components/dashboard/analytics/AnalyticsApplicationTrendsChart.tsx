@@ -30,12 +30,12 @@ const AnalyticsApplicationTrendsChart = ({
   ];
 
   return (
-    <Card className="p-6">
+    <Card className="border-primary/10 bg-background/60 overflow-hidden rounded-2xl border p-6 backdrop-blur-xl">
       <div className="mb-6">
-        <h3 className="text-foreground text-lg font-semibold">
+        <h3 className="text-foreground text-lg font-bold tracking-tight">
           Application Trends
         </h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-xs font-medium opacity-60">
           Monthly application flow and conversion metrics
         </p>
       </div>
