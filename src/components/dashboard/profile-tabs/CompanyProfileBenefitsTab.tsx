@@ -77,7 +77,7 @@ const CompanyProfileBenefitsTab = ({
   const [isFormLoading, setIsFormLoading] = useState(false);
 
   const benefits: CompanyBenefit[] = useMemo(() => {
-    return (currentProfile.benefits || []).map((b: any) => {
+    return (currentProfile?.benefits || []).map((b: any) => {
       if (typeof b === "string")
         return { id: Math.random().toString(), title: b, isActive: true };
       return {
@@ -89,7 +89,7 @@ const CompanyProfileBenefitsTab = ({
         isActive: b.isActive ?? true,
       };
     });
-  }, [currentProfile.benefits]);
+  }, [currentProfile?.benefits]);
 
   const activeBenefits = benefits.filter((b) => b.isActive);
   const inactiveBenefits = benefits.filter((b) => !b.isActive);

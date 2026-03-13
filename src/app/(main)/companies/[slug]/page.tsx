@@ -53,6 +53,9 @@ export type CompanyDetails = {
   createdAt: string;
 };
 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
 export async function generateMetadata({
   params,
 }: {
@@ -61,16 +64,13 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/company/company/${slug}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: revalidate },
+    const res = await fetch(`${BACKEND_URL}/api/v1/company/company/${slug}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      next: { revalidate: revalidate },
+    });
 
     if (res.ok) {
       const data = await res.json();
@@ -99,16 +99,13 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/company/company/${slug}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: revalidate },
+    const res = await fetch(`${BACKEND_URL}/api/v1/company/company/${slug}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      next: { revalidate: revalidate },
+    });
 
     if (!res.ok) {
       return (

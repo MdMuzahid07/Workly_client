@@ -71,7 +71,7 @@ const CompanyProfileDetailsTab = ({
     mode: "onChange",
     values: {
       ...editedProfile,
-      industry: getIndustryId(editedProfile.industry),
+      industry: getIndustryId(editedProfile?.industry),
     },
   });
 

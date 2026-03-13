@@ -100,7 +100,6 @@ export const mapApiDataToProfile = (
     isVerified: company.isVerified || false,
     verifiedAt: company.verifiedAt || null,
     mission: company.mission || "",
-    cultureSummary: company.cultureSummary || "",
     values: company.values || [],
     benefits: parseBenefitsFromApi(company.benefits || []),
     socialLinks: company.socialLinks || [],
@@ -118,13 +117,15 @@ export const mapApiDataToProfile = (
  * @param profile - Company profile to evaluate
  * @returns Completion percentage (0-100)
  */
-export const calculateProfileCompletion = (profile: CompanyProfile): number => {
+export const calculateProfileCompletion = (
+  profile: CompanyProfile | null,
+): number => {
+  if (!profile) return 0;
   let completedFields = 0;
   const totalFields = 11; // Major fields we care about
 
   if (profile.description) completedFields++;
   if (profile.mission) completedFields++;
-  if (profile.cultureSummary) completedFields++;
   if (profile.logoUrl) completedFields++;
   if (profile.coverUrl) completedFields++;
   if (profile.location) completedFields++;

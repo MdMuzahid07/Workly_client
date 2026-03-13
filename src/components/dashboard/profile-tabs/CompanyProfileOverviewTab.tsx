@@ -3,7 +3,7 @@
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Briefcase, Eye, Rocket, Target, Users } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import WKTextArea from "../../form/WkTextArea";
 
@@ -21,8 +21,8 @@ const CompanyProfileOverviewTab = ({
   const methods = useForm({
     mode: "onChange",
     values: {
-      description: editedProfile.description,
-      mission: editedProfile.mission,
+      description: editedProfile?.description || "",
+      mission: editedProfile?.mission || "",
     },
   });
 
@@ -30,35 +30,44 @@ const CompanyProfileOverviewTab = ({
     () => [
       {
         label: "Total Jobs",
-        value: currentProfile.stats?.totalJobs || 0,
+        value: currentProfile?.stats?.totalJobs || 0,
         icon: Briefcase,
         color: "",
         iconColor: "text-blue-600",
       },
       {
         label: "Applications",
-        value: currentProfile.stats?.totalApplications || 0,
+        value: currentProfile?.stats?.totalApplications || 0,
         icon: Target,
         color: "",
         iconColor: "text-emerald-600",
       },
       {
         label: "Employees",
-        value: currentProfile.stats?.totalEmployees || 0,
+        value: currentProfile?.stats?.totalEmployees || 0,
         icon: Users,
         color: "",
         iconColor: "text-orange-600",
       },
       {
         label: "Profile Views",
-        value: currentProfile.stats?.profileViews || 0,
+        value: currentProfile?.stats?.profileViews || 0,
         icon: Eye,
         color: "",
         iconColor: "text-purple-600",
       },
     ],
-    [currentProfile.stats],
+    [currentProfile?.stats],
   );
+
+  useEffect(() => {
+    const subscription = methods.watch((value: any, { name }) => {
+      if (name && value[name] !== undefined) {
+        updateField(name, value[name]);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [methods, updateField]);
 
   return (
     <TabsContent value="overview" className="space-y-10 focus:outline-none">
@@ -94,7 +103,7 @@ const CompanyProfileOverviewTab = ({
         <FormProvider {...methods}>
           <SectionCard
             title="About the Company"
-            isCompleted={!!currentProfile.description}
+            isCompleted={!!currentProfile?.description}
             className="h-full"
           >
             <div className="space-y-4">
@@ -116,17 +125,14 @@ const CompanyProfileOverviewTab = ({
               {isEditing ? (
                 <WKTextArea
                   name="description"
+                  label="Description"
                   placeholder="Tell potential candidates who you are..."
                   className="min-h-[250px] resize-none"
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  //@ts-ignore
-                  onChange={(e: any) =>
-                    updateField("description", e.target.value)
-                  }
                 />
               ) : (
                 <div className="text-muted-foreground bg-muted/30 min-h-[150px] rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap">
-                  {currentProfile.description || "No description provided yet."}
+                  {currentProfile?.description ||
+                    "No description provided yet."}
                 </div>
               )}
             </div>
@@ -134,7 +140,7 @@ const CompanyProfileOverviewTab = ({
 
           <SectionCard
             title="Our Mission Statement"
-            isCompleted={!!currentProfile.mission}
+            isCompleted={!!currentProfile?.mission}
             className="h-full"
           >
             <div className="space-y-4">
@@ -155,15 +161,13 @@ const CompanyProfileOverviewTab = ({
               {isEditing ? (
                 <WKTextArea
                   name="mission"
+                  label="Mission"
                   placeholder="What is your company's core mission?"
                   className="min-h-[250px] resize-none"
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  //@ts-ignore
-                  onChange={(e: any) => updateField("mission", e.target.value)}
                 />
               ) : (
                 <div className="text-muted-foreground bg-muted/30 min-h-[150px] rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap">
-                  {currentProfile.mission ||
+                  {currentProfile?.mission ||
                     "Mission statement hasn't been defined."}
                 </div>
               )}

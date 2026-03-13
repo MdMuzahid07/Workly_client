@@ -106,14 +106,12 @@ const CompanyProfileCultureValuesTab = ({
   currentProfile,
   isEditing,
   onMissionChange,
-  onCultureSummaryChange,
   onValuesChange,
   initialValues = [],
 }: {
   currentProfile: any;
   isEditing: boolean;
   onMissionChange?: (mission: string) => void;
-  onCultureSummaryChange?: (cultureSummary: string) => void;
   onValuesChange?: (values: string[]) => void;
   initialValues?: string[];
 }) => {
@@ -125,8 +123,7 @@ const CompanyProfileCultureValuesTab = ({
   const methods = useForm({
     mode: "onChange",
     values: {
-      mission: currentProfile.mission || "",
-      cultureSummary: currentProfile.cultureSummary || "",
+      mission: currentProfile?.mission || "",
     },
   });
 
@@ -135,12 +132,8 @@ const CompanyProfileCultureValuesTab = ({
       if (name === "mission" && value.mission !== undefined) {
         onMissionChange?.(value.mission);
       }
-      if (name === "cultureSummary" && value.cultureSummary !== undefined) {
-        onCultureSummaryChange?.(value.cultureSummary);
-      }
     });
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [methods, onMissionChange]);
 
   const handleAddValue = (valueToAdd: string) => {
@@ -382,21 +375,11 @@ const CompanyProfileCultureValuesTab = ({
             Our Living Culture
           </h3>
 
-          {isEditing ? (
-            <FormProvider {...methods}>
-              <WKTextArea
-                name="cultureSummary"
-                label="Culture Summary"
-                placeholder="Culture isn't just what we say; it's what we do..."
-                className="min-h-[150px] resize-none border-white/10 bg-white/5 text-center"
-              />
-            </FormProvider>
-          ) : (
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              {currentProfile.cultureSummary ||
-                "Culture isn't just what we say; it's what we do. By defining our mission and values, we create a compass that guides every hire, every meeting, and every line of code."}
-            </p>
-          )}
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            Culture isn&apos;t just what we say; it&apos;s what we do. By
+            defining our mission and values, we create a compass that guides
+            every hire, every meeting, and every line of code.
+          </p>
         </div>
       </div>
     </TabsContent>

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
 const CompanyDetailsSidebar = ({ company }: { company: any }) => {
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-primary/5 border">
         <CardContent className="p-6">
           <Button className="bg-primary hover:bg-primary mb-3 w-full text-white">
             Follow Company
@@ -19,7 +19,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-primary/5 border">
         <CardHeader>
           <CardTitle>Company Stats</CardTitle>
         </CardHeader>
@@ -46,7 +46,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-primary/5 border">
         <CardHeader>
           <CardTitle>Connect With Us</CardTitle>
         </CardHeader>
@@ -91,7 +91,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
       </Card>
 
       {/* Similar Companies */}
-      <Card>
+      <Card className="bg-primary/5 border">
         <CardHeader>
           <CardTitle>Similar Companies</CardTitle>
         </CardHeader>

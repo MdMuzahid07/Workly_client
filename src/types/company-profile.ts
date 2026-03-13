@@ -39,7 +39,6 @@ export interface CompanyProfile {
   isVerified: boolean;
   verifiedAt: string | null;
   mission?: string;
-  cultureSummary?: string;
   values?: string[];
   benefits?: CompanyBenefit[];
   socialLinks?: SocialLink[];
@@ -70,7 +69,6 @@ export interface ApiCompanyData {
   isVerified?: boolean;
   verifiedAt?: string | null;
   mission?: string;
-  cultureSummary?: string;
   values?: string[];
   benefits?: CompanyBenefit[];
   socialLinks?: SocialLink[];
@@ -100,7 +98,6 @@ export const DEFAULT_PROFILE: CompanyProfile = {
   isVerified: false,
   verifiedAt: null,
   mission: "",
-  cultureSummary: "",
   values: [],
   benefits: [],
   socialLinks: [],

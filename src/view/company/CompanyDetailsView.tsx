@@ -31,7 +31,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
   const jobsPerLoad = 4;
   //* infinite scroll state for jobs end here =============<
 
-  const { icon: CategoryIcon } = getIconComponent(
+  const { icon: CategoryIcon, color: iconBgColor } = getIconComponent(
     companyDetails?.industry?.icon || "Briefcase",
   );
 
@@ -62,9 +62,6 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
       posted: new Date(job.createdAt).toLocaleDateString(),
     })) || [];
 
-  const transformedBenefits =
-    companyDetails.benefits?.map((benefit) => benefit.title) || [];
-
   //* infinite scroll logic start ==========================>
   const hasMoreJobs = companyDetails.jobs
     ? visibleJobsCount < companyDetails.jobs.length
@@ -93,35 +90,57 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
   return (
     <div className="bg-primary/2 min-h-screen md:pt-16">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Company Banner */}
+        <div className="relative mb-8 h-48 w-full overflow-hidden rounded-2xl md:h-64 lg:h-80">
+          <Image
+            src={companyDetails.coverUrl || "/placeholder.svg"}
+            alt={`${companyDetails.name} banner`}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+        </div>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
             {/* Company Header */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-start gap-6">
-                  <Image
-                    width={100}
-                    height={100}
-                    src={companyDetails.logoUrl || "/placeholder.svg"}
-                    alt={`${companyDetails.name} logo`}
-                    className="bg-primary h-20 w-20 rounded-full object-cover object-center"
-                  />
-                  <div className="flex-1">
-                    <div className="mb-2 flex items-center gap-3">
-                      <h1 className="text-foreground/90 text-3xl font-bold">
-                        {companyDetails.name}
-                      </h1>
-                      {companyDetails.isVerified && (
-                        <Badge variant="default">Verified</Badge>
-                      )}
+            <Card className="border-white/10 bg-white/5 backdrop-blur-md">
+              <CardHeader className="p-6 sm:p-8">
+                <div className="flex flex-col gap-6 md:flex-row md:items-start">
+                  <div className="relative h-24 w-24 shrink-0 sm:h-32 sm:w-32">
+                    <Image
+                      fill
+                      src={companyDetails.logoUrl || "/placeholder.svg"}
+                      alt={`${companyDetails.name} logo`}
+                      className="bg-primary rounded-3xl object-cover shadow-2xl"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <div className="mb-2 flex flex-wrap items-center gap-3">
+                        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                          {companyDetails.name}
+                        </h1>
+                        {companyDetails.isVerified && (
+                          <Badge
+                            variant="default"
+                            className="border-emerald-500/20 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                          >
+                            Verified
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-foreground/70 flex items-center gap-2 text-lg font-medium">
+                        <CategoryIcon
+                          className={`h-5 w-5 ${iconBgColor.replace("bg-", "text-")}`}
+                        />
+                        {companyDetails?.industry?.name}
+                      </p>
                     </div>
-                    <p className="text-foreground/60 mb-4 flex items-center gap-2 text-lg">
-                      <CategoryIcon className={`h-5 w-5 text-white`} />
-                      {companyDetails?.industry?.name}
-                    </p>
 
-                    <div className="text-foreground/60 flex flex-wrap items-center gap-6 text-sm">
+                    <div className="text-foreground/60 flex flex-wrap gap-x-8 gap-y-3 text-sm">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
                         <span>{companyDetails.location}</span>
@@ -141,7 +160,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                             href={companyDetails.websiteUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-green-600 hover:underline"
+                            className="text-primary hover:text-primary/80 transition-colors hover:underline"
                           >
                             {websiteDisplay}
                           </a>
@@ -150,12 +169,20 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Heart className="h-4 w-4" />
+                  <div className="flex items-center gap-2 self-start">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-xl border border-white/5 bg-white/5 hover:bg-white/10"
+                    >
+                      <Heart className="h-5 w-5" />
                     </Button>
-                    <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4" />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-xl border border-white/5 bg-white/5 hover:bg-white/10"
+                    >
+                      <Share2 className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
@@ -178,7 +205,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
             </Card>
 
             {/* Benefits & Perks */}
-            {transformedBenefits.length > 0 && (
+            {companyDetails.benefits && companyDetails.benefits.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -187,15 +214,38 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {transformedBenefits.map((benefit, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="bg-primary mt-2 h-2 w-2 rounded-full"></div>
-                        <span className="text-secondary-foreground">
-                          {benefit}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {companyDetails.benefits.map((benefit) => {
+                      const { icon: BenefitIcon, color: iconBgColor } =
+                        getIconComponent(benefit.icon);
+                      return (
+                        <div
+                          key={benefit.id}
+                          className="group hover:border-primary/20 flex flex-col gap-3 rounded-2xl border border-white/5 bg-white/3 p-5 transition-all duration-300 hover:bg-white/5"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div
+                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBgColor}/10 ${iconBgColor.replace("bg-", "text-")}`}
+                            >
+                              <BenefitIcon className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="text-secondary-foreground font-semibold">
+                                {benefit.title}
+                              </h4>
+                              <p className="text-foreground/50 text-xs font-medium tracking-wider uppercase">
+                                {benefit.category}
+                              </p>
+                            </div>
+                          </div>
+                          {benefit.description && (
+                            <p className="text-foreground/60 line-clamp-2 text-sm leading-relaxed">
+                              {benefit.description}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

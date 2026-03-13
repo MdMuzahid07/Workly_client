@@ -72,8 +72,8 @@ const CompanyProfileMediaTabs = ({
     }
   };
 
-  const logoUrl = editedProfile.logoUrl || currentProfile.logoUrl;
-  const coverUrl = editedProfile.coverUrl || currentProfile.coverUrl;
+  const logoUrl = editedProfile?.logoUrl || currentProfile?.logoUrl;
+  const coverUrl = editedProfile?.coverUrl || currentProfile?.coverUrl;
 
   return (
     <TabsContent value="media" className="space-y-10 focus:outline-none">

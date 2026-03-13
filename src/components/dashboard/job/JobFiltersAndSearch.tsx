@@ -54,7 +54,7 @@ const JobFiltersAndSearch = ({
           placeholder="Search jobs by title, location, or type..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border-border rounded pl-10"
+          className="border-border rounded-full pl-10"
         />
       </div>
 
@@ -66,7 +66,7 @@ const JobFiltersAndSearch = ({
         </div>
 
         <Select value={selectedType} onValueChange={setSelectedType}>
-          <SelectTrigger className="border-border w-[140px]">
+          <SelectTrigger className="border-border w-[140px] rounded-full">
             <SelectValue placeholder="Job Type" />
           </SelectTrigger>
           <SelectContent>
@@ -82,7 +82,7 @@ const JobFiltersAndSearch = ({
           value={selectedExperience}
           onValueChange={setSelectedExperience}
         >
-          <SelectTrigger className="border-border w-[140px]">
+          <SelectTrigger className="border-border w-[140px] rounded-full">
             <SelectValue placeholder="Experience" />
           </SelectTrigger>
           <SelectContent>
@@ -95,7 +95,7 @@ const JobFiltersAndSearch = ({
         </Select>
 
         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-          <SelectTrigger className="border-border w-[140px]">
+          <SelectTrigger className="border-border w-[140px] rounded-full">
             <SelectValue placeholder="Location" />
           </SelectTrigger>
           <SelectContent>

@@ -31,6 +31,8 @@ export const MOCK_COMPANY: CompanyProfile = {
   verifiedAt: "2023-01-15T10:00:00Z",
   mission:
     "To empower organizations worldwide through cutting-edge technology solutions that streamline workflows, enhance productivity, and foster sustainable growth in the digital age.",
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
   cultureSummary:
     "Culture isn't just what we say; it's what we do. By defining our mission and values, we create a compass that guides every hire, every meeting, and every line of code.",
   values: [

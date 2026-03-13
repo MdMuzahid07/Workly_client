@@ -48,7 +48,7 @@ const JobManagementTabs = ({
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="mb-6 grid w-full grid-cols-4 lg:w-auto">
+      <TabsList className="mb-6 grid w-full grid-cols-4 border p-0 lg:w-auto">
         <TabsTrigger value="all" className="gap-2">
           All Jobs
           <Badge variant="secondary" className="ml-1">

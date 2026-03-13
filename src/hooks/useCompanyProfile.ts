@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { MOCK_COMPANY } from "@/constants/company-mock-data";
 import {
   useGetMyCompanyQuery,
   useUpdateCompanyByIdMutation,
@@ -27,16 +26,14 @@ export const useCompanyProfile = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
-  const [companyProfile, setCompanyProfile] =
-    useState<CompanyProfile>(MOCK_COMPANY);
-  const [editedProfile, setEditedProfile] =
-    useState<CompanyProfile>(MOCK_COMPANY);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
-    MOCK_COMPANY.socialLinks || [],
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(
+    null,
   );
-  const [benefits, setBenefits] = useState<CompanyBenefit[]>(
-    MOCK_COMPANY.benefits || [],
+  const [editedProfile, setEditedProfile] = useState<CompanyProfile | null>(
+    null,
   );
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [benefits, setBenefits] = useState<CompanyBenefit[]>([]);
 
   // ===== API Integration =====
   const {
@@ -44,9 +41,7 @@ export const useCompanyProfile = () => {
     isLoading: isLoadingCompany,
     error: companyError,
     refetch: refetchCompany,
-  } = useGetMyCompanyQuery(undefined, {
-    skip: true, // Skip API fetching for now as we use mock data
-  });
+  } = useGetMyCompanyQuery(undefined);
 
   const [updateCompany, { isLoading: isSaving }] =
     useUpdateCompanyByIdMutation();
@@ -78,6 +73,8 @@ export const useCompanyProfile = () => {
     }
 
     try {
+      if (!editedProfile) return;
+
       // Prepare social links
       const socialLinksData = socialLinks.map(({ id, platform, url }) => ({
         id,
@@ -100,7 +97,6 @@ export const useCompanyProfile = () => {
         coverUrl: editedProfile.coverUrl,
         size: editedProfile.size,
         mission: editedProfile.mission,
-        cultureSummary: editedProfile.cultureSummary,
         values: editedProfile.values || [],
         socialLinks: socialLinksData,
         benefits: benefitsData,
@@ -145,9 +141,11 @@ export const useCompanyProfile = () => {
    * Cancels editing and reverts to saved profile
    */
   const handleCancel = useCallback(() => {
-    setEditedProfile(companyProfile);
-    setSocialLinks(companyProfile.socialLinks || []);
-    setBenefits(companyProfile.benefits || []);
+    if (companyProfile) {
+      setEditedProfile(companyProfile);
+      setSocialLinks(companyProfile.socialLinks || []);
+      setBenefits(companyProfile.benefits || []);
+    }
     setIsEditing(false);
   }, [companyProfile]);
 
@@ -155,10 +153,13 @@ export const useCompanyProfile = () => {
    * Updates a specific field in the edited profile
    */
   const updateField = useCallback((field: keyof CompanyProfile, value: any) => {
-    setEditedProfile((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setEditedProfile((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        [field]: value,
+      } as CompanyProfile;
+    });
   }, []);
 
   /**
@@ -174,12 +175,6 @@ export const useCompanyProfile = () => {
   /**
    * Updates the company culture summary
    */
-  const handleCultureSummaryChange = useCallback(
-    (cultureSummary: string) => {
-      updateField("cultureSummary", cultureSummary);
-    },
-    [updateField],
-  );
 
   /**
    * Updates the company values
@@ -221,7 +216,7 @@ export const useCompanyProfile = () => {
   const currentProfile = useMemo(
     () => (isEditing ? editedProfile : companyProfile),
     [isEditing, editedProfile, companyProfile],
-  );
+  ) as CompanyProfile;
 
   /**
    * Profile completion percentage
@@ -255,7 +250,6 @@ export const useCompanyProfile = () => {
     handleCancel,
     updateField,
     handleMissionChange,
-    handleCultureSummaryChange,
     handleValuesChange,
     handleBenefitsChange,
     handleSocialLinksChange,

@@ -33,7 +33,6 @@ const ManageCompanyProfileView = () => {
     handleCancel,
     updateField,
     handleMissionChange,
-    handleCultureSummaryChange,
     handleValuesChange,
     handleBenefitsChange,
     handleSocialLinksChange,
@@ -41,7 +40,7 @@ const ManageCompanyProfileView = () => {
   } = useCompanyProfile();
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || !currentProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loading />
@@ -115,7 +114,6 @@ const ManageCompanyProfileView = () => {
               currentProfile={currentProfile}
               isEditing={isEditing}
               onMissionChange={handleMissionChange}
-              onCultureSummaryChange={handleCultureSummaryChange}
               onValuesChange={handleValuesChange}
               initialValues={currentProfile.values}
             />
