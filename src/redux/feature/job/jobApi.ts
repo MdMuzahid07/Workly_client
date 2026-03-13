@@ -20,6 +20,15 @@ const jobApi = baseApi.injectEndpoints({
       providesTags: ["jobs"],
     }),
 
+    getMyJobs: builder.query({
+      query: (params) => ({
+        url: "/job/my-jobs",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["jobs"],
+    }),
+
     getJobById: builder.query({
       query: (id: string) => ({
         url: `/job/job/${id}`,
@@ -47,6 +56,7 @@ const jobApi = baseApi.injectEndpoints({
 export const {
   useCreateJobMutation,
   useGetJobsQuery,
+  useGetMyJobsQuery,
   useGetJobByIdQuery,
   useUpdateJobMutation,
   useDeleteJobMutation,
