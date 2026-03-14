@@ -15,8 +15,8 @@ const LegalPageView = ({
   children,
 }: LegalPageViewProps) => {
   return (
-    <div className="bg-background min-h-screen pb-20">
-      <div className="mx-auto mt-16 max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="bg-background mt-16 min-h-screen pt-16 pb-20 md:mt-20">
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="mb-10 text-center md:text-left">
           <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">

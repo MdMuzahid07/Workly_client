@@ -34,11 +34,11 @@ export const footerLinks = [
   {
     title: "Support",
     links: [
-      { name: "Help Center", href: "#" },
-      { name: "Contact Us", href: "#" },
-      { name: "Privacy Policy", href: "#" },
-      { name: "Terms of Service", href: "#" },
-      { name: "Accessibility", href: "#" },
+      { name: "Help Center", href: "/help-center" },
+      { name: "Contact Us", href: "/contact-us" },
+      { name: "Privacy Policy", href: "/legal/privacy-policy" },
+      { name: "Terms of Service", href: "/legal/user-agreement" },
+      { name: "Accessibility", href: "/legal/accessibility" },
     ],
   },
 ];

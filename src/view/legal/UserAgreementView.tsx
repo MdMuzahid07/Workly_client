@@ -18,7 +18,7 @@ const UserAgreementView = () => {
         <h2>2. Use of the Service</h2>
         <p>
           You agree to use the Service only for lawful purposes and in a way
-          that does not infringe the rights of, restrict or inhibit anyone
+          that does not infringe the rights of, restrict or inhibit anyone{" "}
           {`else's`} use and enjoyment of the Service.
         </p>
         <ul>

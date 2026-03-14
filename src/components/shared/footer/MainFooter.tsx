@@ -1,5 +1,6 @@
 import { footerLinks, worklyJobSocials } from "../../../constants";
 import WJLogo from "../WJLogo";
+import Link from "next/link";
 
 const MainFooter = () => {
   return (
@@ -40,12 +41,12 @@ const MainFooter = () => {
             <ul className="space-y-4">
               {section.links.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-muted-foreground hover:text-primary relative text-sm transition-colors duration-200"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
