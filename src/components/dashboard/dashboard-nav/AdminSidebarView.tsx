@@ -296,6 +296,36 @@ export default function AdminSidebarView({
         },
       ],
     },
+    {
+      title: "Legal & Compliance",
+      items: [
+        {
+          icon: ShieldCheck,
+          label: "Privacy Policy",
+          href: "/admin/legal/privacy-policy",
+        },
+        {
+          icon: ShieldCheck,
+          label: "Terms of Service",
+          href: "/admin/legal/terms-of-service",
+        },
+        {
+          icon: ShieldCheck,
+          label: "Accessibility Statement",
+          href: "/admin/legal/accessibility-statement",
+        },
+        {
+          icon: ShieldCheck,
+          label: "Cookie Policy",
+          href: "/admin/legal/cookie-policy",
+        },
+        {
+          icon: ShieldCheck,
+          label: "User Agreements",
+          href: "/admin/legal/user-agreements",
+        },
+      ],
+    },
   ];
 
   const bottomItems: SidebarItemProps[] = [
