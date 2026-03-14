@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const FooterBottom = () => {
   const year = new Date().getFullYear();
 
@@ -17,18 +19,18 @@ const FooterBottom = () => {
 
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">
             {[
-              "Accessibility",
-              "User Agreement",
-              "Privacy Policy",
-              "Cookie Policy",
+              { label: "Accessibility", path: "/legal/accessibility" },
+              { label: "User Agreement", path: "/legal/user-agreement" },
+              { label: "Privacy Policy", path: "/legal/privacy-policy" },
+              { label: "Cookie Policy", path: "/legal/cookie-policy" },
             ].map((item) => (
-              <a
-                key={item}
-                href="#"
+              <Link
+                key={item.label}
+                href={item.path}
                 className="text-muted-foreground hover:text-primary transition-colors duration-200"
               >
-                {item}
-              </a>
+                {item.label}
+              </Link>
             ))}
           </div>
         </div>

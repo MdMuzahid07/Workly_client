@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import WKSelect from "@/components/form/WkSelect";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,27 +42,31 @@ const JobApplyForm = ({
   handleSubmit,
   isSubmitting,
   resumeFile,
+  existingResumes,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: any;
   EXPERIENCE_OPTIONS: { label: string; value: string }[];
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   formatFileSize: (bytes: number) => string;
   handleRemoveFile: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   handleSubmit: (data: any) => void;
   isSubmitting: boolean;
   resumeFile: File | null;
+
+  existingResumes?: any[];
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Information</CardTitle>
-        <CardDescription>
+    <Card className="bg-card rounded-2xl border shadow-none">
+      <CardHeader className="border-border/50 border-b p-6 sm:px-8">
+        <CardTitle className="text-xl font-bold tracking-tight">
+          Your Information
+        </CardTitle>
+        <CardDescription className="text-sm font-medium opacity-80">
           Please provide your details to apply for this position
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6 sm:p-8">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
@@ -203,15 +209,16 @@ const JobApplyForm = ({
 
             <Separator />
 
-            {/* Resume Upload Section */}
+            {/* Resume Selection Section */}
             <div className="space-y-4">
               <h3 className="font-semibold">Resume (PDF)</h3>
+
               <FormField
                 control={form.control}
                 name="resumeFile"
                 render={({ field: { value, onChange, ...field } }) => (
                   <FormItem>
-                    <FormLabel>Upload Resume *</FormLabel>
+                    <FormLabel>Upload Resume</FormLabel>
                     <FormControl>
                       <div className="space-y-3">
                         {!resumeFile ? (
@@ -219,32 +226,35 @@ const JobApplyForm = ({
                             <input
                               type="file"
                               accept=".pdf,.doc,.docx"
-                              onChange={handleFileChange}
+                              onChange={(e) => {
+                                handleFileChange(e);
+                                form.setValue("resumeUrl", "");
+                              }}
                               className="sr-only"
                               id="resume-upload"
                               {...field}
                             />
                             <label
                               htmlFor="resume-upload"
-                              className="border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10 flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed px-6 py-8 transition-colors"
+                              className="border-border bg-card hover:bg-accent flex cursor-pointer items-center justify-center gap-4 rounded-xl border-2 border-dashed px-6 py-10 transition-all duration-300"
                             >
-                              <div className="bg-primary/20 flex h-10 w-10 items-center justify-center rounded-lg">
-                                <FileUp className="text-primary h-5 w-5" />
+                              <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
+                                <FileUp className="h-6 w-6" />
                               </div>
                               <div className="text-left">
-                                <p className="font-medium">
+                                <p className="text-sm font-bold tracking-tight sm:text-base">
                                   Click to upload or drag and drop
                                 </p>
-                                <p className="text-muted-foreground text-xs">
-                                  PDF or Word document
+                                <p className="text-muted-foreground mt-1 text-xs font-medium">
+                                  PDF or Word document up to 10MB
                                 </p>
                               </div>
                             </label>
                           </div>
                         ) : (
-                          <div className="border-primary/30 bg-primary/5 flex items-center justify-between rounded-lg border px-4 py-3">
+                          <div className="border-border bg-card flex items-center justify-between rounded-lg border px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="bg-primary/20 flex h-10 w-10 items-center justify-center rounded-lg">
+                              <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
                                 <FileUp className="text-primary h-5 w-5" />
                               </div>
                               <div>
@@ -273,6 +283,54 @@ const JobApplyForm = ({
                   </FormItem>
                 )}
               />
+
+              <div className="pt-2">
+                <div className="text-muted-foreground relative mb-6 flex items-center py-2 text-xs font-bold tracking-widest uppercase">
+                  <div className="border-border grow border-t"></div>
+                  <span className="mx-4 shrink">OR SELECT EXISTING</span>
+                  <div className="border-border grow border-t"></div>
+                </div>
+                <WKSelect
+                  name="resumeUrl"
+                  label="Select Existing Resume"
+                  className="w-full"
+                  placeholder={
+                    existingResumes && existingResumes.length > 0
+                      ? "Choose a previously uploaded resume..."
+                      : "Choose a previously uploaded resume (Dummy Data)"
+                  }
+                  options={(existingResumes && existingResumes.length > 0
+                    ? existingResumes
+                    : [
+                        {
+                          name: "Frontend_Developer_Resume_2024.pdf",
+                          file: "dummy_url_1",
+                          isDefault: true,
+                        },
+                        {
+                          name: "UI_UX_Designer_CV.pdf",
+                          file: "dummy_url_2",
+                          isDefault: false,
+                        },
+                        {
+                          name: "React_Specialist_Resume.doc",
+                          file: "dummy_url_3",
+                          isDefault: false,
+                        },
+                      ]
+                  ).map((r: any) => ({
+                    value: r.file,
+                    label: `${r.name} ${r.isDefault ? "(Default)" : ""}`,
+                  }))}
+                />
+                {form.watch("resumeUrl") && resumeFile && (
+                  <p className="text-muted-foreground mt-3 text-xs font-medium">
+                    Note: You have both selected an existing resume and uploaded
+                    a new one. The new uploaded file will be prioritized. Please
+                    remove it if you wish to use the selected existing resume.
+                  </p>
+                )}
+              </div>
             </div>
 
             <Separator />
@@ -329,18 +387,18 @@ const JobApplyForm = ({
             {/* Submit Button */}
             <Button
               type="submit"
-              className="bg-primary hover:bg-primary/90 w-full"
+              className="bg-primary hover:bg-primary/90 mt-4 h-12 w-full rounded-xl font-bold tracking-wide shadow-none transition-all"
               size="lg"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
-                  <div className="border-background border-t-primary mr-2 h-4 w-4 animate-spin rounded-full border-2" />
-                  Submitting...
+                  <div className="border-background border-t-primary/50 mr-2 h-5 w-5 animate-spin rounded-full border-2" />
+                  Submitting Application...
                 </>
               ) : (
                 <>
-                  <Send className="mr-2 h-4 w-4" />
+                  <Send className="mr-2 h-5 w-5" />
                   Submit Application
                 </>
               )}

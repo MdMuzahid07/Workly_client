@@ -13,6 +13,7 @@ import JobRequirementsSidebar from "../../components/main/jobs/applyJob/JobRequi
 import JobSummaryCard from "../../components/main/jobs/applyJob/JobSummaryCard";
 import { useCreateApplicationMutation } from "../../redux/feature/application/applicationSlice";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
+import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import { useUploadSingleFileMutation } from "../../redux/feature/upload/uploadApi";
 import JobApplyViewSkeleton from "../../skeleton/job/JobApplyViewSkeleton";
 
@@ -29,26 +30,32 @@ const EXPERIENCE_OPTIONS = [
   { value: "10", label: "10+ years" },
 ];
 
-const applicationSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  location: z.string().min(2, "Location is required"),
-  currentRole: z.string().min(2, "Current role is required"),
-  experience: z.string().min(1, "Years of experience is required"),
-  portfolio: z
-    .string()
-    .url("Please enter a valid portfolio URL")
-    .optional()
-    .or(z.literal("")),
-  coverLetter: z
-    .string()
-    .min(20, "Cover letter must be at least 20 characters"),
-  resumeFile: z.instanceof(File).optional(),
-  agreeTerms: z.boolean().refine((val) => val === true, {
-    message: "You must agree to the terms and conditions",
-  }),
-});
+const applicationSchema = z
+  .object({
+    fullName: z.string().min(2, "Full name must be at least 2 characters"),
+    email: z.string().email("Please enter a valid email"),
+    phone: z.string().min(10, "Please enter a valid phone number"),
+    location: z.string().min(2, "Location is required"),
+    currentRole: z.string().min(2, "Current role is required"),
+    experience: z.string().min(1, "Years of experience is required"),
+    portfolio: z
+      .string()
+      .url("Please enter a valid portfolio URL")
+      .optional()
+      .or(z.literal("")),
+    coverLetter: z
+      .string()
+      .min(20, "Cover letter must be at least 20 characters"),
+    resumeFile: z.instanceof(File).optional(),
+    resumeUrl: z.string().optional().or(z.literal("")),
+    agreeTerms: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the terms and conditions",
+    }),
+  })
+  .refine((data) => data.resumeFile || data.resumeUrl, {
+    message: "Please upload a new resume or select an existing one",
+    path: ["resumeFile"],
+  });
 
 type ApplicationFormData = z.infer<typeof applicationSchema>;
 
@@ -63,6 +70,11 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   const { data: jobData, isLoading: isJobLoading } = useGetJobByIdQuery(jobId, {
     skip: !jobId,
   });
+  const { data: profileResponse, isLoading: isProfileLoading } =
+    useGetProfileQuery({});
+
+  const userProfile = profileResponse?.data;
+  const existingResumes = userProfile?.resumes || [];
 
   const form = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
@@ -76,36 +88,43 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
       portfolio: "",
       coverLetter: "",
       resumeFile: undefined,
+      resumeUrl: "",
       agreeTerms: false,
     },
   });
 
   const handleSubmit = async (data: ApplicationFormData) => {
     try {
-      if (!data.resumeFile) {
-        console.error("Resume file is required");
+      let finalResumeUrl = "";
+
+      if (data.resumeFile) {
+        const formData = new FormData();
+        formData.append("file", data.resumeFile);
+        const resume = await uploadSingleFile(formData).unwrap();
+        if (resume.success) {
+          finalResumeUrl = resume.data.url;
+        } else {
+          throw new Error("Resume upload failed");
+        }
+      } else if (data.resumeUrl) {
+        finalResumeUrl = data.resumeUrl;
+      } else {
+        console.error("No resume provided");
         return;
       }
-
-      const formData = new FormData();
-      formData.append("file", data.resumeFile);
-
-      const resume = await uploadSingleFile(formData).unwrap();
 
       const payload = {
         ...data,
         jobId,
-        resumeFile: resume.data.url,
+        resumeFile: finalResumeUrl,
       };
 
-      if (resume.success) {
-        const response = await createApplication(payload).unwrap();
-        if (response.success) {
-          setSubmitted(true);
-        }
+      const response = await createApplication(payload).unwrap();
+      if (response.success) {
+        setSubmitted(true);
       }
     } catch (error) {
-      console.error("Failed to upload resume file:", error);
+      console.error("Failed to submit application:", error);
     }
   };
 
@@ -131,16 +150,16 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  if (isJobLoading) {
+  if (isJobLoading || isProfileLoading) {
     return <JobApplyViewSkeleton />;
   }
 
   return (
-    <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
+    <div className="bg-background min-h-screen pt-10 pb-20">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:mt-10 lg:px-8">
         <ApplyJobHeader jobTitle={jobData?.data.title} />
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
           <div className="space-y-6 lg:col-span-2">
             <JobSummaryCard job={jobData} />
 
@@ -170,6 +189,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
                 handleSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
                 resumeFile={resumeFile}
+                existingResumes={existingResumes}
               />
             ) : (
               <ApplySuccessMessage />
