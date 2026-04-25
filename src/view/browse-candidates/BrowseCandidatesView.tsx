@@ -39,14 +39,17 @@ const BrowseCandidatesView = () => {
     const p: any = {
       page: currentPage,
       limit: 12,
-      sortBy: "createdAt",
+      sortBy: "fullName",
       sortOrder: "desc",
     };
 
     if (filters.search) p.search = filters.search;
     if (filters.location) p.location = filters.location;
     if (filters.industry) p.industry = filters.industry;
-    if (filters.experienceRange) {
+    if (
+      filters.experienceRange &&
+      (filters.experienceRange[0] !== 0 || filters.experienceRange[1] !== 30)
+    ) {
       p.minExperience = filters.experienceRange[0];
       p.maxExperience = filters.experienceRange[1];
     }
@@ -56,6 +59,8 @@ const BrowseCandidatesView = () => {
   }, [filters, currentPage]);
 
   const { data, isLoading, error } = useGetCandidatesQuery(params);
+
+  console.log("Candidates Data:", data);
 
   useEffect(() => {
     if (data?.data) {
