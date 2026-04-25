@@ -10,7 +10,6 @@ import CandidateCard from "../../components/main/candidates/CandidateCard";
 import CandidateSidebarFilter from "../../components/main/candidates/filter/CandidateSidebarFilter";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
-import { ScrollArea } from "../../components/ui/scroll-area";
 import { useGetCandidatesQuery } from "../../redux/feature/candidate/candidateApi";
 import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
 
@@ -96,7 +95,7 @@ const BrowseCandidatesView = () => {
       <div className="relative h-[250px] w-full overflow-hidden bg-slate-900 md:h-[300px]">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1521737706666-055637bb7bb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
+            src="https://images.unsplash.com/photo-1535957998253-26ae1ef29506?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Candidates background"
             className="h-full w-full object-cover opacity-40 grayscale"
             fill
@@ -162,12 +161,12 @@ const BrowseCandidatesView = () => {
           {/* Sidebar */}
           <div className="col-span-12 lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 hidden lg:block">
-              <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white shadow-sm">
-                <CandidateSidebarFilter
-                  onFiltersChange={handleFiltersChange}
-                  className="w-full"
-                />
-              </ScrollArea>
+              {/* <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white shadow-sm"> */}
+              <CandidateSidebarFilter
+                onFiltersChange={handleFiltersChange}
+                className="w-full"
+              />
+              {/* </ScrollArea> */}
             </div>
             <div className="lg:hidden">
               <Sidebar onFiltersChange={handleFiltersChange} />

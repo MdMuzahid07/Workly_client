@@ -168,7 +168,7 @@ const CandidateSidebarFilter = ({
   return (
     <div className={className}>
       <Card className="h-fit rounded-3xl border-gray-100 dark:border-slate-800">
-        <CardHeader className="px-6 py-5">
+        <CardHeader className="py-5 xl:px-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-foreground text-base font-bold tracking-tight uppercase">
               Filter Candidates
@@ -184,7 +184,7 @@ const CandidateSidebarFilter = ({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6 px-6 pb-8">
+        <CardContent className="space-y-6 pb-8 xl:px-0">
           <div className="space-y-3">
             <Label className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
               Industry

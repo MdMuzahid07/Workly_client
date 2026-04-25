@@ -11,7 +11,6 @@ import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
-import { ScrollArea } from "../../components/ui/scroll-area";
 import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
 import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
@@ -205,12 +204,12 @@ const JobView = () => {
           {/* Sidebar - only show if list view or desktop */}
           <div className="col-span-12 lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 hidden lg:block">
-              <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white">
-                <SidebarFilter
-                  onFiltersChange={handleFiltersChange}
-                  className="w-full"
-                />
-              </ScrollArea>
+              {/* <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white"> */}
+              <SidebarFilter
+                onFiltersChange={handleFiltersChange}
+                className="w-full"
+              />
+              {/* </ScrollArea> */}
             </div>
             <div className="lg:hidden">
               <Sidebar onFiltersChange={handleFiltersChange} />
