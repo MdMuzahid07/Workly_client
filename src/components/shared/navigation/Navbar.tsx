@@ -142,30 +142,32 @@ const Navbar = () => {
           </Link>
 
           {/* Minimalist Desktop Navigation */}
-          <nav className="hidden items-center gap-8 md:flex">
-            {navLinks.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group relative text-[14px] font-semibold tracking-tight transition-colors ${
-                    active
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
-                >
-                  {item.name}
-                  {active && (
-                    <motion.div
-                      layoutId="nav-underline"
-                      className="bg-primary absolute -bottom-1 left-0 h-0.5 w-full rounded-full"
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+          {user?.email && isVerified && (
+            <nav className="hidden items-center gap-8 md:flex">
+              {navLinks.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`group relative text-[14px] font-semibold tracking-tight transition-colors ${
+                      active
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
+                  >
+                    {item.name}
+                    {active && (
+                      <motion.div
+                        layoutId="nav-underline"
+                        className="bg-primary absolute -bottom-1 left-0 h-0.5 w-full rounded-full"
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -181,11 +183,7 @@ const Navbar = () => {
             <ProfileDrop onSignOut={handleLogout} user={user} />
           ) : (
             <div className="flex items-center gap-2">
-              <Button
-                asChild
-                variant="ghost"
-                className="hidden text-sm font-bold md:flex"
-              >
+              <Button asChild variant="ghost" className="text-sm font-bold">
                 <Link href="/login">Log In</Link>
               </Button>
               <Button
@@ -197,14 +195,16 @@ const Navbar = () => {
             </div>
           )}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-green-500 md:hidden"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
+          {user?.email && isVerified && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full text-green-500 md:hidden"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          )}
         </div>
       </div>
 
