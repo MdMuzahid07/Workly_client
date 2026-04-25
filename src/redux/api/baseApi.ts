@@ -87,6 +87,7 @@ const baseApi = createApi({
     "applications",
     "categories",
     "company",
+    "candidates",
   ],
   endpoints: () => ({}),
 });

@@ -177,7 +177,7 @@ export default function DashboardHeader({
                 >
                   <Bell className="h-5 w-5" />
                 </Button>
-                <ProfileDrop user={user} isMobile={true} />
+                <ProfileDrop user={user} />
               </>
             )}
             <ThemeSwitcher isMobile={true} />
