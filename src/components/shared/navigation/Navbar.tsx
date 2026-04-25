@@ -152,7 +152,7 @@ const Navbar = () => {
                   className={`group relative text-[14px] font-semibold tracking-tight transition-colors ${
                     active
                       ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-primary"
                   }`}
                 >
                   {item.name}
