@@ -98,7 +98,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         </div>
       ) : (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="h-8 w-8">
             <Button
               variant="ghost"
               size="icon"

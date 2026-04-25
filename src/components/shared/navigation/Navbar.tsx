@@ -169,7 +169,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-4 md:flex">
             {/* <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
                 <Search className="h-5 w-5" />
              </Button> */}
@@ -200,7 +200,7 @@ const Navbar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full md:hidden"
+            className="h-8 w-8 rounded-full text-green-500 md:hidden"
             onClick={() => setMobileMenuOpen(true)}
           >
             <Menu className="h-6 w-6" />

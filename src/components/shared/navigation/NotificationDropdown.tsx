@@ -151,7 +151,7 @@ const NotificationDropdown = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className="h-8 w-8">
         <Button
           variant="ghost"
           size="icon"
@@ -162,7 +162,7 @@ const NotificationDropdown = () => {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="bg-primary absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full"
+              className="bg-primary absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full"
             >
               <span className="text-primary-foreground text-xs font-bold">
                 {unreadCount > 9 ? "9+" : unreadCount}
