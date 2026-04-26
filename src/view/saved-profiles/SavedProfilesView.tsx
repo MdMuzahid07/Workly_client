@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardEmployerSavedProfilesHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerSavedProfilesHeader";
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockSavedProfiles } from "@/data/mockSavedProfiles";
+import { useGetSavedCandidatesQuery } from "@/redux/feature/candidate/candidateApi";
 import { AnimatePresence } from "framer-motion";
 import { Bookmark, Search } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +22,14 @@ import { useMemo, useState } from "react";
 const SavedProfilesView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
+
+  const { data: savedData, isLoading } = useGetSavedCandidatesQuery({
+    page: 1,
+    limit: 100, // Load all for local filtering
+  });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const allSavedProfiles = savedData?.data || [];
 
   const availabilityOptions = [
     "all",
@@ -31,25 +40,37 @@ const SavedProfilesView = () => {
   ];
 
   const filteredProfiles = useMemo(() => {
-    return mockSavedProfiles.filter((profile) => {
+    return allSavedProfiles.filter((profile: any) => {
+      const candidateName = profile.fullName || "";
+      const currentPosition = profile.profile?.headline || "";
+      const skills = profile.profile?.skills || [];
+      const availability =
+        profile.profile?.preference?.availability || "immediate";
+
       const matchesSearch =
-        profile.candidateName
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        profile.currentPosition
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        profile.skills.some((skill) =>
+        candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        currentPosition.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        skills.some((skill: any) =>
           skill.skillName.toLowerCase().includes(searchTerm.toLowerCase()),
         );
 
       const matchesAvailability =
         availabilityFilter === "all" ||
-        profile.availability === availabilityFilter;
+        availability.toLowerCase() === availabilityFilter.toLowerCase();
 
       return matchesSearch && matchesAvailability;
     });
-  }, [searchTerm, availabilityFilter]);
+  }, [allSavedProfiles, searchTerm, availabilityFilter]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-primary animate-pulse text-lg font-bold">
+          Loading saved profiles...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-16">
@@ -66,7 +87,7 @@ const SavedProfilesView = () => {
                     Total Saved
                   </p>
                   <p className="text-2xl font-bold">
-                    {mockSavedProfiles.length}
+                    {allSavedProfiles.length}
                   </p>
                 </div>
                 <div className="bg-primary/10 text-primary rounded-full p-3">
@@ -85,8 +106,9 @@ const SavedProfilesView = () => {
                   </p>
                   <p className="text-2xl font-bold">
                     {
-                      mockSavedProfiles.filter(
-                        (p) => p.availability === "immediate",
+                      allSavedProfiles.filter(
+                        (p: any) =>
+                          p.profile?.preference?.availability === "immediate",
                       ).length
                     }
                   </p>
@@ -181,7 +203,7 @@ const SavedProfilesView = () => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
           <AnimatePresence mode="popLayout">
             {filteredProfiles.length > 0 ? (
-              filteredProfiles.map((profile, index) => (
+              filteredProfiles.map((profile: any, index: number) => (
                 <SavedProfileCard
                   key={profile.id}
                   profile={profile}

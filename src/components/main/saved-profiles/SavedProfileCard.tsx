@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SavedProfile } from "@/data/mockSavedProfiles";
 import { motion } from "framer-motion";
 import {
   Bookmark,
@@ -27,26 +27,59 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-interface SavedProfileCardProps {
-  profile: SavedProfile;
-  index: number;
-}
-
-const availabilityLabels = {
+const availabilityLabels: any = {
   immediate: "Immediate",
   "2_weeks": "2 Weeks",
   "1_month": "1 Month",
   not_available: "Not Available",
 };
 
-const availabilityColors = {
+const availabilityColors: any = {
   immediate: "bg-success/10 text-success border-success/20",
   "2_weeks": "bg-primary/10 text-primary border-primary/20",
   "1_month": "bg-warning/10 text-warning border-warning/20",
   not_available: "bg-muted text-muted-foreground border-border",
 };
 
-const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
+const SavedProfileCard = ({
+  profile: rawProfile,
+  index,
+}: {
+  profile: any;
+  index: number;
+}) => {
+  // Map real user data to the expected profile structure
+  const profile = {
+    id: rawProfile.id,
+    candidateName: rawProfile.fullName,
+    candidateAvatar: rawProfile.profile?.avatarUrl,
+    currentPosition: rawProfile.profile?.headline || "Professional Candidate",
+    location: rawProfile.profile?.location || "Not Specified",
+    experience: `${rawProfile.profile?.totalExperienceYears || 0} Years`,
+    savedDate: rawProfile.savedAt || new Date().toISOString(),
+    email: rawProfile.email,
+    phone: rawProfile.profile?.phone,
+    skills: rawProfile.profile?.skills || [],
+    education: rawProfile.profile?.education?.[0]
+      ? `${rawProfile.profile.education[0].degree} - ${rawProfile.profile.education[0].institution}`
+      : "Not Specified",
+    summary: rawProfile.profile?.bio || "No biography provided.",
+    resumeUrl: rawProfile.profile?.resumeUrl,
+    linkedinUrl: rawProfile.profile?.linkedInUrl,
+    portfolioUrl: rawProfile.profile?.websiteUrl,
+    availability:
+      (rawProfile.profile?.preference?.availability?.toLowerCase() as any) ||
+      "immediate",
+    salaryExpectation: rawProfile.profile?.preference?.expectedSalary
+      ? {
+          min: rawProfile.profile.preference.expectedSalary,
+          max: rawProfile.profile.preference.expectedSalary, // Single value for now
+          currency: "$",
+        }
+      : undefined,
+    tags: rawProfile.profile?.preference?.tags || [],
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -128,7 +161,7 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
 
           {/* Skills */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {profile.skills.slice(0, 5).map((skill) => (
+            {profile.skills.slice(0, 5).map((skill: any) => (
               <Badge
                 key={skill.id}
                 variant="secondary"
@@ -150,7 +183,7 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
           {/* Tags */}
           {profile.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
-              {profile.tags.map((tag, idx) => (
+              {profile.tags.map((tag: any, idx: number) => (
                 <div
                   key={idx}
                   className="bg-muted/50 text-muted-foreground rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase"
