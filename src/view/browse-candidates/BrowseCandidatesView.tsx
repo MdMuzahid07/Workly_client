@@ -11,7 +11,7 @@ import CandidateSidebarFilter from "../../components/main/candidates/filter/Cand
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import { useGetCandidatesQuery } from "../../redux/feature/candidate/candidateApi";
-import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
+import CandidateCardSkeleton from "../../skeleton/candidate/CandidateCardSkeleton";
 
 type Filters = {
   search: string;
@@ -183,7 +183,7 @@ const BrowseCandidatesView = () => {
               dataLength={allCandidates.length}
               next={loadMore}
               hasMore={data?.meta ? currentPage < data.meta.pages : false}
-              loader={<JobCardSkeleton />}
+              loader={<CandidateCardSkeleton viewType={viewType} />}
               endMessage={
                 <p className="text-muted-foreground py-8 text-center font-medium italic">
                   {allCandidates.length > 0
@@ -202,7 +202,7 @@ const BrowseCandidatesView = () => {
                 {isLoading &&
                   currentPage === 1 &&
                   [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
-                    <JobCardSkeleton key={index} />
+                    <CandidateCardSkeleton key={index} viewType={viewType} />
                   ))}
 
                 {error && (
@@ -218,7 +218,10 @@ const BrowseCandidatesView = () => {
                 )}
 
                 {allCandidates.map((candidate: any) => (
-                  <Suspense key={candidate?.id} fallback={<JobCardSkeleton />}>
+                  <Suspense
+                    key={candidate?.id}
+                    fallback={<CandidateCardSkeleton viewType={viewType} />}
+                  >
                     <CandidateCard candidate={candidate} viewType={viewType} />
                   </Suspense>
                 ))}

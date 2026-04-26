@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Award,
   Briefcase,
   Calendar,
+  Globe,
   GraduationCap,
   Heart,
   Mail,
@@ -14,8 +16,6 @@ import {
   Share2,
   Shield,
   User,
-  Globe,
-  Award,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -24,8 +24,8 @@ import {
   useGetCandidateByIdQuery,
   useToggleSaveCandidateMutation,
 } from "../../redux/feature/candidate/candidateApi";
-import JobDetailsSkeleton from "../../skeleton/job/JobDetailsSkeleton";
 import { useAppSelector } from "../../redux/hooks";
+import CandidateDetailsSkeleton from "../../skeleton/candidate/CandidateDetailsSkeleton";
 
 const CandidateDetailsView = () => {
   const params = useParams();
@@ -61,7 +61,7 @@ const CandidateDetailsView = () => {
     }
   };
 
-  if (isLoading) return <JobDetailsSkeleton />;
+  if (isLoading) return <CandidateDetailsSkeleton />;
 
   if (error || !response?.data) {
     return (
@@ -101,7 +101,7 @@ const CandidateDetailsView = () => {
               <CardHeader className="p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
-                    <div className="bg-card border-primary/10 relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-2xl md:h-32 md:w-32 dark:border-slate-800">
+                    <div className="bg-card relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-2xl md:h-32 md:w-32 dark:border-slate-800">
                       {profile.avatarUrl ? (
                         <Image
                           src={profile.avatarUrl}
@@ -252,7 +252,7 @@ const CandidateDetailsView = () => {
                   {profile.workExperiences.map((exp: any, index: number) => (
                     <div key={exp.id} className="relative pl-8">
                       {index !== profile.workExperiences.length - 1 && (
-                        <div className="bg-primary/10 absolute top-8 left-[11px] h-full w-[2px]" />
+                        <div className="bg-primary/10 absolute top-8 left-[11px] h-full w-0.5" />
                       )}
                       <div className="bg-primary/5 border-primary/20 absolute top-1 left-0 h-6 w-6 rounded-full border-2" />
                       <div className="space-y-1">
