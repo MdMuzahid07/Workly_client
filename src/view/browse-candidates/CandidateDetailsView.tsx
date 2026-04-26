@@ -25,10 +25,17 @@ import {
   useToggleSaveCandidateMutation,
 } from "../../redux/feature/candidate/candidateApi";
 import JobDetailsSkeleton from "../../skeleton/job/JobDetailsSkeleton";
+import { useAppSelector } from "../../redux/hooks";
 
 const CandidateDetailsView = () => {
   const params = useParams();
   const candidateId = params.id as string;
+  const { user: currentUser } = useAppSelector((state) => state.auth);
+
+  const isEmployer =
+    currentUser?.role === "EMPLOYER" ||
+    currentUser?.role === "ADMIN" ||
+    currentUser?.role === "SUPER_ADMIN";
 
   const {
     data: response,
@@ -143,17 +150,25 @@ const CandidateDetailsView = () => {
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-xl border-gray-200"
-                      onClick={handleSave}
-                      disabled={isSaving}
-                    >
-                      <Heart
-                        className={`h-5 w-5 ${candidate.isSaved ? "fill-rose-500 text-rose-500" : "text-gray-400"}`}
-                      />
-                    </Button>
+                    {isEmployer && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={`rounded-xl border-gray-200 transition-colors ${
+                          candidate.isSaved ? "bg-red-50" : ""
+                        }`}
+                        onClick={handleSave}
+                        disabled={isSaving}
+                      >
+                        <Heart
+                          className={`h-5 w-5 ${
+                            candidate.isSaved
+                              ? "fill-rose-500 text-rose-500"
+                              : "text-gray-400"
+                          }`}
+                        />
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="icon"

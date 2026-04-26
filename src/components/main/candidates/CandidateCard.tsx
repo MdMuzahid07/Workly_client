@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useToggleSaveCandidateMutation } from "../../../redux/feature/candidate/candidateApi";
 import HoverHint from "../../shared/HoverHint";
+import { useAppSelector } from "../../../redux/hooks";
 import { Badge } from "../../ui/badge";
 
 interface CandidateProps {
@@ -22,6 +23,7 @@ interface CandidateProps {
         jobType?: string;
       };
     };
+    isSaved?: boolean;
   };
   viewType?: "grid" | "list";
 }
@@ -29,6 +31,12 @@ interface CandidateProps {
 const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
   const [toggleSaveCandidate, { isLoading: isSaving }] =
     useToggleSaveCandidateMutation();
+  const { user: currentUser } = useAppSelector((state) => state.auth);
+
+  const isEmployer =
+    currentUser?.role === "EMPLOYER" ||
+    currentUser?.role === "ADMIN" ||
+    currentUser?.role === "SUPER_ADMIN";
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -67,17 +75,27 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
                 </div>
               )}
             </div>
-            <HoverHint hint="Save Profile">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-primary/10 hover:text-primary h-8 w-8 rounded-full text-slate-400 transition-colors"
-                onClick={handleSave}
-                disabled={isSaving}
+            {isEmployer && (
+              <HoverHint
+                hint={candidate.isSaved ? "Unsave Profile" : "Save Profile"}
               >
-                <Heart className="h-4.5 w-4.5" />
-              </Button>
-            </HoverHint>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-full transition-colors ${
+                    candidate.isSaved
+                      ? "bg-red-50 text-red-500 hover:bg-red-100"
+                      : "hover:bg-primary/10 hover:text-primary text-slate-400"
+                  }`}
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  <Heart
+                    className={`h-4.5 w-4.5 ${candidate.isSaved ? "fill-current" : ""}`}
+                  />
+                </Button>
+              </HoverHint>
+            )}
           </div>
 
           <div className="mb-1">
@@ -227,17 +245,27 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
           </div>
 
           <div className="flex flex-col items-end gap-1 sm:gap-4 sm:text-right">
-            <HoverHint hint="Save Profile">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-primary/10 hover:text-primary h-10 w-10 rounded-full text-slate-400 transition-colors"
-                onClick={handleSave}
-                disabled={isSaving}
+            {isEmployer && (
+              <HoverHint
+                hint={candidate.isSaved ? "Unsave Profile" : "Save Profile"}
               >
-                <Heart className="h-6 w-6" />
-              </Button>
-            </HoverHint>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-10 w-10 rounded-full transition-colors ${
+                    candidate.isSaved
+                      ? "bg-red-50 text-red-500 hover:bg-red-100"
+                      : "hover:bg-primary/10 hover:text-primary text-slate-400"
+                  }`}
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  <Heart
+                    className={`h-6 w-6 ${candidate.isSaved ? "fill-current" : ""}`}
+                  />
+                </Button>
+              </HoverHint>
+            )}
 
             <Link href={`/browse-candidates/${candidate.id}`}>
               <Button className="btn-green-primary rounded-full px-6 text-sm font-bold shadow-md">
