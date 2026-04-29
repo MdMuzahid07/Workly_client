@@ -294,33 +294,10 @@ const JobApplyForm = ({
                   name="resumeUrl"
                   label="Select Existing Resume"
                   className="w-full"
-                  placeholder={
-                    existingResumes && existingResumes.length > 0
-                      ? "Choose a previously uploaded resume..."
-                      : "Choose a previously uploaded resume (Dummy Data)"
-                  }
-                  options={(existingResumes && existingResumes.length > 0
-                    ? existingResumes
-                    : [
-                        {
-                          name: "Frontend_Developer_Resume_2024.pdf",
-                          file: "dummy_url_1",
-                          isDefault: true,
-                        },
-                        {
-                          name: "UI_UX_Designer_CV.pdf",
-                          file: "dummy_url_2",
-                          isDefault: false,
-                        },
-                        {
-                          name: "React_Specialist_Resume.doc",
-                          file: "dummy_url_3",
-                          isDefault: false,
-                        },
-                      ]
-                  ).map((r: any) => ({
-                    value: r.file,
-                    label: `${r.name} ${r.isDefault ? "(Default)" : ""}`,
+                  placeholder="Choose a previously uploaded resume..."
+                  options={(existingResumes || []).map((r: any) => ({
+                    value: r.fileUrl,
+                    label: `${r.fileName} ${r.isDefault ? "(Default)" : ""}`,
                   }))}
                 />
                 {form.watch("resumeUrl") && resumeFile && (

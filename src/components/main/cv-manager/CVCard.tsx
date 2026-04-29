@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Resume } from "@/data/mockCVs";
 import { cn } from "@/lib/utils";
+import {
+  useDeleteResumeMutation,
+  useSetDefaultResumeMutation,
+} from "@/redux/feature/resume/resumeApi";
 import { motion } from "framer-motion";
 import {
   Download,
@@ -21,7 +25,17 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import PDFViewerModal from "../../shared/PDFViewerModal";
+
+interface Resume {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize: number;
+  isDefault: boolean;
+  uploadDate: string;
+}
 
 interface CVCardProps {
   resume: Resume;
@@ -30,6 +44,42 @@ interface CVCardProps {
 
 const CVCard = ({ resume, index }: CVCardProps) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [deleteResume, { isLoading: isDeleting }] = useDeleteResumeMutation();
+  const [setDefaultResume, { isLoading: isSettingDefault }] =
+    useSetDefaultResumeMutation();
+
+  const handleDelete = async () => {
+    try {
+      toast.loading("Deleting resume...", { id: "delete-resume" });
+      await deleteResume(resume.id).unwrap();
+      toast.success("Resume deleted successfully", { id: "delete-resume" });
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete resume", {
+        id: "delete-resume",
+      });
+    }
+  };
+
+  const handleSetDefault = async () => {
+    try {
+      toast.loading("Setting as primary...", { id: "set-default" });
+      await setDefaultResume(resume.id).unwrap();
+      toast.success("Primary resume updated", { id: "set-default" });
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to set primary resume", {
+        id: "set-default",
+      });
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (!bytes) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -39,7 +89,7 @@ const CVCard = ({ resume, index }: CVCardProps) => {
       <Card
         className={cn(
           "group relative overflow-hidden border transition-all duration-300",
-          resume.isMain
+          resume.isDefault
             ? "border-primary/50 ring-primary/20 ring-1"
             : "border-border/50",
         )}
@@ -52,16 +102,20 @@ const CVCard = ({ resume, index }: CVCardProps) => {
               </div>
               <div>
                 <h3 className="line-clamp-1 text-base font-bold tracking-tight">
-                  {resume.name}
+                  {resume.fileName}
                 </h3>
                 <div className="mt-1 flex items-center gap-2">
                   <Badge
                     variant="secondary"
                     className="bg-primary/10 text-primary rounded-lg border-none px-2 py-0.5 text-[10px] font-bold tracking-tight"
                   >
-                    {resume.type}
+                    {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      //@ts-ignore
+                      resume.type
+                    }
                   </Badge>
-                  {resume.isMain && (
+                  {resume.isDefault && (
                     <Badge
                       variant="default"
                       className="rounded-lg px-2 py-0.5 text-[10px] font-black tracking-widest uppercase"
@@ -84,11 +138,19 @@ const CVCard = ({ resume, index }: CVCardProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
-                <DropdownMenuItem className="h-10 cursor-pointer rounded-lg font-medium">
+                <DropdownMenuItem
+                  className="h-10 cursor-pointer rounded-lg font-medium"
+                  onClick={handleSetDefault}
+                  disabled={resume.isDefault || isSettingDefault}
+                >
                   <Star className="mr-2 h-4 w-4" />
                   Set as Primary
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium">
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Resume
                 </DropdownMenuItem>
@@ -99,9 +161,9 @@ const CVCard = ({ resume, index }: CVCardProps) => {
           <div className="border-border/40 mt-6 flex items-center justify-between border-t pt-4">
             <div className="text-muted-foreground/70 text-[11px] font-medium">
               <p>
-                Uploaded on {new Date(resume.uploadedAt).toLocaleDateString()}
+                Uploaded on {new Date(resume.uploadDate).toLocaleDateString()}
               </p>
-              <p>{resume.fileSize}</p>
+              <p>{formatFileSize(resume.fileSize || 0)}</p>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -112,13 +174,20 @@ const CVCard = ({ resume, index }: CVCardProps) => {
               >
                 <Eye className="h-4 w-4" />
               </Button>
-              <Button
-                size="icon"
-                variant="outline"
-                className="h-9 w-9 rounded-xl"
+              <a
+                href={resume.fileUrl}
+                download={resume.fileName}
+                target="_blank"
+                rel="noreferrer"
               >
-                <Download className="h-4 w-4" />
-              </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9 rounded-xl"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </a>
             </div>
           </div>
         </CardContent>
@@ -127,8 +196,8 @@ const CVCard = ({ resume, index }: CVCardProps) => {
       <PDFViewerModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
-        pdfUrl={resume.url}
-        title={resume.name}
+        pdfUrl={resume.fileUrl}
+        title={resume.fileName}
       />
     </motion.div>
   );

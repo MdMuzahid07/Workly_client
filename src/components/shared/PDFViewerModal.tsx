@@ -22,7 +22,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 // Set worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 interface PDFViewerModalProps {
   isOpen: boolean;
@@ -84,22 +84,28 @@ const PDFViewerModal = ({
               </Button>
             </div>
 
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-primary hover:bg-primary/90 hidden h-9 rounded-full px-4 font-bold sm:flex"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Download
-            </Button>
+            <a href={pdfUrl} download={title} target="_blank" rel="noreferrer">
+              <Button
+                variant="default"
+                size="sm"
+                className="bg-primary hover:bg-primary/90 hidden h-9 rounded-full px-4 font-bold sm:flex"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+            </a>
           </div>
         </DialogHeader>
 
         <div className="bg-muted/10 flex flex-1 justify-center overflow-auto p-4 sm:p-8">
           <div className="overflow-hidden rounded-sm border bg-white shadow-2xl">
             <Document
-              file={pdfUrl}
+              file={{ url: pdfUrl }}
               onLoadSuccess={onDocumentLoadSuccess}
+              options={{
+                cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+                cMapPacked: true,
+              }}
               loading={
                 <div className="flex flex-col items-center justify-center gap-4 p-20">
                   <Loader2 className="text-primary h-10 w-10 animate-spin" />

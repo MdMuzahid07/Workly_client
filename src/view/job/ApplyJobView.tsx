@@ -16,7 +16,7 @@ import JobSummaryCard from "../../components/main/jobs/applyJob/JobSummaryCard";
 import { useCreateApplicationMutation } from "../../redux/feature/application/applicationApi";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
-import { useUploadSingleFileMutation } from "../../redux/feature/upload/uploadApi";
+import { useUploadResumeMutation } from "../../redux/feature/resume/resumeApi";
 import JobApplyViewSkeleton from "../../skeleton/job/JobApplyViewSkeleton";
 
 interface ApplyJobViewProps {
@@ -65,8 +65,8 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [uploadSingleFile, { isLoading, error, isSuccess }] =
-    useUploadSingleFileMutation();
+  const [uploadResume, { isLoading: isUploadingResume }] =
+    useUploadResumeMutation();
   const [createApplication, { isLoading: isCreatingApplication }] =
     useCreateApplicationMutation();
   const { data: jobData, isLoading: isJobLoading } = useGetJobByIdQuery(jobId, {
@@ -110,7 +110,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
         coverLetter: "",
         resumeFile: undefined,
         resumeUrl:
-          userProfile.resumes?.find((r: any) => r.isDefault)?.file || "",
+          userProfile.resumes?.find((r: any) => r.isDefault)?.fileUrl || "",
         agreeTerms: false,
       });
     }
@@ -126,9 +126,9 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
       if (data.resumeFile) {
         const formData = new FormData();
         formData.append("file", data.resumeFile);
-        const resume = await uploadSingleFile(formData).unwrap();
-        if (resume.success) {
-          finalResumeUrl = resume.data.url;
+        const resumeResponse = await uploadResume(formData).unwrap();
+        if (resumeResponse.success) {
+          finalResumeUrl = resumeResponse.data.fileUrl;
         } else {
           throw new Error("Resume upload failed");
         }

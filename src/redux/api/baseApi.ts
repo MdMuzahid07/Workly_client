@@ -88,6 +88,7 @@ const baseApi = createApi({
     "categories",
     "company",
     "candidates",
+    "resume",
   ],
   endpoints: () => ({}),
 });
