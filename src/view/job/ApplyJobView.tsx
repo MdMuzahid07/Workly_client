@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 import ApplyJobHeader from "../../components/main/jobs/applyJob/ApplyJobHeader";
 import ApplySuccessMessage from "../../components/main/jobs/applyJob/ApplySuccessMessage";
@@ -11,7 +13,7 @@ import JobApplyForm from "../../components/main/jobs/applyJob/JobApplyForm";
 import JobInfoCard from "../../components/main/jobs/applyJob/JobInfoCard";
 import JobRequirementsSidebar from "../../components/main/jobs/applyJob/JobRequirementsSidebar";
 import JobSummaryCard from "../../components/main/jobs/applyJob/JobSummaryCard";
-import { useCreateApplicationMutation } from "../../redux/feature/application/applicationSlice";
+import { useCreateApplicationMutation } from "../../redux/feature/application/applicationApi";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import { useUploadSingleFileMutation } from "../../redux/feature/upload/uploadApi";
@@ -93,8 +95,32 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     },
   });
 
+  // Pre-fill form when profile is loaded
+  useEffect(() => {
+    if (userProfile) {
+      form.reset({
+        fullName: userProfile.fullName || "",
+        email: userProfile.email || "",
+        phone: userProfile.profile?.phone || "",
+        location: userProfile.profile?.location || "",
+        currentRole: userProfile.profile?.headline || "",
+        experience:
+          userProfile.profile?.totalExperienceYears?.toString() || "3",
+        portfolio: userProfile.profile?.websiteUrl || "",
+        coverLetter: "",
+        resumeFile: undefined,
+        resumeUrl:
+          userProfile.resumes?.find((r: any) => r.isDefault)?.file || "",
+        agreeTerms: false,
+      });
+    }
+  }, [userProfile, form]);
+
   const handleSubmit = async (data: ApplicationFormData) => {
     try {
+      setIsSubmitting(true);
+      toast.loading("Submitting your application...", { id: "apply_job" });
+
       let finalResumeUrl = "";
 
       if (data.resumeFile) {
@@ -109,7 +135,8 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
       } else if (data.resumeUrl) {
         finalResumeUrl = data.resumeUrl;
       } else {
-        console.error("No resume provided");
+        toast.error("Please provide a resume", { id: "apply_job" });
+        setIsSubmitting(false);
         return;
       }
 
@@ -119,12 +146,24 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
         resumeFile: finalResumeUrl,
       };
 
+      // Remove the actual File object from payload as it's not needed by API
+      delete (payload as any).resumeFile;
+      (payload as any).resumeFile = finalResumeUrl; // Restore as string URL
+
       const response = await createApplication(payload).unwrap();
       if (response.success) {
+        toast.success("Application submitted successfully!", {
+          id: "apply_job",
+        });
         setSubmitted(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit application:", error);
+      toast.error(error?.data?.message || "Failed to submit application", {
+        id: "apply_job",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
