@@ -38,10 +38,12 @@ const profileApi = baseApi.injectEndpoints({
     }),
 
     getSavedJobs: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: "/profile/saved-jobs",
         method: "GET",
+        params,
       }),
+      providesTags: ["profile"],
     }),
 
     updateSavedJob: builder.mutation({

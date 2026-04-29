@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardSavedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardSavedJobsHeader";
@@ -14,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockSavedJobs } from "@/data/mockSavedJobs";
+import { useGetSavedJobsQuery } from "@/redux/feature/profile/profileApi";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bookmark, FilterX, Search } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -28,55 +29,56 @@ const SavedJobsView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState("10");
 
-  // Derive data from mock
-  const jobs = mockSavedJobs.map((sj) => sj.job);
+  const [activeTab, setActiveTab] = useState("ACTIVE");
 
-  const companies = useMemo(() => {
-    return ["all", ...Array.from(new Set(jobs.map((j) => j.company.name)))];
-  }, [jobs]);
-
-  // Filtering Logic
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
-      const matchesSearch =
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCompany =
-        selectedCompany === "all" || job.company.name === selectedCompany;
-      return matchesSearch && matchesCompany;
-    });
-  }, [jobs, searchTerm, selectedCompany]);
-
-  const activeJobs = filteredJobs.filter((j) => j.isActive);
-  const closedJobs = filteredJobs.filter((j) => !j.isActive);
-
-  // Pagination Logic (Mock)
-  const jobsLimit = parseInt(limit);
-  const totalResults = activeJobs.length; // Focus pagination on active for demo
-  const totalPages = Math.ceil(totalResults / jobsLimit);
-
-  const paginationMeta = {
+  // RTK Query
+  const { data: savedJobsRes, isLoading } = useGetSavedJobsQuery({
     page: currentPage,
-    limit: jobsLimit,
-    total: totalResults,
-    pages: totalPages,
+    limit: parseInt(limit),
+    searchTerm: searchTerm || undefined,
+    company: selectedCompany !== "all" ? selectedCompany : undefined,
+    status: activeTab,
+  });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const rawSavedJobs = savedJobsRes?.data || [];
+  const meta = savedJobsRes?.meta || {
+    page: 1,
+    limit: parseInt(limit),
+    total: 0,
+    totalPages: 1,
   };
 
-  const pagedActiveJobs = useMemo(() => {
-    const start = (currentPage - 1) * jobsLimit;
-    return activeJobs.slice(start, start + jobsLimit);
-  }, [activeJobs, currentPage, jobsLimit]);
+  const jobs = useMemo(() => {
+    return rawSavedJobs.map((sj: any) => sj.job);
+  }, [rawSavedJobs]);
+
+  const companies = useMemo(() => {
+    return [
+      "all",
+      ...Array.from(
+        new Set<string>(jobs.map((j: any) => j.company?.name || "")),
+      ),
+    ];
+  }, [jobs]);
+
+  const paginationMeta = {
+    page: meta.page,
+    limit: meta.limit,
+    total: meta.total,
+    pages: meta.totalPages,
+  };
 
   const stats = useMemo(() => {
     return {
-      total: jobs.length,
-      expiring: jobs.filter((job) => {
+      total: meta.total, // For demo, use total from the current query
+      expiring: jobs.filter((job: any) => {
         const deadline = new Date(job.applicationDeadline);
         const diff = deadline.getTime() - Date.now();
         return diff > 0 && diff < 7 * 86400000;
       }).length,
     };
-  }, [jobs]);
+  }, [jobs, meta.total]);
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -139,11 +141,16 @@ const SavedJobsView = () => {
         </Card>
 
         {/* Tabs System */}
-        <Tabs defaultValue="active" className="w-full space-y-6">
+        <Tabs
+          defaultValue="ACTIVE"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full space-y-6"
+        >
           <div className="flex items-center justify-between">
             <TabsList className="bg-muted/20 h-10 rounded-full border p-0">
               <TabsTrigger
-                value="active"
+                value="ACTIVE"
                 className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold"
               >
                 Active
@@ -151,11 +158,11 @@ const SavedJobsView = () => {
                   variant="secondary"
                   className="bg-primary/10 text-primary ml-2 border-none"
                 >
-                  {activeJobs.length}
+                  {activeTab === "ACTIVE" ? meta.total : 0}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger
-                value="closed"
+                value="CLOSED"
                 className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold"
               >
                 Closed
@@ -163,7 +170,7 @@ const SavedJobsView = () => {
                   variant="secondary"
                   className="bg-muted/50 text-muted-foreground ml-2 border-none text-[10px]"
                 >
-                  {closedJobs.length}
+                  {activeTab === "CLOSED" ? meta.total : 0}
                 </Badge>
               </TabsTrigger>
             </TabsList>
@@ -191,20 +198,22 @@ const SavedJobsView = () => {
             </div>
           </div>
 
-          <TabsContent value="active" className="mt-0 focus-visible:ring-0">
+          <TabsContent value="ACTIVE" className="mt-0 focus-visible:ring-0">
             <AnimatePresence mode="wait">
-              {pagedActiveJobs.length > 0 ? (
+              {isLoading ? (
+                <div className="py-24 text-center">Loading saved jobs...</div>
+              ) : jobs.length > 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="grid grid-cols-1 gap-4"
                 >
-                  {pagedActiveJobs.map((job) => (
+                  {jobs.map((job: any) => (
                     <JobCard
                       inDashboard={true}
                       key={job.id}
-                      job={job}
+                      job={{ ...job, isSaved: true }}
                       viewType="list"
                     />
                   ))}
@@ -239,7 +248,7 @@ const SavedJobsView = () => {
               )}
             </AnimatePresence>
 
-            {totalPages > 1 && (
+            {meta.totalPages > 1 && (
               <div className="mt-8 border-t pt-6">
                 <PaginationBar
                   meta={paginationMeta}
@@ -249,14 +258,16 @@ const SavedJobsView = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="closed" className="mt-0 focus-visible:ring-0">
-            {closedJobs.length > 0 ? (
+          <TabsContent value="CLOSED" className="mt-0 focus-visible:ring-0">
+            {isLoading ? (
+              <div className="py-24 text-center">Loading saved jobs...</div>
+            ) : jobs.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 opacity-75">
-                {closedJobs.map((job) => (
+                {jobs.map((job: any) => (
                   <JobCard
                     inDashboard={true}
                     key={job.id}
-                    job={job}
+                    job={{ ...job, isSaved: true }}
                     viewType="list"
                   />
                 ))}

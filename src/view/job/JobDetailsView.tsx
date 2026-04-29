@@ -57,8 +57,13 @@ const JobDetailsView = () => {
       if (response.success && response.data.action === "unsaved") {
         toast.success("Job unsaved successfully", { id: "save_job" });
       }
-    } catch (err) {
-      toast.error("Failed to update job status", { id: "save_job" });
+    } catch (err: any) {
+      toast.error(
+        err?.data?.errorSources?.message ||
+          err?.data?.message ||
+          "Failed to update job status",
+        { id: "save_job" },
+      );
       console.error("Failed to save/unsave job:", err);
     }
   };

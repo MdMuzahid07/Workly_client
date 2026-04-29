@@ -24,6 +24,7 @@ interface JobProps {
     JobSkill: Array<{ id: string; skillName: string }>;
     isFeatured: boolean;
     isRemote: boolean;
+    isSaved?: boolean;
   };
   viewType?: "grid" | "list";
   inDashboard?: boolean;
@@ -44,8 +45,14 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
       if (response.success && response.data.action === "unsaved") {
         toast.success("Job unsaved successfully", { id: "save_job" });
       }
-    } catch (err) {
-      toast.error("Failed to update job status", { id: "save_job" });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      toast.error(
+        err?.data?.errorSources?.message ||
+          err?.data?.message ||
+          "Failed to update job status",
+        { id: "save_job" },
+      );
       console.error("Failed to save/unsave job:", err);
     }
   };
@@ -82,7 +89,9 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
                 className="hover:bg-primary/10 hover:text-primary h-8 w-8 rounded-full text-slate-400 transition-colors"
                 onClick={() => handleJobSave(job?.id)}
               >
-                <Heart className="h-4.5 w-4.5" />
+                <Heart
+                  className={`h-4.5 w-4.5 ${job.isSaved ? "fill-rose-500 text-rose-500" : "text-slate-400"}`}
+                />
               </Button>
             </HoverHint>
           </div>
@@ -239,7 +248,9 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
                   className="hover:bg-primary/10 hover:text-primary h-9 w-9 rounded-full text-slate-400 transition-colors"
                   onClick={() => handleJobSave(job?.id)}
                 >
-                  <Heart className="h-5 w-5" />
+                  <Heart
+                    className={`h-5 w-5 ${job.isSaved ? "fill-rose-500 text-rose-500" : "text-gray-400"}`}
+                  />
                 </Button>
               </HoverHint>
             </div>
