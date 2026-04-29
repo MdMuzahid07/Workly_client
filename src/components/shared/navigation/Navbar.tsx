@@ -134,12 +134,9 @@ const Navbar = () => {
     >
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:h-20 md:px-6">
         <div className="flex items-center gap-10">
-          <Link
-            href="/"
-            className="flex items-center transition-opacity hover:opacity-80"
-          >
+          <div className="flex items-center transition-opacity hover:opacity-80">
             <WJLogo />
-          </Link>
+          </div>
 
           {/* Minimalist Desktop Navigation */}
           {user?.email && isVerified && (

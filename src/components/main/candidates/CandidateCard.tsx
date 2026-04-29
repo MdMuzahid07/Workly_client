@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useToggleSaveCandidateMutation } from "../../../redux/feature/candidate/candidateApi";
-import HoverHint from "../../shared/HoverHint";
 import { useAppSelector } from "../../../redux/hooks";
+import HoverHint from "../../shared/HoverHint";
 import { Badge } from "../../ui/badge";
 
 interface CandidateProps {
@@ -57,7 +57,7 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
 
   if (viewType === "grid") {
     return (
-      <Card className="group hover:border-primary/50 relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 transition-all duration-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900/50">
+      <Card className="group from-primary/30 via-primary/10 to-primary/20 relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
         <CardContent className="flex flex-1 flex-col p-0">
           <div className="mb-4 flex items-start justify-between">
             <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-gray-50 p-0 dark:bg-slate-800">
@@ -173,7 +173,7 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
   }
 
   return (
-    <Card className="group hover:border-primary/50 relative overflow-hidden rounded-3xl border border-gray-100 bg-white px-3 py-5 transition-all duration-300 hover:shadow-lg md:px-8 md:py-8 dark:border-slate-800 dark:bg-slate-900/50">
+    <Card className="group hover:border-primary/50 relative overflow-hidden rounded-3xl border bg-white px-3 py-5 transition-all duration-300 md:px-8 md:py-8 dark:border-slate-800 dark:bg-slate-900/50">
       <CardContent className="p-0">
         <div className="flex flex-row gap-2 sm:items-center sm:gap-6">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-gray-50 p-0 sm:h-20 sm:w-20 dark:bg-slate-800">

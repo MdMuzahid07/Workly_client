@@ -83,7 +83,7 @@ const CandidateDetailsView = () => {
         <Image
           src={
             profile.coverUrl ||
-            "https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
+            "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           }
           alt="Cover"
           fill
@@ -97,7 +97,7 @@ const CandidateDetailsView = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             {/* Premium Header Card */}
-            <Card className="border-primary/10 bg-background/60 overflow-hidden border backdrop-blur-xl">
+            <Card className="bg-background/60 overflow-hidden border backdrop-blur-xl">
               <CardHeader className="p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
@@ -196,7 +196,7 @@ const CandidateDetailsView = () => {
             </Card>
 
             {/* About / Bio */}
-            <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+            <Card className="bg-background/50 border backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="text-primary h-5 w-5" />
@@ -212,7 +212,7 @@ const CandidateDetailsView = () => {
 
             {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
-              <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+              <Card className="bg-background/50 border backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Shield className="text-primary h-5 w-5" />
@@ -319,7 +319,7 @@ const CandidateDetailsView = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+            <Card className="bg-background/50 border backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-base tracking-wider uppercase">
                   Candidate Info
@@ -353,7 +353,7 @@ const CandidateDetailsView = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+            <Card className="bg-background/50 border backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-base tracking-wider uppercase">
                   Links
@@ -387,7 +387,7 @@ const CandidateDetailsView = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-primary/10 bg-card overflow-hidden shadow-lg">
+            <Card className="bg-card overflow-hidden border">
               <div className="space-y-4 p-6 text-center">
                 <Award className="text-primary mx-auto h-12 w-12 opacity-20" />
                 <h3 className="text-lg font-bold">Workly Verified</h3>

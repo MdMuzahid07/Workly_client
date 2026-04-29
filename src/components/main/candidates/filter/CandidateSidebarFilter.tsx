@@ -167,7 +167,7 @@ const CandidateSidebarFilter = ({
 
   return (
     <div className={className}>
-      <Card className="h-fit rounded-3xl border-gray-100 dark:border-slate-800">
+      <Card className="bg-background h-fit rounded-3xl">
         <CardHeader className="py-5 xl:px-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-foreground text-base font-bold tracking-tight uppercase">
@@ -193,7 +193,7 @@ const CandidateSidebarFilter = ({
               value={filters.industry}
               onValueChange={(val) => updateFilters({ industry: val })}
             >
-              <SelectTrigger className="w-full rounded-xl border-gray-100 bg-gray-50/50 dark:border-slate-800 dark:bg-slate-900/50">
+              <SelectTrigger className="w-full rounded-full border-gray-100 bg-gray-50/50 dark:border-slate-800 dark:bg-slate-900/50">
                 <SelectValue placeholder="Select Industry" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
