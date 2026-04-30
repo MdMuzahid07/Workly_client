@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardJobViewHistoryHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobViewHistoryHeader";
@@ -12,17 +13,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockJobHistory } from "@/data/mockJobHistory";
+import { useGetJobViewHistoryQuery } from "@/redux/feature/jobView/jobViewApi";
 import { AnimatePresence } from "framer-motion";
-import { Briefcase, Search } from "lucide-react";
+import { Briefcase, Loader2, Search } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const JobViewHistoryView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("all");
 
+  const { data: response, isLoading } = useGetJobViewHistoryQuery(undefined);
+
+  console.log("[JobViewHistory] Response from server:", response);
+
   const jobTypes = ["all", "FULL_TIME", "PART_TIME", "CONTRACT", "INTERNSHIP"];
+
+  const filteredJobs = useMemo(() => {
+    if (!response?.data) return [];
+
+    return response.data.filter((item: any) => {
+      const job = item.job;
+      const matchesSearch =
+        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.company?.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType =
+        jobTypeFilter === "all" || job.jobType === jobTypeFilter;
+
+      return matchesSearch && matchesType;
+    });
+  }, [response, searchTerm, jobTypeFilter]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center pt-16">
+        <Loader2 className="text-primary h-10 w-10 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-16">
@@ -80,18 +108,33 @@ const JobViewHistoryView = () => {
         {/* Jobs Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
           <AnimatePresence mode="popLayout">
-            {mockJobHistory.length > 0 ? (
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              mockJobHistory.map((job, index) => (
-                <JobCard key={job.id} job={job} inDashboard={true} />
-              ))
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((item: any) => {
+                // Map backend logoUrl to frontend logo for JobCard
+                const jobWithMappedLogo = {
+                  ...item.job,
+                  company: {
+                    ...item.job.company,
+                    logo: item.job.company.logoUrl,
+                  },
+                };
+                return (
+                  <JobCard
+                    key={item.id}
+                    job={jobWithMappedLogo}
+                    inDashboard={true}
+                  />
+                );
+              })
             ) : (
               <div className="bg-card col-span-full flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
                 <div className="bg-muted/20 rounded-full p-6">
                   <Briefcase className="text-muted-foreground/20 h-10 w-10" />
                 </div>
                 <p className="text-muted-foreground text-sm font-bold italic">
-                  Your viewing history is currently empty.
+                  {searchTerm || jobTypeFilter !== "all"
+                    ? "No jobs match your search filters."
+                    : "Your viewing history is currently empty."}
                 </p>
                 <Link href="/dashboard/find-jobs">
                   <Button className="mt-2 rounded-full font-bold">

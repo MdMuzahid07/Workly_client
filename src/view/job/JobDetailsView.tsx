@@ -24,12 +24,34 @@ import JobDetailsSidebar from "../../components/main/jobs/jobDetails/JobDetailsS
 import getIconComponent from "../../helper/getIconComponent";
 import getTimeAgo from "../../helper/getTimeAgo";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
+import { useLogJobViewMutation } from "../../redux/feature/jobView/jobViewApi";
 import { useToggleSaveUnsaveJobMutation } from "../../redux/feature/profile/profileApi";
 import JobDetailsSkeleton from "../../skeleton/job/JobDetailsSkeleton";
+import { useEffect } from "react";
 
 const JobDetailsView = () => {
   const params = useParams();
   const jobId = params.id as string;
+
+  const [logJobView] = useLogJobViewMutation();
+
+  useEffect(() => {
+    const trackView = async () => {
+      if (jobId) {
+        try {
+          console.log(`[JobView] Tracking view for job: ${jobId}`);
+          await logJobView(jobId).unwrap();
+          console.log(`[JobView] Successfully tracked view for job: ${jobId}`);
+        } catch (err) {
+          console.error(
+            `[JobView] Failed to track view for job: ${jobId}`,
+            err,
+          );
+        }
+      }
+    };
+    trackView();
+  }, [jobId, logJobView]);
 
   const {
     data: response,
