@@ -1,19 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FollowedCompany } from "@/data/mockFollowedCompanies";
+import { useUnfollowCompanyMutation } from "@/redux/feature/follow/followApi";
 import { motion } from "framer-motion";
-import { Building2, ExternalLink, MapPin, Users2 } from "lucide-react";
+import { Building2, ExternalLink, Loader2, MapPin, Users2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface FollowedCompanyCardProps {
-  company: FollowedCompany;
+  company: any;
   index: number;
 }
 
 const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
+  const [unfollowCompany, { isLoading: isUnfollowing }] =
+    useUnfollowCompanyMutation();
+
+  const handleUnfollow = async () => {
+    try {
+      await unfollowCompany(company.id).unwrap();
+      toast.success(`Unfollowed ${company.name}`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to unfollow company");
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -48,9 +62,15 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
             <Button
               variant="outline"
               size="sm"
+              disabled={isUnfollowing}
+              onClick={handleUnfollow}
               className="text-destructive hover:bg-destructive hover:border-destructive/30 h-8 rounded-full border px-4 text-xs font-bold hover:text-white"
             >
-              Unfollow
+              {isUnfollowing ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                "Unfollow"
+              )}
             </Button>
           </div>
 
@@ -86,7 +106,7 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
               {company.openPositions} Active Jobs
             </div>
             <Link
-              href={`/companies/${company.id}`}
+              href={`/companies/${company.slug}`}
               className="text-primary flex items-center gap-1.5 text-xs font-black tracking-tight underline-offset-4 hover:underline"
             >
               View Profile

@@ -6,6 +6,7 @@ import {
   Globe,
   Instagram,
   Linkedin,
+  Loader2,
   Mail,
   Phone,
   Twitter,
@@ -13,14 +14,52 @@ import {
 import Image from "next/image";
 import { Button } from "../../../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
+import {
+  useFollowCompanyMutation,
+  useIsFollowingQuery,
+  useUnfollowCompanyMutation,
+} from "@/redux/feature/follow/followApi";
+import { toast } from "sonner";
 
 const CompanyDetailsSidebar = ({ company }: { company: any }) => {
+  const { data: followStatus, isLoading: isStatusLoading } =
+    useIsFollowingQuery(company.id);
+  const [followCompany, { isLoading: isFollowingMutation }] =
+    useFollowCompanyMutation();
+  const [unfollowCompany, { isLoading: isUnfollowingMutation }] =
+    useUnfollowCompanyMutation();
+
+  const isFollowing = followStatus?.data;
+
+  const handleToggleFollow = async () => {
+    try {
+      if (isFollowing) {
+        await unfollowCompany(company.id).unwrap();
+        toast.success(`Unfollowed ${company.name}`);
+      } else {
+        await followCompany(company.id).unwrap();
+        toast.success(`Following ${company.name}`);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Something went wrong");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-primary/5 border">
         <CardContent className="p-6">
-          <Button className="bg-primary hover:bg-primary mb-3 w-full text-white">
-            Follow Company
+          <Button
+            disabled={
+              isStatusLoading || isFollowingMutation || isUnfollowingMutation
+            }
+            onClick={handleToggleFollow}
+            className="bg-primary hover:bg-primary mb-3 w-full text-white"
+          >
+            {isFollowingMutation || isUnfollowingMutation ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {isFollowing ? "Unfollow Company" : "Follow Company"}
           </Button>
           <Button variant="outline" className="w-full bg-transparent">
             View All Jobs
