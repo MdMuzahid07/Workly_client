@@ -15,23 +15,24 @@ import {
   useGetProfileQuery,
   useGetSavedJobsQuery,
 } from "@/redux/feature/profile/profileApi";
+import { useGetProfileViewStatsQuery } from "@/redux/feature/profileView/profileViewApi";
 import { useAppSelector } from "@/redux/hooks";
 import { Bookmark, FileText, Search, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import DashboardJobSeekerHeader from "../../components/dashboard/dashboard-nav/header/DashboardJobSeekerHeader";
 
+interface ProfileCompletionData {
+  profile?: {
+    bio?: string | null;
+    location?: string | null;
+    avatarUrl?: string | null;
+    resumeUrl?: string | null;
+  };
+  fullName?: string;
+}
+
 function computeProfileCompletion(
-  data:
-    | {
-        profile?: {
-          bio?: string | null;
-          location?: string | null;
-          avatarUrl?: string | null;
-          resumeUrl?: string | null;
-        };
-        fullName?: string;
-      }
-    | undefined,
+  data: ProfileCompletionData | undefined,
 ): number {
   if (!data) return 0;
   const { profile } = data;
@@ -48,18 +49,24 @@ function computeProfileCompletion(
 
 export default function JobSeekerDashboardView() {
   const { user } = useAppSelector((state) => state.auth) || {};
+  const userId = user?.id;
+
   const { data: profileData } = useGetProfileQuery(undefined, {
-    skip: !user?.id,
+    skip: !userId,
   });
   const { data: applicationsData } = useGetMyApplicationsQuery(undefined, {
-    skip: !user?.id,
+    skip: !userId,
   });
   const { data: savedJobsData } = useGetSavedJobsQuery(undefined, {
-    skip: !user?.id,
+    skip: !userId,
+  });
+  const { data: profileViewStats } = useGetProfileViewStatsQuery(undefined, {
+    skip: !userId,
   });
 
   const profileCompletion = computeProfileCompletion(profileData?.data);
-  const applications = applicationsData?.data ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applications = (applicationsData?.data as any[]) || [];
   const savedCount = Array.isArray(savedJobsData?.data)
     ? savedJobsData.data.length
     : 0;
@@ -169,7 +176,7 @@ export default function JobSeekerDashboardView() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
-          <ProfileViewsChart />
+          <ProfileViewsChart data={profileViewStats?.data?.chartData || []} />
           <JobApplicationsChart />
         </div>
 

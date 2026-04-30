@@ -24,13 +24,23 @@ import {
   useGetCandidateByIdQuery,
   useToggleSaveCandidateMutation,
 } from "../../redux/feature/candidate/candidateApi";
+import { useLogProfileViewMutation } from "../../redux/feature/profileView/profileViewApi";
 import { useAppSelector } from "../../redux/hooks";
 import CandidateDetailsSkeleton from "../../skeleton/candidate/CandidateDetailsSkeleton";
+import { useEffect } from "react";
 
 const CandidateDetailsView = () => {
   const params = useParams();
   const candidateId = params.id as string;
   const { user: currentUser } = useAppSelector((state) => state.auth);
+
+  const [logProfileView] = useLogProfileViewMutation();
+
+  useEffect(() => {
+    if (candidateId && currentUser?.userId !== candidateId) {
+      logProfileView(candidateId);
+    }
+  }, [candidateId, currentUser, logProfileView]);
 
   const isEmployer =
     currentUser?.role === "EMPLOYER" ||

@@ -80,6 +80,7 @@ export const tagTypes = {
   candidates: "candidates",
   resume: "resume",
   follow: "follow",
+  profile_views: "profile_views",
 } as const;
 
 export type TagType = (typeof tagTypes)[keyof typeof tagTypes];

@@ -10,53 +10,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, Search, TrendingUp, Users } from "lucide-react";
+import {
+  useGetProfileViewStatsQuery,
+  useGetRecentVisitorsQuery,
+} from "@/redux/feature/profileView/profileViewApi";
+import { formatDistanceToNow } from "date-fns";
+import { Eye, Loader2, Search, TrendingUp, Users } from "lucide-react";
 import DashboardHeaderContainer from "../../components/dashboard/dashboard-nav/header/DashboardHeaderContainer";
 
-const mockVisitors = [
-  {
-    id: 1,
-    name: "Google",
-    industry: "Technology",
-    time: "2 hours ago",
-    location: "Mountain View, CA",
-    logo: "https://www.google.com/favicon.ico",
-  },
-  {
-    id: 2,
-    name: "Amazon",
-    industry: "E-commerce",
-    time: "5 hours ago",
-    location: "Seattle, WA",
-    logo: "https://www.amazon.com/favicon.ico",
-  },
-  {
-    id: 3,
-    name: "Meta",
-    industry: "Social Media",
-    time: "Yesterday",
-    location: "Menlo Park, CA",
-    logo: "https://www.meta.com/favicon.ico",
-  },
-  {
-    id: 4,
-    name: "Netflix",
-    industry: "Entertainment",
-    time: "2 days ago",
-    location: "Los Gatos, CA",
-    logo: "https://www.netflix.com/favicon.ico",
-  },
-  {
-    id: 5,
-    name: "Microsoft",
-    industry: "Software",
-    time: "3 days ago",
-    location: "Redmond, WA",
-    logo: "https://www.microsoft.com/favicon.ico",
-  },
-];
-
 export default function ProfileViewsView() {
+  const { data: statsResponse, isLoading: isStatsLoading } =
+    useGetProfileViewStatsQuery(undefined);
+  const { data: visitorsResponse, isLoading: isVisitorsLoading } =
+    useGetRecentVisitorsQuery(undefined);
+
+  if (isStatsLoading || isVisitorsLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center pt-16">
+        <Loader2 className="text-primary h-10 w-10 animate-spin" />
+      </div>
+    );
+  }
+
+  const stats = statsResponse?.data || {};
+  const visitors = visitorsResponse?.data || [];
+
+  // Calculate percentage change
+  const viewsThisMonth = stats.totalViews; // This is a bit simplified, but okay for now
+  const viewsLastMonth = stats.viewsLastMonth || 0;
+  const percentageChange =
+    viewsLastMonth > 0
+      ? ((viewsThisMonth - viewsLastMonth) / viewsLastMonth) * 100
+      : 0;
+
   return (
     <div className="mt-16 min-h-screen">
       <DashboardHeaderContainer>
@@ -84,11 +70,20 @@ export default function ProfileViewsView() {
               <Eye className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-primary text-2xl font-bold">1,284</div>
+              <div className="text-primary text-2xl font-bold">
+                {stats.totalViews?.toLocaleString()}
+              </div>
               <p className="text-muted-foreground flex items-center gap-1 text-xs">
-                <TrendingUp className="h-3 w-3 text-green-500" />
-                <span className="font-medium text-green-500">+12.5%</span> from
-                last month
+                <TrendingUp
+                  className={`h-3 w-3 ${percentageChange >= 0 ? "text-green-500" : "text-red-500"}`}
+                />
+                <span
+                  className={`font-medium ${percentageChange >= 0 ? "text-green-500" : "text-red-500"}`}
+                >
+                  {percentageChange >= 0 ? "+" : ""}
+                  {percentageChange.toFixed(1)}%
+                </span>{" "}
+                from last month
               </p>
             </CardContent>
           </Card>
@@ -100,9 +95,11 @@ export default function ProfileViewsView() {
               <Users className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-primary text-2xl font-bold">42</div>
+              <div className="text-primary text-2xl font-bold">
+                {stats.uniqueCompaniesCount}
+              </div>
               <p className="text-muted-foreground text-xs">
-                +4 new companies this week
+                Viewers from different companies
               </p>
             </CardContent>
           </Card>
@@ -114,17 +111,15 @@ export default function ProfileViewsView() {
               <Search className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-primary text-2xl font-bold">856</div>
-              <p className="text-muted-foreground text-xs">
-                +18% increase in visibility
-              </p>
+              <div className="text-primary text-2xl font-bold">0</div>
+              <p className="text-muted-foreground text-xs">Coming soon...</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Chart Section */}
         <div className="grid grid-cols-1 gap-6">
-          <ProfileViewsChart />
+          <ProfileViewsChart data={stats.chartData} />
         </div>
 
         {/* Visitors List */}
@@ -137,35 +132,65 @@ export default function ProfileViewsView() {
           </CardHeader>
           <CardContent>
             <div className="divide-border divide-y">
-              {mockVisitors.map((visitor) => (
-                <div
-                  key={visitor.id}
-                  className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-10 w-10 rounded-lg border">
-                      <AvatarImage src={visitor.logo} alt={visitor.name} />
-                      <AvatarFallback className="rounded-lg">
-                        {visitor.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h4 className="text-sm font-semibold">{visitor.name}</h4>
-                      <p className="text-muted-foreground text-xs">
-                        {visitor.industry} • {visitor.location}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] font-normal"
+              {visitors.length > 0 ? (
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                visitors.map((view: any) => {
+                  const viewer = view.viewer;
+                  const company = viewer?.company;
+                  const profile = viewer?.profile;
+
+                  return (
+                    <div
+                      key={view.id}
+                      className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
                     >
-                      {visitor.time}
-                    </Badge>
-                  </div>
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-10 w-10 rounded-lg border">
+                          <AvatarImage
+                            src={company?.logoUrl || profile?.avatarUrl}
+                            alt={company?.name || viewer?.fullName}
+                          />
+                          <AvatarFallback className="rounded-lg">
+                            {(
+                              company?.name ||
+                              viewer?.fullName ||
+                              "??"
+                            ).substring(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="text-sm font-semibold">
+                            {company?.name ||
+                              viewer?.fullName ||
+                              "Anonymous User"}
+                          </h4>
+                          <p className="text-muted-foreground text-xs">
+                            {company
+                              ? `${company.industry?.name || "Industry"} • ${company.location}`
+                              : profile?.headline || "Workly User"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] font-normal"
+                        >
+                          {formatDistanceToNow(new Date(view.viewedAt), {
+                            addSuffix: true,
+                          })}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-10 text-center">
+                  <p className="text-muted-foreground italic">
+                    No profile visitors yet.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
