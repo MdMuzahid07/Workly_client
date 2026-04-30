@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { AdditionalInfo } from "@/components/main/profile/AdditionalInfo";
 import EducationList from "@/components/main/profile/EducationList";
@@ -9,17 +10,22 @@ import { SkillsManager } from "@/components/main/profile/SkillsManager";
 import { VolunteerSection } from "@/components/main/profile/VolunteerSection";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "@/redux/feature/profile/profileApi";
 import {
   Briefcase,
   CheckCircle2,
   GraduationCap,
   Info,
   LayoutGrid,
+  Loader2,
   User,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
 
@@ -35,16 +41,13 @@ import {
 } from "@/components/ui/dialog";
 import { AddressForm } from "../../components/dashboard/profile-tabs/forms/AddressForm";
 import { AwardForm } from "../../components/dashboard/profile-tabs/forms/AwardForm";
-import { CertificationForm } from "../../components/dashboard/profile-tabs/forms/CertificationForm";
 import { JobPreferenceForm } from "../../components/dashboard/profile-tabs/forms/JobPreferenceForm";
 import { LanguageForm } from "../../components/dashboard/profile-tabs/forms/LanguageForm";
 import { PublicationForm } from "../../components/dashboard/profile-tabs/forms/PublicationForm";
 import { ReferenceForm } from "../../components/dashboard/profile-tabs/forms/ReferenceForm";
-import { ResumeForm } from "../../components/dashboard/profile-tabs/forms/ResumeForm";
-import { SocialLinksForm } from "../../components/dashboard/profile-tabs/forms/SocialLinksForm";
 import { SoftSkillsForm } from "../../components/dashboard/profile-tabs/forms/SoftSkillsForm";
-import { VideoResumeForm } from "../../components/dashboard/profile-tabs/forms/VideoResumeForm";
 import { VolunteerForm } from "../../components/dashboard/profile-tabs/forms/VolunteerForm";
+import { Button } from "../../components/ui/button";
 
 const ProfileView = () => {
   const [activeModal, setActiveModal] = useState<
@@ -66,17 +69,62 @@ const ProfileView = () => {
     | "jobPreference"
     | null
   >(null);
+
   const { data, isLoading } = useGetProfileQuery(undefined);
   const user = data?.data;
 
-  // Mock progress calculation
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+
+  // Local state to track all changes before global save
+  const [localProfile, setLocalProfile] = useState<any>(null);
+
+  // Initialize local state when data loads
+  useEffect(() => {
+    if (user && !localProfile) {
+      setLocalProfile({
+        ...user.profile,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+      });
+    }
+  }, [user, localProfile]);
+
+  const handleGlobalSave = async () => {
+    try {
+      await updateProfile(localProfile).unwrap();
+      toast.success("Profile updated successfully!");
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      toast.error("Failed to update profile. Please try again.");
+    }
+  };
+
+  const updateLocalSection = (section: string, data: any) => {
+    setLocalProfile((prev: any) => ({
+      ...prev,
+      [section]: data,
+    }));
+    setActiveModal(null);
+  };
+
   const calculateProgress = () => {
-    let progress = 20; // Base account creation
-    if (user?.profile?.avatarUrl) progress += 10;
-    if (user?.profile?.bio) progress += 10;
-    if (user?.profile?.location) progress += 10;
-    if (user?.profile?.skills?.length > 0) progress += 20;
-    if (user?.profile?.preference?.jobType) progress += 10;
+    let progress = 20; // Base: Account Created
+    if (localProfile?.avatarUrl) progress += 5;
+    if (localProfile?.bio) progress += 5;
+    if (localProfile?.location) progress += 5;
+    if (localProfile?.headline) progress += 5;
+    if (localProfile?.skills?.length > 0) progress += 10;
+    if (localProfile?.education?.length > 0) progress += 10;
+    if (localProfile?.workExperiences?.length > 0) progress += 10;
+    if (localProfile?.projects?.length > 0) progress += 5;
+    if (localProfile?.volunteers?.length > 0) progress += 5;
+    if (localProfile?.awards?.length > 0) progress += 5;
+    if (localProfile?.publications?.length > 0) progress += 5;
+    if (localProfile?.references?.length > 0) progress += 5;
+    if (localProfile?.languages?.length > 0) progress += 5;
+    if (localProfile?.address) progress += 5;
+    if (localProfile?.preference) progress += 5;
     return Math.min(progress, 100);
   };
 
@@ -85,16 +133,6 @@ const ProfileView = () => {
   if (isLoading && !data) {
     return <ProfileSkeleton />;
   }
-
-  const mockEducation = [
-    {
-      level: "Bachelor",
-      degree: "Bachelor of Science (BSc)",
-      institute: "National University",
-      year: "2026",
-      result: "GPA 4",
-    },
-  ];
 
   return (
     <div className="bg-background mt-16 min-h-screen pt-8 pb-20">
@@ -126,8 +164,24 @@ const ProfileView = () => {
                 {user?.profile?.headline || "MERN Stack Developer"}
               </p>
             </div>
-            <div className="text-primary ml-auto text-right text-xl font-bold">
-              {progress}%
+            <div className="ml-auto flex items-center gap-3">
+              <Button
+                onClick={handleGlobalSave}
+                disabled={isUpdating}
+                className="rounded-full px-8 font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              >
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+              <div className="text-primary text-right text-xl font-bold">
+                {progress}%
+              </div>
             </div>
           </div>
 
@@ -195,20 +249,24 @@ const ProfileView = () => {
                   <div className="text-muted-foreground mb-1 text-xs tracking-wider uppercase">
                     Full Name
                   </div>
-                  <div className="font-medium">{user?.fullName}</div>
+                  <div className="font-medium">
+                    {localProfile?.fullName || user?.fullName}
+                  </div>
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1 text-xs tracking-wider uppercase">
                     Email
                   </div>
-                  <div className="font-medium">{user?.email}</div>
+                  <div className="font-medium">
+                    {localProfile?.email || user?.email}
+                  </div>
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1 text-xs tracking-wider uppercase">
                     Phone
                   </div>
                   <div className="font-medium">
-                    {user?.phone || "Not provided"}
+                    {localProfile?.phone || "Not provided"}
                   </div>
                 </div>
                 <div>
@@ -216,7 +274,7 @@ const ProfileView = () => {
                     Location
                   </div>
                   <div className="font-medium">
-                    {user?.profile?.location || "Not provided"}
+                    {localProfile?.location || "Not provided"}
                   </div>
                 </div>
                 <div className="md:col-span-2">
@@ -224,7 +282,7 @@ const ProfileView = () => {
                     Career Objective
                   </div>
                   <div className="text-muted-foreground text-sm leading-relaxed font-medium">
-                    {user?.profile?.bio || "No summary added."}
+                    {localProfile?.bio || "No summary added."}
                   </div>
                 </div>
               </div>
@@ -233,24 +291,44 @@ const ProfileView = () => {
             {/* Portfolio Section */}
             <PortfolioSection
               socialLinks={{
-                linkedin: "linkedin.com/in/oliver",
-                github: "github.com/oliver",
-                website: "oliver.dev",
+                linkedin: localProfile?.linkedInUrl || "",
+                github: localProfile?.githubUrl || "",
+                website: localProfile?.websiteUrl || "",
               }}
-              onAddResume={() => setActiveModal("resume")}
-              onAddVideoResume={() => setActiveModal("video")}
               onEditSocials={() => setActiveModal("social")}
             />
 
-            {/* Address */}
+            {/* Address Details */}
             <SectionCard
               title="Address Details"
-              noData
-              onAdd={() => setActiveModal("address")}
+              isCompleted={!!localProfile?.address}
+              completionPercentage={5}
+              onEdit={() => setActiveModal("address")}
             >
-              <div className="text-muted-foreground py-4 text-center text-sm">
-                Add permanent and present address.
-              </div>
+              {localProfile?.address ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-muted-foreground text-xs uppercase">
+                      Street
+                    </div>
+                    <div className="font-medium">
+                      {localProfile.address.street}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground text-xs uppercase">
+                      City
+                    </div>
+                    <div className="font-medium">
+                      {localProfile.address.city}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-muted-foreground text-sm italic">
+                  Add permanent and present address.
+                </div>
+              )}
             </SectionCard>
           </TabsContent>
 
@@ -260,32 +338,15 @@ const ProfileView = () => {
             className="animate-in fade-in-50 space-y-8 duration-300"
           >
             <ExperienceList
-              experience={[
-                {
-                  designation: "Senior Frontend Developer",
-                  company: "Tech Corp",
-                  startDate: "Jan 2024",
-                  currentlyWorking: true,
-                  employmentType: "Full-time",
-                  description:
-                    "Led the migration to Next.js 14, improving performance by 40%.",
-                },
-              ]}
+              experience={localProfile?.workExperiences || []}
               onAdd={() => setActiveModal("experience")}
             />
             <ProjectList
-              projects={[
-                {
-                  title: "E-Commerce Platform Redesign",
-                  description:
-                    "Complete overhaul of a high-traffic retail site using React and Node.js.",
-                  technologies: ["React", "Redux", "Node.js"],
-                },
-              ]}
+              projects={localProfile?.projects || []}
               onAdd={() => setActiveModal("project")}
             />
             <VolunteerSection
-              volunteer={[]}
+              volunteer={localProfile?.volunteers || []}
               onAdd={() => setActiveModal("volunteer")}
             />
           </TabsContent>
@@ -296,11 +357,14 @@ const ProfileView = () => {
             className="animate-in fade-in-50 space-y-8 duration-300"
           >
             <EducationList
-              education={mockEducation}
+              education={localProfile?.education || []}
               onAdd={() => setActiveModal("education")}
               onAddCertificate={() => setActiveModal("certification")}
             />
             <AdditionalInfo
+              awards={localProfile?.awards || []}
+              publications={localProfile?.publications || []}
+              references={localProfile?.references || []}
               onAddAward={() => setActiveModal("award")}
               onAddPublication={() => setActiveModal("publication")}
               onAddReference={() => setActiveModal("reference")}
@@ -313,18 +377,18 @@ const ProfileView = () => {
             className="animate-in fade-in-50 space-y-8 duration-300"
           >
             <SkillsManager
-              skills={user?.profile?.skills}
+              skills={localProfile?.skills || []}
               onAddSoftSkill={() => setActiveModal("softSkill")}
               onAddLanguage={() => setActiveModal("language")}
             />
 
             <SectionCard
               title="Job Preferences"
-              isCompleted={!!user?.profile?.preference}
+              isCompleted={!!localProfile?.preference}
               completionPercentage={10}
               onEdit={() => setActiveModal("jobPreference")}
             >
-              <JobPreference preferences={user?.profile?.preference} />
+              <JobPreference preferences={localProfile?.preference} />
             </SectionCard>
           </TabsContent>
         </Tabs>
@@ -341,8 +405,6 @@ const ProfileView = () => {
               {activeModal === "education" && "Add Education"}
               {activeModal === "experience" && "Add Experience"}
               {activeModal === "project" && "Add Project"}
-              {activeModal === "resume" && "Upload Resume"}
-              {activeModal === "video" && "Add Video Resume"}
               {activeModal === "certification" && "Add Certification"}
               {activeModal === "social" && "Edit Online Presence"}
               {activeModal === "address" && "Edit Address Details"}
@@ -350,6 +412,9 @@ const ProfileView = () => {
               {activeModal === "award" && "Add Honor / Award"}
               {activeModal === "publication" && "Add Publication"}
               {activeModal === "reference" && "Add Reference"}
+              {activeModal === "softSkill" && "Add Soft Skill"}
+              {activeModal === "language" && "Add Language"}
+              {activeModal === "jobPreference" && "Edit Job Preferences"}
             </DialogTitle>
           </DialogHeader>
 
@@ -357,15 +422,15 @@ const ProfileView = () => {
             {activeModal === "basic" && (
               <BasicInfoForm
                 defaultValues={{
-                  fullName: user?.fullName || "",
-                  email: user?.email || "",
-                  phone: user?.phone || "",
-                  location: user?.profile?.location || "",
-                  bio: user?.profile?.bio || "",
-                  headline: user?.profile?.headline || "",
+                  fullName: localProfile?.fullName || user?.fullName || "",
+                  email: localProfile?.email || user?.email || "",
+                  phone: localProfile?.phone || user?.phone || "",
+                  location: localProfile?.location || "",
+                  bio: localProfile?.bio || "",
+                  headline: localProfile?.headline || "",
                 }}
-                onSubmit={(data) => {
-                  console.log(data);
+                onSubmit={async (data) => {
+                  setLocalProfile((prev: any) => ({ ...prev, ...data }));
                   setActiveModal(null);
                 }}
                 onCancel={() => setActiveModal(null)}
@@ -373,113 +438,30 @@ const ProfileView = () => {
             )}
             {activeModal === "education" && (
               <EducationForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
+                onSubmit={async (data) => {
+                  const newEdu = [...(localProfile?.education || []), data];
+                  updateLocalSection("education", newEdu);
                 }}
                 onCancel={() => setActiveModal(null)}
               />
             )}
             {activeModal === "experience" && (
               <ExperienceForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
+                onSubmit={async (data) => {
+                  const newExp = [
+                    ...(localProfile?.workExperiences || []),
+                    data,
+                  ];
+                  updateLocalSection("workExperiences", newExp);
                 }}
                 onCancel={() => setActiveModal(null)}
               />
             )}
             {activeModal === "project" && (
               <ProjectForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "resume" && (
-              <ResumeForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "video" && (
-              <VideoResumeForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "certification" && (
-              <CertificationForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "social" && (
-              <SocialLinksForm
-                defaultValues={{
-                  linkedin: "linkedin.com/in/mr_oliver",
-                  github: "github.com/oliver",
-                  website: "Oliver",
-                }}
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "address" && (
-              <AddressForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "volunteer" && (
-              <VolunteerForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "award" && (
-              <AwardForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "publication" && (
-              <PublicationForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
-                }}
-                onCancel={() => setActiveModal(null)}
-              />
-            )}
-            {activeModal === "reference" && (
-              <ReferenceForm
-                onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
+                onSubmit={async (data) => {
+                  const newProj = [...(localProfile?.projects || []), data];
+                  updateLocalSection("projects", newProj);
                 }}
                 onCancel={() => setActiveModal(null)}
               />
@@ -487,8 +469,11 @@ const ProfileView = () => {
             {activeModal === "softSkill" && (
               <SoftSkillsForm
                 onSubmit={(data) => {
-                  console.log(data);
-                  setActiveModal(null);
+                  const newSkills = [
+                    ...(localProfile?.skills || []),
+                    { ...data, type: "SOFT" },
+                  ];
+                  updateLocalSection("skills", newSkills);
                 }}
                 onCancel={() => setActiveModal(null)}
               />
@@ -496,17 +481,66 @@ const ProfileView = () => {
             {activeModal === "language" && (
               <LanguageForm
                 onSubmit={(data) => {
-                  console.log(data);
+                  const newLangs = [...(localProfile?.languages || []), data];
+                  updateLocalSection("languages", newLangs);
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "address" && (
+              <AddressForm
+                defaultValues={localProfile?.address || {}}
+                onSubmit={async (data) => {
+                  setLocalProfile((prev: any) => ({ ...prev, address: data }));
                   setActiveModal(null);
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "volunteer" && (
+              <VolunteerForm
+                onSubmit={async (data) => {
+                  const newVol = [...(localProfile?.volunteers || []), data];
+                  updateLocalSection("volunteers", newVol);
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "award" && (
+              <AwardForm
+                onSubmit={async (data) => {
+                  const newAward = [...(localProfile?.awards || []), data];
+                  updateLocalSection("awards", newAward);
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "publication" && (
+              <PublicationForm
+                onSubmit={async (data) => {
+                  const newPub = [...(localProfile?.publications || []), data];
+                  updateLocalSection("publications", newPub);
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "reference" && (
+              <ReferenceForm
+                onSubmit={async (data) => {
+                  const newRef = [...(localProfile?.references || []), data];
+                  updateLocalSection("references", newRef);
                 }}
                 onCancel={() => setActiveModal(null)}
               />
             )}
             {activeModal === "jobPreference" && (
               <JobPreferenceForm
-                defaultValues={user?.profile?.preference || {}}
-                onSubmit={(data) => {
-                  console.log(data);
+                defaultValues={localProfile?.preference || {}}
+                onSubmit={async (data) => {
+                  setLocalProfile((prev: any) => ({
+                    ...prev,
+                    preference: data,
+                  }));
                   setActiveModal(null);
                 }}
                 onCancel={() => setActiveModal(null)}
