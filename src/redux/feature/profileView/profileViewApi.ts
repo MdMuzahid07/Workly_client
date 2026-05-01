@@ -10,9 +10,10 @@ export const profileViewApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.profile_views],
     }),
     getProfileViewStats: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: "/profile-view/stats",
         method: "GET",
+        params,
       }),
       providesTags: [tagTypes.profile_views],
     }),

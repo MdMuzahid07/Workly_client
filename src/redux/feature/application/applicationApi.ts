@@ -17,9 +17,20 @@ const applicationApi = baseApi.injectEndpoints({
       }),
       providesTags: ["applications"],
     }),
+    getApplicationStats: builder.query({
+      query: (params) => ({
+        url: "/application/stats",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["applications"],
+    }),
   }),
 });
 
-export const { useCreateApplicationMutation, useGetMyApplicationsQuery } =
-  applicationApi;
+export const {
+  useCreateApplicationMutation,
+  useGetMyApplicationsQuery,
+  useGetApplicationStatsQuery,
+} = applicationApi;
 export default applicationApi;

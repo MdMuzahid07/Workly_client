@@ -15,7 +15,6 @@ import {
   useGetProfileQuery,
   useGetSavedJobsQuery,
 } from "@/redux/feature/profile/profileApi";
-import { useGetProfileViewStatsQuery } from "@/redux/feature/profileView/profileViewApi";
 import { useAppSelector } from "@/redux/hooks";
 import { Bookmark, FileText, Search, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
@@ -58,9 +57,6 @@ export default function JobSeekerDashboardView() {
     skip: !userId,
   });
   const { data: savedJobsData } = useGetSavedJobsQuery(undefined, {
-    skip: !userId,
-  });
-  const { data: profileViewStats } = useGetProfileViewStatsQuery(undefined, {
     skip: !userId,
   });
 
@@ -176,7 +172,7 @@ export default function JobSeekerDashboardView() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
-          <ProfileViewsChart data={profileViewStats?.data?.chartData || []} />
+          <ProfileViewsChart />
           <JobApplicationsChart />
         </div>
 
