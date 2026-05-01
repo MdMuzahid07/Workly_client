@@ -306,21 +306,42 @@ const ProfileView = () => {
               onEdit={() => setActiveModal("address")}
             >
               {localProfile?.address ? (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <div className="text-muted-foreground text-xs uppercase">
-                      Street
+                    <div className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                      Street Address
                     </div>
-                    <div className="font-medium">
-                      {localProfile.address.street}
+                    <div className="text-foreground text-sm font-medium">
+                      {localProfile.address.street || "N/A"}
                     </div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground text-xs uppercase">
+                    <div className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
                       City
                     </div>
-                    <div className="font-medium">
-                      {localProfile.address.city}
+                    <div className="text-foreground text-sm font-medium">
+                      {localProfile.address.city || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                      State / Province
+                    </div>
+                    <div className="text-foreground text-sm font-medium">
+                      {localProfile.address.state || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                      Zip / Country
+                    </div>
+                    <div className="text-foreground text-sm font-medium">
+                      {localProfile.address.zipCode &&
+                      localProfile.address.country
+                        ? `${localProfile.address.zipCode}, ${localProfile.address.country}`
+                        : localProfile.address.zipCode ||
+                          localProfile.address.country ||
+                          "N/A"}
                     </div>
                   </div>
                 </div>
@@ -489,9 +510,22 @@ const ProfileView = () => {
             )}
             {activeModal === "address" && (
               <AddressForm
-                defaultValues={localProfile?.address || {}}
+                defaultValues={
+                  localProfile?.address?.presentAddress
+                    ? localProfile.address
+                    : { presentAddress: localProfile?.address }
+                }
                 onSubmit={async (data) => {
-                  setLocalProfile((prev: any) => ({ ...prev, address: data }));
+                  const flattenedAddress = {
+                    ...data.presentAddress,
+                  };
+                  setLocalProfile((prev: any) => ({
+                    ...prev,
+                    address: flattenedAddress,
+                  }));
+                  toast.success(
+                    "Address updated locally. Click 'Save Changes' to persist.",
+                  );
                   setActiveModal(null);
                 }}
                 onCancel={() => setActiveModal(null)}
