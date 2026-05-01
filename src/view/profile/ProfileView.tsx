@@ -381,6 +381,7 @@ const ProfileView = () => {
           >
             <EducationList
               education={localProfile?.education || []}
+              certifications={localProfile?.certifications || []}
               onAdd={() => setActiveModal("education")}
               onAddCertificate={() => setActiveModal("certification")}
             />
