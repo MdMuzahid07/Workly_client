@@ -33,11 +33,13 @@ import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicIn
 import { EducationForm } from "@/components/dashboard/profile-tabs/forms/EducationForm";
 import { ExperienceForm } from "@/components/dashboard/profile-tabs/forms/ExperienceForm";
 import { ProjectForm } from "@/components/dashboard/profile-tabs/forms/ProjectForm";
+import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { AddressForm } from "../../components/dashboard/profile-tabs/forms/AddressForm";
 import { AwardForm } from "../../components/dashboard/profile-tabs/forms/AwardForm";
@@ -437,6 +439,9 @@ const ProfileView = () => {
               {activeModal === "language" && "Add Language"}
               {activeModal === "jobPreference" && "Edit Job Preferences"}
             </DialogTitle>
+            <DialogDescription className="hidden">
+              Form to manage your profile details.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
@@ -483,6 +488,18 @@ const ProfileView = () => {
                 onSubmit={async (data) => {
                   const newProj = [...(localProfile?.projects || []), data];
                   updateLocalSection("projects", newProj);
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "certification" && (
+              <CertificationForm
+                onSubmit={async (data) => {
+                  const newCert = [
+                    ...(localProfile?.certifications || []),
+                    data,
+                  ];
+                  updateLocalSection("certifications", newCert);
                 }}
                 onCancel={() => setActiveModal(null)}
               />
