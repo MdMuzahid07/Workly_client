@@ -24,22 +24,24 @@ import {
   User,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
 
 import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicInfoForm";
+import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
 import { EducationForm } from "@/components/dashboard/profile-tabs/forms/EducationForm";
 import { ExperienceForm } from "@/components/dashboard/profile-tabs/forms/ExperienceForm";
 import { ProjectForm } from "@/components/dashboard/profile-tabs/forms/ProjectForm";
-import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
+import { SocialLinksForm } from "@/components/dashboard/profile-tabs/forms/SocialLinksForm";
+import { VideoResumeForm } from "@/components/dashboard/profile-tabs/forms/VideoResumeForm";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { AddressForm } from "../../components/dashboard/profile-tabs/forms/AddressForm";
 import { AwardForm } from "../../components/dashboard/profile-tabs/forms/AwardForm";
@@ -51,14 +53,35 @@ import { SoftSkillsForm } from "../../components/dashboard/profile-tabs/forms/So
 import { VolunteerForm } from "../../components/dashboard/profile-tabs/forms/VolunteerForm";
 import { Button } from "../../components/ui/button";
 
+const createLocalProfile = (userData: any) => ({
+  ...userData.profile,
+  fullName: userData.fullName,
+  email: userData.email,
+  phone: userData.phone,
+});
+
+const stableStringify = (value: any): string => {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .filter((key) => value[key] !== undefined)
+      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
+      .join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+};
+
 const ProfileView = () => {
   const [activeModal, setActiveModal] = useState<
     | "basic"
     | "education"
     | "experience"
     | "project"
-    | "resume"
-    | "video"
     | "certification"
     | "social"
     | "address"
@@ -69,6 +92,7 @@ const ProfileView = () => {
     | "softSkill"
     | "language"
     | "jobPreference"
+    | "video"
     | null
   >(null);
 
@@ -79,22 +103,29 @@ const ProfileView = () => {
 
   // Local state to track all changes before global save
   const [localProfile, setLocalProfile] = useState<any>(null);
+  const [savedProfile, setSavedProfile] = useState<any>(null);
 
   // Initialize local state when data loads
   useEffect(() => {
     if (user && !localProfile) {
-      setLocalProfile({
-        ...user.profile,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-      });
+      const initialProfile = createLocalProfile(user);
+      setLocalProfile(initialProfile);
+      setSavedProfile(initialProfile);
     }
   }, [user, localProfile]);
 
+  const hasUnsavedChanges = useMemo(() => {
+    if (!localProfile || !savedProfile) return false;
+
+    return stableStringify(localProfile) !== stableStringify(savedProfile);
+  }, [localProfile, savedProfile]);
+
   const handleGlobalSave = async () => {
+    if (!hasUnsavedChanges || !localProfile) return;
+
     try {
       await updateProfile(localProfile).unwrap();
+      setSavedProfile(localProfile);
       toast.success("Profile updated successfully!");
     } catch (err) {
       console.error("Failed to save profile:", err);
@@ -108,6 +139,54 @@ const ProfileView = () => {
       [section]: data,
     }));
     setActiveModal(null);
+  };
+
+  const handleAddTechnicalSkill = (skillData: {
+    skillName: string;
+    experienceYears: number;
+    type: "HARD";
+  }) => {
+    setLocalProfile((prev: any) => {
+      const prevSkills = prev?.skills || [];
+      const exists = prevSkills.some(
+        (skill: any) =>
+          (skill?.skillName || skill?.skill || "").toLowerCase() ===
+            skillData.skillName.toLowerCase() && skill?.type !== "SOFT",
+      );
+
+      if (exists) return prev;
+
+      return {
+        ...prev,
+        skills: [...prevSkills, skillData],
+      };
+    });
+  };
+
+  const handleRemoveSkill = (idOrIndex: string | number) => {
+    setLocalProfile((prev: any) => {
+      const prevSkills = prev?.skills || [];
+      const nextSkills =
+        typeof idOrIndex === "string"
+          ? prevSkills.filter((skill: any) => skill.id !== idOrIndex)
+          : prevSkills.filter((_: any, index: number) => index !== idOrIndex);
+
+      return { ...prev, skills: nextSkills };
+    });
+  };
+
+  const handleRemoveLanguage = (idOrIndex: string | number) => {
+    setLocalProfile((prev: any) => {
+      const prevLanguages = prev?.languages || [];
+      const nextLanguages =
+        typeof idOrIndex === "string"
+          ? prevLanguages.filter((lang: any) => lang.id !== idOrIndex)
+          : prevLanguages.filter(
+              (_: any, index: number) => index !== idOrIndex,
+            );
+
+      return { ...prev, languages: nextLanguages };
+    });
   };
 
   const calculateProgress = () => {
@@ -169,8 +248,8 @@ const ProfileView = () => {
             <div className="ml-auto flex items-center gap-3">
               <Button
                 onClick={handleGlobalSave}
-                disabled={isUpdating}
-                className="rounded-full px-8 font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+                disabled={!hasUnsavedChanges || isUpdating}
+                className="rounded-full px-8 font-bold shadow-lg transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
                 {isUpdating ? (
                   <>
@@ -292,11 +371,13 @@ const ProfileView = () => {
 
             {/* Portfolio Section */}
             <PortfolioSection
+              videoResumeUrl={localProfile?.resumeUrl || ""}
               socialLinks={{
                 linkedin: localProfile?.linkedInUrl || "",
                 github: localProfile?.githubUrl || "",
                 website: localProfile?.websiteUrl || "",
               }}
+              onAddVideoResume={() => setActiveModal("video")}
               onEditSocials={() => setActiveModal("social")}
             />
 
@@ -402,8 +483,12 @@ const ProfileView = () => {
           >
             <SkillsManager
               skills={localProfile?.skills || []}
+              languages={localProfile?.languages || []}
               onAddSoftSkill={() => setActiveModal("softSkill")}
               onAddLanguage={() => setActiveModal("language")}
+              onAddTechnicalSkill={handleAddTechnicalSkill}
+              onRemoveSkill={handleRemoveSkill}
+              onRemoveLanguage={handleRemoveLanguage}
             />
 
             <SectionCard
@@ -431,6 +516,7 @@ const ProfileView = () => {
               {activeModal === "project" && "Add Project"}
               {activeModal === "certification" && "Add Certification"}
               {activeModal === "social" && "Edit Online Presence"}
+              {activeModal === "video" && "Add Video Resume"}
               {activeModal === "address" && "Edit Address Details"}
               {activeModal === "volunteer" && "Add Volunteer Work"}
               {activeModal === "award" && "Add Honor / Award"}
@@ -505,12 +591,56 @@ const ProfileView = () => {
                 onCancel={() => setActiveModal(null)}
               />
             )}
+            {activeModal === "social" && (
+              <SocialLinksForm
+                defaultValues={{
+                  linkedin: localProfile?.linkedInUrl || "",
+                  github: localProfile?.githubUrl || "",
+                  website: localProfile?.websiteUrl || "",
+                }}
+                onSubmit={async (data) => {
+                  setLocalProfile((prev: any) => ({
+                    ...prev,
+                    linkedInUrl: data.linkedin,
+                    githubUrl: data.github,
+                    websiteUrl: data.website,
+                  }));
+                  setActiveModal(null);
+                  toast.success(
+                    "Online presence updated! Click 'Save Changes' to persist.",
+                  );
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "video" && (
+              <VideoResumeForm
+                defaultValues={{
+                  videoUrl: localProfile?.resumeUrl || "",
+                }}
+                onSubmit={async (data) => {
+                  setLocalProfile((prev: any) => ({
+                    ...prev,
+                    resumeUrl: data.videoUrl,
+                  }));
+                  setActiveModal(null);
+                  toast.success(
+                    "Video resume updated! Click 'Save Changes' to persist.",
+                  );
+                }}
+                onCancel={() => setActiveModal(null)}
+              />
+            )}
             {activeModal === "softSkill" && (
               <SoftSkillsForm
                 onSubmit={(data) => {
                   const newSkills = [
                     ...(localProfile?.skills || []),
-                    { ...data, type: "SOFT" },
+                    {
+                      skillName: data.skill,
+                      experienceYears: 0,
+                      type: "SOFT",
+                    },
                   ];
                   updateLocalSection("skills", newSkills);
                 }}
