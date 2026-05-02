@@ -3,6 +3,7 @@
 import DashboardAppliedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAppliedJobsHeader";
 import { ApplicationRow } from "@/components/main/jobs/myAppliedJobs/ApplicationRow";
 import { ApplicationStats } from "@/components/main/jobs/myAppliedJobs/ApplicationStats";
+import ErrorState from "@/components/main/jobs/myAppliedJobs/ErrorState";
 import PaginationBar from "@/components/shared/PaginationBar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,17 +24,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ApplicationStatus, mockApplications } from "@/data/mockApplications";
+import {
+  useGetMyApplicationsQuery,
+  useGetMyApplicationSummaryQuery,
+  useWithdrawApplicationMutation,
+} from "@/redux/feature/application/applicationApi";
+import { ApplicationStatus, MyAppliedJob } from "@/types/application";
 import debounce from "debounce";
 import { AnimatePresence } from "framer-motion";
 import { FilterX, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export type DateFilter = "all" | "today" | "last_7_days" | "this_month";
 
 const MyAppliedJobsView = () => {
-  // Query States
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
     "all",
@@ -46,9 +51,16 @@ const MyAppliedJobsView = () => {
 
   // UI State for search
   const [searchValue, setSearchValue] = useState("");
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+
+  const jobsLimit = parseInt(limit);
 
   const debouncedSearch = useMemo(
-    () => debounce((value: string) => setSearchTerm(value), 500),
+    () =>
+      debounce((value: string) => {
+        setSearchTerm(value);
+        setCurrentPage(1);
+      }, 500),
     [],
   );
 
@@ -57,24 +69,44 @@ const MyAppliedJobsView = () => {
     return () => debouncedSearch.clear();
   }, [searchValue, debouncedSearch]);
 
-  // Total results (Mocking backend total)
-  const totalResults = mockApplications.length;
-  const jobsLimit = parseInt(limit);
-  const totalPages = Math.ceil(totalResults / jobsLimit);
+  const queryParams = useMemo(
+    () => ({
+      page: currentPage,
+      limit: jobsLimit,
+      q: searchTerm || undefined,
+      status: statusFilter !== "all" ? statusFilter : undefined,
+      dateFilter: dateFilter !== "all" ? dateFilter : undefined,
+    }),
+    [currentPage, dateFilter, jobsLimit, searchTerm, statusFilter],
+  );
+
+  const {
+    data: applicationsResponse,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetMyApplicationsQuery(queryParams);
+  const { data: summaryResponse } = useGetMyApplicationSummaryQuery(undefined);
+  const [withdrawApplication] = useWithdrawApplicationMutation();
+
+  const applications = (applicationsResponse?.data || []) as MyAppliedJob[];
+  const meta = applicationsResponse?.meta || {
+    page: currentPage,
+    limit: jobsLimit,
+    total: 0,
+    pages: 0,
+  };
+  const totalResults = meta.total || 0;
+  const totalPages = meta.pages || Math.ceil(totalResults / jobsLimit);
 
   // Pagination Meta for shared component
   const paginationMeta = {
-    page: currentPage,
-    limit: jobsLimit,
+    page: meta.page || currentPage,
+    limit: meta.limit || jobsLimit,
     total: totalResults,
     pages: totalPages,
   };
-
-  // Handle current data based on pagination (visual mock only)
-  const currentJobs = useMemo(() => {
-    const start = (currentPage - 1) * jobsLimit;
-    return mockApplications.slice(start, start + jobsLimit);
-  }, [currentPage, jobsLimit]);
 
   const handleClearFilters = () => {
     setSearchValue("");
@@ -89,17 +121,62 @@ const MyAppliedJobsView = () => {
     setCurrentPage(1);
   };
 
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value as ApplicationStatus | "all");
+    setCurrentPage(1);
+  };
+
+  const handleDateFilterChange = (value: string) => {
+    setDateFilter(value as DateFilter);
+    setCurrentPage(1);
+  };
+
+  const handleWithdraw = async (applicationId: string) => {
+    const shouldWithdraw = window.confirm(
+      "Withdraw this application? You cannot undo this action.",
+    );
+
+    if (!shouldWithdraw) return;
+
+    setWithdrawingId(applicationId);
+    toast.loading("Withdrawing application...", { id: "withdraw-application" });
+
+    try {
+      await withdrawApplication(applicationId).unwrap();
+      toast.success("Application withdrawn", { id: "withdraw-application" });
+    } catch (error: unknown) {
+      const message =
+        typeof error === "object" &&
+        error !== null &&
+        "data" in error &&
+        typeof (error as { data?: { message?: string } }).data?.message ===
+          "string"
+          ? (error as { data: { message: string } }).data.message
+          : "Failed to withdraw application";
+
+      toast.error(message, { id: "withdraw-application" });
+    } finally {
+      setWithdrawingId(null);
+    }
+  };
+
   const stats = useMemo(() => {
+    const summary = summaryResponse?.data;
+
     return {
-      total: mockApplications.length,
-      pending: mockApplications.filter((app) => app.status === "pending")
-        .length,
-      interviewing: mockApplications.filter(
-        (app) => app.status === "interviewing",
-      ).length,
-      offer: mockApplications.filter((app) => app.status === "offer").length,
+      total: summary?.total || 0,
+      inReview: summary?.inReview || 0,
+      interviewing: summary?.interviewing || 0,
+      offer: summary?.offer || 0,
     };
-  }, []);
+  }, [summaryResponse]);
+
+  const hasActiveFilters =
+    searchValue !== "" || statusFilter !== "all" || dateFilter !== "all";
+
+  if (isError) {
+    return <ErrorState onRetry={refetch} />;
+  }
 
   return (
     <div className="min-h-screen pt-16">
@@ -122,10 +199,7 @@ const MyAppliedJobsView = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <Select
-                value={dateFilter}
-                onValueChange={(v) => setDateFilter(v as DateFilter)}
-              >
+              <Select value={dateFilter} onValueChange={handleDateFilterChange}>
                 <SelectTrigger className="h-10 w-40 cursor-pointer rounded-full font-semibold">
                   <SelectValue placeholder="All Time" />
                 </SelectTrigger>
@@ -154,12 +228,7 @@ const MyAppliedJobsView = () => {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={statusFilter}
-                onValueChange={(v) =>
-                  setStatusFilter(v as ApplicationStatus | "all")
-                }
-              >
+              <Select value={statusFilter} onValueChange={handleStatusChange}>
                 <SelectTrigger className="h-10 w-[170px] cursor-pointer rounded-full font-semibold">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
@@ -169,39 +238,51 @@ const MyAppliedJobsView = () => {
                   </SelectItem>
                   <SelectItem
                     className="cursor-pointer rounded-lg"
-                    value="pending"
+                    value="SUBMITTED"
                   >
-                    Pending
+                    Submitted
                   </SelectItem>
                   <SelectItem
                     className="cursor-pointer rounded-lg"
-                    value="under_review"
+                    value="REVIEWING"
                   >
-                    Under Review
+                    Reviewing
                   </SelectItem>
                   <SelectItem
                     className="cursor-pointer rounded-lg"
-                    value="interviewing"
+                    value="SHORTLISTED"
+                  >
+                    Shortlisted
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="INTERVIEWED"
                   >
                     Interviewing
                   </SelectItem>
                   <SelectItem
                     className="cursor-pointer rounded-lg"
-                    value="offer"
+                    value="OFFERED"
                   >
                     Offer Received
                   </SelectItem>
                   <SelectItem
                     className="cursor-pointer rounded-lg"
-                    value="accepted"
+                    value="ACCEPTED"
                   >
                     Accepted
                   </SelectItem>
                   <SelectItem
                     className="cursor-pointer rounded-lg"
-                    value="rejected"
+                    value="REJECTED"
                   >
                     Rejected
+                  </SelectItem>
+                  <SelectItem
+                    className="cursor-pointer rounded-lg"
+                    value="WITHDRAWN"
+                  >
+                    Withdrawn
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -211,6 +292,7 @@ const MyAppliedJobsView = () => {
                 size="sm"
                 onClick={handleClearFilters}
                 className="hover:bg-destructive/5 hover:text-destructive h-10 rounded-full px-4 font-bold transition-colors"
+                disabled={!hasActiveFilters}
               >
                 Clear Filters
               </Button>
@@ -294,9 +376,22 @@ const MyAppliedJobsView = () => {
                 </TableHeader>
                 <TableBody className="divide-border/30 divide-y">
                   <AnimatePresence mode="popLayout" initial={false}>
-                    {currentJobs.length > 0 ? (
-                      currentJobs.map((app) => (
-                        <ApplicationRow key={app.id} app={app} />
+                    {isLoading || isFetching ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="py-16 text-center">
+                          <span className="text-muted-foreground text-sm font-medium">
+                            Loading applications...
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ) : applications.length > 0 ? (
+                      applications.map((app) => (
+                        <ApplicationRow
+                          key={app.id}
+                          app={app}
+                          isWithdrawing={withdrawingId === app.id}
+                          onWithdraw={handleWithdraw}
+                        />
                       ))
                     ) : (
                       <TableRow>

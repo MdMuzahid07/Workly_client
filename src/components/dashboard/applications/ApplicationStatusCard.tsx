@@ -19,7 +19,7 @@ const ApplicationStatusCards = ({
       label: "Total Applications",
       value: totalApplications,
       icon: FileText,
-      subtext: "+12 from last month",
+      subtext: "All received applications",
     },
     {
       label: "New This Week",
@@ -37,7 +37,7 @@ const ApplicationStatusCards = ({
       label: "Rejected",
       value: rejected,
       icon: XCircle,
-      subtext: "This month",
+      subtext: "Rejected applications",
     },
   ];
 

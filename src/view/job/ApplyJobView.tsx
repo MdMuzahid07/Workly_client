@@ -3,6 +3,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign, MapPin } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import JobApplyForm from "../../components/main/jobs/applyJob/JobApplyForm";
 import JobInfoCard from "../../components/main/jobs/applyJob/JobInfoCard";
 import JobRequirementsSidebar from "../../components/main/jobs/applyJob/JobRequirementsSidebar";
 import JobSummaryCard from "../../components/main/jobs/applyJob/JobSummaryCard";
+import { Button } from "../../components/ui/button";
 import { useCreateApplicationMutation } from "../../redux/feature/application/applicationApi";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
@@ -69,7 +71,11 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     useUploadResumeMutation();
   const [createApplication, { isLoading: isCreatingApplication }] =
     useCreateApplicationMutation();
-  const { data: jobData, isLoading: isJobLoading } = useGetJobByIdQuery(jobId, {
+  const {
+    data: jobData,
+    isLoading: isJobLoading,
+    isError: isJobError,
+  } = useGetJobByIdQuery(jobId, {
     skip: !jobId,
   });
   const { data: profileResponse, isLoading: isProfileLoading } =
@@ -146,10 +152,6 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
         resumeFile: finalResumeUrl,
       };
 
-      // Remove the actual File object from payload as it's not needed by API
-      delete (payload as any).resumeFile;
-      (payload as any).resumeFile = finalResumeUrl; // Restore as string URL
-
       const response = await createApplication(payload).unwrap();
       if (response.success) {
         toast.success("Application submitted successfully!", {
@@ -159,9 +161,13 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
       }
     } catch (error: any) {
       console.error("Failed to submit application:", error);
-      toast.error(error?.data?.message || "Failed to submit application", {
-        id: "apply_job",
-      });
+      const message =
+        error?.data?.errorSources?.message ||
+        error?.data?.message ||
+        error?.message ||
+        "Failed to submit application";
+
+      toast.error(message, { id: "apply_job" });
     } finally {
       setIsSubmitting(false);
     }
@@ -191,6 +197,24 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
 
   if (isJobLoading || isProfileLoading) {
     return <JobApplyViewSkeleton />;
+  }
+
+  if (isJobError || !jobData?.data) {
+    return (
+      <div className="bg-background flex min-h-screen items-center justify-center px-4 py-20">
+        <div className="border-border bg-card max-w-md rounded-2xl border p-8 text-center shadow-sm">
+          <h1 className="text-foreground text-2xl font-bold">
+            Job unavailable
+          </h1>
+          <p className="text-muted-foreground mt-3 text-sm leading-6">
+            This job is no longer accepting applications or is not published.
+          </p>
+          <Button asChild className="mt-6 rounded-xl px-6 font-bold">
+            <Link href="/jobs">Browse active jobs</Link>
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
