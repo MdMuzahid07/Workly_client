@@ -56,6 +56,14 @@ const companyApi = baseApi.injectEndpoints({
       providesTags: ["company"],
     }),
 
+    getCompanyOverviewStatistics: builder.query({
+      query: () => ({
+        url: "/company/overview-statistics",
+        method: "GET",
+      }),
+      providesTags: ["company"],
+    }),
+
     updateCompanySettings: builder.mutation({
       query: ({ companyId, ...data }) => ({
         url: `/company/settings/${companyId}`,
@@ -74,6 +82,7 @@ export const {
   useUpdateCompanyMutation,
   useDeleteCompanyMutation,
   useGetMyCompanyQuery,
+  useGetCompanyOverviewStatisticsQuery,
   useUpdateCompanySettingsMutation,
   useUpdateCompanyByIdMutation,
 } = companyApi;

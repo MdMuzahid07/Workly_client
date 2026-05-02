@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useGetMyCompanyApplicationSummaryQuery } from "@/redux/feature/application/applicationApi";
+import {
+  useGetCompanyOverviewStatisticsQuery,
+  useGetMyCompanyQuery,
+} from "@/redux/feature/company/companyApi";
+import { useGetMyJobsQuery } from "@/redux/feature/job/jobApi";
+import { useAppSelector } from "@/redux/hooks";
+import { formatDistanceToNow } from "date-fns";
 import {
   Briefcase,
   Building2,
@@ -23,80 +30,130 @@ import {
 import Link from "next/link";
 import DashboardOverviewHeader from "../../components/dashboard/dashboard-nav/header/DashboardOverviewHeader";
 
-// Mock company data
-const companyData = {
-  name: "TechFlow Inc.",
-  logo: "https://mdmuzahid.vercel.app/assets/logo-DuOSblLl.png",
-  industry: "Technology",
-  location: "San Francisco, CA",
-  website: "techflow.com",
-  founded: "2018",
-  employees: 250,
-  description:
-    "Leading software development company specializing in web applications and cloud solutions.",
-  stats: {
-    totalJobs: 12,
-    activeJobs: 8,
-    totalApplications: 156,
-    totalEmployees: 250,
-  },
+interface EmployerJob {
+  id: string;
+  title: string;
+  status: string;
+  createdAt?: string | Date | null;
+  _count?: {
+    applications?: number;
+  };
+}
+
+interface CompanyOverview {
+  totalJobs: number;
+  activeJobs: number;
+  totalApplications: number;
+  pendingApplications: number;
+  totalEmployees: number;
+}
+
+interface CompanyHeaderData {
+  name: string;
+  industry: string;
+  location: string;
+}
+
+interface CompanyApplicationSummary {
+  total: number;
+  newThisWeek: number;
+  inReview: number;
+  rejected: number;
+  rejectedThisMonth: number;
+  byStatus: Record<string, number>;
+}
+
+const statusToBadgeVariant = (status: string) => {
+  if (status === "ACTIVE" || status === "OFFERED" || status === "ACCEPTED") {
+    return "default" as const;
+  }
+
+  if (status === "CLOSED" || status === "REJECTED" || status === "WITHDRAWN") {
+    return "secondary" as const;
+  }
+
+  return "outline" as const;
+};
+
+const humanizeStatus = (status: string) => {
+  return status
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 };
 
 const EmployerDashboardView = () => {
-  const recentJobs = [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      applications: 23,
-      status: "Active",
-      posted: "2 days ago",
-    },
-    {
-      id: 2,
-      title: "Backend Engineer",
-      applications: 18,
-      status: "Active",
-      posted: "1 week ago",
-    },
-    {
-      id: 3,
-      title: "Product Manager",
-      applications: 31,
-      status: "Closed",
-      posted: "2 weeks ago",
-    },
-  ];
+  const { user } = useAppSelector((state) => state.auth) || {};
+  const shouldFetch = Boolean(user?.id);
 
-  const recentEmployees = [
-    {
-      id: 1,
-      name: "John Doe",
-      role: "Senior Developer",
-      avatar: "/employee-1.jpg",
-      joined: "2023-01-15",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      role: "Product Manager",
-      avatar: "/employee-2.jpg",
-      joined: "2023-02-20",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      role: "Designer",
-      avatar: "/employee-3.jpg",
-      joined: "2023-03-10",
-    },
-  ];
+  const {
+    data: companyResult,
+    isLoading: companyLoading,
+    isError: companyError,
+  } = useGetMyCompanyQuery(undefined, {
+    skip: !shouldFetch,
+  });
+
+  const {
+    data: overviewResult,
+    isLoading: overviewLoading,
+    isError: overviewError,
+  } = useGetCompanyOverviewStatisticsQuery(undefined, {
+    skip: !shouldFetch,
+  });
+
+  const {
+    data: summaryResult,
+    isLoading: summaryLoading,
+    isError: summaryError,
+  } = useGetMyCompanyApplicationSummaryQuery(undefined, {
+    skip: !shouldFetch,
+  });
+
+  const {
+    data: jobsResult,
+    isLoading: jobsLoading,
+    isError: jobsError,
+  } = useGetMyJobsQuery({ page: 1, limit: 3 }, { skip: !shouldFetch });
+
+  const company = companyResult?.data;
+  const overview = overviewResult?.data as CompanyOverview | undefined;
+  const summary = summaryResult?.data as CompanyApplicationSummary | undefined;
+  const recentJobs = (
+    Array.isArray(jobsResult?.data) ? jobsResult.data : []
+  ) as EmployerJob[];
+
+  const isLoading =
+    companyLoading || overviewLoading || summaryLoading || jobsLoading;
+  const hasError = companyError || overviewError || summaryError || jobsError;
+
+  const stats = {
+    totalJobs: overview?.totalJobs ?? 0,
+    activeJobs: overview?.activeJobs ?? 0,
+    totalApplications: overview?.totalApplications ?? 0,
+    totalEmployees: overview?.totalEmployees ?? 0,
+    pendingApplications: overview?.pendingApplications ?? 0,
+  };
+
+  const headerData: CompanyHeaderData = {
+    name: company?.name ?? "Employer dashboard",
+    industry: company?.industry?.name ?? "Employer",
+    location: company?.location ?? "",
+  };
 
   return (
     <div className="min-h-screen pt-16">
-      <DashboardOverviewHeader companyData={companyData} />
+      <DashboardOverviewHeader companyData={headerData} />
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">
-        {/* Stats Cards */}
+        {hasError && (
+          <div className="border-destructive/20 bg-destructive/5 text-destructive rounded-xl border p-4 text-sm">
+            Unable to load dashboard data. Please refresh the page or contact
+            support.
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
           <Card className="bg-card border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -107,10 +164,12 @@ const EmployerDashboardView = () => {
             </CardHeader>
             <CardContent>
               <div className="text-primary text-2xl font-bold">
-                {companyData.stats.totalJobs}
+                {isLoading ? "—" : stats.totalJobs}
               </div>
               <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                +2 from last month
+                {isLoading
+                  ? "Loading stats..."
+                  : `${stats.totalJobs} jobs posted`}
               </p>
               <Link href="/employer/jobs">
                 <Button
@@ -132,10 +191,12 @@ const EmployerDashboardView = () => {
             </CardHeader>
             <CardContent>
               <div className="text-primary text-2xl font-bold">
-                {companyData.stats.activeJobs}
+                {isLoading ? "—" : stats.activeJobs}
               </div>
               <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                Currently hiring
+                {isLoading
+                  ? "Loading stats..."
+                  : `${stats.activeJobs} currently active`}
               </p>
               <Link href="/employer/new-job-post">
                 <Button
@@ -157,10 +218,12 @@ const EmployerDashboardView = () => {
             </CardHeader>
             <CardContent>
               <div className="text-primary text-2xl font-bold">
-                {companyData.stats.totalApplications}
+                {isLoading ? "—" : stats.totalApplications}
               </div>
               <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                +12 this week
+                {isLoading
+                  ? "Loading stats..."
+                  : `${stats.pendingApplications} pending review`}
               </p>
               <Link href="/employer/applications">
                 <Button
@@ -182,10 +245,10 @@ const EmployerDashboardView = () => {
             </CardHeader>
             <CardContent>
               <div className="text-primary text-2xl font-bold">
-                {companyData.stats.totalEmployees}
+                {isLoading ? "—" : stats.totalEmployees}
               </div>
               <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                +5 this quarter
+                {isLoading ? "Loading stats..." : "Active team members"}
               </p>
               <Link href="/employer/employees">
                 <Button
@@ -199,7 +262,6 @@ const EmployerDashboardView = () => {
           </Card>
         </div>
 
-        {/* Quick Actions */}
         <Card className="bg-card border transition-shadow">
           <CardHeader>
             <CardTitle className="text-base sm:text-lg">
@@ -246,7 +308,6 @@ const EmployerDashboardView = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <Card className="bg-card border">
             <CardHeader>
@@ -258,27 +319,42 @@ const EmployerDashboardView = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentJobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="hover:bg-muted/50 flex flex-col justify-between gap-3 rounded-xl border p-4 transition-colors sm:flex-row sm:items-center sm:gap-0"
-                >
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="truncate text-sm font-bold sm:text-base">
-                      {job.title}
-                    </p>
-                    <p className="text-muted-foreground text-xs sm:text-sm">
-                      {job.applications} applications • {job.posted}
-                    </p>
-                  </div>
-                  <Badge
-                    variant={job.status === "Active" ? "default" : "secondary"}
-                    className="self-start rounded-full px-3 py-1 text-xs font-bold sm:self-center"
+              {isLoading ? (
+                <p className="text-muted-foreground text-sm">
+                  Loading recent jobs…
+                </p>
+              ) : recentJobs.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  No recent jobs found.
+                </p>
+              ) : (
+                recentJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="hover:bg-muted/50 flex flex-col justify-between gap-3 rounded-xl border p-4 transition-colors sm:flex-row sm:items-center sm:gap-0"
                   >
-                    {job.status}
-                  </Badge>
-                </div>
-              ))}
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <p className="truncate text-sm font-bold sm:text-base">
+                        {job.title}
+                      </p>
+                      <p className="text-muted-foreground text-xs sm:text-sm">
+                        {job._count?.applications ?? 0} applications •{" "}
+                        {job.createdAt
+                          ? formatDistanceToNow(new Date(job.createdAt), {
+                              addSuffix: true,
+                            })
+                          : "Recently posted"}
+                      </p>
+                    </div>
+                    <Badge
+                      variant={statusToBadgeVariant(job.status)}
+                      className="self-start rounded-full px-3 py-1 text-xs font-bold sm:self-center"
+                    >
+                      {humanizeStatus(job.status)}
+                    </Badge>
+                  </div>
+                ))
+              )}
               <Link href="/employer/jobs">
                 <Button
                   variant="outline"
@@ -294,52 +370,66 @@ const EmployerDashboardView = () => {
           <Card className="bg-card border">
             <CardHeader>
               <CardTitle className="text-base sm:text-lg">
-                Recent Employees
+                Application Activity
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Newest team members
+                Review the latest company-level application trends.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentEmployees.map((employee) => (
-                <div
-                  key={employee.id}
-                  className="hover:bg-muted/50 flex items-center gap-4 rounded-xl border p-4 transition-colors"
-                >
-                  <Avatar className="h-12 w-12 shrink-0">
-                    <AvatarImage
-                      src={employee.avatar || "/placeholder.svg"}
-                      alt={employee.name}
-                    />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
-                      {employee.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="truncate text-sm font-bold sm:text-base">
-                      {employee.name}
-                    </p>
-                    <p className="text-muted-foreground truncate text-xs sm:text-sm">
-                      {employee.role}
+              {isLoading ? (
+                <p className="text-muted-foreground text-sm">
+                  Loading application summary…
+                </p>
+              ) : summary ? (
+                <div className="grid gap-3">
+                  <div className="rounded-xl border p-4">
+                    <p className="text-sm font-semibold">In review</p>
+                    <p className="text-primary text-2xl font-bold">
+                      {summary.inReview}
                     </p>
                   </div>
-                  <p className="text-muted-foreground hidden shrink-0 text-xs sm:block">
-                    {new Date(employee.joined).toLocaleDateString()}
-                  </p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border p-4">
+                      <p className="text-muted-foreground text-xs tracking-[0.12em] uppercase">
+                        New this week
+                      </p>
+                      <p className="text-xl font-bold">{summary.newThisWeek}</p>
+                    </div>
+                    <div className="rounded-xl border p-4">
+                      <p className="text-muted-foreground text-xs tracking-[0.12em] uppercase">
+                        Rejected this month
+                      </p>
+                      <p className="text-xl font-bold">
+                        {summary.rejectedThisMonth}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border p-4">
+                    <p className="text-sm font-semibold">Status breakdown</p>
+                    <div className="mt-3 grid gap-2">
+                      {(
+                        Object.entries(summary.byStatus || {}) as [
+                          string,
+                          number,
+                        ][]
+                      ).map(([status, count]) => (
+                        <div
+                          key={status}
+                          className="bg-muted flex items-center justify-between gap-3 rounded-lg p-3 text-sm"
+                        >
+                          <span>{humanizeStatus(status)}</span>
+                          <span className="font-semibold">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              ))}
-              <Link href="/employer/employees">
-                <Button
-                  variant="outline"
-                  className="w-full rounded-full font-bold"
-                >
-                  <Users className="mr-2 h-4 w-4" />
-                  View All Employees
-                </Button>
-              </Link>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  No application summary available yet.
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
