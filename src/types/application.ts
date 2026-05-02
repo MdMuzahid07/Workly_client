@@ -46,3 +46,47 @@ export interface ApplicationSummary {
   withdrawn: number;
   byStatus: Record<ApplicationStatus, number>;
 }
+
+export interface EmployerApplication {
+  id: string;
+  status: ApplicationStatus;
+  fullName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  resumeUrl?: string | null;
+  coverLetter?: string | null;
+  yearsOfExperience?: number | null;
+  currentLocation?: string | null;
+  rejectionReason?: string | null;
+  interviewScheduledAt?: string | null;
+  interviewNotes?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+  job: {
+    id: string;
+    title: string;
+    slug?: string;
+    location?: string | null;
+    isRemote?: boolean;
+  };
+  applicant: {
+    id: string;
+    fullName: string;
+    email: string;
+    phone?: string | null;
+    profile?: {
+      avatarUrl?: string | null;
+      headline?: string | null;
+      location?: string | null;
+    } | null;
+  };
+}
+
+export interface CompanyApplicationSummary {
+  total: number;
+  newThisWeek: number;
+  inReview: number;
+  rejected: number;
+  rejectedThisMonth: number;
+  byStatus: Record<ApplicationStatus, number>;
+}

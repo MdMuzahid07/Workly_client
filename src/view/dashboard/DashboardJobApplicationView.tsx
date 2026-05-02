@@ -1,5 +1,6 @@
 "use client";
 
+import PaginationBar from "@/components/shared/PaginationBar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,106 +12,274 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  useGetMyCompanyApplicationsQuery,
+  useGetMyCompanyApplicationSummaryQuery,
+  useUpdateApplicationStatusMutation,
+} from "@/redux/feature/application/applicationApi";
+import { useGetMyJobsQuery } from "@/redux/feature/job/jobApi";
+import { ApplicationStatus, EmployerApplication } from "@/types/application";
+import debounce from "debounce";
+import {
   CheckCircle,
+  Download,
   Eye,
   FileText,
+  Mail,
   MoreVertical,
+  Phone,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import ApplicationFiltersAndSearch from "../../components/dashboard/applications/ApplicationFiltersAndSearch";
 import ApplicationStatusCards from "../../components/dashboard/applications/ApplicationStatusCard";
 import DashboardApplicationsHeader from "../../components/dashboard/dashboard-nav/header/DashboardJobApplicationsHeader";
 
-// fake data
-const mockApplications = [
-  {
-    id: "1",
-    applicantName: "John Doe",
-    applicantEmail: "john.doe@email.com",
-    applicantAvatar: "/placeholder.svg?height=40&width=40",
-    jobTitle: "Senior Frontend Developer",
-    jobLocation: "San Francisco, CA",
-    appliedDate: "2024-01-15",
-    status: "submitted",
-  },
-  {
-    id: "2",
-    applicantName: "Jane Smith",
-    applicantEmail: "jane.smith@email.com",
-    jobTitle: "Backend Engineer",
-    jobLocation: "Remote",
-    appliedDate: "2024-01-14",
-    status: "reviewing",
-  },
-  {
-    id: "3",
-    applicantName: "Mike Johnson",
-    applicantEmail: "mike.j@email.com",
-    jobTitle: "Product Manager",
-    jobLocation: "New York, NY",
-    appliedDate: "2024-01-12",
-    status: "shortlisted",
-  },
-  {
-    id: "4",
-    applicantName: "Sarah Wilson",
-    applicantEmail: "sarah.w@email.com",
-    applicantAvatar: "/placeholder.svg?height=40&width=40",
-    jobTitle: "UX Designer",
-    jobLocation: "Austin, TX",
-    appliedDate: "2024-01-10",
-    status: "interviewed",
-  },
-  {
-    id: "5",
-    applicantName: "Alex Chen",
-    applicantEmail: "alex.chen@email.com",
-    jobTitle: "Senior Frontend Developer",
-    jobLocation: "San Francisco, CA",
-    appliedDate: "2024-01-08",
-    status: "rejected",
-  },
+const STATUS_OPTIONS: Array<{ value: ApplicationStatus; label: string }> = [
+  { value: "SUBMITTED", label: "Submitted" },
+  { value: "REVIEWING", label: "Reviewing" },
+  { value: "SHORTLISTED", label: "Shortlisted" },
+  { value: "INTERVIEWED", label: "Interviewed" },
+  { value: "OFFERED", label: "Offered" },
+  { value: "ACCEPTED", label: "Accepted" },
+  { value: "REJECTED", label: "Rejected" },
+  { value: "WITHDRAWN", label: "Withdrawn" },
 ];
 
+const TAB_STATUSES: Array<{ value: ApplicationStatus | "all"; label: string }> =
+  [
+    { value: "all", label: "All" },
+    { value: "SUBMITTED", label: "Submitted" },
+    { value: "REVIEWING", label: "Reviewing" },
+    { value: "SHORTLISTED", label: "Shortlisted" },
+    { value: "INTERVIEWED", label: "Interviewed" },
+    { value: "REJECTED", label: "Rejected" },
+  ];
+
+const NEXT_STATUS: Partial<Record<ApplicationStatus, ApplicationStatus>> = {
+  SUBMITTED: "REVIEWING",
+  REVIEWING: "SHORTLISTED",
+  SHORTLISTED: "INTERVIEWED",
+  INTERVIEWED: "OFFERED",
+  OFFERED: "ACCEPTED",
+};
+
+const statusLabels = Object.fromEntries(
+  STATUS_OPTIONS.map((status) => [status.value, status.label]),
+) as Record<ApplicationStatus, string>;
+
+const getStatusColor = (status: ApplicationStatus) => {
+  const colors: Record<ApplicationStatus, string> = {
+    SUBMITTED: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
+    REVIEWING: "bg-blue-500/10 text-blue-700 border-blue-500/20",
+    SHORTLISTED: "bg-cyan-500/10 text-cyan-700 border-cyan-500/20",
+    INTERVIEWED: "bg-violet-500/10 text-violet-700 border-violet-500/20",
+    OFFERED: "bg-green-500/10 text-green-700 border-green-500/20",
+    ACCEPTED: "bg-primary/10 text-primary border-primary/20",
+    REJECTED: "bg-destructive/10 text-destructive border-destructive/20",
+    WITHDRAWN: "bg-muted text-muted-foreground border-border",
+  };
+
+  return colors[status];
+};
+
+const getApplicantName = (application: EmployerApplication) =>
+  application.fullName || application.applicant.fullName || "Unknown applicant";
+
+const getApplicantEmail = (application: EmployerApplication) =>
+  application.email || application.applicant.email;
+
+const getApplicantPhone = (application: EmployerApplication) =>
+  application.phone || application.applicant.phone;
+
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "data" in error) {
+    const data = (
+      error as {
+        data?: { message?: string; errorSources?: { message?: string } };
+      }
+    ).data;
+    return data?.errorSources?.message || data?.message || fallback;
+  }
+
+  return fallback;
+};
+
 const DashboardJobApplicationView = () => {
+  const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedJob, setSelectedJob] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [activeTab, setActiveTab] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState<
+    ApplicationStatus | "all"
+  >("all");
+  const [activeTab, setActiveTab] = useState<ApplicationStatus | "all">("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedApplication, setSelectedApplication] =
+    useState<EmployerApplication | null>(null);
+  const [updatingApplicationId, setUpdatingApplicationId] = useState<
+    string | null
+  >(null);
+
+  const limit = 10;
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchQuery(value);
+        setCurrentPage(1);
+      }, 500),
+    [],
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchValue);
+    return () => debouncedSearch.clear();
+  }, [debouncedSearch, searchValue]);
+
+  const effectiveStatus = activeTab !== "all" ? activeTab : selectedStatus;
+
+  const queryParams = useMemo(
+    () => ({
+      page: currentPage,
+      limit,
+      q: searchQuery || undefined,
+      jobId: selectedJob !== "all" ? selectedJob : undefined,
+      status: effectiveStatus !== "all" ? effectiveStatus : undefined,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    }),
+    [currentPage, effectiveStatus, searchQuery, selectedJob],
+  );
+
+  const {
+    data: applicationsResponse,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetMyCompanyApplicationsQuery(queryParams);
+  const { data: summaryResponse } =
+    useGetMyCompanyApplicationSummaryQuery(undefined);
+  const { data: jobsResponse } = useGetMyJobsQuery({
+    page: 1,
+    limit: 100,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+  const [updateApplicationStatus] = useUpdateApplicationStatusMutation();
+
+  const applications = (applicationsResponse?.data ||
+    []) as EmployerApplication[];
+  const meta = applicationsResponse?.meta || {
+    page: currentPage,
+    limit,
+    total: 0,
+    pages: 0,
+  };
+  const summary = summaryResponse?.data;
+  const statusCounts = summary?.byStatus || {};
+  const jobs = (
+    (jobsResponse?.data || []) as Array<{ id: string; title: string }>
+  ).map((job) => ({
+    id: job.id,
+    title: job.title,
+  }));
 
   const handleClearFilters = () => {
+    setSearchValue("");
     setSearchQuery("");
     setSelectedJob("all");
     setSelectedStatus("all");
+    setActiveTab("all");
+    setCurrentPage(1);
   };
 
-  const getApplicationsByStatus = (status: string) => {
-    if (status === "all") return mockApplications;
-    return mockApplications.filter((app) => app.status === status);
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as ApplicationStatus | "all");
+    setSelectedStatus("all");
+    setCurrentPage(1);
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      submitted: "bg-chart-1/10 text-chart-1 border-chart-1/20",
-      reviewing: "bg-chart-2/10 text-chart-2 border-chart-2/20",
-      shortlisted: "bg-chart-4/10 text-chart-4 border-chart-4/20",
-      interviewed: "bg-chart-5/10 text-chart-5 border-chart-5/20",
-      rejected: "bg-destructive/10 text-destructive border-destructive/20",
-      offered: "bg-chart-3/10 text-chart-3 border-chart-3/20",
-      accepted: "bg-primary/10 text-primary border-primary/20",
-    };
-    return colors[status.toLowerCase()] || "bg-muted text-muted-foreground";
+  const handleStatusFilterChange = (value: string) => {
+    setSelectedStatus(value as ApplicationStatus | "all");
+    setActiveTab("all");
+    setCurrentPage(1);
   };
 
-  const filteredApplications = getApplicationsByStatus(activeTab);
+  const handleJobChange = (value: string) => {
+    setSelectedJob(value);
+    setCurrentPage(1);
+  };
+
+  const handleUpdateStatus = async (
+    application: EmployerApplication,
+    status: ApplicationStatus,
+  ) => {
+    const isRejecting = status === "REJECTED";
+    if (isRejecting && !window.confirm("Reject this application?")) return;
+
+    setUpdatingApplicationId(application.id);
+    toast.loading("Updating application status...", {
+      id: "application-status",
+    });
+
+    try {
+      await updateApplicationStatus({
+        id: application.id,
+        status,
+        rejectionReason: isRejecting ? "Rejected by employer" : undefined,
+      }).unwrap();
+      toast.success("Application status updated", {
+        id: "application-status",
+      });
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, "Failed to update application status"),
+        {
+          id: "application-status",
+        },
+      );
+    } finally {
+      setUpdatingApplicationId(null);
+    }
+  };
+
+  const hasActiveFilters =
+    searchValue !== "" ||
+    selectedJob !== "all" ||
+    selectedStatus !== "all" ||
+    activeTab !== "all";
 
   return (
     <div className="mt-16 min-h-screen">
@@ -118,44 +287,41 @@ const DashboardJobApplicationView = () => {
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         <ApplicationStatusCards
-          totalApplications={156}
-          newThisWeek={12}
-          inReview={23}
-          rejected={8}
+          totalApplications={summary?.total || 0}
+          newThisWeek={summary?.newThisWeek || 0}
+          inReview={summary?.inReview || 0}
+          rejected={summary?.rejected || 0}
         />
 
-        {/* Filters and Search */}
         <ApplicationFiltersAndSearch
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
+          searchQuery={searchValue}
+          onSearchChange={setSearchValue}
           selectedJob={selectedJob}
-          onJobChange={setSelectedJob}
+          onJobChange={handleJobChange}
           selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
+          onStatusChange={handleStatusFilterChange}
           onClearFilters={handleClearFilters}
+          jobs={jobs}
+          statuses={STATUS_OPTIONS}
+          hasActiveFilters={hasActiveFilters}
         />
 
         <div className="rounded-2xl border px-4 py-6 md:px-6 md:py-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-card h-10 w-full border p-0">
-              <TabsTrigger className="py-3" value="all">
-                All ({mockApplications.length})
-              </TabsTrigger>
-              <TabsTrigger className="py-3" value="submitted">
-                Submitted ({getApplicationsByStatus("submitted").length})
-              </TabsTrigger>
-              <TabsTrigger className="py-3" value="reviewing">
-                Reviewing ({getApplicationsByStatus("reviewing").length})
-              </TabsTrigger>
-              <TabsTrigger className="py-3" value="shortlisted">
-                Shortlisted ({getApplicationsByStatus("shortlisted").length})
-              </TabsTrigger>
-              <TabsTrigger className="py-3" value="interviewed">
-                Interviewed ({getApplicationsByStatus("interviewed").length})
-              </TabsTrigger>
-              <TabsTrigger className="py-3" value="rejected">
-                Rejected ({getApplicationsByStatus("rejected").length})
-              </TabsTrigger>
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <TabsList className="bg-card h-auto w-full flex-wrap justify-start border p-1">
+              {TAB_STATUSES.map((tab) => (
+                <TabsTrigger
+                  className="min-w-32 rounded-full py-3"
+                  key={tab.value}
+                  value={tab.value}
+                >
+                  {tab.label} (
+                  {tab.value === "all"
+                    ? summary?.total || 0
+                    : statusCounts[tab.value as ApplicationStatus] || 0}
+                  )
+                </TabsTrigger>
+              ))}
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-6">
@@ -165,109 +331,138 @@ const DashboardJobApplicationView = () => {
                     Application List
                   </CardTitle>
                   <CardDescription>
-                    {filteredApplications.length} applications found
+                    {meta.total || 0} application{meta.total === 1 ? "" : "s"}{" "}
+                    found
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="border-b">
-                        <tr>
-                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Applicant
-                          </th>
-                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Job Title
-                          </th>
-                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Location
-                          </th>
-                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Applied Date
-                          </th>
-                          <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Status
-                          </th>
-                          <th className="text-muted-foreground px-4 py-3 text-right text-xs font-medium tracking-wider uppercase">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {filteredApplications.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="px-4 py-12 text-center">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Applicant</TableHead>
+                          <TableHead>Job Title</TableHead>
+                          <TableHead>Location</TableHead>
+                          <TableHead>Applied Date</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {isLoading || isFetching ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                              className="py-16 text-center"
+                            >
+                              <span className="text-muted-foreground text-sm font-medium">
+                                Loading applications...
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ) : isError ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                              className="py-16 text-center"
+                            >
+                              <div className="flex flex-col items-center gap-4">
+                                <XCircle className="text-destructive h-10 w-10" />
+                                <p className="text-muted-foreground text-sm font-medium">
+                                  Failed to load applications.
+                                </p>
+                                <Button variant="outline" onClick={refetch}>
+                                  Retry
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : applications.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                              className="py-16 text-center"
+                            >
                               <div className="flex flex-col items-center gap-2">
                                 <FileText className="text-muted-foreground/50 h-12 w-12" />
                                 <p className="text-muted-foreground text-sm">
                                   No applications found
                                 </p>
                               </div>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         ) : (
-                          filteredApplications.map((application) => {
-                            const initials = application.applicantName
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase();
+                          applications.map((application) => {
+                            const applicantName = getApplicantName(application);
+                            const applicantEmail =
+                              getApplicantEmail(application);
+                            const nextStatus = NEXT_STATUS[application.status];
 
                             return (
-                              <tr
+                              <TableRow
                                 key={application.id}
                                 className="hover:bg-muted/50"
                               >
-                                <td className="px-4 py-4 whitespace-nowrap">
+                                <TableCell>
                                   <div className="flex items-center gap-3">
                                     <Avatar className="h-10 w-10">
                                       <AvatarImage
                                         src={
-                                          application.applicantAvatar ||
-                                          "/placeholder.svg" ||
-                                          "/placeholder.svg"
+                                          application.applicant.profile
+                                            ?.avatarUrl || undefined
                                         }
+                                        alt={applicantName}
                                       />
                                       <AvatarFallback>
-                                        {initials}
+                                        {getInitials(applicantName)}
                                       </AvatarFallback>
                                     </Avatar>
-                                    <div>
+                                    <div className="min-w-44">
                                       <p className="font-medium">
-                                        {application.applicantName}
+                                        {applicantName}
                                       </p>
                                       <p className="text-muted-foreground text-sm">
-                                        {application.applicantEmail}
+                                        {applicantEmail}
                                       </p>
                                     </div>
                                   </div>
-                                </td>
-                                <td className="px-4 py-4">
+                                </TableCell>
+                                <TableCell>
                                   <p className="font-medium">
-                                    {application.jobTitle}
+                                    {application.job.title}
                                   </p>
-                                </td>
-                                <td className="px-4 py-4">
+                                </TableCell>
+                                <TableCell>
                                   <p className="text-sm">
-                                    {application.jobLocation}
+                                    {application.job.location ||
+                                      "Not specified"}
+                                    {application.job.isRemote
+                                      ? " (Remote)"
+                                      : ""}
                                   </p>
-                                </td>
-                                <td className="px-4 py-4">
+                                </TableCell>
+                                <TableCell>
                                   <p className="text-sm">
-                                    {application.appliedDate}
+                                    {new Date(
+                                      application.createdAt,
+                                    ).toLocaleDateString(undefined, {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })}
                                   </p>
-                                </td>
-                                <td className="px-4 py-4">
+                                </TableCell>
+                                <TableCell>
                                   <Badge
                                     variant="outline"
                                     className={getStatusColor(
                                       application.status,
                                     )}
                                   >
-                                    {application.status}
+                                    {statusLabels[application.status]}
                                   </Badge>
-                                </td>
-                                <td className="px-4 py-4 text-right">
+                                </TableCell>
+                                <TableCell className="text-right">
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="sm">
@@ -275,34 +470,240 @@ const DashboardJobApplicationView = () => {
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          setSelectedApplication(application)
+                                        }
+                                      >
                                         <Eye className="mr-2 h-4 w-4" />
                                         View Details
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem>
-                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                        Move to Next Stage
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem className="text-destructive">
-                                        <XCircle className="mr-2 h-4 w-4" />
-                                        Reject Application
-                                      </DropdownMenuItem>
+                                      {application.resumeUrl && (
+                                        <DropdownMenuItem asChild>
+                                          <Link
+                                            href={application.resumeUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                          >
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Open Resume
+                                          </Link>
+                                        </DropdownMenuItem>
+                                      )}
+                                      <DropdownMenuSeparator />
+                                      {nextStatus && (
+                                        <DropdownMenuItem
+                                          disabled={
+                                            updatingApplicationId ===
+                                            application.id
+                                          }
+                                          onClick={() =>
+                                            handleUpdateStatus(
+                                              application,
+                                              nextStatus,
+                                            )
+                                          }
+                                        >
+                                          <CheckCircle className="mr-2 h-4 w-4" />
+                                          Move to {statusLabels[nextStatus]}
+                                        </DropdownMenuItem>
+                                      )}
+                                      {application.status !== "REJECTED" &&
+                                        application.status !== "WITHDRAWN" && (
+                                          <DropdownMenuItem
+                                            disabled={
+                                              updatingApplicationId ===
+                                              application.id
+                                            }
+                                            onClick={() =>
+                                              handleUpdateStatus(
+                                                application,
+                                                "REJECTED",
+                                              )
+                                            }
+                                            className="text-destructive focus:text-destructive"
+                                          >
+                                            <XCircle className="mr-2 h-4 w-4" />
+                                            Reject Application
+                                          </DropdownMenuItem>
+                                        )}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
-                                </td>
-                              </tr>
+                                </TableCell>
+                              </TableRow>
                             );
                           })
                         )}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   </div>
+
+                  <PaginationBar
+                    meta={{
+                      page: meta.page || currentPage,
+                      limit: meta.limit || limit,
+                      total: meta.total || 0,
+                      pages: meta.pages || 0,
+                    }}
+                    onPageChange={setCurrentPage}
+                    className="border-t pt-6"
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
       </div>
+
+      <Dialog
+        open={!!selectedApplication}
+        onOpenChange={(open) => !open && setSelectedApplication(null)}
+      >
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          {selectedApplication && (
+            <>
+              <DialogHeader>
+                <DialogTitle>
+                  {getApplicantName(selectedApplication)}
+                </DialogTitle>
+                <DialogDescription>
+                  Application for {selectedApplication.job.title}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Badge
+                    variant="outline"
+                    className={getStatusColor(selectedApplication.status)}
+                  >
+                    {statusLabels[selectedApplication.status]}
+                  </Badge>
+                  <span className="text-muted-foreground text-sm">
+                    Applied{" "}
+                    {new Date(selectedApplication.createdAt).toLocaleDateString(
+                      undefined,
+                      {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
+                  </span>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border p-4">
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
+                      <Mail className="h-4 w-4" />
+                      Email
+                    </div>
+                    <p className="mt-2 text-sm font-medium">
+                      {getApplicantEmail(selectedApplication)}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border p-4">
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
+                      <Phone className="h-4 w-4" />
+                      Phone
+                    </div>
+                    <p className="mt-2 text-sm font-medium">
+                      {getApplicantPhone(selectedApplication) || "Not provided"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border p-4">
+                    <p className="text-muted-foreground text-xs font-bold uppercase">
+                      Current Location
+                    </p>
+                    <p className="mt-2 text-sm font-medium">
+                      {selectedApplication.currentLocation ||
+                        selectedApplication.applicant.profile?.location ||
+                        "Not provided"}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border p-4">
+                    <p className="text-muted-foreground text-xs font-bold uppercase">
+                      Experience
+                    </p>
+                    <p className="mt-2 text-sm font-medium">
+                      {selectedApplication.yearsOfExperience ?? 0} years
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border p-4">
+                  <p className="text-muted-foreground text-xs font-bold uppercase">
+                    Cover Letter
+                  </p>
+                  <p className="mt-3 text-sm leading-6 whitespace-pre-wrap">
+                    {selectedApplication.coverLetter ||
+                      "No cover letter provided."}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  {selectedApplication.resumeUrl && (
+                    <Button asChild className="rounded-xl">
+                      <Link
+                        href={selectedApplication.resumeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Open Resume
+                      </Link>
+                    </Button>
+                  )}
+                  {NEXT_STATUS[selectedApplication.status] && (
+                    <Button
+                      variant="outline"
+                      className="rounded-xl"
+                      disabled={
+                        updatingApplicationId === selectedApplication.id
+                      }
+                      onClick={() =>
+                        handleUpdateStatus(
+                          selectedApplication,
+                          NEXT_STATUS[
+                            selectedApplication.status
+                          ] as ApplicationStatus,
+                        )
+                      }
+                    >
+                      Move to{" "}
+                      {
+                        statusLabels[
+                          NEXT_STATUS[
+                            selectedApplication.status
+                          ] as ApplicationStatus
+                        ]
+                      }
+                    </Button>
+                  )}
+                  {selectedApplication.status !== "REJECTED" &&
+                    selectedApplication.status !== "WITHDRAWN" && (
+                      <Button
+                        variant="outline"
+                        className="text-destructive hover:text-destructive rounded-xl"
+                        disabled={
+                          updatingApplicationId === selectedApplication.id
+                        }
+                        onClick={() =>
+                          handleUpdateStatus(selectedApplication, "REJECTED")
+                        }
+                      >
+                        Reject
+                      </Button>
+                    )}
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

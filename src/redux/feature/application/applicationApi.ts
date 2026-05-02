@@ -33,6 +33,29 @@ const applicationApi = baseApi.injectEndpoints({
       }),
       providesTags: ["applications"],
     }),
+    getMyCompanyApplications: builder.query({
+      query: (params) => ({
+        url: "/application/my-company-applications",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["applications"],
+    }),
+    getMyCompanyApplicationSummary: builder.query({
+      query: () => ({
+        url: "/application/my-company-summary",
+        method: "GET",
+      }),
+      providesTags: ["applications"],
+    }),
+    updateApplicationStatus: builder.mutation({
+      query: ({ id, status, rejectionReason }) => ({
+        url: `/application/${id}/status`,
+        method: "PATCH",
+        body: { status, rejectionReason },
+      }),
+      invalidatesTags: ["applications"],
+    }),
     withdrawApplication: builder.mutation({
       query: (id: string) => ({
         url: `/application/${id}/withdraw`,
@@ -49,6 +72,9 @@ export const {
   useGetMyApplicationsQuery,
   useGetMyApplicationSummaryQuery,
   useGetApplicationStatsQuery,
+  useGetMyCompanyApplicationsQuery,
+  useGetMyCompanyApplicationSummaryQuery,
+  useUpdateApplicationStatusMutation,
   useWithdrawApplicationMutation,
 } = applicationApi;
 export default applicationApi;
