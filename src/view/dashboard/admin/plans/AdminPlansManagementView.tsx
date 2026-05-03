@@ -107,17 +107,17 @@ const AdminPlansManagementView = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 lg:pt-20">
+    <div className="min-h-screen min-w-0 pt-16 lg:pt-20">
       <DashboardAdminPlansHeader
         onCreatePlanClick={() => setIsAdvancedBuilderOpen(true)}
       />
 
-      <div className="space-y-12 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-full min-w-0 space-y-12 px-4 py-8 sm:px-6 lg:px-8">
         {/* Stats Overview */}
         <PlanStatsGrid />
 
         {/* Plans Management Grid */}
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid min-w-0 grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
           {plans.map((plan) => (
             <PlanCard
               key={plan.id}

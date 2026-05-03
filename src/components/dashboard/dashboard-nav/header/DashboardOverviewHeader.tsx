@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { Building2, Plus, Settings } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../../ui/button";
@@ -19,13 +20,15 @@ const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
               {companyData.name}
             </h1>
             <p className="text-muted-foreground truncate text-xs font-medium opacity-80 sm:text-sm">
-              {companyData.industry} • {companyData.location}
+              {[companyData.industry, companyData.location]
+                .filter(Boolean)
+                .join(" • ") || "Employer account"}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/employer/settings" className="sm:hidden">
+          <Link href={EMPLOYER_ROUTES.settings} className="sm:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -35,13 +38,13 @@ const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
               <span className="sr-only">Settings</span>
             </Button>
           </Link>
-          <Link href="/employer/settings" className="hidden sm:block">
+          <Link href={EMPLOYER_ROUTES.settings} className="hidden sm:block">
             <Button variant="outline" className="rounded-full font-bold">
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </Button>
           </Link>
-          <Link href="/employer/new-job-post">
+          <Link href={EMPLOYER_ROUTES.postJob}>
             <Button className="rounded-full font-bold shadow-sm">
               <Plus className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Post Job</span>

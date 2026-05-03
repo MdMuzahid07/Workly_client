@@ -13,12 +13,13 @@ const baseQuery = fetchBaseQuery({
   // extra added with fetchBaseQuery
   // in prepareHeaders we get two parameters (header,api), we get the getState() from the api
   prepareHeaders: (headers, { getState }) => {
-    // getting the token from the redux state
-    const token = (getState() as RootState).auth.accessToken;
+    const fromStore = (getState() as RootState).auth.accessToken;
+    const fromStorage =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("accessToken")
+        : null;
+    const token = fromStore || fromStorage;
 
-    // if token find we are setting it to header, by headers.set() , in this method we have to pass
-    // two arguments, one is "authorization", second is token, if backend receiving bearer then with bearer
-    // otherwise just token
     if (token) {
       headers.set("authorization", `${token}`);
     }

@@ -136,19 +136,19 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
   onItemClick: () => void;
 }) {
   return (
-    <div className="bg-sidebar flex h-full min-h-0 flex-col">
+    <div className="bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex h-14 items-center justify-between px-4 sm:h-16">
+      <div className="flex h-14 shrink-0 items-center justify-between px-4 sm:h-16">
         <WJLogo />
         <span className="pr-10 lg:pr-0">
           <ThemeToggleButtonCompact />
         </span>
       </div>
 
-      <Separator className="opacity-50" />
+      <Separator className="shrink-0 opacity-50" />
 
       {/* Company Profile Section */}
-      <div className="px-4 py-4">
+      <div className="shrink-0 px-4 py-4">
         <Link
           href="/employer/company-profile"
           className="group border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 flex items-center gap-3 rounded-lg border p-3 transition-all hover:shadow-sm"
@@ -177,8 +177,8 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
       </div>
 
       {/* Navigation */}
-      <div className="scrollbar-thin scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/40 min-h-0 flex-1 overflow-y-auto px-3 py-2">
-        <nav className="space-y-6">
+      <div className="scrollbar-thin scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/40 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 py-2 [-webkit-overflow-scrolling:touch]">
+        <nav className="space-y-6 pb-2">
           {navGroups.map((group, index) => (
             <div key={index}>
               {group.title && (
@@ -203,7 +203,7 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
       </div>
 
       {/* Footer / Bottom Items */}
-      <div className="mt-auto p-3">
+      <div className="bg-sidebar border-border/40 mt-auto shrink-0 border-t p-3">
         <Separator className="mb-3 opacity-50" />
         <nav className="space-y-1">
           {bottomItems.map((item) => (
@@ -337,8 +337,8 @@ export default function EmployerSidebarView({
 
   return (
     <div className="relative">
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
-        <div className="border-sidebar-border bg-sidebar flex flex-1 flex-col border-r shadow-sm">
+      <div className="hidden lg:fixed lg:top-0 lg:bottom-0 lg:z-40 lg:flex lg:h-dvh lg:max-h-dvh lg:min-h-0 lg:w-64 lg:flex-col">
+        <div className="border-sidebar-border bg-sidebar flex h-full min-h-0 flex-1 flex-col overflow-hidden border-r shadow-sm">
           <EmployerSidebarContent
             navGroups={navGroups}
             bottomItems={bottomItems}
@@ -363,7 +363,7 @@ export default function EmployerSidebarView({
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="z-9999 w-[280px] max-w-[85vw] border-r p-0 sm:w-[320px]"
+          className="z-9999 flex h-dvh max-h-dvh min-h-0 w-[280px] max-w-[85vw] flex-col gap-0 overflow-hidden border-r p-0 sm:w-[320px]"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Employer Menu</SheetTitle>

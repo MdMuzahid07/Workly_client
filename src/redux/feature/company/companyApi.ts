@@ -56,6 +56,23 @@ const companyApi = baseApi.injectEndpoints({
       providesTags: ["company"],
     }),
 
+    getCompanyOverviewStatistics: builder.query({
+      query: () => ({
+        url: "/company/overview-statistics",
+        method: "GET",
+      }),
+      providesTags: ["company"],
+    }),
+
+    getEmployerAnalytics: builder.query({
+      query: (period: string) => ({
+        url: "/company/employer-analytics",
+        method: "GET",
+        params: { period },
+      }),
+      providesTags: ["company"],
+    }),
+
     updateCompanySettings: builder.mutation({
       query: ({ companyId, ...data }) => ({
         url: `/company/settings/${companyId}`,
@@ -74,6 +91,8 @@ export const {
   useUpdateCompanyMutation,
   useDeleteCompanyMutation,
   useGetMyCompanyQuery,
+  useGetCompanyOverviewStatisticsQuery,
+  useGetEmployerAnalyticsQuery,
   useUpdateCompanySettingsMutation,
   useUpdateCompanyByIdMutation,
 } = companyApi;

@@ -37,7 +37,7 @@ interface PlanCardProps {
 export function PlanCard({ plan, onEdit, onToggleStatus }: PlanCardProps) {
   return (
     <Card
-      className={`group relative flex flex-col overflow-hidden rounded-xl border-2 transition-all ${
+      className={`group relative flex min-w-0 flex-col overflow-hidden rounded-xl border-2 transition-all ${
         plan.featured ? "border-primary shadow-primary/5" : "border-border"
       }`}
     >
