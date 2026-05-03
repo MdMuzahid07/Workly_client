@@ -1,6 +1,8 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { EmployerApplicationTrendBucket } from "@/types/employerAnalytics";
 import {
   Bar,
   BarChart,
@@ -13,21 +15,26 @@ import {
 } from "recharts";
 
 interface ApplicationTrendsChartProps {
-  timeRange: string;
+  data: EmployerApplicationTrendBucket[];
+  isLoading: boolean;
 }
 
-const AnalyticsApplicationTrendsChart = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  timeRange,
-}: ApplicationTrendsChartProps) => {
-  const data = [
-    { month: "Jan", applications: 220, interviews: 85, hired: 32 },
-    { month: "Feb", applications: 215, interviews: 78, hired: 28 },
-    { month: "Mar", applications: 145, interviews: 52, hired: 18 },
-    { month: "Apr", applications: 280, interviews: 105, hired: 42 },
-    { month: "May", applications: 195, interviews: 68, hired: 24 },
-    { month: "Jun", applications: 240, interviews: 92, hired: 35 },
-  ];
+export default function AnalyticsApplicationTrendsChart({
+  data,
+  isLoading,
+}: ApplicationTrendsChartProps) {
+  if (isLoading) {
+    return (
+      <Card className="border-primary/10 bg-background/60 overflow-hidden rounded-2xl border p-6 backdrop-blur-xl">
+        <Skeleton className="mb-4 h-7 w-48" />
+        <Skeleton className="h-80 w-full" />
+      </Card>
+    );
+  }
+
+  const chartData = data.length
+    ? data
+    : [{ periodLabel: "—", applications: 0, interviews: 0, hired: 0 }];
 
   return (
     <Card className="border-primary/10 bg-background/60 overflow-hidden rounded-2xl border p-6 backdrop-blur-xl">
@@ -36,14 +43,15 @@ const AnalyticsApplicationTrendsChart = ({
           Application Trends
         </h3>
         <p className="text-muted-foreground text-xs font-medium opacity-60">
-          Monthly application flow and conversion metrics
+          Bucketed application volume, scheduled interviews, and hires for the
+          selected period
         </p>
       </div>
 
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
+            data={chartData}
             margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
           >
             <CartesianGrid
@@ -52,13 +60,14 @@ const AnalyticsApplicationTrendsChart = ({
               vertical={false}
             />
             <XAxis
-              dataKey="month"
+              dataKey="periodLabel"
               stroke="hsl(var(--muted-foreground))"
               style={{ fontSize: "12px" }}
             />
             <YAxis
               stroke="hsl(var(--muted-foreground))"
               style={{ fontSize: "12px" }}
+              allowDecimals={false}
             />
             <Tooltip
               contentStyle={{
@@ -76,8 +85,12 @@ const AnalyticsApplicationTrendsChart = ({
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {!data.length && (
+        <p className="text-muted-foreground mt-4 text-center text-sm">
+          No applications in this period yet.
+        </p>
+      )}
     </Card>
   );
-};
-
-export default AnalyticsApplicationTrendsChart;
+}

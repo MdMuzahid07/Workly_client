@@ -1,29 +1,57 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { EmployerDepartmentSlice } from "@/types/employerAnalytics";
 import { Users } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-const AnalyticsDepartmentDistribution = () => {
-  const departments = [
-    { name: "Engineering", employees: 85, percentage: 34, color: "#22c55e" },
-    { name: "Product", employees: 42, percentage: 17, color: "#3b82f6" },
-    { name: "Design", employees: 28, percentage: 11, color: "#f59e0b" },
-    { name: "Marketing", employees: 35, percentage: 14, color: "#ef4444" },
-    { name: "Sales", employees: 38, percentage: 15, color: "#8b5cf6" },
-    { name: "Operations", employees: 22, percentage: 9, color: "#06b6d4" },
-  ];
+interface Props {
+  departments: EmployerDepartmentSlice[];
+  isLoading: boolean;
+}
 
-  const total = departments.reduce((sum, dept) => sum + dept.employees, 0);
+export default function AnalyticsDepartmentDistribution({
+  departments,
+  isLoading,
+}: Props) {
+  if (isLoading) {
+    return (
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="p-6">
+          <Skeleton className="mb-4 h-7 w-56" />
+          <Skeleton className="h-80 w-full" />
+        </Card>
+        <Card className="p-6">
+          <Skeleton className="mb-4 h-7 w-56" />
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-lg" />
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  const chartData = departments.length
+    ? departments.map((d) => ({
+        name: d.name,
+        applicants: d.count,
+        percentage: d.percentage,
+        color: d.color,
+      }))
+    : [{ name: "Other", applicants: 1, percentage: 100, color: "#64748b" }];
+
+  const totalApplicants = departments.reduce((sum, d) => sum + d.count, 0);
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      {/* Pie Chart */}
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold">Department Distribution</h3>
+          <h3 className="text-lg font-semibold">Discipline distribution</h3>
           <p className="text-muted-foreground text-sm">
-            Employee count by department
+            Application volume by job discipline (proxy for team focus areas)
           </p>
         </div>
 
@@ -31,16 +59,20 @@ const AnalyticsDepartmentDistribution = () => {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={departments}
+                data={chartData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percentage }) => `${name} ${percentage}%`}
+                label={({ name, percentage }) =>
+                  typeof percentage === "number"
+                    ? `${name} ${percentage}%`
+                    : `${name}`
+                }
                 outerRadius={100}
                 fill="#8884d8"
-                dataKey="employees"
+                dataKey="applicants"
               >
-                {departments.map((entry, index) => (
+                {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -50,58 +82,67 @@ const AnalyticsDepartmentDistribution = () => {
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                 }}
-                formatter={(value) => `${value} employees`}
+                formatter={(value) => [`${value} applications`, "Applicants"]}
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
       </Card>
 
-      {/* Department Cards */}
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold">Department Overview</h3>
+          <h3 className="text-lg font-semibold">Discipline overview</h3>
           <p className="text-muted-foreground text-sm">
-            Quick stats for each department
+            Share of applications per discipline
           </p>
         </div>
 
-        <div className="space-y-3">
-          {departments.map((dept) => (
-            <div
-              key={dept.name}
-              className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="rounded-lg p-2"
-                  style={{ backgroundColor: dept.color + "20" }}
-                >
-                  <Users className="h-5 w-5" style={{ color: dept.color }} />
+        {!departments.length ? (
+          <p className="text-muted-foreground text-sm">
+            No application data to group by discipline in this period.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {departments.map((dept) => (
+              <div
+                key={dept.name}
+                className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition-colors"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className="rounded-lg p-2"
+                    style={{ backgroundColor: `${dept.color}20` }}
+                  >
+                    <Users
+                      className="h-5 w-5"
+                      style={{ color: dept.color }}
+                      aria-hidden
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{dept.name}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {dept.count} applications
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium">{dept.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {dept.employees} employees
-                  </p>
-                </div>
+                <span className="text-muted-foreground shrink-0 text-sm font-semibold tabular-nums">
+                  {dept.percentage}%
+                </span>
               </div>
-              <span className="text-muted-foreground text-sm font-semibold">
-                {dept.percentage}%
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="bg-muted mt-6 rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Total Employees</span>
-            <span className="text-2xl font-bold">{total}</span>
+            <span className="text-sm font-medium">Total applications</span>
+            <span className="text-2xl font-bold tabular-nums">
+              {totalApplicants}
+            </span>
           </div>
         </div>
       </Card>
     </div>
   );
-};
-
-export default AnalyticsDepartmentDistribution;
+}

@@ -1,6 +1,11 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  EmployerConversionMetric,
+  EmployerFunnelStage,
+} from "@/types/employerAnalytics";
 import {
   Bar,
   BarChart,
@@ -12,37 +17,61 @@ import {
   YAxis,
 } from "recharts";
 
-const AnalyticsHiringFunnelChart = () => {
-  const stages = [
-    { name: "Applications", count: 1234, percentage: 100, color: "#f87171" },
-    { name: "Screening", count: 456, percentage: 37, color: "#fb923c" },
-    { name: "Interviews", count: 189, percentage: 15, color: "#fbbf24" },
-    { name: "Final Round", count: 67, percentage: 5, color: "#a3e635" },
-    { name: "Offers", count: 34, percentage: 3, color: "#4ade80" },
-    { name: "Hired", count: 28, percentage: 2, color: "#22c55e" },
-  ];
+interface Props {
+  stages: EmployerFunnelStage[];
+  conversionMetrics: EmployerConversionMetric[];
+  isLoading: boolean;
+}
 
-  const conversionMetrics = [
-    { label: "Application to Interview", value: "15%" },
-    { label: "Interview to Offer", value: "18%" },
-    { label: "Overall Conversion", value: "2.3%" },
-  ];
+export default function AnalyticsHiringFunnelChart({
+  stages,
+  conversionMetrics,
+  isLoading,
+}: Props) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6">
+          <Skeleton className="mb-4 h-7 w-40" />
+          <Skeleton className="h-80 w-full" />
+        </Card>
+        <Card className="p-6">
+          <Skeleton className="mb-4 h-7 w-48" />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-24 rounded-lg" />
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  const chartData = stages.length
+    ? stages
+    : [
+        {
+          name: "No data",
+          count: 0,
+          percentage: 0,
+          color: "#94a3b8",
+        },
+      ];
 
   return (
     <div className="space-y-6">
-      {/* Funnel Bar Chart */}
       <Card className="p-6">
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Hiring Funnel</h3>
           <p className="text-muted-foreground text-sm">
-            Candidate progression through hiring stages
+            Application counts by status for applications created in this period
           </p>
         </div>
 
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={stages}
+              data={chartData}
               layout="vertical"
               margin={{ top: 5, right: 30, left: 120, bottom: 5 }}
             >
@@ -55,12 +84,14 @@ const AnalyticsHiringFunnelChart = () => {
                 type="number"
                 stroke="hsl(var(--muted-foreground))"
                 style={{ fontSize: "12px" }}
+                allowDecimals={false}
               />
               <YAxis
                 dataKey="name"
                 type="category"
                 stroke="hsl(var(--muted-foreground))"
                 style={{ fontSize: "12px" }}
+                width={110}
               />
               <Tooltip
                 contentStyle={{
@@ -68,10 +99,10 @@ const AnalyticsHiringFunnelChart = () => {
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                 }}
-                formatter={(value) => `${value} candidates`}
+                formatter={(value) => [`${value} applications`, "Count"]}
               />
               <Bar dataKey="count" radius={[0, 8, 8, 0]} fill="#8884d8">
-                {stages.map((entry, index) => (
+                {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
@@ -80,22 +111,21 @@ const AnalyticsHiringFunnelChart = () => {
         </div>
       </Card>
 
-      {/* Conversion Rate Summary */}
       <Card className="p-6">
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Conversion Metrics</h3>
           <p className="text-muted-foreground text-sm">
-            Key conversion rates across hiring stages
+            Derived rates from the selected period funnel
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          {conversionMetrics.map((metric) => (
+          {(conversionMetrics.length ? conversionMetrics : []).map((metric) => (
             <div key={metric.label} className="rounded-lg border p-4">
               <p className="text-muted-foreground text-sm font-medium">
                 {metric.label}
               </p>
-              <p className="text-primary mt-2 text-3xl font-bold">
+              <p className="text-primary mt-2 text-3xl font-bold tabular-nums">
                 {metric.value}
               </p>
             </div>
@@ -104,6 +134,4 @@ const AnalyticsHiringFunnelChart = () => {
       </Card>
     </div>
   );
-};
-
-export default AnalyticsHiringFunnelChart;
+}

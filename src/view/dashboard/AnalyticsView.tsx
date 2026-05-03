@@ -1,26 +1,108 @@
 "use client";
 
+import AnalyticsApplicationTrendsChart from "@/components/dashboard/analytics/AnalyticsApplicationTrendsChart";
+import AnalyticsDepartmentDistribution from "@/components/dashboard/analytics/AnalyticsDepartmentDistribution";
+import AnalyticsHiringFunnelChart from "@/components/dashboard/analytics/AnalyticsHiringFunnelChart";
+import AnalyticsJobPerformanceChart from "@/components/dashboard/analytics/AnalyticsJobPerformanceChart";
+import AnalyticsOverview from "@/components/dashboard/analytics/AnalyticsOverview";
+import DashboardAnalyticsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAnalyticsHeader";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
+import { downloadEmployerAnalyticsCsv } from "@/lib/exportEmployerAnalyticsCsv";
+import { useGetEmployerAnalyticsQuery } from "@/redux/feature/company/companyApi";
+import { useAppSelector } from "@/redux/hooks";
+import type {
+  EmployerAnalyticsPayload,
+  EmployerAnalyticsPeriod,
+} from "@/types/employerAnalytics";
 import { Briefcase, FileText, TrendingUp, Users } from "lucide-react";
-import { useState } from "react";
-import AnalyticsApplicationTrendsChart from "../../components/dashboard/analytics/AnalyticsApplicationTrendsChart";
-import AnalyticsDepartmentDistribution from "../../components/dashboard/analytics/AnalyticsDepartmentDistribution";
-import AnalyticsHiringFunnelChart from "../../components/dashboard/analytics/AnalyticsHiringFunnelChart";
-import AnalyticsJobPerformanceChart from "../../components/dashboard/analytics/AnalyticsJobPerformanceChart";
-import AnalyticsOverview from "../../components/dashboard/analytics/AnalyticsOverview";
-import DashboardAnalyticsHeader from "../../components/dashboard/dashboard-nav/header/DashboardAnalyticsHeader";
+import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
 
-const AnalyticsView = () => {
-  const [timeRange, setTimeRange] = useState("30d");
+export default function AnalyticsView() {
+  const { user } = useAppSelector((s) => s.auth);
+  const [timeRange, setTimeRange] = useState<EmployerAnalyticsPeriod>("30d");
+
+  const skip = !user?.id;
+
+  const {
+    data: envelope,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetEmployerAnalyticsQuery(timeRange, {
+    skip,
+    refetchOnMountOrArgChange: true,
+  });
+
+  const analytics = useMemo(
+    () => envelope?.data as EmployerAnalyticsPayload | undefined,
+    [envelope],
+  );
+
+  const handleExport = useCallback(() => {
+    if (!analytics) return;
+    downloadEmployerAnalyticsCsv(
+      analytics,
+      `employer-analytics-${analytics.period}.csv`,
+    );
+  }, [analytics]);
+
+  const chartLoading = isLoading || isFetching;
 
   return (
     <div className="mt-16 min-h-screen">
       <DashboardAnalyticsHeader
         timeRange={timeRange}
         setTimeRange={setTimeRange}
+        onExportReport={handleExport}
+        exportDisabled={!analytics || chartLoading}
       />
-      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
-        <AnalyticsOverview timeRange={timeRange} />
+      <div className="space-y-6 px-4 pb-10 sm:px-6 sm:py-8">
+        {skip && (
+          <p className="text-muted-foreground text-sm">
+            Sign in as an employer to view analytics.
+          </p>
+        )}
+
+        {isError && !skip && (
+          <div
+            className="border-destructive/20 bg-destructive/5 text-destructive flex flex-col gap-3 rounded-xl border p-4 text-sm sm:flex-row sm:items-center sm:justify-between"
+            role="alert"
+          >
+            <p>Unable to load analytics for your company.</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+
+        {analytics?.hasCompany === false && !isError && (
+          <div
+            className="flex flex-col gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-950 sm:flex-row sm:items-center sm:justify-between dark:text-amber-100"
+            role="status"
+          >
+            <p>
+              Your account is not linked to a company yet. Create or complete
+              your company profile to track hiring analytics.
+            </p>
+            <Button type="button" variant="outline" size="sm" asChild>
+              <Link href={EMPLOYER_ROUTES.companyProfile}>Company profile</Link>
+            </Button>
+          </div>
+        )}
+
+        <AnalyticsOverview
+          summary={analytics?.summary}
+          isLoading={isLoading && !analytics}
+        />
 
         <Tabs defaultValue="applications" className="space-y-8">
           <div className="scrollbar-none text-foreground -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
@@ -57,24 +139,35 @@ const AnalyticsView = () => {
           </div>
 
           <TabsContent value="applications">
-            <AnalyticsApplicationTrendsChart timeRange={timeRange} />
+            <AnalyticsApplicationTrendsChart
+              data={analytics?.applicationTrends ?? []}
+              isLoading={chartLoading && !analytics}
+            />
           </TabsContent>
 
           <TabsContent value="jobs">
-            <AnalyticsJobPerformanceChart timeRange={timeRange} />
+            <AnalyticsJobPerformanceChart
+              rows={analytics?.jobPerformance ?? []}
+              isLoading={chartLoading && !analytics}
+            />
           </TabsContent>
 
           <TabsContent value="departments">
-            <AnalyticsDepartmentDistribution />
+            <AnalyticsDepartmentDistribution
+              departments={analytics?.departments ?? []}
+              isLoading={chartLoading && !analytics}
+            />
           </TabsContent>
 
           <TabsContent value="funnel">
-            <AnalyticsHiringFunnelChart />
+            <AnalyticsHiringFunnelChart
+              stages={analytics?.funnelStages ?? []}
+              conversionMetrics={analytics?.conversionMetrics ?? []}
+              isLoading={chartLoading && !analytics}
+            />
           </TabsContent>
         </Tabs>
       </div>
     </div>
   );
-};
-
-export default AnalyticsView;
+}
