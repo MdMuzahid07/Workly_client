@@ -8,7 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  useGetMyNotificationsQuery,
+  useGetUnreadCountQuery,
+  useMarkNotificationReadMutation,
+} from "@/redux/feature/notification/notificationApi";
 import { useAppSelector } from "@/redux/hooks";
+import type { NotificationType } from "@/types/notification";
+import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -25,13 +32,7 @@ import CompactNotificationCard from "./CompactNotificationCard";
 
 interface Notification {
   id: string;
-  type:
-    | "APPLICATION_RECEIVED"
-    | "APPLICATION_STATUS_CHANGE"
-    | "NEW_JOB_MATCH"
-    | "MESSAGE_RECEIVED"
-    | "INTERVIEW_SCHEDULED"
-    | "SYSTEM_ANNOUNCEMENT";
+  type: NotificationType;
   title: string;
   message: string;
   isRead: boolean;
@@ -85,62 +86,42 @@ const NotificationDropdown = () => {
   const { user } = useAppSelector((state) => state.auth) || {};
   const isEmployer = user?.role === "EMPLOYER" || (user?.role as number) === 1;
 
-  // TODO: Replace with actual API call when notification API is ready
-  // For now using mock data
-  const notifications: Notification[] = useMemo(() => {
-    // Mock notifications - replace with actual API call
-    return [
-      {
-        id: "1",
-        type: "APPLICATION_STATUS_CHANGE",
-        title: "Application Status Updated",
-        message:
-          'Your application for Frontend Developer at TechFlow Inc. has been moved to "Interview" stage.',
-        isRead: false,
-        timestamp: "2 hours ago",
-        metadata: {
-          jobTitle: "Frontend Developer",
-          companyName: "TechFlow Inc.",
-          applicationStatus: "Interview",
-        },
-      },
-      {
-        id: "2",
-        type: "MESSAGE_RECEIVED",
-        title: "New Message",
-        message: "Sarah Johnson sent you a message about your application.",
-        isRead: false,
-        timestamp: "3 hours ago",
-        metadata: {
-          senderName: "Sarah Johnson",
-          companyName: "TechFlow Inc.",
-        },
-      },
-      {
-        id: "3",
-        type: "INTERVIEW_SCHEDULED",
-        title: "Interview Scheduled",
-        message:
-          "Your interview for Backend Engineer position has been scheduled for tomorrow at 2:00 PM.",
-        isRead: true,
-        timestamp: "1 day ago",
-        metadata: {
-          jobTitle: "Backend Engineer",
-          companyName: "DataVision Labs",
-        },
-      },
-    ];
-  }, []);
+  const skip = !user?.id;
+  const { data: unreadEnvelope } = useGetUnreadCountQuery(undefined, { skip });
+  const unreadCount = unreadEnvelope?.data?.unreadCount ?? 0;
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-  const recentNotifications = notifications.slice(0, 5);
+  const { data: listEnvelope } = useGetMyNotificationsQuery(
+    { page: 1, limit: 5 },
+    { skip },
+  );
+
+  const [markRead] = useMarkNotificationReadMutation();
+
+  const recentNotifications: Notification[] = useMemo(() => {
+    const raw = Array.isArray(listEnvelope?.data) ? listEnvelope!.data : [];
+    return raw.map((n) => ({
+      id: n.id,
+      type: n.type,
+      title: n.title,
+      message: n.message,
+      isRead: n.isRead,
+      timestamp: n.createdAt
+        ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })
+        : "",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      metadata: (n.metadata as any) ?? undefined,
+    }));
+  }, [listEnvelope]);
   const notificationUrl = isEmployer
     ? "/employer/notifications"
     : "/dashboard/notifications";
 
-  const markAsRead = (id: string) => {
-    // TODO: Implement mark as read API call
-    console.log("Mark as read:", id);
+  const markAsRead = async (id: string) => {
+    try {
+      await markRead(id).unwrap();
+    } catch {
+      // ignore; UI will recover on next fetch/socket tick
+    }
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

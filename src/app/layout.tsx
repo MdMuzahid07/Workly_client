@@ -3,6 +3,7 @@ import { Barlow } from "next/font/google";
 import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
+import SocketProvider from "../provider/SocketProvider";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 import "./globals.css";
@@ -46,7 +47,9 @@ export default function RootLayout({
           disableTransitionOnChange={false}
           storageKey="workly-theme"
         >
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <SocketProvider>{children}</SocketProvider>
+          </ReduxProvider>
         </ThemeProvider>
         <Toaster
           position="top-center"

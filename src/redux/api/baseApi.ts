@@ -78,6 +78,7 @@ export const tagTypes = {
   applications: "applications",
   categories: "categories",
   company: "company",
+  notifications: "notifications",
   candidates: "candidates",
   resume: "resume",
   follow: "follow",

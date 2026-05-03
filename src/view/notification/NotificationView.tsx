@@ -3,6 +3,15 @@ import DashboardNotificationHeader from "@/components/dashboard/dashboard-nav/he
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  useDeleteNotificationMutation,
+  useGetMyNotificationsQuery,
+  useMarkAllNotificationsReadMutation,
+  useMarkNotificationReadMutation,
+} from "@/redux/feature/notification/notificationApi";
+import { useAppSelector } from "@/redux/hooks";
+import type { NotificationType } from "@/types/notification";
+import { formatDistanceToNow } from "date-fns";
+import {
   Bell,
   BellRing,
   Briefcase,
@@ -14,13 +23,7 @@ import NotificationCard from "../../components/main/notification/NotificationCar
 
 interface Notification {
   id: string;
-  type:
-    | "APPLICATION_RECEIVED"
-    | "APPLICATION_STATUS_CHANGE"
-    | "NEW_JOB_MATCH"
-    | "MESSAGE_RECEIVED"
-    | "INTERVIEW_SCHEDULED"
-    | "SYSTEM_ANNOUNCEMENT";
+  type: NotificationType;
   title: string;
   message: string;
   isRead: boolean;
@@ -71,79 +74,27 @@ const getNotificationColor = (type: Notification["type"]) => {
 
 const NotificationView = () => {
   const [activeTab, setActiveTab] = useState("all");
+  const { user } = useAppSelector((s) => s.auth) || {};
+  const skip = !user?.id;
 
-  // fake data
-  const notifications: Notification[] = [
-    {
-      id: "1",
-      type: "APPLICATION_STATUS_CHANGE",
-      title: "Application Status Updated",
-      message:
-        'Your application for Frontend Developer at TechFlow Inc. has been moved to "Interview" stage.',
-      isRead: false,
-      timestamp: "2 hours ago",
-      metadata: {
-        jobTitle: "Frontend Developer",
-        companyName: "TechFlow Inc.",
-        applicationStatus: "Interview",
-      },
-    },
-    {
-      id: "2",
-      type: "MESSAGE_RECEIVED",
-      title: "New Message",
-      message: "Sarah Johnson sent you a message about your application.",
-      isRead: false,
-      timestamp: "3 hours ago",
-      metadata: {
-        senderName: "Sarah Johnson",
-        companyName: "TechFlow Inc.",
-      },
-    },
-    {
-      id: "3",
-      type: "INTERVIEW_SCHEDULED",
-      title: "Interview Scheduled",
-      message:
-        "Your interview for Backend Engineer position has been scheduled for tomorrow at 2:00 PM.",
-      isRead: true,
-      timestamp: "1 day ago",
-      metadata: {
-        jobTitle: "Backend Engineer",
-        companyName: "DataVision Labs",
-      },
-    },
-    {
-      id: "4",
-      type: "NEW_JOB_MATCH",
-      title: "New Job Match",
-      message: "We found 3 new jobs that match your preferences.",
-      isRead: true,
-      timestamp: "2 days ago",
-    },
-    {
-      id: "5",
-      type: "APPLICATION_RECEIVED",
-      title: "Application Received",
-      message:
-        "Your application for Full Stack Developer at InnovateCorp has been received.",
-      isRead: true,
-      timestamp: "3 days ago",
-      metadata: {
-        jobTitle: "Full Stack Developer",
-        companyName: "InnovateCorp",
-      },
-    },
-    {
-      id: "6",
-      type: "SYSTEM_ANNOUNCEMENT",
-      title: "Platform Update",
-      message:
-        "New features have been added to improve your job search experience.",
-      isRead: true,
-      timestamp: "1 week ago",
-    },
-  ];
+  const { data: envelope } = useGetMyNotificationsQuery(
+    { page: 1, limit: 100 },
+    { skip, refetchOnMountOrArgChange: true },
+  );
+  const raw = Array.isArray(envelope?.data) ? envelope!.data : [];
+
+  const notifications: Notification[] = raw.map((n) => ({
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    message: n.message,
+    isRead: n.isRead,
+    timestamp: n.createdAt
+      ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })
+      : "",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    metadata: (n.metadata as any) ?? undefined,
+  }));
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -161,10 +112,33 @@ const NotificationView = () => {
     return true;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const markAsRead = (id: string) => {};
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const deleteNotification = (id: string) => {};
+  const [markRead] = useMarkNotificationReadMutation();
+  const [markAllRead] = useMarkAllNotificationsReadMutation();
+  const [deleteNotif] = useDeleteNotificationMutation();
+
+  const markAsRead = async (id: string) => {
+    try {
+      await markRead(id).unwrap();
+    } catch {
+      // ignore
+    }
+  };
+
+  const deleteNotification = async (id: string) => {
+    try {
+      await deleteNotif(id).unwrap();
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleMarkAll = async () => {
+    try {
+      await markAllRead().unwrap();
+    } catch {
+      // ignore
+    }
+  };
 
   return (
     <div className="min-h-screen pt-16">
@@ -201,6 +175,18 @@ const NotificationView = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
+
+          {unreadCount > 0 && (
+            <div className="mb-6 flex justify-end">
+              <button
+                type="button"
+                onClick={handleMarkAll}
+                className="text-primary hover:text-primary/80 text-sm font-bold"
+              >
+                Mark all as read
+              </button>
+            </div>
+          )}
 
           {/* Notifications List */}
           <div className="space-y-4">
