@@ -16,13 +16,13 @@ const DashboardAdminPlansHeader = ({
 }: DashboardAdminPlansHeaderProps) => {
   return (
     <DashboardHeaderContainer>
-      <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4">
+      <div className="flex h-full min-w-0 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-4">
           <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
             <CreditCard className="text-primary h-6 w-6" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight sm:text-xl">
                 Subscription Plans
               </h1>
