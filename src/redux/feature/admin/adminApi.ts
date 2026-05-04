@@ -4,6 +4,11 @@ import type {
   AdminEmployerStats,
   AdminEmployerStatus,
 } from "@/types/adminEmployers";
+import type {
+  AdminJobSeekerRow,
+  AdminJobSeekerStats,
+  AdminJobSeekerStatus,
+} from "@/types/adminJobSeekers";
 
 type Envelope<T> = {
   success: boolean;
@@ -17,6 +22,13 @@ export type AdminEmployerListArgs = {
   limit?: number;
   q?: string;
   status?: AdminEmployerStatus | null;
+};
+
+export type AdminJobSeekerListArgs = {
+  page?: number;
+  limit?: number;
+  q?: string;
+  status?: AdminJobSeekerStatus | null;
 };
 
 const adminApi = baseApi.injectEndpoints({
@@ -74,6 +86,52 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["company"],
     }),
+
+    getJobSeekerStats: builder.query<Envelope<AdminJobSeekerStats>, void>({
+      query: () => ({ url: "/admin/job-seekers/stats", method: "GET" }),
+      providesTags: ["user"],
+    }),
+
+    getJobSeekersAdmin: builder.query<
+      Envelope<AdminJobSeekerRow[]>,
+      AdminJobSeekerListArgs
+    >({
+      query: (args) => ({
+        url: "/admin/job-seekers",
+        method: "GET",
+        params: {
+          page: args.page ?? 1,
+          limit: args.limit ?? 20,
+          q: args.q || undefined,
+          status: args.status || undefined,
+        },
+      }),
+      providesTags: ["user"],
+    }),
+
+    suspendJobSeekerAdmin: builder.mutation<Envelope<unknown>, string>({
+      query: (userId) => ({
+        url: `/admin/job-seekers/${userId}/suspend`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["user"],
+    }),
+
+    reactivateJobSeekerAdmin: builder.mutation<Envelope<unknown>, string>({
+      query: (userId) => ({
+        url: `/admin/job-seekers/${userId}/reactivate`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["user"],
+    }),
+
+    deleteJobSeekerAdmin: builder.mutation<Envelope<unknown>, string>({
+      query: (userId) => ({
+        url: `/admin/job-seekers/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["user"],
+    }),
   }),
 });
 
@@ -84,6 +142,11 @@ export const {
   useSuspendEmployerAdminMutation,
   useReactivateEmployerAdminMutation,
   useDeleteEmployerAdminMutation,
+  useGetJobSeekerStatsQuery,
+  useGetJobSeekersAdminQuery,
+  useSuspendJobSeekerAdminMutation,
+  useReactivateJobSeekerAdminMutation,
+  useDeleteJobSeekerAdminMutation,
 } = adminApi;
 
 export default adminApi;
