@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -22,6 +23,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  useDeleteEmployerAdminMutation,
+  useGetEmployerStatsQuery,
+  useGetEmployersAdminQuery,
+  useReactivateEmployerAdminMutation,
+  useSuspendEmployerAdminMutation,
+  useVerifyCompanyAdminMutation,
+} from "@/redux/feature/admin/adminApi";
+import type { AdminEmployerStatus } from "@/types/adminEmployers";
+import {
   AlertTriangle,
   Briefcase,
   Building2,
@@ -29,104 +39,102 @@ import {
   ChevronDown,
   ExternalLink,
   Filter,
-  Mail,
   MoreVertical,
   Search,
   ShieldCheck,
   Trash2,
   UserX,
 } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 import DashboardAdminEmployersHeader from "../../components/dashboard/dashboard-nav/header/DashboardAdminEmployersHeader";
 
 const AdminEmployersManagementView = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] =
+    useState<AdminEmployerStatus | null>(null);
 
-  // Mock data for employers
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [employers, setEmployers] = useState([
-    {
-      id: "1",
-      companyName: "TechFlow Inc.",
-      logo: "https://mdmuzahid.vercel.app/assets/logo-DuOSblLl.png",
-      industry: "Technology",
-      ownerName: "Sarah Chen",
-      ownerEmail: "sarah@techflow.com",
-      status: "Verified",
-      activeJobs: 12,
-      joinedDate: "2024-01-15",
-    },
-    {
-      id: "2",
-      companyName: "Global Solutions",
-      logo: "",
-      industry: "Consulting",
-      ownerName: "James Wilson",
-      ownerEmail: "james@globalsolutions.com",
-      status: "Pending",
-      activeJobs: 5,
-      joinedDate: "2024-02-10",
-    },
-    {
-      id: "3",
-      companyName: "Creative Minds",
-      logo: "",
-      industry: "Design",
-      ownerName: "Elena Rodriguez",
-      ownerEmail: "elena@creativeminds.io",
-      status: "Verified",
-      activeJobs: 8,
-      joinedDate: "2024-02-28",
-    },
-    {
-      id: "4",
-      companyName: "HealthPlus",
-      logo: "",
-      industry: "Healthcare",
-      ownerName: "Dr. Robert Smith",
-      ownerEmail: "r.smith@healthplus.org",
-      status: "Suspended",
-      activeJobs: 0,
-      joinedDate: "2023-11-20",
-    },
-  ]);
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  const stats = [
-    {
-      label: "Total Employers",
-      value: "324",
-      icon: Building2,
-      color: "text-blue-500",
-    },
-    {
-      label: "Verified Companies",
-      value: "286",
-      icon: CheckCircle2,
-      color: "text-emerald-500",
-    },
-    {
-      label: "Pending Verification",
-      value: "18",
-      icon: ShieldCheck,
-      color: "text-amber-500",
-    },
-    {
-      label: "Active Jobs",
-      value: "1,245",
-      icon: Briefcase,
-      color: "text-purple-500",
-    },
-  ];
+  const {
+    data: statsEnvelope,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useGetEmployerStatsQuery();
 
-  const filteredEmployers = employers.filter(
-    (emp) =>
-      (emp.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        emp.ownerEmail.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedStatus || emp.status === selectedStatus),
+  const {
+    data: listEnvelope,
+    isLoading: listLoading,
+    isFetching,
+    isError: listError,
+    refetch,
+  } = useGetEmployersAdminQuery({
+    page,
+    limit,
+    q: searchTerm || undefined,
+    status: selectedStatus,
+  });
+
+  const employers = useMemo(
+    () => (Array.isArray(listEnvelope?.data) ? listEnvelope!.data : []),
+    [listEnvelope],
   );
 
-  const statusOptions = ["Verified", "Pending", "Suspended"];
+  const meta = (listEnvelope?.meta ?? null) as {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPage?: number;
+  } | null;
+  const totalPage = meta?.totalPage ?? 1;
+
+  const stats = useMemo(() => {
+    const s = statsEnvelope?.data;
+    return [
+      {
+        label: "Total Employers",
+        value: s ? String(s.totalEmployers) : "—",
+        icon: Building2,
+        color: "text-blue-500",
+      },
+      {
+        label: "Verified Companies",
+        value: s ? String(s.verifiedCompanies) : "—",
+        icon: CheckCircle2,
+        color: "text-emerald-500",
+      },
+      {
+        label: "Pending Verification",
+        value: s ? String(s.pendingVerification) : "—",
+        icon: ShieldCheck,
+        color: "text-amber-500",
+      },
+      {
+        label: "Active Jobs",
+        value: s ? String(s.activeJobs) : "—",
+        icon: Briefcase,
+        color: "text-purple-500",
+      },
+    ];
+  }, [statsEnvelope]);
+
+  const statusOptions: AdminEmployerStatus[] = [
+    "Verified",
+    "Pending",
+    "Suspended",
+  ];
+
+  const [verifyCompany, { isLoading: verifying }] =
+    useVerifyCompanyAdminMutation();
+  const [suspendEmployer, { isLoading: suspending }] =
+    useSuspendEmployerAdminMutation();
+  const [reactivateEmployer, { isLoading: reactivating }] =
+    useReactivateEmployerAdminMutation();
+  const [deleteEmployer, { isLoading: deleting }] =
+    useDeleteEmployerAdminMutation();
+
+  const busy = verifying || suspending || reactivating || deleting;
 
   return (
     <div className="min-h-screen pt-16">
@@ -145,8 +153,17 @@ const AdminEmployersManagementView = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold sm:text-3xl">
-                  {stat.value}
+                  {statsLoading ? (
+                    <Skeleton className="h-8 w-20" />
+                  ) : (
+                    stat.value
+                  )}
                 </div>
+                {statsError && (
+                  <p className="text-destructive mt-2 text-xs font-medium">
+                    Unable to load stats.
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -201,10 +218,20 @@ const AdminEmployersManagementView = () => {
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedStatus(null);
+                  setPage(1);
                 }}
                 className="text-muted-foreground hover:text-primary rounded-full font-bold"
               >
                 Reset
+              </Button>
+            )}
+            {(listError || statsError) && (
+              <Button
+                variant="ghost"
+                onClick={() => refetch()}
+                className="text-muted-foreground hover:text-primary rounded-full font-bold"
+              >
+                Retry
               </Button>
             )}
           </div>
@@ -225,7 +252,22 @@ const AdminEmployersManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredEmployers.map((emp) => (
+                {(listLoading || isFetching) &&
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={`sk-${i}`}>
+                      <TableCell colSpan={6}>
+                        <div className="flex items-center gap-3 py-2">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-4 w-56" />
+                            <Skeleton className="h-3 w-40" />
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
+                {employers.map((emp) => (
                   <TableRow
                     key={emp.id}
                     className="group hover:bg-muted/40 transition-colors"
@@ -251,8 +293,7 @@ const AdminEmployersManagementView = () => {
                     <TableCell>
                       <div className="text-sm">
                         <p className="font-medium">{emp.ownerName}</p>
-                        <p className="text-muted-foreground flex items-center gap-1 text-xs">
-                          <Mail className="h-3 w-3" />
+                        <p className="text-muted-foreground truncate text-xs">
                           {emp.ownerEmail}
                         </p>
                       </div>
@@ -291,9 +332,14 @@ const AdminEmployersManagementView = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            View Profile
+                          <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link
+                              href={`/companies/${emp.slug}`}
+                              target="_blank"
+                            >
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              View Profile
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem className="cursor-pointer">
                             <Briefcase className="mr-2 h-4 w-4" />
@@ -301,23 +347,51 @@ const AdminEmployersManagementView = () => {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {emp.status !== "Verified" && (
-                            <DropdownMenuItem className="cursor-pointer text-emerald-600">
+                            <DropdownMenuItem
+                              className="cursor-pointer text-emerald-600"
+                              disabled={busy}
+                              onClick={() => verifyCompany(emp.id)}
+                            >
                               <ShieldCheck className="mr-2 h-4 w-4" />
                               Verify Account
                             </DropdownMenuItem>
                           )}
                           {emp.status !== "Suspended" ? (
-                            <DropdownMenuItem className="cursor-pointer text-amber-600">
+                            <DropdownMenuItem
+                              className="cursor-pointer text-amber-600"
+                              disabled={busy || !emp.ownerId}
+                              onClick={() =>
+                                emp.ownerId
+                                  ? suspendEmployer(emp.ownerId)
+                                  : undefined
+                              }
+                            >
                               <UserX className="mr-2 h-4 w-4" />
                               Suspend Account
                             </DropdownMenuItem>
                           ) : (
-                            <DropdownMenuItem className="cursor-pointer text-emerald-600">
+                            <DropdownMenuItem
+                              className="cursor-pointer text-emerald-600"
+                              disabled={busy || !emp.ownerId}
+                              onClick={() =>
+                                emp.ownerId
+                                  ? reactivateEmployer(emp.ownerId)
+                                  : undefined
+                              }
+                            >
                               <CheckCircle2 className="mr-2 h-4 w-4" />
                               Reactivate Account
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem className="text-destructive cursor-pointer">
+                          <DropdownMenuItem
+                            className="text-destructive cursor-pointer"
+                            disabled={busy || !emp.ownerId}
+                            onClick={() =>
+                              emp.ownerId
+                                ? deleteEmployer(emp.ownerId)
+                                : undefined
+                            }
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Account
                           </DropdownMenuItem>
@@ -329,7 +403,7 @@ const AdminEmployersManagementView = () => {
               </TableBody>
             </Table>
           </div>
-          {filteredEmployers.length === 0 && (
+          {!listLoading && !isFetching && employers.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="bg-muted mb-4 rounded-full p-4">
                 <AlertTriangle className="text-muted-foreground h-8 w-8" />
@@ -342,6 +416,30 @@ const AdminEmployersManagementView = () => {
             </div>
           )}
         </Card>
+
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground text-sm">
+            Page {page} of {totalPage}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="rounded-full"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Prev
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full"
+              disabled={page >= totalPage}
+              onClick={() => setPage((p) => Math.min(totalPage, p + 1))}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
