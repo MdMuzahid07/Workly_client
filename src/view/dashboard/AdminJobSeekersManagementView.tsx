@@ -38,101 +38,96 @@ import {
   UserX,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 import DashboardAdminJobSeekersHeader from "../../components/dashboard/dashboard-nav/header/DashboardAdminJobSeekersHeader";
+import type { AdminJobSeekerStatus } from "@/types/adminJobSeekers";
+import {
+  useDeleteJobSeekerAdminMutation,
+  useGetJobSeekerStatsQuery,
+  useGetJobSeekersAdminQuery,
+  useReactivateJobSeekerAdminMutation,
+  useSuspendJobSeekerAdminMutation,
+} from "@/redux/feature/admin/adminApi";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminJobSeekersManagementView = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] =
+    useState<AdminJobSeekerStatus | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  // Mock data for job seekers
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [jobSeekers, setJobSeekers] = useState([
-    {
-      id: "1",
-      name: "Alex Rivera",
-      avatar: "",
-      email: "alex.rivera@example.com",
-      location: "San Francisco, CA",
-      status: "Looking",
-      experience: "Senior",
-      primarySkill: "React",
-      joinedDate: "2024-01-20",
-      socials: { github: "#", linkedin: "#", portfolio: "#" },
-    },
-    {
-      id: "2",
-      name: "Sarah Kim",
-      avatar: "",
-      email: "sarah.kim@dev.io",
-      location: "Remote",
-      status: "Hired",
-      experience: "Intermediate",
-      primarySkill: "Node.js",
-      joinedDate: "2024-02-05",
-      socials: { github: "#", linkedin: "#", portfolio: "#" },
-    },
-    {
-      id: "3",
-      name: "Michael Ross",
-      avatar: "",
-      email: "m.ross@corporate.com",
-      location: "New York, NY",
-      status: "Active",
-      experience: "Cloud Architect",
-      primarySkill: "AWS",
-      joinedDate: "2024-02-25",
-      socials: { github: "#", linkedin: "#" },
-    },
-    {
-      id: "4",
-      name: "Chloe Dubois",
-      avatar: "",
-      email: "chloe.d@design.fr",
-      location: "Paris, FR",
-      status: "Looking",
-      experience: "Junior",
-      primarySkill: "Figma",
-      joinedDate: "2024-03-01",
-      socials: { portfolio: "#", linkedin: "#" },
-    },
-  ]);
+  const {
+    data: statsEnvelope,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useGetJobSeekerStatsQuery();
 
-  const stats = [
-    {
-      label: "Total Job Seekers",
-      value: "12,482",
-      icon: Users,
-      color: "text-blue-500",
-    },
-    {
-      label: "Active Resumes",
-      value: "8,245",
-      icon: FileText,
-      color: "text-emerald-500",
-    },
-    {
-      label: "Portfolios Shared",
-      value: "3,150",
-      icon: Globe,
-      color: "text-purple-500",
-    },
-    {
-      label: "High Match Rate",
-      value: "12%",
-      icon: TrendingUp,
-      color: "text-amber-500",
-    },
-  ];
+  const {
+    data: listEnvelope,
+    isLoading: listLoading,
+    isFetching,
+    isError: listError,
+    refetch,
+  } = useGetJobSeekersAdminQuery({
+    page,
+    limit,
+    q: searchTerm || undefined,
+    status: selectedStatus,
+  });
 
-  const filteredJobSeekers = jobSeekers.filter(
-    (js) =>
-      (js.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        js.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedStatus || js.status === selectedStatus),
+  const jobSeekers = useMemo(
+    () => (Array.isArray(listEnvelope?.data) ? listEnvelope!.data : []),
+    [listEnvelope],
   );
 
-  const statusOptions = ["Hired", "Looking", "Active"];
+  const meta = (listEnvelope?.meta ?? null) as {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPage?: number;
+  } | null;
+  const totalPage = meta?.totalPage ?? 1;
+
+  const stats = useMemo(() => {
+    const s = statsEnvelope?.data;
+    return [
+      {
+        label: "Total Job Seekers",
+        value: s ? String(s.totalJobSeekers) : "—",
+        icon: Users,
+        color: "text-blue-500",
+      },
+      {
+        label: "Active Resumes",
+        value: s ? String(s.activeResumes) : "—",
+        icon: FileText,
+        color: "text-emerald-500",
+      },
+      {
+        label: "Portfolios Shared",
+        value: s ? String(s.portfoliosShared) : "—",
+        icon: Globe,
+        color: "text-purple-500",
+      },
+      {
+        label: "High Match Rate",
+        value: s ? `${s.highMatchRate}%` : "—",
+        icon: TrendingUp,
+        color: "text-amber-500",
+      },
+    ];
+  }, [statsEnvelope]);
+
+  const statusOptions: AdminJobSeekerStatus[] = ["Hired", "Looking", "Active"];
+
+  const [suspend, { isLoading: suspending }] =
+    useSuspendJobSeekerAdminMutation();
+  const [reactivate, { isLoading: reactivating }] =
+    useReactivateJobSeekerAdminMutation();
+  const [remove, { isLoading: deleting }] = useDeleteJobSeekerAdminMutation();
+  const busy = suspending || reactivating || deleting;
 
   return (
     <div className="min-h-screen pt-16">
@@ -151,8 +146,17 @@ const AdminJobSeekersManagementView = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold sm:text-3xl">
-                  {stat.value}
+                  {statsLoading ? (
+                    <Skeleton className="h-8 w-20" />
+                  ) : (
+                    stat.value
+                  )}
                 </div>
+                {statsError && (
+                  <p className="text-destructive mt-2 text-xs font-medium">
+                    Unable to load stats.
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -207,10 +211,21 @@ const AdminJobSeekersManagementView = () => {
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedStatus(null);
+                  setPage(1);
                 }}
                 className="text-muted-foreground hover:text-primary rounded-full font-bold"
               >
                 Reset
+              </Button>
+            )}
+
+            {(listError || statsError) && (
+              <Button
+                variant="ghost"
+                onClick={() => refetch()}
+                className="text-muted-foreground hover:text-primary rounded-full font-bold"
+              >
+                Retry
               </Button>
             )}
           </div>
@@ -231,7 +246,22 @@ const AdminJobSeekersManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredJobSeekers.map((js) => (
+                {(listLoading || isFetching) &&
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={`sk-${i}`}>
+                      <TableCell colSpan={6}>
+                        <div className="flex items-center gap-3 py-2">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-4 w-56" />
+                            <Skeleton className="h-3 w-40" />
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
+                {jobSeekers.map((js) => (
                   <TableRow
                     key={js.id}
                     className="group hover:bg-muted/40 transition-colors"
@@ -290,6 +320,8 @@ const AdminJobSeekersManagementView = () => {
                             href={js.socials.github}
                             className="text-muted-foreground transition-colors hover:text-black"
                             title="GitHub"
+                            target="_blank"
+                            rel="noreferrer"
                           >
                             <Github className="h-4 w-4" />
                           </a>
@@ -299,6 +331,8 @@ const AdminJobSeekersManagementView = () => {
                             href={js.socials.linkedin}
                             className="text-muted-foreground transition-colors hover:text-blue-600"
                             title="LinkedIn"
+                            target="_blank"
+                            rel="noreferrer"
                           >
                             <Linkedin className="h-4 w-4" />
                           </a>
@@ -308,6 +342,8 @@ const AdminJobSeekersManagementView = () => {
                             href={js.socials.portfolio}
                             className="text-muted-foreground hover:text-primary transition-colors"
                             title="Portfolio"
+                            target="_blank"
+                            rel="noreferrer"
                           >
                             <Globe className="h-4 w-4" />
                           </a>
@@ -323,9 +359,14 @@ const AdminJobSeekersManagementView = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            View Full Profile
+                          <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link
+                              href={`/dashboard/profile?userId=${js.id}`}
+                              target="_blank"
+                            >
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              View Full Profile
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem className="cursor-pointer">
                             <FileText className="mr-2 h-4 w-4" />
@@ -336,11 +377,25 @@ const AdminJobSeekersManagementView = () => {
                             Search Analytics
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="cursor-pointer text-amber-600">
+                          <DropdownMenuItem
+                            className="cursor-pointer text-amber-600"
+                            disabled={busy}
+                            onClick={() =>
+                              js.status === "Suspended"
+                                ? reactivate(js.id)
+                                : suspend(js.id)
+                            }
+                          >
                             <UserX className="mr-2 h-4 w-4" />
-                            Suspend User
+                            {js.status === "Suspended"
+                              ? "Reactivate User"
+                              : "Suspend User"}
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive cursor-pointer">
+                          <DropdownMenuItem
+                            className="text-destructive cursor-pointer"
+                            disabled={busy}
+                            onClick={() => remove(js.id)}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Profile
                           </DropdownMenuItem>
@@ -352,7 +407,7 @@ const AdminJobSeekersManagementView = () => {
               </TableBody>
             </Table>
           </div>
-          {filteredJobSeekers.length === 0 && (
+          {!listLoading && !isFetching && jobSeekers.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="bg-muted mb-4 rounded-full p-4">
                 <AlertTriangle className="text-muted-foreground h-8 w-8" />
@@ -364,6 +419,30 @@ const AdminJobSeekersManagementView = () => {
             </div>
           )}
         </Card>
+
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground text-sm">
+            Page {page} of {totalPage}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="rounded-full"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Prev
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full"
+              disabled={page >= totalPage}
+              onClick={() => setPage((p) => Math.min(totalPage, p + 1))}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
