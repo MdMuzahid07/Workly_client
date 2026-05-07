@@ -9,6 +9,7 @@ import type {
   AdminJobSeekerStats,
   AdminJobSeekerStatus,
 } from "@/types/adminJobSeekers";
+import type { AdminJobRow, AdminJobStats } from "@/types/adminJobs";
 
 type Envelope<T> = {
   success: boolean;
@@ -29,6 +30,13 @@ export type AdminJobSeekerListArgs = {
   limit?: number;
   q?: string;
   status?: AdminJobSeekerStatus | null;
+};
+
+export type AdminJobListArgs = {
+  page?: number;
+  limit?: number;
+  q?: string;
+  type?: string | null;
 };
 
 const adminApi = baseApi.injectEndpoints({
@@ -132,6 +140,26 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["user"],
     }),
+    getActiveJobsStats: builder.query<Envelope<AdminJobStats>, void>({
+      query: () => ({ url: "/admin/jobs/stats", method: "GET" }),
+      providesTags: ["jobs"],
+    }),
+    getActiveJobsAdmin: builder.query<
+      Envelope<AdminJobRow[]>,
+      AdminJobListArgs
+    >({
+      query: (args) => ({
+        url: "/admin/jobs",
+        method: "GET",
+        params: {
+          page: args.page ?? 1,
+          limit: args.limit ?? 20,
+          q: args.q || undefined,
+          type: args.type || undefined,
+        },
+      }),
+      providesTags: ["jobs"],
+    }),
   }),
 });
 
@@ -147,6 +175,8 @@ export const {
   useSuspendJobSeekerAdminMutation,
   useReactivateJobSeekerAdminMutation,
   useDeleteJobSeekerAdminMutation,
+  useGetActiveJobsStatsQuery,
+  useGetActiveJobsAdminQuery,
 } = adminApi;
 
 export default adminApi;
