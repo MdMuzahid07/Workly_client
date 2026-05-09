@@ -11,15 +11,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUpdateCategoryMutation } from "@/redux/feature/category/categoryApi";
 import { Loader2, Plus, Tag } from "lucide-react";
-import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
 
 interface AddSubcategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (data: FieldValues) => void;
-  parentCategory: { id: string; name: string } | null;
+  parentCategory: { id: string; name: string; subcategories: string[] } | null;
 }
 
 const AddSubcategoryDialog = ({
@@ -28,15 +29,24 @@ const AddSubcategoryDialog = ({
   onSuccess,
   parentCategory,
 }: AddSubcategoryDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [updateCategory, { isLoading }] = useUpdateCategoryMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    onSuccess({ ...data, parentId: parentCategory?.id });
-    setIsSubmitting(false);
-    onOpenChange(false);
+    if (!parentCategory) return;
+
+    try {
+      await updateCategory({
+        categoryId: parentCategory.id,
+        subcategories: [...parentCategory.subcategories, data.name],
+      }).unwrap();
+
+      toast.success("Subcategory added successfully");
+      onSuccess(data);
+      onOpenChange(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to add subcategory");
+    }
   };
 
   return (
@@ -82,11 +92,11 @@ const AddSubcategoryDialog = ({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isLoading}
               className="rounded-full font-bold shadow-sm"
               size="sm"
             >
-              {isSubmitting ? (
+              {isLoading ? (
                 <Loader2 className="mr-2 h-3 w-3 animate-spin" />
               ) : (
                 <Plus className="mr-2 h-3 w-3" />

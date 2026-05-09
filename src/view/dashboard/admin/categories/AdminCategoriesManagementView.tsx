@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import AddCategoryDialog from "@/components/dashboard/categories/AddCategoryDialog";
 import AddSubcategoryDialog from "@/components/dashboard/categories/AddSubcategoryDialog";
 import DashboardAdminCategoriesHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminCategoriesHeader";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { CategoryFilterBar } from "./components/CategoryFilterBar";
 import { CategoryStatsGrid } from "./components/CategoryStatsGrid";
 import { CategoryTable } from "./components/CategoryTable";
+
+import { useGetCategoryStatisticsQuery } from "@/redux/feature/category/categoryApi";
 
 const AdminCategoriesManagementView = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,103 +21,43 @@ const AdminCategoriesManagementView = () => {
   // Modal States
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddSubcategoryOpen, setIsAddSubcategoryOpen] = useState(false);
-  const [selectedParent, setSelectedParent] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [selectedParent, setSelectedParent] = useState<any>(null);
 
-  // Mock data for industries (categories)
-  const [categories, setCategories] = useState([
-    {
-      id: "1",
-      name: "Software Engineering",
-      slug: "software-engineering",
-      icon: "Code",
-      active: true,
-      subcategories: ["Web Dev", "Mobile", "DevOps", "AI/ML"],
-      jobCount: 452,
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      name: "Healthcare",
-      slug: "healthcare",
-      icon: "Heart",
-      active: true,
-      subcategories: ["Nursing", "Dental", "Pharma", "Medical Tech"],
-      jobCount: 890,
-      createdAt: "2024-01-16",
-    },
-    {
-      id: "3",
-      name: "Marketing",
-      slug: "marketing",
-      icon: "TrendingUp",
-      active: true,
-      subcategories: ["Social Media", "SEO", "Content", "Brand"],
-      jobCount: 230,
-      createdAt: "2024-01-18",
-    },
-    {
-      id: "4",
-      name: "Financial Services",
-      slug: "finance",
-      icon: "Globe",
-      active: false,
-      subcategories: ["Banking", "Audit", "Crypto", "Insurance"],
-      jobCount: 0,
-      createdAt: "2024-01-20",
-    },
-    {
-      id: "5",
-      name: "Creative & Design",
-      slug: "creative-design",
-      icon: "Camera",
-      active: true,
-      subcategories: ["UI/UX", "Graphic", "Motion", "Product"],
-      jobCount: 156,
-      createdAt: "2024-01-22",
-    },
-  ]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAddCategory = (data: any) => {
-    const newCategory = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: data.name,
-      slug: data.slug,
-      icon: data.icon,
-      active: true,
-      subcategories: [],
-      jobCount: 0,
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    setCategories([newCategory, ...categories]);
+  const queryParams = {
+    search: searchTerm || undefined,
+    active:
+      statusFilter === "ACTIVE"
+        ? "true"
+        : statusFilter === "INACTIVE"
+          ? "false"
+          : undefined,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAddSubcategory = (data: any) => {
-    setCategories(
-      categories.map((cat) =>
-        cat.id === data.parentId
-          ? { ...cat, subcategories: [...cat.subcategories, data.name] }
-          : cat,
-      ),
+  const { data, isLoading, error } = useGetCategoryStatisticsQuery(queryParams);
+
+  const categories = data?.data?.categories || [];
+  const summary = data?.data?.summary;
+
+  if (error) {
+    const err = error as any;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-destructive mt-4 text-xl font-bold">
+            Failed to load data
+          </h2>
+          <p className="text-muted-foreground mt-2">
+            {err?.data?.message ||
+              err?.message ||
+              "An unexpected error occurred"}
+          </p>
+          <Button onClick={() => window.location.reload()} className="mt-6">
+            Retry
+          </Button>
+        </div>
+      </div>
     );
-  };
-
-  const filteredCategories = categories.filter(
-    (cat) =>
-      (cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cat.subcategories.some((sub) =>
-          sub.toLowerCase().includes(searchTerm.toLowerCase()),
-        )) &&
-      (statusFilter === null
-        ? true
-        : statusFilter === "ACTIVE"
-          ? cat.active
-          : !cat.active),
-  );
+  }
 
   return (
     <div className="min-h-screen pt-16 lg:pt-20">
@@ -123,7 +67,7 @@ const AdminCategoriesManagementView = () => {
 
       <div className="space-y-8 px-4 py-8 pb-20 sm:px-6 lg:px-8">
         {/* Stats Grid */}
-        <CategoryStatsGrid />
+        <CategoryStatsGrid summary={summary} isLoading={isLoading} />
 
         {/* Filter Bar */}
         <CategoryFilterBar
@@ -135,7 +79,8 @@ const AdminCategoriesManagementView = () => {
 
         {/* Categories Table */}
         <CategoryTable
-          categories={filteredCategories}
+          categories={categories}
+          isLoading={isLoading}
           onAddSubcategory={(cat) => {
             setSelectedParent(cat);
             setIsAddSubcategoryOpen(true);
@@ -147,12 +92,12 @@ const AdminCategoriesManagementView = () => {
       <AddCategoryDialog
         open={isAddCategoryOpen}
         onOpenChange={setIsAddCategoryOpen}
-        onSuccess={handleAddCategory}
+        onSuccess={() => {}} // RTK Query handles invalidation
       />
       <AddSubcategoryDialog
         open={isAddSubcategoryOpen}
         onOpenChange={setIsAddSubcategoryOpen}
-        onSuccess={handleAddSubcategory}
+        onSuccess={() => {}} // RTK Query handles invalidation
         parentCategory={selectedParent}
       />
     </div>
