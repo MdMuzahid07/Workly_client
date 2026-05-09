@@ -12,9 +12,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useCreateCategoryMutation } from "@/redux/feature/category/categoryApi";
 import { Loader2, Save } from "lucide-react";
-import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
 
 interface AddCategoryDialogProps {
   open: boolean;
@@ -27,15 +28,18 @@ const AddCategoryDialog = ({
   onOpenChange,
   onSuccess,
 }: AddCategoryDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createCategory, { isLoading }] = useCreateCategoryMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    onSuccess(data);
-    setIsSubmitting(false);
-    onOpenChange(false);
+    try {
+      await createCategory(data).unwrap();
+      toast.success("Category created successfully");
+      onSuccess(data);
+      onOpenChange(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to create category");
+    }
   };
 
   return (
@@ -84,10 +88,10 @@ const AddCategoryDialog = ({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isLoading}
               className="rounded-full font-bold shadow-md"
             >
-              {isSubmitting ? (
+              {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Save className="mr-2 h-4 w-4" />
