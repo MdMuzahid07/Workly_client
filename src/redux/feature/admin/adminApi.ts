@@ -161,17 +161,45 @@ const adminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["jobs"],
     }),
-    getStaffStats: builder.query<Envelope<any>, void>({
+    getStaffStats: builder.query<any, void>({
       query: () => ({ url: "/admin/staff/stats", method: "GET" }),
-      providesTags: ["user"],
+      providesTags: ["admin"],
     }),
-    getStaffList: builder.query<Envelope<any[]>, any>({
-      query: (args) => ({
+    getStaffList: builder.query<any, any>({
+      query: (params) => ({
         url: "/admin/staff",
         method: "GET",
-        params: args,
+        params,
       }),
-      providesTags: ["user"],
+      providesTags: ["admin"],
+    }),
+    getDashboardOverviewStats: builder.query<any, void>({
+      query: () => ({ url: "/admin/overview/stats", method: "GET" }),
+      providesTags: ["admin"],
+    }),
+    getRecentUsers: builder.query<any, { limit?: number }>({
+      query: (params) => ({
+        url: "/admin/overview/recent-users",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["admin"],
+    }),
+    getModerationQueue: builder.query<any, { limit?: number }>({
+      query: (params) => ({
+        url: "/admin/overview/moderation-queue",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["admin"],
+    }),
+    getAuditLogs: builder.query<any, any>({
+      query: (params) => ({
+        url: "/admin/audit-logs",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["admin"],
     }),
     createStaff: builder.mutation<Envelope<any>, any>({
       query: (body) => ({
@@ -179,7 +207,7 @@ const adminApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["user"],
+      invalidatesTags: ["admin"],
     }),
     setStaffStatus: builder.mutation<
       Envelope<any>,
@@ -190,14 +218,7 @@ const adminApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { isActive },
       }),
-      invalidatesTags: ["user"],
-    }),
-    getAuditLogs: builder.query<Envelope<any[]>, any>({
-      query: (args) => ({
-        url: "/admin/audit-logs",
-        method: "GET",
-        params: args,
-      }),
+      invalidatesTags: ["admin"],
     }),
   }),
 });
@@ -209,6 +230,7 @@ export const {
   useSuspendEmployerAdminMutation,
   useReactivateEmployerAdminMutation,
   useDeleteEmployerAdminMutation,
+  useGetStaffListQuery,
   useGetJobSeekerStatsQuery,
   useGetJobSeekersAdminQuery,
   useSuspendJobSeekerAdminMutation,
@@ -217,10 +239,12 @@ export const {
   useGetActiveJobsStatsQuery,
   useGetActiveJobsAdminQuery,
   useGetStaffStatsQuery,
-  useGetStaffListQuery,
   useCreateStaffMutation,
   useSetStaffStatusMutation,
   useGetAuditLogsQuery,
+  useGetDashboardOverviewStatsQuery,
+  useGetRecentUsersQuery,
+  useGetModerationQueueQuery,
 } = adminApi;
 
 export default adminApi;

@@ -85,6 +85,7 @@ export const tagTypes = {
   profile_views: "profile_views",
   job_views: "job_views",
   legal: "legal",
+  admin: "admin",
 } as const;
 
 export type TagType = (typeof tagTypes)[keyof typeof tagTypes];
