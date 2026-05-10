@@ -42,7 +42,7 @@ const baseQueryWithRefreshToken = async (
   let result = await baseQuery(args, api, extraOptions);
   let res;
   if (result?.error?.status === 401 && url) {
-    res = await fetch(url, {
+    res = await fetch(`${url}/auth/refresh`, {
       method: "POST",
       credentials: "include",
     });
