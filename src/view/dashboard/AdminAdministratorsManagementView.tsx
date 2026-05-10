@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import DashboardAdminAdministratorsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminAdministratorsHeader";
 import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
 import WKSelect from "@/components/form/WkSelect";
@@ -22,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -30,6 +33,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  useCreateStaffMutation,
+  useGetAuditLogsQuery,
+  useGetStaffListQuery,
+  useGetStaffStatsQuery,
+  useSetStaffStatusMutation,
+} from "@/redux/feature/admin/adminApi";
+import { format } from "date-fns";
 import {
   Activity,
   AlertTriangle,
@@ -42,114 +53,113 @@ import {
   Search,
   ShieldAlert,
   ShieldCheck,
+  UserCheck,
   UserPlus,
   UserX,
 } from "lucide-react";
-import { useState } from "react";
-import DashboardAdminAdministratorsHeader from "../../components/dashboard/dashboard-nav/header/DashboardAdminAdministratorsHeader";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+
+import { useAppSelector } from "@/redux/hooks";
 
 const AdminAdministratorsManagementView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddAdminOpen, setIsAddAdminOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
-  // Mock roles aligned with UserRole enum
-  const roleOptions = [
-    { value: "ADMIN", label: "System Admin" },
-    { value: "SUPER_ADMIN", label: "Super Administrator" },
-  ];
+  const currentUser = useAppSelector((state) => state.auth.user);
 
-  // Mock data for admins
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [admins, setAdmins] = useState([
-    {
-      id: "1",
-      name: "Master Controller",
-      avatar: "",
-      email: "super@workly.com",
-      role: "SUPER_ADMIN",
-      status: "Active",
-      lastLogin: "2 mins ago",
-    },
-    {
-      id: "2",
-      name: "Staff Manager",
-      avatar: "",
-      email: "staff@workly.com",
-      role: "ADMIN",
-      status: "Active",
-      lastLogin: "1 hour ago",
-    },
-  ]);
+  const [page, setPage] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [auditPage, setAuditPage] = useState(1);
+  const limit = 10;
 
-  // Mock audit logs mirroring AuditLog model
-  const auditLogs = [
-    {
-      id: "1",
-      action: "UPDATE_ROLE",
-      entityType: "User",
-      target: "John Editor",
-      actor: "Super Admin",
-      createdAt: "2024-03-03 14:20",
-    },
-    {
-      id: "2",
-      action: "DEACTIVATE",
-      entityType: "User",
-      target: "Sarah Mod",
-      actor: "Super Admin",
-      createdAt: "2024-03-03 12:45",
-    },
-    {
-      id: "3",
-      action: "LOGIN",
-      entityType: "User",
-      target: "Master Controller",
-      actor: "System",
-      createdAt: "2024-03-03 15:10",
-    },
-  ];
+  // API Hooks
+  const { data: statsData, isLoading: isStatsLoading } =
+    useGetStaffStatsQuery();
+  const { data: staffData, isLoading: isStaffLoading } = useGetStaffListQuery({
+    page,
+    limit,
+    q: searchTerm || undefined,
+    role: selectedRole || undefined,
+  });
+  const { data: auditData, isLoading: isAuditLoading } = useGetAuditLogsQuery({
+    page: auditPage,
+    limit: 5,
+  });
 
-  const stats = [
-    {
-      label: "Total Admins",
-      value: "8",
-      icon: ShieldCheck,
-      color: "text-primary",
-    },
-    {
-      label: "Active Now",
-      value: "3",
-      icon: Activity,
-      color: "text-emerald-500",
-    },
-    {
-      label: "Audit Events",
-      value: "142",
-      icon: History,
-      color: "text-blue-500",
-    },
-    {
-      label: "Risk Items",
-      value: "0",
-      icon: ShieldAlert,
-      color: "text-amber-500",
-    },
-  ];
+  const [createStaff, { isLoading: isCreating }] = useCreateStaffMutation();
+  const [setStaffStatus, { isLoading: isUpdatingStatus }] =
+    useSetStaffStatusMutation();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onAddAdminSubmit = (data: any) => {
-    console.log("Adding new admin:", data);
-    // In real app, this would be an API call
-    setIsAddAdminOpen(false);
+  const roleOptions = useMemo(() => {
+    const options = [
+      { value: "ADMIN", label: "System Admin" },
+      { value: "SUPER_ADMIN", label: "Super Administrator" },
+    ];
+
+    if (currentUser?.role === "ADMIN") {
+      return options.filter((o) => o.value === "ADMIN");
+    }
+
+    return options;
+  }, [currentUser]);
+
+  const stats = useMemo(() => {
+    const s = statsData?.data;
+    return [
+      {
+        label: "Total Admins",
+        value: s?.totalAdmins ?? "0",
+        icon: ShieldCheck,
+        color: "text-primary",
+      },
+      {
+        label: "Active Now",
+        value: s?.activeNow ?? "0",
+        icon: Activity,
+        color: "text-emerald-500",
+      },
+      {
+        label: "Audit Events",
+        value: s?.totalAuditLogs ?? "0",
+        icon: History,
+        color: "text-blue-500",
+      },
+      {
+        label: "Risk Items",
+        value: s?.riskItems ?? "0",
+        icon: ShieldAlert,
+        color: "text-amber-500",
+      },
+    ];
+  }, [statsData]);
+
+  const onAddAdminSubmit = async (data: any) => {
+    try {
+      await createStaff(data).unwrap();
+      toast.success("Administrator created successfully");
+      setIsAddAdminOpen(false);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to create administrator");
+    }
   };
 
-  const filteredAdmins = admins.filter(
-    (adm) =>
-      (adm.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        adm.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedRole || adm.role === selectedRole),
-  );
+  const handleToggleStatus = async (userId: string, currentStatus: string) => {
+    const isActive = currentStatus === "Inactive";
+    try {
+      await setStaffStatus({ userId, isActive }).unwrap();
+      toast.success(
+        `Administrator ${isActive ? "activated" : "deactivated"} successfully`,
+      );
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update status");
+    }
+  };
+
+  const staffMembers = staffData?.data || [];
+  const auditLogs = auditData?.data || [];
 
   return (
     <div className="min-h-screen pt-16">
@@ -161,7 +171,7 @@ const AdminAdministratorsManagementView = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map((stat, idx) => (
-            <Card key={idx} className="bg-card rounded-xl border">
+            <Card key={idx} className="bg-card rounded-xl border shadow-none">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
                   {stat.label}
@@ -170,7 +180,11 @@ const AdminAdministratorsManagementView = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  {stat.value}
+                  {isStatsLoading ? (
+                    <Skeleton className="h-9 w-16" />
+                  ) : (
+                    stat.value
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -179,7 +193,7 @@ const AdminAdministratorsManagementView = () => {
 
         {/* Search & Main Table */}
         <div className="space-y-4">
-          <div className="bg-card flex flex-col gap-4 rounded-xl border p-4 sm:flex-row sm:items-center">
+          <div className="bg-card flex flex-col gap-4 rounded-xl border p-4 shadow-none sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
@@ -238,7 +252,7 @@ const AdminAdministratorsManagementView = () => {
             </div>
           </div>
 
-          <Card className="overflow-hidden rounded-xl border">
+          <Card className="overflow-hidden rounded-xl border shadow-none">
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow>
@@ -250,71 +264,126 @@ const AdminAdministratorsManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredAdmins.map((adm) => (
-                  <TableRow
-                    key={adm.id}
-                    className="group hover:bg-muted/40 transition-colors"
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="border-primary/5 h-10 w-10 border-2">
-                          <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                            {adm.name.substring(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0">
-                          <p className="truncate font-bold">{adm.name}</p>
-                          <p className="text-muted-foreground truncate text-xs">
-                            {adm.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className="border-primary/20 bg-primary/5 text-primary font-bold"
-                      >
-                        {adm.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm font-medium">
-                      <div className="text-muted-foreground flex items-center gap-1.5">
-                        <History className="h-3 w-3" />
-                        {adm.lastLogin}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className="border-none bg-emerald-500/10 font-bold text-emerald-600 hover:bg-emerald-500/20"
-                        variant="outline"
-                      >
-                        {adm.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem className="cursor-pointer">
-                            <Key className="mr-2 h-4 w-4" /> Permissions
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <Eye className="mr-2 h-4 w-4" /> Audit Logs
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive cursor-pointer">
-                            <UserX className="mr-2 h-4 w-4" /> Deactivate
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {isStaffLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton className="h-12 w-48" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Skeleton className="ml-auto h-8 w-8" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : staffMembers.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-muted-foreground h-32 text-center"
+                    >
+                      No staff members found.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  staffMembers.map((adm) => (
+                    <TableRow
+                      key={adm.id}
+                      className="group hover:bg-muted/40 transition-colors"
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="border-primary/5 h-10 w-10 border-2">
+                            <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                              {adm.name.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="truncate font-bold">{adm.name}</p>
+                            <p className="text-muted-foreground truncate text-xs">
+                              {adm.email}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className="border-primary/20 bg-primary/5 text-primary font-bold"
+                        >
+                          {adm.role.replace("_", " ")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">
+                        <div className="text-muted-foreground flex items-center gap-1.5">
+                          <History className="h-3 w-3" />
+                          {adm.lastLogin
+                            ? format(new Date(adm.lastLogin), "MMM d, h:mm a")
+                            : "Never"}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`border-none font-bold ${
+                            adm.status === "Active"
+                              ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                              : "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20"
+                          }`}
+                          variant="outline"
+                        >
+                          {adm.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                              disabled={isUpdatingStatus}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem className="cursor-pointer">
+                              <Key className="mr-2 h-4 w-4" /> Permissions
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <Eye className="mr-2 h-4 w-4" /> Audit Logs
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className={`cursor-pointer ${adm.status === "Active" ? "text-destructive" : "text-emerald-600"}`}
+                              onClick={() =>
+                                handleToggleStatus(adm.id, adm.status)
+                              }
+                            >
+                              {adm.status === "Active" ? (
+                                <>
+                                  <UserX className="mr-2 h-4 w-4" /> Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="mr-2 h-4 w-4" />{" "}
+                                  Activate
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </Card>
@@ -326,7 +395,7 @@ const AdminAdministratorsManagementView = () => {
             <History className="text-primary h-5 w-5" />
             <h3 className="text-lg font-bold">System Audit Logs</h3>
           </div>
-          <Card className="rounded-xl border">
+          <Card className="rounded-xl border shadow-none">
             <Table>
               <TableHeader className="bg-muted/30 text-[11px] tracking-wider uppercase">
                 <TableRow>
@@ -338,28 +407,62 @@ const AdminAdministratorsManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {auditLogs.map((log) => (
-                  <TableRow key={log.id} className="text-xs">
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className="bg-muted/50 text-[10px] font-bold"
-                      >
-                        {log.action}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-medium">
-                      {log.entityType}
-                    </TableCell>
-                    <TableCell className="font-bold">{log.target}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {log.actor}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-right">
-                      {log.createdAt}
+                {isAuditLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton className="h-6 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-24" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Skeleton className="ml-auto h-6 w-32" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : auditLogs.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-muted-foreground h-24 text-center"
+                    >
+                      No audit logs found.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  auditLogs.map((log) => (
+                    <TableRow key={log.id} className="text-xs">
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className="bg-muted/50 text-[10px] font-bold"
+                        >
+                          {log.action}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground font-medium">
+                        {log.entityType}
+                      </TableCell>
+                      <TableCell className="font-bold">{log.target}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {log.actor}
+                        <span className="ml-1 text-[10px] opacity-70">
+                          ({log.actorRole})
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-right">
+                        {format(new Date(log.createdAt), "yyyy-MM-dd HH:mm")}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </Card>
@@ -423,12 +526,17 @@ const AdminAdministratorsManagementView = () => {
                 <Button
                   variant="outline"
                   type="button"
+                  disabled={isCreating}
                   onClick={() => setIsAddAdminOpen(false)}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="px-8 font-bold">
-                  Create Account
+                <Button
+                  type="submit"
+                  className="px-8 font-bold"
+                  disabled={isCreating}
+                >
+                  {isCreating ? "Creating..." : "Create Account"}
                 </Button>
               </div>
             </div>

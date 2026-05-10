@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "@/redux/api/baseApi";
 import type {
   AdminEmployerRow,
@@ -160,6 +161,44 @@ const adminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["jobs"],
     }),
+    getStaffStats: builder.query<Envelope<any>, void>({
+      query: () => ({ url: "/admin/staff/stats", method: "GET" }),
+      providesTags: ["user"],
+    }),
+    getStaffList: builder.query<Envelope<any[]>, any>({
+      query: (args) => ({
+        url: "/admin/staff",
+        method: "GET",
+        params: args,
+      }),
+      providesTags: ["user"],
+    }),
+    createStaff: builder.mutation<Envelope<any>, any>({
+      query: (body) => ({
+        url: "/admin/staff",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["user"],
+    }),
+    setStaffStatus: builder.mutation<
+      Envelope<any>,
+      { userId: string; isActive: boolean }
+    >({
+      query: ({ userId, isActive }) => ({
+        url: `/admin/staff/${userId}/status`,
+        method: "PATCH",
+        body: { isActive },
+      }),
+      invalidatesTags: ["user"],
+    }),
+    getAuditLogs: builder.query<Envelope<any[]>, any>({
+      query: (args) => ({
+        url: "/admin/audit-logs",
+        method: "GET",
+        params: args,
+      }),
+    }),
   }),
 });
 
@@ -177,6 +216,11 @@ export const {
   useDeleteJobSeekerAdminMutation,
   useGetActiveJobsStatsQuery,
   useGetActiveJobsAdminQuery,
+  useGetStaffStatsQuery,
+  useGetStaffListQuery,
+  useCreateStaffMutation,
+  useSetStaffStatusMutation,
+  useGetAuditLogsQuery,
 } = adminApi;
 
 export default adminApi;
