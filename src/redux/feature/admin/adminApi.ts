@@ -220,6 +220,43 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["admin"],
     }),
+    getJobReports: builder.query<any, any>({
+      query: (params) => ({
+        url: "/admin/job-reports",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["admin"],
+    }),
+    getJobReportStats: builder.query<any, void>({
+      query: () => ({ url: "/admin/job-reports/stats", method: "GET" }),
+      providesTags: ["admin"],
+    }),
+    updateJobReportStatus: builder.mutation<
+      any,
+      { reportId: string; status: string }
+    >({
+      query: ({ reportId, ...body }) => ({
+        url: `/admin/job-reports/${reportId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["admin"],
+    }),
+    deactivateJob: builder.mutation<any, string>({
+      query: (jobId) => ({
+        url: `/admin/jobs/${jobId}/deactivate`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["admin"],
+    }),
+    deleteJobListing: builder.mutation<any, string>({
+      query: (jobId) => ({
+        url: `/admin/jobs/${jobId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
@@ -245,6 +282,11 @@ export const {
   useGetDashboardOverviewStatsQuery,
   useGetRecentUsersQuery,
   useGetModerationQueueQuery,
+  useGetJobReportsQuery,
+  useGetJobReportStatsQuery,
+  useUpdateJobReportStatusMutation,
+  useDeactivateJobMutation,
+  useDeleteJobListingMutation,
 } = adminApi;
 
 export default adminApi;
