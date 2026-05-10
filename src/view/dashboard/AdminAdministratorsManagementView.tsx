@@ -294,7 +294,7 @@ const AdminAdministratorsManagementView = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  staffMembers.map((adm) => (
+                  staffMembers.map((adm: any) => (
                     <TableRow
                       key={adm.id}
                       className="group hover:bg-muted/40 transition-colors"
@@ -437,7 +437,7 @@ const AdminAdministratorsManagementView = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  auditLogs.map((log) => (
+                  auditLogs.map((log: any) => (
                     <TableRow key={log.id} className="text-xs">
                       <TableCell>
                         <Badge

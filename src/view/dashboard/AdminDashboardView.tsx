@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import AdminDashboardHeader from "@/components/dashboard/dashboard-nav/header/AdminDashboardHeader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useGetDashboardOverviewStatsQuery,
+  useGetModerationQueueQuery,
+  useGetRecentUsersQuery,
+} from "@/redux/feature/admin/adminApi";
+import { formatDistanceToNow } from "date-fns";
 import {
   Activity,
   ArrowUpRight,
@@ -21,91 +30,54 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import AdminDashboardHeader from "../../components/dashboard/dashboard-nav/header/AdminDashboardHeader";
+import { useMemo } from "react";
 
 const AdminDashboardView = () => {
-  // Mock data for Admin Dashboard
-  const stats = [
-    {
-      title: "Total Users",
-      value: "14,582",
-      change: "+12.5% from last month",
-      icon: Users,
-      trend: "up",
-    },
-    {
-      title: "Active Jobs",
-      value: "2,845",
-      change: "+8.2% from last month",
-      icon: Briefcase,
-      trend: "up",
-    },
-    {
-      title: "Pending Approvals",
-      value: "42",
-      change: "-5 yesterday",
-      icon: CheckCircle2,
-      trend: "down",
-    },
-    {
-      title: "Global Revenue",
-      value: "$52,145",
-      change: "+1.2% from last month",
-      icon: CreditCard,
-      trend: "up",
-    },
-  ];
+  const { data: statsData, isLoading: isStatsLoading } =
+    useGetDashboardOverviewStatsQuery();
+  const { data: recentUsersData, isLoading: isUsersLoading } =
+    useGetRecentUsersQuery({ limit: 5 });
+  const { data: moderationQueueData, isLoading: isModerationLoading } =
+    useGetModerationQueueQuery({ limit: 5 });
 
-  const recentApprovals = [
-    {
-      id: 1,
-      name: "Senior React Developer",
-      company: "Google",
-      status: "Pending",
-      posted: "1 hour ago",
-    },
-    {
-      id: 2,
-      name: "Product Designer",
-      company: "Stripe",
-      status: "Pending",
-      posted: "3 hours ago",
-    },
-    {
-      id: 3,
-      name: "Full Stack Engineer",
-      company: "Supabase",
-      status: "Approved",
-      posted: "5 hours ago",
-    },
-  ];
+  const stats = useMemo(() => {
+    // Robust data access: check for both s.data and s itself
+    const s = statsData?.data || statsData;
 
-  const recentUsers = [
-    {
-      id: 1,
-      name: "Alex Rivera",
-      role: "Job Seeker",
-      email: "alex@example.com",
-      status: "New",
-      joined: "2 mins ago",
-    },
-    {
-      id: 2,
-      name: "Sarah Chen",
-      role: "Employer",
-      email: "sarah@techcorp.com",
-      status: "Verified",
-      joined: "15 mins ago",
-    },
-    {
-      id: 3,
-      name: "Michael Ross",
-      role: "Employer",
-      email: "michael@law.com",
-      status: "New",
-      joined: "1 hour ago",
-    },
-  ];
+    return [
+      {
+        title: "Total Users",
+        value: s?.totalUsers?.value?.toLocaleString() ?? "0",
+        change: s?.totalUsers?.change ?? "—",
+        icon: Users,
+        trend: s?.totalUsers?.trend ?? "neutral",
+      },
+      {
+        title: "Active Jobs",
+        value: s?.activeJobs?.value?.toLocaleString() ?? "0",
+        change: s?.activeJobs?.change ?? "—",
+        icon: Briefcase,
+        trend: s?.activeJobs?.trend ?? "neutral",
+      },
+      {
+        title: "Pending Approvals",
+        value: s?.pendingApprovals?.value?.toLocaleString() ?? "0",
+        change: s?.pendingApprovals?.change ?? "—",
+        icon: CheckCircle2,
+        trend: "neutral",
+      },
+      {
+        title: "Global Revenue",
+        value: `$${(s?.globalRevenue?.value || 0).toLocaleString()}`,
+        change: s?.globalRevenue?.change ?? "—",
+        icon: CreditCard,
+        trend: s?.globalRevenue?.trend ?? "up",
+      },
+    ];
+  }, [statsData]);
+
+  const moderationQueue = moderationQueueData?.data || [];
+  const recentUsers = recentUsersData?.data || [];
 
   return (
     <div className="min-h-screen pt-16">
@@ -114,31 +86,53 @@ const AdminDashboardView = () => {
       <div className="space-y-6 px-4 pb-8 sm:px-6 sm:pt-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {stats.map((stat, idx) => (
-            <Card key={idx} className="group overflow-hidden rounded-xl border">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="text-muted-foreground group-hover:text-primary h-4 w-4 transition-colors" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold tracking-tight">
-                  {stat.value}
-                </div>
-                <div className="mt-1 flex items-center gap-1">
-                  <span
-                    className={`text-xs font-bold ${stat.trend === "up" ? "text-emerald-500" : "text-amber-500"}`}
-                  >
-                    {stat.change.split(" ")[0]}
-                  </span>
-                  <span className="text-muted-foreground text-xs">
-                    {stat.change.split(" ").slice(1).join(" ")}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {isStatsLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i} className="rounded-xl border">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="mb-2 h-8 w-16" />
+                    <Skeleton className="h-3 w-32" />
+                  </CardContent>
+                </Card>
+              ))
+            : stats.map((stat, idx) => (
+                <Card
+                  key={idx}
+                  className="group overflow-hidden rounded-xl border"
+                >
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {stat.title}
+                    </CardTitle>
+                    <stat.icon className="text-muted-foreground group-hover:text-primary h-4 w-4 transition-colors" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold tracking-tight">
+                      {stat.value}
+                    </div>
+                    <div className="mt-1 flex items-center gap-1">
+                      <span
+                        className={`text-xs font-bold ${
+                          stat.trend === "up"
+                            ? "text-emerald-500"
+                            : stat.trend === "down"
+                              ? "text-amber-500"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        {stat.change.split(" ")[0]}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {stat.change.split(" ").slice(1).join(" ")}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
         </div>
 
         {/* Quick Actions & Activity Grid */}
@@ -219,34 +213,59 @@ const AdminDashboardView = () => {
                 </Link>
               </CardHeader>
               <CardContent className="space-y-4">
-                {recentApprovals.map((job) => (
-                  <div
-                    key={job.id}
-                    className="hover:bg-muted/50 flex items-center justify-between rounded-xl border p-4 transition-colors"
-                  >
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="bg-primary/10 rounded-full p-2">
-                        <Briefcase className="text-primary h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-bold">{job.name}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {job.company} • {job.posted}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge
-                      variant={job.status === "Pending" ? "outline" : "default"}
-                      className={
-                        job.status === "Pending"
-                          ? "border-amber-500 bg-amber-500/5 text-amber-500"
-                          : "bg-emerald-500 text-white"
-                      }
+                {isModerationLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
                     >
-                      {job.status}
-                    </Badge>
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-48" />
+                          <Skeleton className="h-3 w-32" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                    </div>
+                  ))
+                ) : moderationQueue.length === 0 ? (
+                  <div className="text-muted-foreground py-8 text-center">
+                    No jobs in moderation queue
                   </div>
-                ))}
+                ) : (
+                  moderationQueue.map((job: any) => (
+                    <div
+                      key={job.id}
+                      className="hover:bg-muted/50 flex items-center justify-between rounded-xl border p-4 transition-colors"
+                    >
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="bg-primary/10 rounded-full p-2">
+                          <Briefcase className="text-primary h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="font-bold">{job.title}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {job.company} •{" "}
+                            {formatDistanceToNow(new Date(job.createdAt))} ago
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        variant={
+                          job.status === "PENDING" ? "outline" : "default"
+                        }
+                        className={
+                          job.status === "PENDING"
+                            ? "border-amber-500 bg-amber-500/5 text-amber-500"
+                            : "bg-emerald-500 text-white"
+                        }
+                      >
+                        {job.status}
+                      </Badge>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
 
@@ -271,32 +290,59 @@ const AdminDashboardView = () => {
                 </Link>
               </CardHeader>
               <CardContent className="space-y-4">
-                {recentUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="hover:bg-muted/50 flex items-center justify-between rounded-xl border p-4 transition-colors"
-                  >
-                    <div className="flex items-center gap-4 text-sm">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                          {user.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-bold">{user.name}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {user.email} • {user.role}
-                        </p>
+                {isUsersLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                    >
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-48" />
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-right">
+                        <Skeleton className="ml-auto h-3 w-16" />
+                        <Skeleton className="ml-auto h-4 w-20 rounded-full" />
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs font-medium">{user.joined}</p>
-                      <Badge className="bg-primary/10 text-primary mt-1 border-none text-[10px]">
-                        {user.status}
-                      </Badge>
-                    </div>
+                  ))
+                ) : recentUsers.length === 0 ? (
+                  <div className="text-muted-foreground py-8 text-center">
+                    No recent users
                   </div>
-                ))}
+                ) : (
+                  recentUsers.map((user: any) => (
+                    <div
+                      key={user.id}
+                      className="hover:bg-muted/50 flex items-center justify-between rounded-xl border p-4 transition-colors"
+                    >
+                      <div className="flex items-center gap-4 text-sm">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                            {user.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-bold">{user.name}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {user.email} • {user.role.replace("_", " ")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-medium">
+                          {formatDistanceToNow(new Date(user.joinedAt))} ago
+                        </p>
+                        <Badge className="bg-primary/10 text-primary mt-1 border-none text-[10px]">
+                          {user.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
           </div>
