@@ -215,7 +215,7 @@ const AdminReportedJobsManagementView = () => {
                   {selectedSeverity
                     ? severityOptions.find((s) => s.value === selectedSeverity)
                         ?.label
-                    : "Severity"}
+                    : "Priority"}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -224,7 +224,7 @@ const AdminReportedJobsManagementView = () => {
                   onClick={() => setSelectedSeverity(null)}
                   className="cursor-pointer"
                 >
-                  All Severities
+                  All Priorities
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {severityOptions.map((severity) => (
@@ -264,7 +264,7 @@ const AdminReportedJobsManagementView = () => {
                   <TableHead>Reason & Details</TableHead>
                   <TableHead>Reporter</TableHead>
                   <TableHead>Timing</TableHead>
-                  <TableHead>Severity</TableHead>
+                  <TableHead>Priority</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
