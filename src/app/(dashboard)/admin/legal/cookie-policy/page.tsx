@@ -5,16 +5,5 @@ export const metadata = {
 };
 
 export default function AdminCookiePolicyPage() {
-  const defaultValues = {
-    title: "Cookie Policy",
-    lastUpdated: "March 14, 2026",
-    intro:
-      "Cookies are small text files that are placed on your computer by websites that you visit.",
-    content:
-      "1. What Are Cookies\n\nCookies are small text files that are placed on your computer by websites that you visit...",
-  };
-
-  return (
-    <AdminLegalEditorView title="Cookie Policy" defaultValues={defaultValues} />
-  );
+  return <AdminLegalEditorView title="Cookie Policy" slug="cookie-policy" />;
 }
