@@ -13,9 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
+import { updateUser } from "@/redux/feature/auth/authSlice";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "@/redux/feature/profile/profileApi";
 import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { ArrowLeft, Camera, Mail, Phone, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -28,6 +32,10 @@ export default function JobSeekerPersonalInformationView({
   onBack,
 }: JobSeekerPersonalInformationViewProps) {
   const { user } = useAppSelector((state) => state.auth) || {};
+  const dispatch = useAppDispatch();
+  const { data: profileData } = useGetProfileQuery(undefined);
+  const userFullInfo = profileData?.data;
+  const profile = userFullInfo?.profile;
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [uploadFile, { isLoading: isUploadingImage }] =
     useUploadSingleFileMutation();
@@ -41,24 +49,35 @@ export default function JobSeekerPersonalInformationView({
   });
 
   useEffect(() => {
-    if (user) {
+    if (userFullInfo) {
       setFormData({
-        fullName: user.fullName || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        role: user.role || "",
+        fullName: userFullInfo.fullName || user?.fullName || "",
+        email: userFullInfo.email || user?.email || "",
+        phone: userFullInfo.phone || user?.phone || "",
+        role: profile?.headline || "",
       });
     }
-  }, [user]);
+  }, [userFullInfo, profile, user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateProfile({
+      const result = await updateProfile({
         fullName: formData.fullName,
         phone: formData.phone,
         headline: formData.role,
       }).unwrap();
+
+      if (result?.data) {
+        const updatedUser = result.data.user || result.data;
+        dispatch(
+          updateUser({
+            fullName: updatedUser.fullName,
+            phone: updatedUser.phone,
+          }),
+        );
+      }
+
       toast.success("Profile updated successfully");
       onBack();
     } catch (err: any) {
@@ -80,8 +99,19 @@ export default function JobSeekerPersonalInformationView({
 
     try {
       const res = await uploadFile(formData).unwrap();
-      if (res.success && res.data) {
-        await updateProfile({ profilePicture: res.data }).unwrap();
+      if (res.success && res.data?.url) {
+        const result = await updateProfile({
+          profilePicture: res.data.url,
+        }).unwrap();
+
+        if (result?.data) {
+          dispatch(
+            updateUser({
+              profilePicture: res.data.url,
+            }),
+          );
+        }
+
         toast.success("Profile picture updated");
       }
     } catch (err: any) {
@@ -135,9 +165,12 @@ export default function JobSeekerPersonalInformationView({
           <div className="flex flex-col items-center gap-4 rounded-xl border p-6 text-center">
             <div className="relative">
               <Avatar className="h-32 w-32 border-4 border-white outline-1">
-                <AvatarImage src={user?.profilePicture} alt={user?.fullName} />
+                <AvatarImage
+                  src={profile?.avatarUrl || user?.profilePicture}
+                  alt={userFullInfo?.fullName || user?.fullName}
+                />
                 <AvatarFallback className="text-4xl font-bold">
-                  {user?.fullName?.charAt(0) || "U"}
+                  {(userFullInfo?.fullName || user?.fullName)?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
               <input

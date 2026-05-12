@@ -74,8 +74,8 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
 
     try {
       const res = await uploadFile(logoFormData).unwrap();
-      if (res.success && res.data) {
-        setFormData((prev) => ({ ...prev, siteLogo: res.data }));
+      if (res.success && res.data?.url) {
+        setFormData((prev) => ({ ...prev, siteLogo: res.data.url }));
         toast.success("Logo uploaded. Click 'Update Brand' to save changes.");
       }
     } catch (err: any) {
