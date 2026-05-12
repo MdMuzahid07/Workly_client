@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
+import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   AlertTriangle,
@@ -123,6 +125,8 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
   bottomItems,
   pathname,
   user,
+  profile,
+  profileData,
   onSignOut,
   onItemClick,
 }: {
@@ -130,6 +134,8 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
   bottomItems: SidebarItemProps[];
   pathname: string;
   user: { fullName?: string; profilePicture?: string } | null;
+  profile: { avatarUrl?: string | null } | undefined;
+  profileData?: any;
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
@@ -147,14 +153,18 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
       <div className="shrink-0 px-4 py-4">
         <div className="group border-border/50 bg-card/30 flex items-center gap-3 rounded-lg border p-3">
           <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={user?.profilePicture} alt={user?.fullName} />
+            <AvatarImage
+              src={profile?.avatarUrl || user?.profilePicture}
+              alt={profileData?.data?.fullName || user?.fullName}
+            />
             <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-              {user?.fullName?.charAt(0) || "A"}
+              {(profileData?.data?.fullName || user?.fullName)?.charAt(0) ||
+                "A"}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="text-foreground truncate text-sm font-semibold">
-              {user?.fullName || "Admin"}
+              {profileData?.data?.fullName || user?.fullName || "Admin"}
             </p>
             <p className="text-muted-foreground truncate text-xs">
               System Administrator
@@ -222,6 +232,10 @@ export default function AdminSidebarView({
   const dispatch = useAppDispatch();
   const [logoutUser, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
+  const { data: profileData } = useGetProfileQuery(undefined, {
+    skip: !user?.id,
+  });
+  const profile = profileData?.data?.profile;
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
 
@@ -348,6 +362,8 @@ export default function AdminSidebarView({
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
+            profile={profile}
+            profileData={profileData}
             onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
           />
@@ -376,6 +392,8 @@ export default function AdminSidebarView({
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
+            profile={profile}
+            profileData={profileData}
             onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
           />

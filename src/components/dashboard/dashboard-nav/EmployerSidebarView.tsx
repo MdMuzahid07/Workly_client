@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
+import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   BarChart2,
@@ -125,13 +127,17 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
   bottomItems,
   pathname,
   user,
+  profile,
+  profileData,
   onSignOut,
   onItemClick,
 }: {
   navGroups: SidebarGroupProps[];
   bottomItems: SidebarItemProps[];
   pathname: string;
-  user: { fullName?: string; avatar?: string } | null;
+  user: { fullName?: string; profilePicture?: string } | null;
+  profile: { avatarUrl?: string | null } | undefined;
+  profileData?: any;
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
@@ -154,11 +160,14 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
           className="group border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 flex items-center gap-3 rounded-lg border p-3 transition-all hover:shadow-sm"
         >
           <Avatar className="h-10 w-10 shrink-0 sm:h-11 sm:w-11">
-            <AvatarImage src={user?.avatar} alt={user?.fullName} />
+            <AvatarImage
+              src={profile?.avatarUrl || user?.profilePicture}
+              alt={profileData?.data?.fullName || user?.fullName}
+            />
             <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-              {user?.fullName
+              {(profileData?.data?.fullName || user?.fullName)
                 ?.split(" ")
-                .map((n) => n[0])
+                .map((n: string) => n[0])
                 .join("")
                 .toUpperCase()
                 .slice(0, 2) || <Building2 className="h-5 w-5" />}
@@ -166,7 +175,7 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="text-foreground truncate text-sm font-semibold">
-              {user?.fullName || "Company Name"}
+              {profileData?.data?.fullName || user?.fullName || "Company Name"}
             </p>
             <p className="text-muted-foreground truncate text-xs">
               Employer Account
@@ -252,6 +261,10 @@ export default function EmployerSidebarView({
   const dispatch = useAppDispatch();
   const [logoutUser, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
+  const { data: profileData } = useGetProfileQuery(undefined, {
+    skip: !user?.id,
+  });
+  const profile = profileData?.data?.profile;
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
 
@@ -344,6 +357,8 @@ export default function EmployerSidebarView({
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
+            profile={profile}
+            profileData={profileData}
             onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
           />
@@ -373,6 +388,8 @@ export default function EmployerSidebarView({
             bottomItems={bottomItems}
             pathname={pathname ?? ""}
             user={user}
+            profile={profile}
+            profileData={profileData}
             onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
           />
