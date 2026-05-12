@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -153,6 +154,7 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   pathname,
   user,
   profile,
+  profileData,
   profileCompletion,
   onSignOut,
   onItemClick,
@@ -160,8 +162,9 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   navGroups: SidebarGroupProps[];
   bottomItems: SidebarItemProps[];
   pathname: string;
-  user: { fullName?: string; avatar?: string } | null;
+  user: { fullName?: string; avatar?: string; profilePicture?: string } | null;
   profile: { avatarUrl?: string | null } | undefined;
+  profileData?: any;
   profileCompletion: number;
   onSignOut: () => void;
   onItemClick: () => void;
@@ -183,13 +186,13 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
             <AvatarImage
-              src={profile?.avatarUrl || user?.avatar}
-              alt={user?.fullName}
+              src={profile?.avatarUrl || user?.profilePicture}
+              alt={profileData?.data?.fullName || user?.fullName}
             />
             <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-              {user?.fullName
+              {(profileData?.data?.fullName || user?.fullName)
                 ?.split(" ")
-                .map((n) => n[0])
+                .map((n: string) => n[0])
                 .join("")
                 .toUpperCase()
                 .slice(0, 2) || "U"}
@@ -197,7 +200,7 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="text-foreground truncate text-sm font-semibold">
-              {user?.fullName || "User"}
+              {profileData?.data?.fullName || user?.fullName || "User"}
             </p>
             <div className="mt-1.5 flex items-center gap-2">
               <Progress value={profileCompletion} className="h-1.5 flex-1" />
@@ -395,6 +398,7 @@ export default function JobSeekerSidebarView({
             pathname={pathname ?? ""}
             user={user}
             profile={profile}
+            profileData={profileData}
             profileCompletion={profileCompletion}
             onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}
@@ -427,6 +431,7 @@ export default function JobSeekerSidebarView({
             pathname={pathname ?? ""}
             user={user}
             profile={profile}
+            profileData={profileData}
             profileCompletion={profileCompletion}
             onSignOut={handleSignOutClick}
             onItemClick={handleItemClick}

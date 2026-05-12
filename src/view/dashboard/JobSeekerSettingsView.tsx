@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardSettingsHeader from "@/components/dashboard/dashboard-nav/header/DashboardSettingsHeader";
@@ -7,6 +8,10 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
+import {
+  useGetUserSettingsQuery,
+  useUpdateUserSettingsMutation,
+} from "@/redux/feature/profile/profileApi";
 import { useAppDispatch } from "@/redux/hooks";
 import JobSeekerPersonalInformationView from "@/view/dashboard/JobSeekerPersonalInformationView";
 import JobSeekerSecurityView from "@/view/dashboard/JobSeekerSecurityView";
@@ -24,7 +29,8 @@ import {
   User,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface SettingItem {
   id: string;
@@ -36,28 +42,28 @@ interface SettingItem {
 
 const notificationSettingsSeed: SettingItem[] = [
   {
-    id: "email-jobs",
+    id: "jobRecommendations",
     label: "Job Recommendations",
     description: "Get notified about jobs matching your profile",
     icon: <Zap className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "email-applications",
+    id: "applicationUpdates",
     label: "Application Updates",
     description: "Updates on your job applications",
     icon: <Mail className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "email-messages",
+    id: "messages",
     label: "Messages",
     description: "Notifications when recruiters message you",
     icon: <BellRing className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "email-interviews",
+    id: "interviewUpdates",
     label: "Interview Updates",
     description: "Interview scheduling and reminders",
     icon: <Smartphone className="h-5 w-5" />,
@@ -67,21 +73,21 @@ const notificationSettingsSeed: SettingItem[] = [
 
 const privacySettingsSeed: SettingItem[] = [
   {
-    id: "profile-public",
+    id: "profileVisibility",
     label: "Public Profile",
     description: "Allow recruiters to find your profile",
     icon: <Globe className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "profile-views",
+    id: "profileViews",
     label: "Profile Views",
     description: "See who viewed your profile",
     icon: <Eye className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "search-visibility",
+    id: "searchVisibility",
     label: "Search Visibility",
     description: "Appear in recruiter search results",
     icon: <ShieldCheck className="h-5 w-5" />,
@@ -92,11 +98,36 @@ const privacySettingsSeed: SettingItem[] = [
 export default function JobSeekerSettingsView() {
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
+  const { data: settingsData } = useGetUserSettingsQuery(undefined);
+  const [updateSettings, { isLoading: isSaving }] =
+    useUpdateUserSettingsMutation();
+
   const [notifications, setNotifications] = useState(notificationSettingsSeed);
   const [privacy, setPrivacy] = useState(privacySettingsSeed);
   const [activeSection, setActiveSection] = useState<
     "main" | "personal" | "security"
   >("main");
+
+  useEffect(() => {
+    if (settingsData?.data) {
+      const data = settingsData.data;
+      setNotifications((prev) =>
+        prev.map((item) => ({
+          ...item,
+          enabled: data[item.id] ?? item.enabled,
+        })),
+      );
+      setPrivacy((prev) =>
+        prev.map((item) => ({
+          ...item,
+          enabled:
+            item.id === "profileVisibility"
+              ? data.profileVisibility === "PUBLIC"
+              : (data[item.id] ?? item.enabled),
+        })),
+      );
+    }
+  }, [settingsData]);
 
   const toggleNotification = (id: string) => {
     setNotifications((prev) =>
@@ -114,6 +145,30 @@ export default function JobSeekerSettingsView() {
     );
   };
 
+  const handleSaveSettings = async () => {
+    try {
+      const mergedSettings: any = {
+        ...notifications.reduce((acc: any, item) => {
+          acc[item.id] = item.enabled;
+          return acc;
+        }, {}),
+        ...privacy.reduce((acc: any, item) => {
+          if (item.id === "profileVisibility") {
+            acc.profileVisibility = item.enabled ? "PUBLIC" : "PRIVATE";
+          } else {
+            acc[item.id] = item.enabled;
+          }
+          return acc;
+        }, {}),
+      };
+
+      await updateSettings(mergedSettings).unwrap();
+      toast.success("Settings updated successfully");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update settings");
+    }
+  };
+
   const handleSignOut = async () => {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -129,27 +184,22 @@ export default function JobSeekerSettingsView() {
 
   if (activeSection === "personal") {
     return (
-      <div className="min-h-screen pt-16">
-        <DashboardSettingsHeader />
-        <JobSeekerPersonalInformationView
-          onBack={() => setActiveSection("main")}
-        />
-      </div>
+      <JobSeekerPersonalInformationView
+        onBack={() => setActiveSection("main")}
+      />
     );
   }
 
   if (activeSection === "security") {
-    return (
-      <div className="min-h-screen pt-16">
-        <DashboardSettingsHeader />
-        <JobSeekerSecurityView onBack={() => setActiveSection("main")} />
-      </div>
-    );
+    return <JobSeekerSecurityView onBack={() => setActiveSection("main")} />;
   }
 
   return (
-    <div className="min-h-screen pt-16">
-      <DashboardSettingsHeader />
+    <div className="min-h-screen pt-16 lg:pt-20">
+      <DashboardSettingsHeader
+        isSaving={isSaving}
+        onSave={handleSaveSettings}
+      />
 
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl space-y-10">

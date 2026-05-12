@@ -154,6 +154,21 @@ const profileApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["profile"],
     }),
+    getUserSettings: builder.query({
+      query: () => ({
+        url: "/profile/settings",
+        method: "GET",
+      }),
+      providesTags: ["profile"],
+    }),
+    updateUserSettings: builder.mutation({
+      query: (data) => ({
+        url: "/profile/settings",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["profile"],
+    }),
   }),
 });
 
@@ -176,4 +191,6 @@ export const {
   useAddProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useGetUserSettingsQuery,
+  useUpdateUserSettingsMutation,
 } = profileApi;

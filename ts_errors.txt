@@ -1,0 +1,8 @@
+[96msrc/view/dashboard/admin/settings/AdminBrandingView.tsx[0m:[93m152[0m:[93m20[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Camera'.
+
+[7m152[0m                   <Camera className="h-6 w-6 text-white" />
+[7m   [0m [91m                   ~~~~~~[0m
+
+
+Found 1 error in src/view/dashboard/admin/settings/AdminBrandingView.tsx[90m:152[0m
+

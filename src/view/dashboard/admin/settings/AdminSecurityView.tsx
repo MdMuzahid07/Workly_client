@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { useChangePasswordMutation } from "@/redux/feature/auth/authApi";
 import {
   AlertCircle,
   ArrowLeft,
@@ -28,16 +30,36 @@ interface AdminSecurityViewProps {
 }
 
 export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
-  const [loading, setLoading] = useState(false);
+  const [changePassword, { isLoading: isUpdating }] =
+    useChangePasswordMutation();
+
+  const [formData, setFormData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    if (formData.newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    try {
+      await changePassword({
+        oldPassword: formData.oldPassword,
+        newPassword: formData.newPassword,
+      }).unwrap();
       toast.success("Security settings updated successfully");
       onBack();
-    }, 1000);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update security settings");
+    }
   };
 
   return (
@@ -70,9 +92,9 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
           <Button
             className="shadow-primary/20 rounded-full px-8 font-bold shadow-lg"
             onClick={handleUpdatePassword}
-            disabled={loading}
+            disabled={isUpdating}
           >
-            {loading ? "Updating..." : "Save Controls"}
+            {isUpdating ? "Updating..." : "Save Controls"}
           </Button>
         </div>
       </div>
@@ -145,7 +167,7 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
               <form onSubmit={handleUpdatePassword} className="space-y-6">
                 <div className="grid gap-2">
                   <Label
-                    htmlFor="current"
+                    htmlFor="oldPassword"
                     className="text-xs font-bold tracking-widest uppercase opacity-60"
                   >
                     Current Password
@@ -153,8 +175,15 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
                   <div className="relative">
                     <Lock className="text-muted-foreground absolute top-3 left-4 h-4 w-4" />
                     <Input
-                      id="current"
+                      id="oldPassword"
                       type="password"
+                      value={formData.oldPassword}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          oldPassword: e.target.value,
+                        })
+                      }
                       placeholder="••••••••••••"
                       className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                     />
@@ -168,7 +197,7 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label
-                      htmlFor="new"
+                      htmlFor="newPassword"
                       className="text-xs font-bold tracking-widest uppercase opacity-60"
                     >
                       New Password
@@ -176,8 +205,15 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
                     <div className="relative">
                       <Lock className="text-muted-foreground absolute top-3 left-4 h-4 w-4" />
                       <Input
-                        id="new"
+                        id="newPassword"
                         type="password"
+                        value={formData.newPassword}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            newPassword: e.target.value,
+                          })
+                        }
                         placeholder="••••••••••••"
                         className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                       />
@@ -186,7 +222,7 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
 
                   <div className="grid gap-2">
                     <Label
-                      htmlFor="confirm"
+                      htmlFor="confirmPassword"
                       className="text-xs font-bold tracking-widest uppercase opacity-60"
                     >
                       Verify Password
@@ -194,8 +230,15 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
                     <div className="relative">
                       <Lock className="text-muted-foreground absolute top-3 left-4 h-4 w-4" />
                       <Input
-                        id="confirm"
+                        id="confirmPassword"
                         type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
                         placeholder="••••••••••••"
                         className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                       />
