@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,9 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
+import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
 import { useAppSelector } from "@/redux/hooks";
 import { ArrowLeft, Camera, Mail, Phone, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface AdminPersonalInformationViewProps {
@@ -25,16 +28,62 @@ export default function AdminPersonalInformationView({
   onBack,
 }: AdminPersonalInformationViewProps) {
   const { user } = useAppSelector((state) => state.auth) || {};
-  const [loading, setLoading] = useState(false);
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [uploadFile, { isLoading: isUploadingImage }] =
+    useUploadSingleFileMutation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await updateProfile({
+        fullName: formData.fullName,
+        phone: formData.phone,
+      }).unwrap();
       toast.success("Administrative profile updated successfully");
       onBack();
-    }, 1000);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update profile");
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      toast.error("File size must be less than 1MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadFile(formData).unwrap();
+      if (res.success && res.data) {
+        await updateProfile({ profilePicture: res.data }).unwrap();
+        toast.success("Profile picture updated");
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to upload image");
+    }
   };
 
   return (
@@ -67,9 +116,9 @@ export default function AdminPersonalInformationView({
           <Button
             className="shadow-primary/20 rounded-full px-8 font-bold shadow-lg"
             onClick={handleSave}
-            disabled={loading}
+            disabled={isUpdating}
           >
-            {loading ? "Saving..." : "Save Changes"}
+            {isUpdating ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -103,16 +152,28 @@ export default function AdminPersonalInformationView({
                   </AvatarFallback>
                 </Avatar>
               </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                className="hidden"
+                accept="image/*"
+              />
               <button
                 type="button"
-                className="bg-primary text-primary-foreground border-background absolute right-2 bottom-2 cursor-pointer rounded-xl border-4 p-3 shadow-lg transition-transform hover:scale-110 active:scale-95"
+                disabled={isUploadingImage}
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-primary text-primary-foreground border-background absolute right-2 bottom-2 cursor-pointer rounded-xl border-4 p-3 shadow-lg transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
               >
                 <Camera className="h-5 w-5" />
               </button>
             </div>
             <div className="text-sm">
-              <p className="text-primary mb-1 text-[10px] font-bold tracking-widest uppercase">
-                Update Avatar
+              <p
+                className="text-primary mb-1 cursor-pointer text-[10px] font-bold tracking-widest uppercase hover:underline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {isUploadingImage ? "Uploading..." : "Update Avatar"}
               </p>
               <p className="text-muted-foreground text-xs font-medium">
                 JPG, GIF or PNG. Max size 1MB
@@ -142,7 +203,10 @@ export default function AdminPersonalInformationView({
                   <UserIcon className="text-muted-foreground absolute top-3 left-4 h-4 w-4" />
                   <Input
                     id="fullName"
-                    defaultValue={user?.fullName || "Administrative User"}
+                    value={formData.fullName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, fullName: e.target.value })
+                    }
                     placeholder="e.g. System Admin"
                     className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                   />
@@ -162,8 +226,9 @@ export default function AdminPersonalInformationView({
                     <Input
                       id="email"
                       type="email"
-                      defaultValue={user?.email || "admin@workly.com"}
-                      className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
+                      value={formData.email}
+                      disabled
+                      className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold opacity-70"
                     />
                   </div>
                 </div>
@@ -180,7 +245,10 @@ export default function AdminPersonalInformationView({
                     <Input
                       id="phone"
                       type="tel"
-                      defaultValue={user?.phone || ""}
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
                       placeholder="+1 (555) 000-0000"
                       className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                     />
@@ -203,7 +271,11 @@ export default function AdminPersonalInformationView({
                   <p className="text-primary mb-1 text-xs font-bold tracking-widest uppercase">
                     Permission Tier
                   </p>
-                  <p className="text-xl font-bold">Super Administrator</p>
+                  <p className="text-xl font-bold">
+                    {user?.role === "SUPER_ADMIN"
+                      ? "Super Administrator"
+                      : "Administrator"}
+                  </p>
                 </div>
                 <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl">
                   <ShieldIcon className="text-primary h-6 w-6" />

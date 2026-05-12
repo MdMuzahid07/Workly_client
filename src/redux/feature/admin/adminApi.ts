@@ -257,6 +257,18 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["admin"],
     }),
+    getSystemSettings: builder.query<Envelope<any>, void>({
+      query: () => ({ url: "/admin/settings", method: "GET" }),
+      providesTags: ["admin"],
+    }),
+    updateSystemSettings: builder.mutation<Envelope<any>, any>({
+      query: (body) => ({
+        url: "/admin/settings",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
@@ -287,6 +299,8 @@ export const {
   useUpdateJobReportStatusMutation,
   useDeactivateJobMutation,
   useDeleteJobListingMutation,
+  useGetSystemSettingsQuery,
+  useUpdateSystemSettingsMutation,
 } = adminApi;
 
 export default adminApi;

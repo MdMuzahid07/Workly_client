@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,9 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
+import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
 import { useAppSelector } from "@/redux/hooks";
-import { ArrowLeft, Camera, Mail, Phone, User } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Camera, Mail, Phone, User as UserIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface JobSeekerPersonalInformationViewProps {
@@ -25,17 +28,65 @@ export default function JobSeekerPersonalInformationView({
   onBack,
 }: JobSeekerPersonalInformationViewProps) {
   const { user } = useAppSelector((state) => state.auth) || {};
-  const [loading, setLoading] = useState(false);
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [uploadFile, { isLoading: isUploadingImage }] =
+    useUploadSingleFileMutation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    role: "",
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        role: user.role || "",
+      });
+    }
+  }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await updateProfile({
+        fullName: formData.fullName,
+        phone: formData.phone,
+        headline: formData.role,
+      }).unwrap();
       toast.success("Profile updated successfully");
       onBack();
-    }, 1000);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update profile");
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      toast.error("File size must be less than 1MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadFile(formData).unwrap();
+      if (res.success && res.data) {
+        await updateProfile({ profilePicture: res.data }).unwrap();
+        toast.success("Profile picture updated");
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to upload image");
+    }
   };
 
   return (
@@ -61,8 +112,8 @@ export default function JobSeekerPersonalInformationView({
           <Button variant="outline" onClick={onBack}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
+          <Button onClick={handleSave} disabled={isUpdating}>
+            {isUpdating ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -89,17 +140,31 @@ export default function JobSeekerPersonalInformationView({
                   {user?.fullName?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                className="hidden"
+                accept="image/*"
+              />
               <button
                 type="button"
-                className="bg-primary text-primary-foreground absolute right-0 bottom-0 cursor-pointer rounded-full p-2 transition-transform hover:scale-105"
+                disabled={isUploadingImage}
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-primary text-primary-foreground absolute right-0 bottom-0 cursor-pointer rounded-full p-2 transition-transform hover:scale-105 disabled:opacity-50"
               >
                 <Camera className="h-4 w-4" />
               </button>
             </div>
             <div className="text-sm">
-              <p className="font-medium">Edit Photo</p>
+              <p
+                className="cursor-pointer font-medium hover:underline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {isUploadingImage ? "Uploading..." : "Edit Photo"}
+              </p>
               <p className="text-muted-foreground text-xs">
-                JPG, GIF or PNG. Max size of 800K
+                JPG, GIF or PNG. Max size of 1MB
               </p>
             </div>
           </div>
@@ -118,10 +183,13 @@ export default function JobSeekerPersonalInformationView({
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
                 <div className="relative">
-                  <User className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
+                  <UserIcon className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                   <Input
                     id="fullName"
-                    defaultValue={user?.fullName}
+                    value={formData.fullName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, fullName: e.target.value })
+                    }
                     placeholder="e.g. John Doe"
                     className="border-border rounded-full pl-9"
                   />
@@ -139,9 +207,10 @@ export default function JobSeekerPersonalInformationView({
                     <Input
                       id="email"
                       type="email"
-                      defaultValue={user?.email}
+                      value={formData.email}
+                      disabled
                       placeholder="john@example.com"
-                      className="border-border rounded-full pl-9"
+                      className="border-border bg-muted/50 rounded-full pl-9"
                     />
                   </div>
                 </div>
@@ -153,7 +222,10 @@ export default function JobSeekerPersonalInformationView({
                     <Input
                       id="phone"
                       type="tel"
-                      defaultValue={user?.phone || ""}
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
                       placeholder="+1 (555) 000-0000"
                       className="border-border rounded-full pl-9"
                     />
@@ -175,7 +247,10 @@ export default function JobSeekerPersonalInformationView({
                 <Label htmlFor="role">Current Role</Label>
                 <Input
                   id="role"
-                  defaultValue=""
+                  value={formData.role}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
                   className="border-border rounded-full"
                   placeholder="e.g. Senior Software Engineer"
                 />

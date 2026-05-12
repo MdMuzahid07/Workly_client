@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useChangePasswordMutation } from "@/redux/feature/auth/authApi";
 import { AlertCircle, ArrowLeft, Check, Lock, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,17 +24,34 @@ interface JobSeekerSecurityViewProps {
 export default function JobSeekerSecurityView({
   onBack,
 }: JobSeekerSecurityViewProps) {
-  const [loading, setLoading] = useState(false);
+  const [changePassword, { isLoading: isUpdating }] =
+    useChangePasswordMutation();
+  const [formData, setFormData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    if (formData.newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+    try {
+      await changePassword({
+        oldPassword: formData.oldPassword,
+        newPassword: formData.newPassword,
+      }).unwrap();
       toast.success("Password updated successfully");
       onBack();
-    }, 1000);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update password");
+    }
   };
 
   return (
@@ -58,8 +77,8 @@ export default function JobSeekerSecurityView({
           <Button variant="outline" onClick={onBack}>
             Cancel
           </Button>
-          <Button onClick={handleUpdatePassword} disabled={loading}>
-            {loading ? "Updating..." : "Update Password"}
+          <Button onClick={handleUpdatePassword} disabled={isUpdating}>
+            {isUpdating ? "Updating..." : "Update Password"}
           </Button>
         </div>
       </div>
@@ -128,6 +147,13 @@ export default function JobSeekerSecurityView({
                     <Input
                       id="current"
                       type="password"
+                      value={formData.oldPassword}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          oldPassword: e.target.value,
+                        })
+                      }
                       placeholder="••••••••"
                       className="border-border rounded-full pl-9"
                     />
@@ -144,6 +170,13 @@ export default function JobSeekerSecurityView({
                       <Input
                         id="new"
                         type="password"
+                        value={formData.newPassword}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            newPassword: e.target.value,
+                          })
+                        }
                         placeholder="••••••••"
                         className="border-border rounded-full pl-9"
                       />
@@ -157,6 +190,13 @@ export default function JobSeekerSecurityView({
                       <Input
                         id="confirm"
                         type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
                         placeholder="••••••••"
                         className="border-border rounded-full pl-9"
                       />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Globe, Mail, Sparkles } from "lucide-react";
-import { useState } from "react";
+import {
+  useGetSystemSettingsQuery,
+  useUpdateSystemSettingsMutation,
+} from "@/redux/feature/admin/adminApi";
+import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+import { ArrowLeft, Camera, Globe, Mail, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface AdminBrandingViewProps {
@@ -21,16 +28,59 @@ interface AdminBrandingViewProps {
 }
 
 export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
-  const [loading, setLoading] = useState(false);
+  const { data: settingsData } = useGetSystemSettingsQuery();
+  const [updateSettings, { isLoading: isSaving }] =
+    useUpdateSystemSettingsMutation();
+  const [uploadFile, { isLoading: isUploadingLogo }] =
+    useUploadSingleFileMutation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState({
+    siteName: "",
+    siteSlogan: "",
+    supportEmail: "",
+    siteLogo: "",
+  });
+
+  useEffect(() => {
+    if (settingsData?.data) {
+      const data = settingsData.data;
+      setFormData({
+        siteName: data.siteName || "",
+        siteSlogan: data.siteSlogan || "",
+        supportEmail: data.supportEmail || "",
+        siteLogo: data.siteLogo || "",
+      });
+    }
+  }, [settingsData]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await updateSettings(formData).unwrap();
       toast.success("Portal branding updated successfully");
       onBack();
-    }, 1000);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update branding");
+    }
+  };
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const logoFormData = new FormData();
+    logoFormData.append("file", file);
+
+    try {
+      const res = await uploadFile(logoFormData).unwrap();
+      if (res.success && res.data) {
+        setFormData((prev) => ({ ...prev, siteLogo: res.data }));
+        toast.success("Logo uploaded. Click 'Update Brand' to save changes.");
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to upload logo");
+    }
   };
 
   return (
@@ -61,9 +111,9 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
           <Button
             className="shadow-primary/20 rounded-full px-8 font-bold shadow-lg"
             onClick={handleSave}
-            disabled={loading}
+            disabled={isSaving}
           >
-            {loading ? "Publishing..." : "Update Brand"}
+            {isSaving ? "Publishing..." : "Update Brand"}
           </Button>
         </div>
       </div>
@@ -86,13 +136,38 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
           </div>
           <Card className="from-primary/5 via-background to-primary/5 group relative overflow-hidden rounded-xl border bg-linear-to-br p-8 shadow-sm">
             <div className="relative z-10 flex flex-col items-center gap-6 text-center">
-              <div className="bg-primary shadow-primary/20 flex h-20 w-20 transform items-center justify-center rounded-4xl shadow-xl transition-transform group-hover:rotate-6">
-                <Sparkles className="h-10 w-10 text-white" />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-primary shadow-primary/20 flex h-20 w-20 transform cursor-pointer items-center justify-center overflow-hidden rounded-4xl shadow-xl transition-transform group-hover:rotate-6 hover:scale-105 active:scale-95"
+              >
+                {formData.siteLogo ? (
+                  <Image
+                    width={80}
+                    height={80}
+                    src={formData.siteLogo}
+                    alt="Logo"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Sparkles className="h-10 w-10 text-white" />
+                )}
+                <div className="bg-primary/40 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100">
+                  <Camera className="h-6 w-6 text-white" />
+                </div>
               </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleLogoChange}
+                className="hidden"
+                accept="image/*"
+              />
               <div className="space-y-1">
-                <p className="text-2xl font-bold tracking-tighter">Workly</p>
+                <p className="text-2xl font-bold tracking-tighter">
+                  {formData.siteName || "Workly"}
+                </p>
                 <p className="text-primary text-[10px] font-bold tracking-[0.3em] uppercase">
-                  Job Portal
+                  {isUploadingLogo ? "Uploading Logo..." : "Job Portal"}
                 </p>
               </div>
               <Badge
@@ -128,7 +203,11 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
                   <Globe className="text-muted-foreground absolute top-3 left-4 h-4 w-4" />
                   <Input
                     id="siteName"
-                    defaultValue="Workly Job Portal"
+                    value={formData.siteName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, siteName: e.target.value })
+                    }
+                    placeholder="Workly Job Portal"
                     className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                   />
                 </div>
@@ -136,14 +215,18 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
 
               <div className="grid gap-2">
                 <Label
-                  htmlFor="slogan"
+                  htmlFor="siteSlogan"
                   className="text-xs font-bold tracking-widest uppercase opacity-60"
                 >
                   Tagline / Mission Statement
                 </Label>
                 <Input
-                  id="slogan"
-                  defaultValue="Connecting Talent with Opportunity"
+                  id="siteSlogan"
+                  value={formData.siteSlogan}
+                  onChange={(e) =>
+                    setFormData({ ...formData, siteSlogan: e.target.value })
+                  }
+                  placeholder="Connecting Talent with Opportunity"
                   className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none px-4 font-bold"
                 />
               </div>
@@ -160,7 +243,11 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
                   <Input
                     id="supportEmail"
                     type="email"
-                    defaultValue="support@workly.com"
+                    value={formData.supportEmail}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supportEmail: e.target.value })
+                    }
+                    placeholder="support@workly.com"
                     className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                   />
                 </div>
@@ -174,9 +261,12 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
                 Logo Configuration
               </p>
               <p className="text-muted-foreground text-xs font-medium">
-                To modify the system logo assets, please access the{" "}
-                <span className="text-primary cursor-pointer font-bold underline">
-                  Asset Manager
+                To modify the system logo assets, please click{" "}
+                <span
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-primary cursor-pointer font-bold underline"
+                >
+                  Upload Logo
                 </span>
                 .
               </p>

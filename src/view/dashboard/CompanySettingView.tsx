@@ -22,7 +22,7 @@ import {
   User,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardCompanySettingsHeader from "../../components/dashboard/dashboard-nav/header/DashboardCompanySettingsHeader";
 import {
   useGetMyCompanyQuery,
@@ -30,6 +30,7 @@ import {
 } from "../../redux/feature/company/companyApi";
 import CompanyPersonalInformationView from "./CompanyPersonalInformationView";
 import CompanySecurityView from "./CompanySecurityView";
+import { toast } from "sonner";
 
 interface SettingItem {
   id: string;
@@ -110,6 +111,25 @@ const CompanySettingsView = () => {
   const [notifications, setNotifications] = useState(notificationSettingsSeed);
   const [privacy, setPrivacy] = useState(privacySettingsSeed);
 
+  // Sync state with fetched data
+  useEffect(() => {
+    const settings = companyData?.data?.companySettings;
+    if (settings) {
+      setNotifications((prev) =>
+        prev.map((item) => ({
+          ...item,
+          enabled: settings[item.id] ?? item.enabled,
+        })),
+      );
+      setPrivacy((prev) =>
+        prev.map((item) => ({
+          ...item,
+          enabled: settings[item.id] ?? item.enabled,
+        })),
+      );
+    }
+  }, [companyData]);
+
   const toggleNotification = (id: string) => {
     setNotifications((prev) =>
       prev.map((item) =>
@@ -127,21 +147,29 @@ const CompanySettingsView = () => {
   };
 
   const handleSaveSettings = async () => {
-    if (!companyData?.data?.id) return;
+    if (!companyData?.data?.id) {
+      toast.error("Company data not loaded");
+      return;
+    }
     try {
+      const mergedSettings = {
+        ...notifications.reduce((acc: any, item) => {
+          acc[item.id] = item.enabled;
+          return acc;
+        }, {}),
+        ...privacy.reduce((acc: any, item) => {
+          acc[item.id] = item.enabled;
+          return acc;
+        }, {}),
+      };
+
       await updateCompanySettings({
         companyId: companyData.data.id,
-        notifications: notifications.reduce((acc: any, item) => {
-          acc[item.id] = item.enabled;
-          return acc;
-        }, {}),
-        privacy: privacy.reduce((acc: any, item) => {
-          acc[item.id] = item.enabled;
-          return acc;
-        }, {}),
+        ...mergedSettings,
       }).unwrap();
-    } catch {
-      // toast usually handled by API hook or in component
+      toast.success("Settings updated successfully");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update settings");
     }
   };
 

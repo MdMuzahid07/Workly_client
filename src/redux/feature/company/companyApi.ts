@@ -75,7 +75,7 @@ const companyApi = baseApi.injectEndpoints({
 
     updateCompanySettings: builder.mutation({
       query: ({ companyId, ...data }) => ({
-        url: `/company/settings/${companyId}`,
+        url: `/company/${companyId}/settings`,
         method: "PATCH",
         body: data,
       }),

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardAdminSettingsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminSettingsHeader";
@@ -5,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import {
+  useGetSystemSettingsQuery,
+  useUpdateSystemSettingsMutation,
+} from "@/redux/feature/admin/adminApi";
 import {
   BellRing,
   ChevronRight,
@@ -16,7 +21,8 @@ import {
   User,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import AdminBrandingView from "./AdminBrandingView";
 import AdminPersonalInformationView from "./AdminPersonalInformationView";
 import AdminSecurityView from "./AdminSecurityView";
@@ -31,28 +37,28 @@ interface SettingItem {
 
 const platformControlsSeed: SettingItem[] = [
   {
-    id: "ai-match",
+    id: "aiMatchmaking",
     label: "AI Matchmaking Engine",
     description: "Real-time candidate-to-job scoring using LLMs",
     icon: <Sparkles className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "user-reg",
+    id: "publicRegistration",
     label: "Public Registration",
     description: "Allow new employers and candidates to sign up",
     icon: <User className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "notifications",
+    id: "globalNotifications",
     label: "Global Notification Relay",
     description: "System dispatching for all outbound alerts",
     icon: <BellRing className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "audit-log",
+    id: "extendedAuditLogging",
     label: "Extended Audit Logging",
     description: "Track all administrative actions for 365 days",
     icon: <Zap className="h-5 w-5" />,
@@ -64,8 +70,25 @@ const AdminSettingsView = () => {
   const [activeSection, setActiveSection] = useState<
     "main" | "personal" | "security" | "branding"
   >("main");
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: settingsData } = useGetSystemSettingsQuery();
+  const [updateSettings, { isLoading: isSaving }] =
+    useUpdateSystemSettingsMutation();
+
   const [controls, setControls] = useState(platformControlsSeed);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  useEffect(() => {
+    if (settingsData?.data) {
+      const data = settingsData.data;
+      setControls((prev) =>
+        prev.map((item) => ({
+          ...item,
+          enabled: data[item.id] ?? item.enabled,
+        })),
+      );
+      setMaintenanceMode(data.maintenanceMode ?? false);
+    }
+  }, [settingsData]);
 
   const toggleControl = (id: string) => {
     setControls((prev) =>
@@ -75,11 +98,20 @@ const AdminSettingsView = () => {
     );
   };
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-    }, 1500);
+  const handleSave = async () => {
+    try {
+      const payload = {
+        ...controls.reduce((acc: any, item) => {
+          acc[item.id] = item.enabled;
+          return acc;
+        }, {}),
+        maintenanceMode,
+      };
+      await updateSettings(payload).unwrap();
+      toast.success("System settings updated");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update settings");
+    }
   };
 
   if (activeSection === "personal") {
@@ -262,9 +294,13 @@ const AdminSettingsView = () => {
                   </div>
                   <div className="border-destructive/10 flex items-center gap-3 rounded-full border bg-white/50 px-4 py-1.5 dark:bg-black/20">
                     <span className="text-destructive text-[10px] font-bold tracking-widest uppercase">
-                      OFFLINE
+                      {maintenanceMode ? "ONLINE" : "OFFLINE"}
                     </span>
-                    <Switch className="data-[state=checked]:bg-destructive" />
+                    <Switch
+                      checked={maintenanceMode}
+                      onCheckedChange={setMaintenanceMode}
+                      className="data-[state=checked]:bg-destructive"
+                    />
                   </div>
                 </div>
               </Card>

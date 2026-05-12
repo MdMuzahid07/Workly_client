@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../../api/baseApi";
 import { IUser } from "./authSlice";
 
@@ -98,6 +99,13 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    changePassword: builder.mutation<any, any>({
+      query: (data) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -110,6 +118,7 @@ export const {
   useResetPasswordMutation,
   useRefreshTokenMutation,
   useLogoutUserMutation,
+  useChangePasswordMutation,
 } = authApi;
 
 export default authApi;
