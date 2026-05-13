@@ -3,10 +3,13 @@ import baseApi from "../../api/baseApi";
 const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query({
-      query: (search?: string) => {
-        const params = search ? `?search=${encodeURIComponent(search)}` : "";
+      query: (params?: { search?: string; type?: string }) => {
+        const searchParams = new URLSearchParams();
+        if (params?.search) searchParams.append("search", params.search);
+        if (params?.type) searchParams.append("type", params.type);
+        const queryString = searchParams.toString();
         return {
-          url: `/category/categories${params}`,
+          url: `/category/categories${queryString ? `?${queryString}` : ""}`,
           method: "GET",
         };
       },

@@ -11,9 +11,10 @@ const companyApi = baseApi.injectEndpoints({
     }),
 
     getCompanies: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: "/company/companies",
         method: "GET",
+        params,
       }),
     }),
 

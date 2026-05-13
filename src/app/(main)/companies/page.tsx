@@ -32,14 +32,23 @@ export async function generateMetadata({
 }
 
 async function fetchCompanies(
-  params: { q?: string | undefined } = {},
+  params: {
+    q?: string;
+    industry?: string;
+    location?: string;
+    size?: string;
+  } = {},
 ): Promise<CompanyListItem[]> {
   const baseUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
   const url = new URL(`${baseUrl}/api/v1/company/companies`);
+  url.searchParams.set("limit", "12");
 
-  if (params.q) url.searchParams.set("q", params.q);
+  if (params.q) url.searchParams.set("search", params.q);
+  if (params.industry) url.searchParams.set("industry", params.industry);
+  if (params.location) url.searchParams.set("location", params.location);
+  if (params.size) url.searchParams.set("size", params.size);
 
   const res = await fetch(url.toString(), {
     next: { revalidate: 3600 },
@@ -57,11 +66,20 @@ async function fetchCompanies(
 const page = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    industry?: string;
+    location?: string;
+    size?: string;
+  }>;
 }) => {
   const params = await searchParams;
-  const q = typeof params?.q === "string" ? params.q : undefined;
-  const companies = await fetchCompanies({ q });
+  const q = params?.q;
+  const industry = params?.industry;
+  const location = params?.location;
+  const size = params?.size;
+
+  const companies = await fetchCompanies({ q, industry, location, size });
 
   return (
     <>
