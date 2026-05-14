@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatDistanceToNow } from "date-fns";
 import {
   ArrowLeft,
   Info,
@@ -23,32 +25,34 @@ import {
 import { useEffect, useState } from "react";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
 import { MediaGallery } from "../../components/main/message/MediaGallery";
-import ComingSoonAlert from "../../components/temp_components/ComingSoonAlert";
+import { useSocket } from "../../provider/SocketProvider";
+import {
+  useGetConversationsQuery,
+  useGetMessageHistoryQuery,
+  useMarkAsReadMutation,
+  useSendMessageMutation,
+} from "../../redux/feature/message/messageApi";
+import { useAppSelector } from "../../redux/hooks";
 import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
 
 interface Message {
   id: string;
   senderId: string;
-  senderName: string;
-  senderAvatar: string;
   content: string;
-  timestamp: string;
-  isRead: boolean;
-}
-
-interface Conversation {
-  id: string;
-  participantName: string;
-  participantAvatar: string;
-  participantRole: string;
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  isOnline: boolean;
-  messages: Message[];
+  createdAt: string;
+  status: string;
+  sender?: {
+    fullName: string;
+    profile?: {
+      avatarUrl?: string | null;
+    } | null;
+  } | null;
 }
 
 const MessageView = () => {
+  const { socket } = useSocket();
+  const currentUser = useAppSelector((state) => state.auth.user);
+
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
@@ -56,283 +60,162 @@ const MessageView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
 
-  // fake loading state for skeleton
-  const [isLoading, setIsLoading] = useState(true);
+  // API Queries
+  const { data: conversationsData, isLoading: isConversationsLoading } =
+    useGetConversationsQuery(undefined);
+  const { data: messagesData, isLoading: isMessagesLoading } =
+    useGetMessageHistoryQuery(selectedConversation as string, {
+      skip: !selectedConversation,
+    });
 
+  const [sendMessage] = useSendMessageMutation();
+  const [markAsRead] = useMarkAsReadMutation();
+
+  const [allMessages, setAllMessages] = useState<Message[]>([]);
+
+  // Sync messages from query and clear on switch
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    if (messagesData?.data) {
+      setAllMessages(messagesData.data);
+    } else if (isMessagesLoading) {
+      setAllMessages([]);
+    }
+  }, [messagesData, isMessagesLoading, selectedConversation]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  // Socket event listeners
+  useEffect(() => {
+    if (!socket || !selectedConversation) return;
 
-  // fake data for conversations and messages
-  const conversations: Conversation[] = [
-    {
-      id: "1",
-      participantName: "Aisha Rahman",
-      participantAvatar: "/avatars/aisha-rahman.png",
-      participantRole: "HR Manager at NexGen Technologies",
-      lastMessage:
-        "We’d love to schedule an interview with you next week, Insha’Allah. Are you available?",
-      lastMessageTime: "45 minutes ago",
-      unreadCount: 1,
-      isOnline: true,
-      messages: [
-        {
-          id: "msg-1-1",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "Assalamu Alaikum! I reviewed your resume and your MERN stack skills are quite impressive.",
-          timestamp: "9:10 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-2",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "We'd love to schedule an interview with you next week, Insha'Allah. Are you available?",
-          timestamp: "9:15 AM",
-          isRead: false,
-        },
-        {
-          id: "msg-1-3",
-          senderId: "me",
-          senderName: "You",
-          senderAvatar: "/avatars/me.png",
-          content:
-            "Wa Alaikum Assalam! Thank you for reaching out. Yes, I'm available next week.",
-          timestamp: "9:20 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-4",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "Great! How about Tuesday at 2 PM? We can do it via Google Meet.",
-          timestamp: "9:25 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-5",
-          senderId: "me",
-          senderName: "You",
-          senderAvatar: "/avatars/me.png",
-          content:
-            "Tuesday at 2 PM works perfectly for me. Looking forward to it!",
-          timestamp: "9:30 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-6",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "Perfect! I'll send you the meeting link shortly. Have a blessed day!",
-          timestamp: "9:35 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-7",
-          senderId: "me",
-          senderName: "You",
-          senderAvatar: "/avatars/me.png",
-          content: "JazakAllah Khair! You too.",
-          timestamp: "9:40 AM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "2",
-      participantName: "Omar Farooq",
-      participantAvatar: "/avatars/omar-farooq.png",
-      participantRole: "Recruiter at CloudAxis Solutions",
-      lastMessage:
-        "Could you please share your GitHub link and a short project summary?",
-      lastMessageTime: "3 hours ago",
-      unreadCount: 2,
-      isOnline: true,
-      messages: [
-        {
-          id: "3",
-          senderId: "omar",
-          senderName: "Omar Farooq",
-          senderAvatar: "/avatars/omar-farooq.png",
-          content:
-            "Salam Muzahid, we’re currently hiring a React Developer for our Dhaka team.",
-          timestamp: "7:20 AM",
-          isRead: true,
-        },
-        {
-          id: "4",
-          senderId: "omar",
-          senderName: "Omar Farooq",
-          senderAvatar: "/avatars/omar-farooq.png",
-          content:
-            "Could you please share your GitHub link and a short project summary?",
-          timestamp: "7:25 AM",
-          isRead: false,
-        },
-      ],
-    },
-    {
-      id: "3",
-      participantName: "Fatima Noor",
-      participantAvatar: "/avatars/fatima-noor.png",
-      participantRole: "Engineering Manager at CodeVista Labs",
-      lastMessage:
-        "JazakAllah khair for your time yesterday. We’ll follow up soon with feedback.",
-      lastMessageTime: "Yesterday",
+    const handleNewMessage = (message: any) => {
+      if (message.conversationId === selectedConversation) {
+        setAllMessages((prev) => {
+          const exists = prev.some((m) => m.id === message.id);
+          if (exists) return prev;
+          return [...prev, message];
+        });
+        markAsRead(selectedConversation);
+      }
+    };
+
+    const handleTyping = (data: {
+      conversationId: string;
+      userId: string;
+      isTyping: boolean;
+    }) => {
+      if (
+        data.conversationId === selectedConversation &&
+        data.userId !== currentUser?.id
+      ) {
+        setTypingUsers((prev) => ({ ...prev, [data.userId]: data.isTyping }));
+      }
+    };
+
+    socket.on("new_message", handleNewMessage);
+    socket.on("user_typing", handleTyping);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+      socket.off("user_typing", handleTyping);
+    };
+  }, [socket, selectedConversation, currentUser?.id, markAsRead]);
+
+  // Join/Leave conversation room
+  useEffect(() => {
+    if (socket && selectedConversation) {
+      socket.emit("join_conversation", selectedConversation);
+      markAsRead(selectedConversation);
+      return () => {
+        socket.emit("leave_conversation", selectedConversation);
+      };
+    }
+    return undefined;
+  }, [socket, selectedConversation, markAsRead]);
+
+  const conversations = (conversationsData?.data || []).map((conv: any) => {
+    const participant = conv.conversationParticipants.find(
+      (p: any) => p.userId !== currentUser?.id,
+    );
+
+    return {
+      id: conv.id,
+      participantName: participant?.user?.fullName || "Unknown User",
+      participantAvatar:
+        participant?.user?.profile?.avatarUrl || "/placeholder.svg",
+      participantRole: participant?.user?.profile?.headline || "",
+      lastMessage: conv.lastMessage?.content || "No messages yet",
+      lastMessageTime: conv.lastMessage?.createdAt
+        ? formatDistanceToNow(new Date(conv.lastMessage.createdAt), {
+            addSuffix: true,
+          })
+        : "",
       unreadCount: 0,
       isOnline: false,
-      messages: [
-        {
-          id: "5",
-          senderId: "fatima",
-          senderName: "Fatima Noor",
-          senderAvatar: "/avatars/fatima-noor.png",
-          content:
-            "It was a pleasure talking about your full-stack experience yesterday. You have strong fundamentals.",
-          timestamp: "Yesterday, 4:10 PM",
-          isRead: true,
-        },
-        {
-          id: "6",
-          senderId: "fatima",
-          senderName: "Fatima Noor",
-          senderAvatar: "/avatars/fatima-noor.png",
-          content:
-            "JazakAllah khair for your time yesterday. We’ll follow up soon with feedback.",
-          timestamp: "Yesterday, 4:15 PM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "4",
-      participantName: "Ahmad Khan",
-      participantAvatar: "/avatars/ahmad-khan.png",
-      participantRole: "CTO at Crescent Innovations",
-      lastMessage:
-        "Looking forward to reviewing your approach to our dashboard redesign test.",
-      lastMessageTime: "2 days ago",
-      unreadCount: 0,
-      isOnline: true,
-      messages: [
-        {
-          id: "7",
-          senderId: "ahmad",
-          senderName: "Ahmad Khan",
-          senderAvatar: "/avatars/ahmad-khan.png",
-          content:
-            "Hi Muzahid, your UI portfolio is well-crafted — very clean and minimal.",
-          timestamp: "2 days ago, 10:40 AM",
-          isRead: true,
-        },
-        {
-          id: "8",
-          senderId: "ahmad",
-          senderName: "Ahmad Khan",
-          senderAvatar: "/avatars/ahmad-khan.png",
-          content:
-            "Looking forward to reviewing your approach to our dashboard redesign test.",
-          timestamp: "2 days ago, 10:45 AM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "5",
-      participantName: "Maryam Siddiqui",
-      participantAvatar: "/avatars/maryam-siddiqui.png",
-      participantRole: "HR Executive at StellarSoft",
-      lastMessage:
-        "Your application has been shortlisted, Alhamdulillah. Our team will contact you soon.",
-      lastMessageTime: "3 days ago",
-      unreadCount: 0,
-      isOnline: false,
-      messages: [
-        {
-          id: "9",
-          senderId: "maryam",
-          senderName: "Maryam Siddiqui",
-          senderAvatar: "/avatars/maryam-siddiqui.png",
-          content:
-            "Hello! We received your application for the React Developer position at StellarSoft.",
-          timestamp: "3 days ago, 1:50 PM",
-          isRead: true,
-        },
-        {
-          id: "10",
-          senderId: "maryam",
-          senderName: "Maryam Siddiqui",
-          senderAvatar: "/avatars/maryam-siddiqui.png",
-          content:
-            "Your application has been shortlisted, Alhamdulillah. Our team will contact you soon.",
-          timestamp: "3 days ago, 1:55 PM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "6",
-      participantName: "Yusuf Ali",
-      participantAvatar: "/avatars/yusuf-ali.png",
-      participantRole: "Product Manager at BrightPath Digital",
-      lastMessage:
-        "Can we schedule a short meeting tomorrow to discuss your project availability?",
-      lastMessageTime: "4 days ago",
-      unreadCount: 1,
-      isOnline: false,
-      messages: [
-        {
-          id: "11",
-          senderId: "yusuf",
-          senderName: "Yusuf Ali",
-          senderAvatar: "/avatars/yusuf-ali.png",
-          content:
-            "Salam! Your Redux Toolkit experience is impressive. We might have a project match for you.",
-          timestamp: "4 days ago, 4:30 PM",
-          isRead: true,
-        },
-        {
-          id: "12",
-          senderId: "yusuf",
-          senderName: "Yusuf Ali",
-          senderAvatar: "/avatars/yusuf-ali.png",
-          content:
-            "Can we schedule a short meeting tomorrow to discuss your project availability?",
-          timestamp: "4 days ago, 4:35 PM",
-          isRead: false,
-        },
-      ],
-    },
-  ];
+      recipientId: participant?.userId,
+    };
+  });
 
   const filteredConversations = conversations.filter(
-    (conv) =>
+    (conv: any) =>
       conv.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const currentConversation = conversations.find(
-    (conv) => conv.id === selectedConversation,
+    (conv: any) => conv.id === selectedConversation,
   );
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() && selectedConversation) {
-      console.log("Sending message:", newMessage);
-      setNewMessage("");
+      const messageContent = newMessage;
+      const recipientId = currentConversation?.recipientId;
+
+      try {
+        setNewMessage("");
+        // Optimistic update for UI feedback
+        const tempId = Date.now().toString();
+        const optimisticMessage: Message = {
+          id: tempId,
+          senderId: currentUser?.id || "",
+          content: messageContent,
+          createdAt: new Date().toISOString(),
+          status: "SENT",
+          sender: {
+            fullName: currentUser?.fullName || "You",
+            profile: { avatarUrl: currentUser?.profile?.avatarUrl },
+          },
+        };
+        setAllMessages((prev) => [...prev, optimisticMessage]);
+
+        await sendMessage({
+          conversationId: selectedConversation,
+          content: messageContent,
+          recipientId,
+        }).unwrap();
+
+        // Notify socket about typing stop
+        socket?.emit("typing", {
+          conversationId: selectedConversation,
+          userId: currentUser?.id,
+          isTyping: false,
+        });
+      } catch (err) {
+        console.error("Failed to send message:", err);
+        // Remove optimistic message on failure
+        setAllMessages((prev) => prev.filter((m) => m.id.length > 15)); // Assuming UUIDs are long
+      }
+    }
+  };
+
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    if (socket && selectedConversation) {
+      socket.emit("typing", {
+        conversationId: selectedConversation,
+        userId: currentUser?.id,
+        isTyping: e.target.value.length > 0,
+      });
     }
   };
 
@@ -346,7 +229,7 @@ const MessageView = () => {
     setSelectedConversation(null);
   };
 
-  if (isLoading) {
+  if (isConversationsLoading) {
     return <MessageViewSkeleton />;
   }
 
@@ -375,7 +258,9 @@ const MessageView = () => {
                 <div className="flex items-center space-x-1.5">
                   <span className="bg-success h-1.5 w-1.5 animate-pulse rounded-full" />
                   <p className="text-muted-foreground/80 text-[10px] font-black tracking-[0.15em] uppercase">
-                    Active Now
+                    {Object.values(typingUsers).some(Boolean)
+                      ? "Typing..."
+                      : "Active Now"}
                   </p>
                 </div>
               </div>
@@ -428,7 +313,7 @@ const MessageView = () => {
                           <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
                             {currentConversation.participantName
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
@@ -443,7 +328,9 @@ const MessageView = () => {
                         <div className="flex items-center space-x-2">
                           <span className="bg-success flex h-2 w-2 animate-pulse rounded-full" />
                           <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                            {currentConversation.participantRole}
+                            {Object.values(typingUsers).some(Boolean)
+                              ? "Typing..."
+                              : currentConversation.participantRole}
                           </p>
                         </div>
                       </div>
@@ -501,18 +388,16 @@ const MessageView = () => {
                           <div className="border-border/40 w-full border-t"></div>
                         </div>
                         <span className="bg-background/80 border-border/60 text-muted-foreground/80 relative z-10 rounded-full border px-5 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase shadow-md backdrop-blur-sm">
-                          February 05, 2026
+                          Chat Started
                         </span>
                       </div>
 
                       <div className="space-y-4">
-                        {currentConversation.messages.map((message, index) => {
+                        {allMessages.map((message, index) => {
                           const isCurrentUser =
-                            message.senderId === "current-user";
-                          const nextMessage =
-                            currentConversation.messages[index + 1];
-                          const prevMessage =
-                            currentConversation.messages[index - 1];
+                            message.senderId === currentUser?.id;
+                          const nextMessage = allMessages[index + 1];
+                          const prevMessage = allMessages[index - 1];
 
                           const isNewGroup =
                             !prevMessage ||
@@ -520,6 +405,17 @@ const MessageView = () => {
                           const isLastInGroup =
                             !nextMessage ||
                             nextMessage.senderId !== message.senderId;
+
+                          const senderName =
+                            message.sender?.fullName ||
+                            (isCurrentUser
+                              ? "You"
+                              : currentConversation.participantName);
+                          const senderAvatar =
+                            message.sender?.profile?.avatarUrl ||
+                            (isCurrentUser
+                              ? "/placeholder.svg"
+                              : currentConversation.participantAvatar);
 
                           return (
                             <div
@@ -533,22 +429,18 @@ const MessageView = () => {
                                     : ""
                                 }`}
                               >
-                                {/* Grouped Avatars */}
                                 {!isCurrentUser && (
                                   <div className="w-8 shrink-0">
                                     {isLastInGroup && (
                                       <Avatar className="ring-background ring-offset-border/10 h-8 w-8 shadow-lg ring-2 ring-offset-1">
                                         <AvatarImage
-                                          src={
-                                            message.senderAvatar ||
-                                            "/placeholder.svg"
-                                          }
+                                          src={senderAvatar}
                                           className="object-cover"
                                         />
                                         <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-black">
-                                          {message.senderName
+                                          {senderName
                                             .split(" ")
-                                            .map((n) => n[0])
+                                            .map((n: string) => n[0])
                                             .join("")}
                                         </AvatarFallback>
                                       </Avatar>
@@ -569,20 +461,19 @@ const MessageView = () => {
                                     <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap md:text-[14px]">
                                       {message.content}
                                     </p>
-
-                                    {/* Tick Status for Current User */}
-                                    {isCurrentUser && (
-                                      <div className="absolute -bottom-1.5 -left-1 opacity-0 transition-opacity group-hover:opacity-100">
-                                        <div className="bg-success border-background h-3 w-3 rounded-full border-2 shadow-sm" />
-                                      </div>
-                                    )}
                                   </div>
 
                                   {isLastInGroup && (
                                     <span
                                       className={`mt-2 px-1 text-[9px] font-black tracking-widest uppercase opacity-60 md:text-[10px] ${isCurrentUser ? "text-primary/70" : "text-muted-foreground"}`}
                                     >
-                                      {message.timestamp} • Delivered
+                                      {new Date(
+                                        message.createdAt,
+                                      ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}{" "}
+                                      • {message.status}
                                     </span>
                                   )}
                                 </div>
@@ -607,7 +498,7 @@ const MessageView = () => {
                     <Input
                       placeholder="Message..."
                       value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
+                      onChange={handleTyping}
                       onKeyPress={(e) =>
                         e.key === "Enter" && handleSendMessage()
                       }
@@ -654,8 +545,6 @@ const MessageView = () => {
           </div>
         </div>
       </div>
-
-      <ComingSoonAlert />
 
       {currentConversation && (
         <MediaGallery

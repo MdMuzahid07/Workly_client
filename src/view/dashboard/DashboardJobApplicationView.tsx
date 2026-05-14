@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import PaginationBar from "@/components/shared/PaginationBar";
@@ -40,6 +41,7 @@ import {
   useUpdateApplicationStatusMutation,
 } from "@/redux/feature/application/applicationApi";
 import { useGetMyJobsQuery } from "@/redux/feature/job/jobApi";
+import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
 import { ApplicationStatus, EmployerApplication } from "@/types/application";
 import debounce from "debounce";
 import {
@@ -48,11 +50,13 @@ import {
   Eye,
   FileText,
   Mail,
+  MessageSquare,
   MoreVertical,
   Phone,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import ApplicationFiltersAndSearch from "../../components/dashboard/applications/ApplicationFiltersAndSearch";
@@ -198,6 +202,9 @@ const DashboardJobApplicationView = () => {
     sortOrder: "desc",
   });
   const [updateApplicationStatus] = useUpdateApplicationStatusMutation();
+  const [createConversation, { isLoading: isCreatingChat }] =
+    useCreateConversationMutation();
+  const router = useRouter();
 
   const applications = (applicationsResponse?.data ||
     []) as EmployerApplication[];
@@ -272,6 +279,26 @@ const DashboardJobApplicationView = () => {
       );
     } finally {
       setUpdatingApplicationId(null);
+    }
+  };
+
+  const handleStartChat = async (application: EmployerApplication) => {
+    try {
+      toast.loading("Starting conversation...", { id: "create_chat" });
+      const res = await createConversation({
+        participantId: application.applicant.id,
+        applicationId: application.id,
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Conversation started!", { id: "create_chat" });
+        router.push("/employer/messages");
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to start conversation", {
+        id: "create_chat",
+      });
+      console.error(err);
     }
   };
 
@@ -683,6 +710,15 @@ const DashboardJobApplicationView = () => {
                       }
                     </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    className="rounded-xl"
+                    disabled={isCreatingChat}
+                    onClick={() => handleStartChat(selectedApplication)}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Message
+                  </Button>
                   {selectedApplication.status !== "REJECTED" &&
                     selectedApplication.status !== "WITHDRAWN" && (
                       <Button

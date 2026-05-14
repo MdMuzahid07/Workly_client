@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
-import { Badge } from "../../ui/badge";
-import { Card, CardContent, CardHeader } from "../../ui/card";
-import { Input } from "../../ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const ConversationSidebar = ({
   showMobileChat,

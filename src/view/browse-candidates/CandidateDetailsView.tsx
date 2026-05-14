@@ -24,20 +24,25 @@ import {
   useGetCandidateByIdQuery,
   useToggleSaveCandidateMutation,
 } from "../../redux/feature/candidate/candidateApi";
+import { useCreateConversationMutation } from "../../redux/feature/message/messageApi";
 import { useLogProfileViewMutation } from "../../redux/feature/profileView/profileViewApi";
 import { useAppSelector } from "../../redux/hooks";
 import CandidateDetailsSkeleton from "../../skeleton/candidate/CandidateDetailsSkeleton";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const CandidateDetailsView = () => {
   const params = useParams();
   const candidateId = params.id as string;
   const { user: currentUser } = useAppSelector((state) => state.auth);
+  const router = useRouter();
 
   const [logProfileView] = useLogProfileViewMutation();
+  const [createConversation, { isLoading: isCreatingChat }] =
+    useCreateConversationMutation();
 
   useEffect(() => {
-    if (candidateId && currentUser?.userId !== candidateId) {
+    if (candidateId && currentUser?.id !== candidateId) {
       logProfileView(candidateId);
     }
   }, [candidateId, currentUser, logProfileView]);
@@ -67,6 +72,31 @@ const CandidateDetailsView = () => {
       }
     } catch (err) {
       toast.error("Failed to update status", { id: "save_candidate" });
+      console.error(err);
+    }
+  };
+
+  const handleStartChat = async () => {
+    if (!isEmployer) {
+      toast.error("Only employers can start a conversation");
+      return;
+    }
+
+    try {
+      toast.loading("Starting conversation...", { id: "create_chat" });
+      const res = await createConversation({
+        participantId: candidateId,
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Conversation started!", { id: "create_chat" });
+        // Redirect to employer messages
+        router.push("/employer/messages");
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to start conversation", {
+        id: "create_chat",
+      });
       console.error(err);
     }
   };
@@ -190,7 +220,11 @@ const CandidateDetailsView = () => {
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Button className="btn-green-primary rounded-full px-8 font-bold shadow-lg">
+                  <Button
+                    onClick={handleStartChat}
+                    disabled={isCreatingChat}
+                    className="btn-green-primary rounded-full px-8 font-bold shadow-lg"
+                  >
                     <MessageSquare className="mr-2 h-5 w-5" />
                     Message
                   </Button>
@@ -405,7 +439,11 @@ const CandidateDetailsView = () => {
                   This candidate has a verified profile and is actively looking
                   for new opportunities.
                 </p>
-                <Button className="btn-green-primary w-full rounded-full font-bold">
+                <Button
+                  onClick={handleStartChat}
+                  disabled={isCreatingChat}
+                  className="btn-green-primary w-full rounded-full font-bold"
+                >
                   Contact Now
                 </Button>
               </div>
