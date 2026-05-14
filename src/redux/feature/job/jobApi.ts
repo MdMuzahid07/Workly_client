@@ -44,6 +44,15 @@ const jobApi = baseApi.injectEndpoints({
       }),
     }),
 
+    getRecommendedJobs: builder.query({
+      query: (params) => ({
+        url: "/job/recommended",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["jobs"],
+    }),
+
     deleteJob: builder.mutation({
       query: (id: string) => ({
         url: `/job/delete/${id}`,
@@ -57,6 +66,7 @@ export const {
   useCreateJobMutation,
   useGetJobsQuery,
   useGetMyJobsQuery,
+  useGetRecommendedJobsQuery,
   useGetJobByIdQuery,
   useUpdateJobMutation,
   useDeleteJobMutation,

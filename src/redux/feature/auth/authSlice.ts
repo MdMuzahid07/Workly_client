@@ -15,6 +15,7 @@ export interface IUser {
   role: UserRole;
   isVerified: boolean;
   isActive: boolean;
+  isPremium: boolean;
   profileId?: string;
   companyId?: string;
   lastLogin?: Date;
