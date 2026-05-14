@@ -146,7 +146,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                         item.fileUrl?.startsWith("blob:")
                       }
                     />
-                    <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/20 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
                       <p className="mb-1 truncate text-[10px] font-bold text-white/90">
                         {item.fileName}
                       </p>
