@@ -67,7 +67,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-background/95 flex max-h-[90vh] max-w-4xl flex-col overflow-hidden border-none p-0 shadow-2xl backdrop-blur-xl">
+      <DialogContent className="bg-background/95 flex h-[90vh] w-[95vw] max-w-7xl flex-col overflow-hidden border-none p-0 shadow-2xl backdrop-blur-xl md:min-w-[50vw]">
         <DialogHeader className="p-6 pb-0">
           <div className="mb-2 flex items-center justify-between">
             <DialogTitle className="text-2xl font-black tracking-tight">
@@ -101,35 +101,41 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
           defaultValue="media"
           className="mt-6 flex flex-1 flex-col overflow-hidden"
         >
-          <div className="border-border/40 border-b px-6">
-            <TabsList className="h-auto gap-2 bg-transparent p-0">
+          <div className="px-6">
+            <TabsList className="border-border/40 flex h-10 w-full justify-start gap-8 rounded-full border-b p-0">
               <TabsTrigger
                 value="media"
-                className="data-[state=active]:bg-primary/5 data-[state=active]:text-primary data-[state=active]:border-primary gap-2 rounded-t-xl rounded-b-none border-b-2 border-transparent px-6 py-3 font-bold transition-all"
+                className="text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary hover:text-foreground relative h-full rounded-full border-b-2 border-transparent bg-transparent px-2 text-sm font-bold transition-all data-[state=active]:shadow-none"
               >
-                <ImageIcon className="h-4 w-4" />
-                Media ({filteredItems.media.length})
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" />
+                  Media ({filteredItems.media.length})
+                </div>
               </TabsTrigger>
               <TabsTrigger
                 value="docs"
-                className="data-[state=active]:bg-primary/5 data-[state=active]:text-primary data-[state=active]:border-primary gap-2 rounded-t-xl rounded-b-none border-b-2 border-transparent px-6 py-3 font-bold transition-all"
+                className="text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary hover:text-foreground relative h-full rounded-full border-b-2 border-transparent bg-transparent px-2 text-sm font-bold transition-all data-[state=active]:shadow-none"
               >
-                <FileIcon className="h-4 w-4" />
-                Docs ({filteredItems.docs.length})
+                <div className="flex items-center gap-2">
+                  <FileIcon className="h-4 w-4" />
+                  Docs ({filteredItems.docs.length})
+                </div>
               </TabsTrigger>
               <TabsTrigger
                 value="links"
-                className="data-[state=active]:bg-primary/5 data-[state=active]:text-primary data-[state=active]:border-primary gap-2 rounded-t-xl rounded-b-none border-b-2 border-transparent px-6 py-3 font-bold transition-all"
+                className="text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary hover:text-foreground relative h-full rounded-full border-b-2 border-transparent bg-transparent px-2 text-sm font-bold transition-all data-[state=active]:shadow-none"
               >
-                <LinkIcon className="h-4 w-4" />
-                Links ({filteredItems.links.length})
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="h-4 w-4" />
+                  Links ({filteredItems.links.length})
+                </div>
               </TabsTrigger>
             </TabsList>
           </div>
 
           <ScrollArea className="flex-1 p-6">
             <TabsContent value="media" className="m-0 focus-visible:ring-0">
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 {filteredItems.media.map((item: any, idx: number) => (
                   <div
                     key={item.id}
