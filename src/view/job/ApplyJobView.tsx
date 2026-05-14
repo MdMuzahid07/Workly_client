@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DollarSign, MapPin } from "lucide-react";
+import { Crown, DollarSign, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +15,13 @@ import JobInfoCard from "../../components/main/jobs/applyJob/JobInfoCard";
 import JobRequirementsSidebar from "../../components/main/jobs/applyJob/JobRequirementsSidebar";
 import JobSummaryCard from "../../components/main/jobs/applyJob/JobSummaryCard";
 import { Button } from "../../components/ui/button";
-import { useCreateApplicationMutation } from "../../redux/feature/application/applicationApi";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useAppSelector } from "@/redux/hooks";
+import {
+  useCreateApplicationMutation,
+  useGetMyApplicationSummaryQuery,
+} from "../../redux/feature/application/applicationApi";
 import { useGetJobByIdQuery } from "../../redux/feature/job/jobApi";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import { useUploadResumeMutation } from "../../redux/feature/resume/resumeApi";
@@ -69,8 +75,17 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [uploadResume, { isLoading: isUploadingResume }] =
     useUploadResumeMutation();
+  const { data: summaryResponse } = useGetMyApplicationSummaryQuery({});
   const [createApplication, { isLoading: isCreatingApplication }] =
     useCreateApplicationMutation();
+
+  const user = useAppSelector((state) => state.auth.user);
+  const isPremium = user?.isPremium || false;
+  const isJobSeeker = user?.role === "JOB_SEEKER";
+
+  const monthlyCount = summaryResponse?.data?.monthlyCount || 0;
+  const limitReached = !isPremium && isJobSeeker && monthlyCount >= 30;
+  const closeToLimit = !isPremium && isJobSeeker && monthlyCount >= 25;
   const {
     data: jobData,
     isLoading: isJobLoading,
@@ -222,6 +237,61 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:mt-10 lg:px-8">
         <ApplyJobHeader jobTitle={jobData?.data.title} />
 
+        {/* Application Limit Warning */}
+        {!isPremium && isJobSeeker && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mt-6 overflow-hidden"
+          >
+            <div
+              className={cn(
+                "flex flex-col justify-between gap-4 rounded-2xl border-2 p-4 transition-all md:flex-row md:items-center",
+                limitReached
+                  ? "border-red-200 bg-red-50 text-red-900"
+                  : "border-amber-200 bg-amber-50 text-amber-900",
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "shrink-0 rounded-xl p-2",
+                    limitReached ? "bg-red-100" : "bg-amber-100",
+                  )}
+                >
+                  {limitReached ? (
+                    <ShieldCheck className="h-5 w-5 text-red-600" />
+                  ) : (
+                    <Crown className="h-5 w-5 text-amber-600" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-bold">
+                    {limitReached
+                      ? "Monthly limit reached (30/30 applications)"
+                      : `Application usage: ${monthlyCount}/30 this month`}
+                  </p>
+                  <p className="text-xs font-medium opacity-80">
+                    {limitReached
+                      ? "You've used all your free applications for this month. Upgrade to Premium for unlimited access."
+                      : "Free users can apply for up to 30 jobs per month. Go Premium for unlimited applications."}
+                  </p>
+                </div>
+              </div>
+              {!isPremium && (
+                <Button
+                  asChild
+                  size="sm"
+                  variant={limitReached ? "destructive" : "outline"}
+                  className="rounded-xl font-bold"
+                >
+                  <Link href="/pricing">Upgrade to Premium</Link>
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
           <div className="space-y-6 lg:col-span-2">
             <JobSummaryCard job={jobData} />
@@ -243,17 +313,29 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
             </div>
 
             {!submitted ? (
-              <JobApplyForm
-                form={form}
-                EXPERIENCE_OPTIONS={EXPERIENCE_OPTIONS}
-                handleFileChange={handleFileChange}
-                formatFileSize={formatFileSize}
-                handleRemoveFile={handleRemoveFile}
-                handleSubmit={handleSubmit}
-                isSubmitting={isSubmitting}
-                resumeFile={resumeFile}
-                existingResumes={existingResumes}
-              />
+              <div
+                className={cn(limitReached && "pointer-events-none opacity-50")}
+              >
+                <JobApplyForm
+                  form={form}
+                  EXPERIENCE_OPTIONS={EXPERIENCE_OPTIONS}
+                  handleFileChange={handleFileChange}
+                  formatFileSize={formatFileSize}
+                  handleRemoveFile={handleRemoveFile}
+                  handleSubmit={handleSubmit}
+                  isSubmitting={isSubmitting}
+                  resumeFile={resumeFile}
+                  existingResumes={existingResumes}
+                />
+                {limitReached && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm font-bold text-red-600">
+                      You cannot apply for more jobs this month. Please upgrade
+                      your plan.
+                    </p>
+                  </div>
+                )}
+              </div>
             ) : (
               <ApplySuccessMessage />
             )}
