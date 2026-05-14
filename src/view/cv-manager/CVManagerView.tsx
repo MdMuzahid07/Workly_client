@@ -8,19 +8,33 @@ import {
   useListResumesQuery,
   useUploadResumeMutation,
 } from "@/redux/feature/resume/resumeApi";
+import { useAppSelector } from "@/redux/hooks";
 import { motion } from "framer-motion";
-import { Loader2, Plus, UploadCloud } from "lucide-react";
+import {
+  ArrowRight,
+  Crown,
+  Loader2,
+  Plus,
+  ShieldCheck,
+  UploadCloud,
+} from "lucide-react";
+import Link from "next/link";
 import { useRef } from "react";
 import { toast } from "sonner";
 import DashboardCVManagerHeader from "../../components/dashboard/dashboard-nav/header/DashboardCVManagerHeader";
 import CVCard from "../../components/main/cv-manager/CVCard";
 
 const CVManagerView = () => {
+  const user = useAppSelector((state) => state.auth.user);
+  const isPremium = user?.isPremium || false;
+  const isJobSeeker = user?.role === "JOB_SEEKER";
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: response, isLoading } = useListResumesQuery({});
   const [uploadResume, { isLoading: isUploading }] = useUploadResumeMutation();
 
   const resumes = response?.data || [];
+  const hasReachedLimit = !isPremium && resumes.length >= 1;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,6 +60,12 @@ const CVManagerView = () => {
   };
 
   const triggerUpload = () => {
+    if (hasReachedLimit) {
+      toast.error(
+        "Free users can only maintain one resume version. Go Premium for unlimited uploads!",
+      );
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -125,24 +145,68 @@ const CVManagerView = () => {
           </motion.div>
         </div>
 
-        {/* Info Card */}
-        <Card className="bg-primary/5 border-primary/20 overflow-hidden rounded-2xl border">
-          <CardContent className="p-6 sm:p-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center">
-              <div className="bg-primary/10 text-primary h-12 w-12 shrink-0 rounded-full p-3">
-                <Plus className="h-full w-full rotate-45" />
+        {/* Premium Upgrade Hint for Free Users */}
+        {!isPremium && isJobSeeker && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="from-primary/10 via-background border-primary/10 to-primary/5 relative overflow-hidden rounded-2xl border-2 bg-linear-to-br p-8"
+          >
+            <div className="relative z-10 flex flex-col justify-between gap-8 md:flex-row md:items-center">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                <div className="bg-primary shadow-primary/20 flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg">
+                  <Crown className="h-8 w-8 text-white" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-black tracking-tight">
+                    Version Control is a{" "}
+                    <span className="text-primary">Premium</span> Perk
+                  </h3>
+                  <p className="text-muted-foreground max-w-xl text-sm leading-relaxed font-medium opacity-80">
+                    Maintain multiple versions of your resume tailored for
+                    different roles. Premium members can upload up to 10
+                    distinct resumes for maximum application precision.
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold">Pro Tip: Version Control</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed font-medium opacity-80">
-                  Tailoring your resume to specific job descriptions increases
-                  your chances of landing an interview by 40%. Manage versions
-                  for different career paths right here.
-                </p>
-              </div>
+              <Button
+                asChild
+                size="lg"
+                className="shadow-primary/20 h-14 rounded-2xl px-8 font-black shadow-xl"
+              >
+                <Link href="/pricing" className="flex items-center gap-2">
+                  Upgrade to Premium
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+            {/* Background Decoration */}
+            <div className="bg-primary/5 absolute -top-12 -right-12 h-48 w-48 rounded-full blur-3xl" />
+          </motion.div>
+        )}
+
+        {/* Standard Tip Card (only if premium or no resumes yet) */}
+        {(isPremium || resumes.length === 0) && (
+          <Card className="bg-primary/5 border-primary/20 overflow-hidden rounded-2xl border">
+            <CardContent className="p-6 sm:p-8">
+              <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                <div className="bg-primary/10 text-primary h-12 w-12 shrink-0 rounded-full p-3">
+                  <ShieldCheck className="h-full w-full" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold">
+                    Pro Tip: Strategic Tailoring
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed font-medium opacity-80">
+                    Landing a dream role often requires highlighting different
+                    strengths. Managing multiple resumes allows you to pivot
+                    your profile for different career paths instantly.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
