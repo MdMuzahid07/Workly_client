@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 import {
   ArrowLeft,
+  DownloadIcon,
+  FileIcon,
   Info,
   MoreVertical,
   Paperclip,
@@ -22,11 +25,16 @@ import {
   Smile,
   Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
-import { MediaGallery } from "../../components/main/message/MediaGallery";
+import MediaGallery from "../../components/main/message/MediaGallery";
+import MediaLightbox from "../../components/main/message/MediaLightbox";
 import { useSocket } from "../../provider/SocketProvider";
 import {
+  useBlockUserMutation,
+  useDeleteConversationMutation,
   useGetConversationsQuery,
   useGetMessageHistoryQuery,
   useMarkAsReadMutation,
@@ -39,6 +47,10 @@ interface Message {
   id: string;
   senderId: string;
   content: string;
+  messageType: "TEXT" | "IMAGE" | "FILE" | "LINK";
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
   createdAt: string;
   status: string;
   sender?: {
@@ -60,6 +72,13 @@ const MessageView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [lightboxState, setLightboxState] = useState<{
+    isOpen: boolean;
+    index: number;
+  }>({
+    isOpen: false,
+    index: 0,
+  });
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
 
   // API Queries
@@ -72,6 +91,11 @@ const MessageView = () => {
 
   const [sendMessage] = useSendMessageMutation();
   const [markAsRead] = useMarkAsReadMutation();
+  const [blockUser] = useBlockUserMutation();
+  const [deleteConversation] = useDeleteConversationMutation();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [allMessages, setAllMessages] = useState<Message[]>([]);
 
@@ -137,6 +161,9 @@ const MessageView = () => {
     const participant = conv.conversationParticipants.find(
       (p: any) => p.userId !== currentUser?.id,
     );
+    const myParticipant = conv.conversationParticipants.find(
+      (p: any) => p.userId === currentUser?.id,
+    );
 
     return {
       id: conv.id,
@@ -153,6 +180,7 @@ const MessageView = () => {
       unreadCount: 0,
       isOnline: false,
       recipientId: participant?.userId,
+      isBlocked: myParticipant?.isBlocked || false,
     };
   });
 
@@ -166,9 +194,9 @@ const MessageView = () => {
     (conv: any) => conv.id === selectedConversation,
   );
 
-  const handleSendMessage = async () => {
-    if (newMessage.trim() && selectedConversation) {
-      const messageContent = newMessage;
+  const handleSendMessage = async (payloadOverride?: any) => {
+    if ((newMessage.trim() || payloadOverride) && selectedConversation) {
+      const messageContent = payloadOverride?.content || newMessage;
       const recipientId = currentConversation?.recipientId;
 
       try {
@@ -179,6 +207,10 @@ const MessageView = () => {
           id: tempId,
           senderId: currentUser?.id || "",
           content: messageContent,
+          messageType: payloadOverride?.messageType || "TEXT",
+          fileUrl: payloadOverride?.fileUrl,
+          fileName: payloadOverride?.fileName,
+          fileSize: payloadOverride?.fileSize,
           createdAt: new Date().toISOString(),
           status: "SENT",
           sender: {
@@ -192,6 +224,7 @@ const MessageView = () => {
           conversationId: selectedConversation,
           content: messageContent,
           recipientId,
+          ...payloadOverride,
         }).unwrap();
 
         // Notify socket about typing stop
@@ -200,11 +233,79 @@ const MessageView = () => {
           userId: currentUser?.id,
           isTyping: false,
         });
-      } catch (err) {
-        console.error("Failed to send message:", err);
+      } catch (err: any) {
+        console.error("Error sending message:", err);
+        toast.error(err?.data?.message || "Failed to send message");
         // Remove optimistic message on failure
-        setAllMessages((prev) => prev.filter((m) => m.id.length > 15)); // Assuming UUIDs are long
+        setAllMessages((prev) => prev.filter((m) => m.id.length > 15));
       }
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const isImage = file.type.startsWith("image/");
+
+      let fileUrl = "";
+      if (isImage) {
+        // Convert to Base64 for persistence in this demo/mock environment
+        fileUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      } else {
+        fileUrl = URL.createObjectURL(file);
+      }
+
+      await handleSendMessage({
+        content: isImage ? "Shared an image" : `Shared a file: ${file.name}`,
+        messageType: isImage ? "IMAGE" : "FILE",
+        fileUrl,
+        fileName: file.name,
+        fileSize: file.size,
+      });
+
+      toast.success("File uploaded successfully");
+    } catch (err) {
+      toast.error("Failed to upload file");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleBlockUser = async () => {
+    if (!selectedConversation) return;
+    try {
+      await blockUser(selectedConversation).unwrap();
+      toast.success("User block status updated");
+    } catch (err) {
+      toast.error("Failed to update block status");
+    }
+  };
+
+  const allImages = useMemo(
+    () => allMessages.filter((m) => m.messageType === "IMAGE"),
+    [allMessages],
+  );
+
+  const openLightbox = (imageIndex: number) => {
+    setLightboxState({ isOpen: true, index: imageIndex });
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!selectedConversation) return;
+    try {
+      await deleteConversation(selectedConversation).unwrap();
+      setSelectedConversation(null);
+      toast.success("Conversation deleted");
+    } catch (err) {
+      toast.error("Failed to delete conversation");
     }
   };
 
@@ -364,11 +465,21 @@ const MessageView = () => {
                             <Paperclip className="text-primary mr-3 h-4 w-4" />
                             Shared Files
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer rounded-lg py-2.5">
-                            <ShieldAlert className="text-warning mr-3 h-4 w-4" />
-                            Block User
+                          <DropdownMenuItem
+                            className="cursor-pointer rounded-lg py-2.5"
+                            onClick={handleBlockUser}
+                          >
+                            <ShieldAlert
+                              className={`${currentConversation.isBlocked ? "text-primary" : "text-warning"} mr-3 h-4 w-4`}
+                            />
+                            {currentConversation.isBlocked
+                              ? "Unblock User"
+                              : "Block User"}
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer rounded-lg py-2.5">
+                          <DropdownMenuItem
+                            className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer rounded-lg py-2.5"
+                            onClick={handleDeleteConversation}
+                          >
                             <Trash2 className="mr-3 h-4 w-4" />
                             Delete Conversation
                           </DropdownMenuItem>
@@ -458,9 +569,68 @@ const MessageView = () => {
                                         : `bg-card border-border/60 text-foreground/90 border ${isNewGroup ? "rounded-t-2xl rounded-br-2xl rounded-bl-lg" : isLastInGroup ? "rounded-tl-lg rounded-tr-2xl rounded-b-2xl" : "rounded-2xl rounded-l-lg"}`
                                     }`}
                                   >
-                                    <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap md:text-[14px]">
-                                      {message.content}
-                                    </p>
+                                    {message.messageType === "IMAGE" ? (
+                                      <div
+                                        className="cursor-pointer space-y-2"
+                                        onClick={() => {
+                                          const idx = allImages.findIndex(
+                                            (img: Message) =>
+                                              img.id === message.id,
+                                          );
+                                          openLightbox(idx);
+                                        }}
+                                      >
+                                        <div className="border-border/20 relative aspect-video w-full min-w-[200px] overflow-hidden rounded-lg border shadow-sm transition-opacity hover:opacity-90">
+                                          <Image
+                                            src={message.fileUrl || ""}
+                                            alt={
+                                              message.fileName || "Shared image"
+                                            }
+                                            fill
+                                            className="object-cover"
+                                            unoptimized={
+                                              message.fileUrl?.startsWith(
+                                                "data:",
+                                              ) ||
+                                              message.fileUrl?.startsWith(
+                                                "blob:",
+                                              )
+                                            }
+                                          />
+                                        </div>
+                                        <p className="text-[13px] font-medium opacity-90">
+                                          {message.content}
+                                        </p>
+                                      </div>
+                                    ) : message.messageType === "FILE" ? (
+                                      <div className="bg-background/10 flex items-center gap-3 rounded-xl border border-white/10 p-2">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+                                          <FileIcon className="h-5 w-5" />
+                                        </div>
+                                        <div className="min-w-0">
+                                          <p className="max-w-[200px] truncate text-[13px] font-bold">
+                                            {message.fileName}
+                                          </p>
+                                          <p className="text-[10px] opacity-70">
+                                            {(message.fileSize! / 1024).toFixed(
+                                              1,
+                                            )}{" "}
+                                            KB
+                                          </p>
+                                        </div>
+                                        <a
+                                          href={message.fileUrl}
+                                          download
+                                          className="rounded-full p-2 transition-colors hover:bg-white/20"
+                                        >
+                                          <DownloadIcon className="h-4 w-4" />
+                                        </a>
+                                      </div>
+                                    ) : (
+                                      <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap md:text-[14px]">
+                                        {message.content}
+                                      </p>
+                                    )}
                                   </div>
 
                                   {isLastInGroup && (
@@ -488,12 +658,22 @@ const MessageView = () => {
 
                 <div className="bg-background/80 md:bg-card/60 border-border/10 md:border-border/40 sticky bottom-0 z-10 border-t px-4 pt-4 pb-10 backdrop-blur-3xl md:p-8">
                   <div className="group bg-muted/40 md:bg-muted/40 border-border/40 md:border-border/40 focus-within:bg-muted/60 focus-within:ring-primary/5 focus-within:border-primary/20 rounded-3x relative mx-auto flex max-w-4xl items-center space-x-2 rounded-full border p-1.5 pl-4 transition-all duration-300 focus-within:ring-4 md:space-x-3 md:p-2.5 md:pl-6">
+                    <input
+                      type="file"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
+                      disabled={isUploading}
+                      onClick={() => fileInputRef.current?.click()}
                       className="text-muted-foreground/50 hover:bg-primary/10 hover:text-primary h-9 w-9 shrink-0 rounded-full transition-all md:h-10 md:w-10"
                     >
-                      <Paperclip className="h-5 w-5" />
+                      <Paperclip
+                        className={`h-5 w-5 ${isUploading ? "animate-spin" : ""}`}
+                      />
                     </Button>
                     <Input
                       placeholder="Message..."
@@ -550,9 +730,21 @@ const MessageView = () => {
         <MediaGallery
           isOpen={showMediaGallery}
           onClose={() => setShowMediaGallery(false)}
+          messages={allMessages}
           participantName={currentConversation.participantName}
+          onImageClick={(idx) => {
+            setShowMediaGallery(false);
+            openLightbox(idx);
+          }}
         />
       )}
+
+      <MediaLightbox
+        isOpen={lightboxState.isOpen}
+        onClose={() => setLightboxState({ ...lightboxState, isOpen: false })}
+        mediaItems={allImages}
+        initialIndex={lightboxState.index}
+      />
     </div>
   );
 };

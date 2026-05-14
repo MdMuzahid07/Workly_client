@@ -17,10 +17,25 @@ const messageApi = baseApi.injectEndpoints({
       providesTags: (result, error, arg) => [{ type: "Messages", id: arg }],
     }),
     sendMessage: builder.mutation({
-      query: ({ conversationId, content, recipientId }) => ({
+      query: ({
+        conversationId,
+        content,
+        recipientId,
+        messageType,
+        fileUrl,
+        fileName,
+        fileSize,
+      }) => ({
         url: `/message/send/${conversationId}`,
         method: "POST",
-        body: { content, recipientId },
+        body: {
+          content,
+          recipientId,
+          messageType,
+          fileUrl,
+          fileName,
+          fileSize,
+        },
       }),
       invalidatesTags: (result, error, arg) => [
         "Conversations",
@@ -42,6 +57,20 @@ const messageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Conversations"],
     }),
+    blockUser: builder.mutation({
+      query: (conversationId) => ({
+        url: `/message/block/${conversationId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Conversations"],
+    }),
+    deleteConversation: builder.mutation({
+      query: (conversationId) => ({
+        url: `/message/delete/${conversationId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Conversations"],
+    }),
   }),
 });
 
@@ -51,6 +80,8 @@ export const {
   useSendMessageMutation,
   useCreateConversationMutation,
   useMarkAsReadMutation,
+  useBlockUserMutation,
+  useDeleteConversationMutation,
 } = messageApi;
 
 export default messageApi;
