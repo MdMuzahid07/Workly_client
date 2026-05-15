@@ -71,6 +71,13 @@ const messageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Conversations"],
     }),
+    deleteMessage: builder.mutation({
+      query: (messageId: string) => ({
+        url: `/message/message/${messageId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Conversations"],
+    }),
   }),
 });
 
@@ -82,6 +89,7 @@ export const {
   useMarkAsReadMutation,
   useBlockUserMutation,
   useDeleteConversationMutation,
+  useDeleteMessageMutation,
 } = messageApi;
 
 export default messageApi;

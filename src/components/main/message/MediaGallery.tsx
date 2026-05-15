@@ -40,12 +40,17 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const filteredItems = useMemo(() => {
-    const media = messages.filter((m) => m.messageType === "IMAGE");
-    const docs = messages.filter((m) => m.messageType === "FILE");
+    const media = messages.filter(
+      (m) => m.messageType === "IMAGE" && m.status !== "DELETED",
+    );
+    const docs = messages.filter(
+      (m) => m.messageType === "FILE" && m.status !== "DELETED",
+    );
     const links = messages.filter(
       (m) =>
-        m.messageType === "LINK" ||
-        (m.messageType === "TEXT" && m.content.match(/https?:\/\/[^\s]+/)),
+        (m.messageType === "LINK" ||
+          (m.messageType === "TEXT" && m.content.match(/https?:\/\/[^\s]+/))) &&
+        m.status !== "DELETED",
     );
 
     const filterFn = (m: any) =>
@@ -143,7 +148,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                     className="group border-border/50 hover:border-primary/30 relative aspect-square cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-xl"
                   >
                     <Image
-                      src={item.fileUrl}
+                      src={item.fileUrl || "/placeholder.svg"}
                       alt={item.fileName || "Shared media"}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -158,7 +163,10 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                       </p>
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-medium text-white/60">
-                          {(item.fileSize / 1024).toFixed(1)} KB
+                          {item.fileSize
+                            ? (item.fileSize / 1024).toFixed(1)
+                            : "0.0"}{" "}
+                          KB
                         </span>
                         <a
                           href={item.fileUrl}
@@ -197,7 +205,10 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                         </h4>
                         <div className="mt-0.5 flex items-center gap-2">
                           <span className="text-muted-foreground text-[10px] font-bold uppercase">
-                            {(item.fileSize / 1024).toFixed(1)} KB
+                            {item.fileSize
+                              ? (item.fileSize / 1024).toFixed(1)
+                              : "0.0"}{" "}
+                            KB
                           </span>
                           <span className="text-muted-foreground/30">•</span>
                           <span className="text-muted-foreground text-[10px] font-bold uppercase">

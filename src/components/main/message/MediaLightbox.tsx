@@ -113,13 +113,13 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
             style={{ transform: `scale(${zoom})` }}
           >
             <Image
-              src={currentItem.fileUrl}
+              src={currentItem.fileUrl || "/placeholder.svg"}
               alt={currentItem.fileName}
               fill
               className="object-contain shadow-2xl"
               unoptimized={
-                currentItem.fileUrl.startsWith("data:") ||
-                currentItem.fileUrl.startsWith("blob:")
+                currentItem.fileUrl?.startsWith("data:") ||
+                currentItem.fileUrl?.startsWith("blob:")
               }
             />
           </div>
@@ -156,7 +156,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
               className={`relative h-16 w-16 cursor-pointer overflow-hidden rounded-xl border-2 transition-all ${idx === currentIndex ? "border-primary scale-110 shadow-xl" : "border-transparent opacity-40 hover:opacity-80"}`}
             >
               <Image
-                src={item.fileUrl}
+                src={item.fileUrl || "/placeholder.svg"}
                 alt="Thumbnail"
                 fill
                 className="object-cover"

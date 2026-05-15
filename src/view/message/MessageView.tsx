@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -39,6 +49,7 @@ import {
   useGetMessageHistoryQuery,
   useMarkAsReadMutation,
   useSendMessageMutation,
+  useDeleteMessageMutation,
 } from "../../redux/feature/message/messageApi";
 import { useAppSelector } from "../../redux/hooks";
 import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
@@ -72,6 +83,7 @@ const MessageView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [lightboxState, setLightboxState] = useState<{
     isOpen: boolean;
     index: number;
@@ -93,6 +105,7 @@ const MessageView = () => {
   const [markAsRead] = useMarkAsReadMutation();
   const [blockUser] = useBlockUserMutation();
   const [deleteConversation] = useDeleteConversationMutation();
+  const [deleteMessage] = useDeleteMessageMutation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -136,12 +149,34 @@ const MessageView = () => {
       }
     };
 
+    const handleMessageDeleted = (data: {
+      messageId: string;
+      conversationId: string;
+    }) => {
+      if (data.conversationId === selectedConversation) {
+        setAllMessages((prev) =>
+          prev.map((m) =>
+            m.id === data.messageId
+              ? {
+                  ...m,
+                  status: "DELETED",
+                  content: "This message was deleted",
+                  fileUrl: undefined,
+                }
+              : m,
+          ),
+        );
+      }
+    };
+
     socket.on("new_message", handleNewMessage);
     socket.on("user_typing", handleTyping);
+    socket.on("message_deleted", handleMessageDeleted);
 
     return () => {
       socket.off("new_message", handleNewMessage);
       socket.off("user_typing", handleTyping);
+      socket.off("message_deleted", handleMessageDeleted);
     };
   }, [socket, selectedConversation, currentUser?.id, markAsRead]);
 
@@ -290,7 +325,10 @@ const MessageView = () => {
   };
 
   const allImages = useMemo(
-    () => allMessages.filter((m) => m.messageType === "IMAGE"),
+    () =>
+      allMessages.filter(
+        (m) => m.messageType === "IMAGE" && m.status !== "DELETED",
+      ),
     [allMessages],
   );
 
@@ -306,6 +344,29 @@ const MessageView = () => {
       toast.success("Conversation deleted");
     } catch (err) {
       toast.error("Failed to delete conversation");
+    }
+  };
+
+  const handleDeleteMessage = async () => {
+    if (!messageToDelete) return;
+    try {
+      await deleteMessage(messageToDelete).unwrap();
+      setAllMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageToDelete
+            ? {
+                ...m,
+                status: "DELETED",
+                content: "This message was deleted",
+                fileUrl: undefined,
+              }
+            : m,
+        ),
+      );
+      toast.success("Message deleted");
+      setMessageToDelete(null);
+    } catch (err) {
+      toast.error("Failed to delete message");
     }
   };
 
@@ -564,12 +625,64 @@ const MessageView = () => {
                                 >
                                   <div
                                     className={`group relative px-4 py-2.5 shadow-sm transition-all duration-300 hover:shadow-md md:px-5 md:py-3 ${
-                                      isCurrentUser
-                                        ? `bg-primary text-primary-foreground ${isNewGroup ? "rounded-t-2xl rounded-br-lg rounded-bl-2xl" : isLastInGroup ? "rounded-tl-2xl rounded-tr-lg rounded-b-2xl" : "rounded-2xl rounded-r-lg"}`
-                                        : `bg-card border-border/60 text-foreground/90 border ${isNewGroup ? "rounded-t-2xl rounded-br-2xl rounded-bl-lg" : isLastInGroup ? "rounded-tl-lg rounded-tr-2xl rounded-b-2xl" : "rounded-2xl rounded-l-lg"}`
+                                      message.status === "DELETED"
+                                        ? "bg-muted/50 text-muted-foreground italic"
+                                        : isCurrentUser
+                                          ? `bg-primary text-primary-foreground ${isNewGroup ? "rounded-t-2xl rounded-br-lg rounded-bl-2xl" : isLastInGroup ? "rounded-tl-2xl rounded-tr-lg rounded-b-2xl" : "rounded-2xl rounded-r-lg"}`
+                                          : `bg-card border-border/60 text-foreground/90 border ${isNewGroup ? "rounded-t-2xl rounded-br-2xl rounded-bl-lg" : isLastInGroup ? "rounded-tl-lg rounded-tr-2xl rounded-b-2xl" : "rounded-2xl rounded-l-lg"}`
                                     }`}
                                   >
-                                    {message.messageType === "IMAGE" ? (
+                                    {isCurrentUser &&
+                                      message.status !== "DELETED" && (
+                                        <div className="absolute top-1/2 -left-10 flex -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 data-[state=open]:opacity-100">
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="hover:bg-muted data-[state=open]:bg-muted h-8 w-8 rounded-full"
+                                              >
+                                                <MoreVertical className="text-muted-foreground h-4 w-4" />
+                                              </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                              align="end"
+                                              className="z-[100]"
+                                            >
+                                              <DropdownMenuItem
+                                                className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                                                onClick={() =>
+                                                  setMessageToDelete(message.id)
+                                                }
+                                              >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete
+                                              </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
+                                        </div>
+                                      )}
+
+                                    {!isCurrentUser &&
+                                      message.status !== "DELETED" && (
+                                        <div className="absolute top-1/2 -right-10 flex -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="hover:bg-muted h-8 w-8 rounded-full"
+                                            onClick={() =>
+                                              toast.info("Coming soon!")
+                                            }
+                                          >
+                                            <Smile className="text-muted-foreground h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      )}
+                                    {message.status === "DELETED" ? (
+                                      <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap italic opacity-80 md:text-[14px]">
+                                        {message.content}
+                                      </p>
+                                    ) : message.messageType === "IMAGE" ? (
                                       <div
                                         className="cursor-pointer space-y-2"
                                         onClick={() => {
@@ -582,7 +695,10 @@ const MessageView = () => {
                                       >
                                         <div className="border-border/20 relative aspect-video w-full min-w-[200px] overflow-hidden rounded-lg border shadow-sm transition-opacity hover:opacity-90">
                                           <Image
-                                            src={message.fileUrl || ""}
+                                            src={
+                                              message.fileUrl ||
+                                              "/placeholder.svg"
+                                            }
                                             alt={
                                               message.fileName || "Shared image"
                                             }
@@ -612,14 +728,16 @@ const MessageView = () => {
                                             {message.fileName}
                                           </p>
                                           <p className="text-[10px] opacity-70">
-                                            {(message.fileSize! / 1024).toFixed(
-                                              1,
-                                            )}{" "}
+                                            {message.fileSize
+                                              ? (
+                                                  message.fileSize / 1024
+                                                ).toFixed(1)
+                                              : 0}{" "}
                                             KB
                                           </p>
                                         </div>
                                         <a
-                                          href={message.fileUrl}
+                                          href={message.fileUrl || "#"}
                                           download
                                           className="rounded-full p-2 transition-colors hover:bg-white/20"
                                         >
@@ -745,6 +863,31 @@ const MessageView = () => {
         mediaItems={allImages}
         initialIndex={lightboxState.index}
       />
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog
+        open={!!messageToDelete}
+        onOpenChange={(open) => !open && setMessageToDelete(null)}
+      >
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot
+              be undone and it will be removed for everyone in the chat.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteMessage}
+              className="bg-destructive hover:bg-destructive/90 rounded-xl"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
