@@ -7,6 +7,7 @@ import AnalyticsJobPerformanceChart from "@/components/dashboard/analytics/Analy
 import AnalyticsOverview from "@/components/dashboard/analytics/AnalyticsOverview";
 import DashboardAnalyticsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAnalyticsHeader";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { downloadEmployerAnalyticsCsv } from "@/lib/exportEmployerAnalyticsCsv";
@@ -16,7 +17,15 @@ import type {
   EmployerAnalyticsPayload,
   EmployerAnalyticsPeriod,
 } from "@/types/employerAnalytics";
-import { Briefcase, FileText, TrendingUp, Users } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  Crown,
+  FileText,
+  Lock,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
@@ -51,6 +60,82 @@ export default function AnalyticsView() {
   }, [analytics]);
 
   const chartLoading = isLoading || isFetching;
+
+  if (user && !user.isPremium) {
+    return (
+      <div className="mt-16 flex min-h-[calc(100vh-64px)] items-center justify-center p-4 sm:p-8">
+        <Card className="max-w-3xl overflow-hidden border">
+          <CardContent className="p-12 text-center">
+            <div className="bg-primary/10 mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full">
+              <TrendingUp className="text-primary h-12 w-12" />
+            </div>
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <Lock className="text-muted-foreground h-5 w-5" />
+              <h1 className="text-foreground text-4xl font-black tracking-tight">
+                Premium Analytics
+              </h1>
+            </div>
+            <p className="text-muted-foreground mx-auto mb-10 max-w-lg text-lg leading-relaxed font-medium">
+              Gain deep insights into your hiring funnel, job performance, and
+              department distribution. Data-driven decisions start with Premium.
+            </p>
+
+            <div className="mb-10 grid grid-cols-1 gap-6 text-left md:grid-cols-2">
+              {[
+                {
+                  title: "Application Trends",
+                  desc: "Track hiring velocity over time",
+                },
+                {
+                  title: "Job Performance",
+                  desc: "Compare view-to-apply conversion rates",
+                },
+                {
+                  title: "Department Analytics",
+                  desc: "Analyze hiring across your organization",
+                },
+                {
+                  title: "Hiring Funnel",
+                  desc: "Identify and fix bottlenecks in your process",
+                },
+              ].map((feature, i) => (
+                <div key={i} className="flex items-start space-x-3">
+                  <div className="bg-primary/20 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                    <CheckCircle2 className="text-primary h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-foreground text-sm font-black">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground text-xs font-medium">
+                      {feature.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+              <Button
+                size="lg"
+                className="bg-primary text-primary-foreground h-14 rounded-2xl px-10 text-lg font-black shadow-xl transition-all hover:scale-105 active:scale-95"
+              >
+                Upgrade to Premium
+                <Crown className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                className="text-muted-foreground h-14 rounded-2xl px-10 text-lg font-bold"
+              >
+                Explore Features
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-16 min-h-screen">
