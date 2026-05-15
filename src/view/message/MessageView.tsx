@@ -25,6 +25,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 import {
   ArrowLeft,
+  CheckCircle2,
+  Crown,
   DownloadIcon,
   FileIcon,
   Info,
@@ -33,6 +35,7 @@ import {
   Send,
   ShieldAlert,
   Smile,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
@@ -45,11 +48,11 @@ import { useSocket } from "../../provider/SocketProvider";
 import {
   useBlockUserMutation,
   useDeleteConversationMutation,
+  useDeleteMessageMutation,
   useGetConversationsQuery,
   useGetMessageHistoryQuery,
   useMarkAsReadMutation,
   useSendMessageMutation,
-  useDeleteMessageMutation,
 } from "../../redux/feature/message/messageApi";
 import { useAppSelector } from "../../redux/hooks";
 import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
@@ -390,6 +393,62 @@ const MessageView = () => {
     setShowMobileChat(false);
     setSelectedConversation(null);
   };
+
+  if (!currentUser?.isPremium) {
+    return (
+      <div className="bg-background flex min-h-screen items-center justify-center p-4">
+        <Card className="max-w-2xl overflow-hidden border">
+          <CardContent className="p-12 text-center">
+            <div className="bg-primary/10 mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full">
+              <Crown className="text-primary h-12 w-12" />
+            </div>
+            <h1 className="text-foreground mb-4 text-4xl font-black tracking-tight">
+              Unlock Professional Messaging
+            </h1>
+            <p className="text-muted-foreground mx-auto mb-10 max-w-md text-lg leading-relaxed font-medium">
+              Connect directly with top employers and candidates. Messaging is a
+              premium feature designed for serious professionals.
+            </p>
+
+            <div className="mb-10 grid grid-cols-1 gap-4 text-left md:grid-cols-2">
+              {[
+                "Direct 1-on-1 conversations",
+                "Share documents and portfolios",
+                "Real-time typing indicators",
+                "Priority message delivery",
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className="bg-primary/20 flex h-6 w-6 items-center justify-center rounded-full">
+                    <CheckCircle2 className="text-primary h-4 w-4" />
+                  </div>
+                  <span className="text-foreground text-sm font-bold">
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+              <Button
+                size="lg"
+                className="bg-primary text-primary-foreground h-14 rounded-2xl px-10 text-lg font-black shadow-xl transition-all hover:scale-105 active:scale-95"
+              >
+                Upgrade to Premium
+                <Sparkles className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                className="text-muted-foreground h-14 rounded-2xl px-10 text-lg font-bold"
+              >
+                Learn More
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isConversationsLoading) {
     return <MessageViewSkeleton />;
