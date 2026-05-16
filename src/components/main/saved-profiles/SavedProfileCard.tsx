@@ -26,6 +26,7 @@ import {
   User,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const availabilityLabels: any = {
   immediate: "Immediate",
@@ -44,9 +45,13 @@ const availabilityColors: any = {
 const SavedProfileCard = ({
   profile: rawProfile,
   index,
+  onRemove,
+  onShortlist,
 }: {
   profile: any;
   index: number;
+  onRemove?: () => void;
+  onShortlist?: () => void;
 }) => {
   // Map real user data to the expected profile structure
   const profile = {
@@ -140,11 +145,17 @@ const SavedProfileCard = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
-                <DropdownMenuItem className="h-10 cursor-pointer rounded-lg font-medium">
+                <DropdownMenuItem
+                  onClick={onShortlist}
+                  className="h-10 cursor-pointer rounded-lg font-medium"
+                >
                   <BookmarkCheck className="mr-2 h-4 w-4" />
                   Move to Shortlist
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium">
+                <DropdownMenuItem
+                  onClick={onRemove}
+                  className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium"
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Remove Profile
                 </DropdownMenuItem>
@@ -294,18 +305,21 @@ const SavedProfileCard = ({
                   size="sm"
                   variant="outline"
                   className="h-9 rounded-full px-4 text-xs font-bold"
+                  onClick={() => window.open(profile.resumeUrl, "_blank")}
                 >
                   <FileText className="mr-1.5 h-3.5 w-3.5" />
                   View Resume
                 </Button>
               )}
-              <Button
-                size="sm"
-                className="h-9 rounded-full px-4 text-xs font-bold shadow-sm"
-              >
-                <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                View Full Profile
-              </Button>
+              <Link href={`/browse-candidates/${profile.id}`}>
+                <Button
+                  size="sm"
+                  className="h-9 rounded-full px-4 text-xs font-bold shadow-sm"
+                >
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                  View Full Profile
+                </Button>
+              </Link>
             </div>
           </div>
 
