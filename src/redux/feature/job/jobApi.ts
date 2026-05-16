@@ -42,6 +42,7 @@ const jobApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: ["jobs"],
     }),
 
     getRecommendedJobs: builder.query({
@@ -58,6 +59,7 @@ const jobApi = baseApi.injectEndpoints({
         url: `/job/delete/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["jobs"],
     }),
   }),
 });

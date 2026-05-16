@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardCompanyJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardCompanyJobsHeader";
@@ -5,8 +6,20 @@ import JobFiltersAndSearch from "@/components/dashboard/job/JobFiltersAndSearch"
 import JobManagementTabs from "@/components/dashboard/job/JobManagementTabs";
 import JobStatusCards from "@/components/dashboard/job/JobStatusCards";
 import { Card } from "@/components/ui/card";
-import { useGetMyJobsQuery } from "@/redux/feature/job/jobApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  useDeleteJobMutation,
+  useGetMyJobsQuery,
+} from "@/redux/feature/job/jobApi";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import CreateNewJobForm from "../../components/dashboard/job/CreateNewJobForm";
 
 interface Job {
   id: string;
@@ -91,6 +104,26 @@ const DashboardJobManagementView = () => {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedExperience, setSelectedExperience] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+  const [currentEditStep, setCurrentEditStep] = useState(1);
+
+  const [deleteJob] = useDeleteJobMutation();
+
+  const handleEdit = (id: string) => {
+    setEditingJobId(id);
+    setCurrentEditStep(1);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this job?")) {
+      try {
+        await deleteJob(id).unwrap();
+        toast.success("Job deleted successfully");
+      } catch (error: any) {
+        toast.error(error?.data?.message || "Failed to delete job");
+      }
+    }
+  };
   const queryParams = useMemo(() => {
     const params: Record<string, string> = {};
 
@@ -214,9 +247,31 @@ const DashboardJobManagementView = () => {
               filteredJobs={filteredJobs}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           </div>
         </Card>
+
+        <Dialog
+          open={!!editingJobId}
+          onOpenChange={(open) => !open && setEditingJobId(null)}
+        >
+          <DialogContent className="bg-card max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Edit Job Posting</DialogTitle>
+              <DialogDescription>
+                Update the details below to modify your job posting
+              </DialogDescription>
+            </DialogHeader>
+            <CreateNewJobForm
+              jobId={editingJobId as string}
+              onClose={() => setEditingJobId(null)}
+              currentStep={currentEditStep}
+              onStepChange={setCurrentEditStep}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
