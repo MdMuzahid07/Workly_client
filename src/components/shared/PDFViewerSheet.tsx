@@ -1,12 +1,24 @@
 "use client";
 
+if (typeof Promise.withResolvers === "undefined") {
+  // @ts-expect-error - Polyfill for Promise.withResolvers
+  Promise.withResolvers = function () {
+    let resolve, reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   ChevronLeft,
   ChevronRight,
@@ -16,7 +28,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -24,37 +36,76 @@ import "react-pdf/dist/Page/TextLayer.css";
 // Set worker for react-pdf
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-interface PDFViewerModalProps {
+interface PDFViewerSheetProps {
   isOpen: boolean;
   onClose: () => void;
   pdfUrl: string;
   title: string;
 }
 
-const PDFViewerModal = ({
+const PDFViewerSheet = ({
   isOpen,
   onClose,
   pdfUrl,
   title,
-}: PDFViewerModalProps) => {
+}: PDFViewerSheetProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
+  const [containerWidth, setContainerWidth] = useState<number>(800);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth - 32); // 32px for padding
+      }
+    };
+
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, [isOpen]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
     setPageNumber(1);
   }
 
+  const handleDownload = async () => {
+    try {
+      setIsDownloading(true);
+      const response = await fetch(pdfUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed, opening in new tab instead", error);
+      window.open(pdfUrl, "_blank");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex h-[90vh] max-w-5xl flex-col overflow-hidden rounded-xl border-none p-0 shadow-2xl sm:rounded-xl xl:min-w-5xl">
-        <DialogHeader className="bg-card flex flex-row items-center justify-between space-y-0 border-b p-4">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent
+        side="right"
+        className="flex h-full w-full max-w-5xl flex-col p-0 sm:max-w-[100%] xl:w-[60vw]"
+      >
+        <SheetHeader className="bg-card flex flex-row items-center justify-between space-y-0 border-b p-4">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 rounded-lg p-2">
-              <DialogTitle className="max-w-[200px] truncate text-base font-bold sm:max-w-md">
+              <SheetTitle className="max-w-[200px] truncate text-base font-bold sm:max-w-md">
                 {title}
-              </DialogTitle>
+              </SheetTitle>
             </div>
             <div className="bg-muted/30 hidden items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold sm:flex">
               Page {pageNumber} of {numPages}
@@ -84,24 +135,32 @@ const PDFViewerModal = ({
               </Button>
             </div>
 
-            <a href={pdfUrl} download={title} target="_blank" rel="noreferrer">
-              <Button
-                variant="default"
-                size="sm"
-                className="bg-primary hover:bg-primary/90 hidden h-9 rounded-full px-4 font-bold sm:flex"
-              >
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="bg-primary hover:bg-primary/90 hidden h-9 rounded-full px-4 font-bold sm:flex"
+            >
+              {isDownloading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
                 <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
-            </a>
+              )}
+              {isDownloading ? "Downloading..." : "Download"}
+            </Button>
           </div>
-        </DialogHeader>
+        </SheetHeader>
 
-        <div className="bg-muted/10 flex flex-1 justify-center overflow-auto p-4 sm:p-8">
+        <div
+          ref={containerRef}
+          className="bg-muted/10 flex flex-1 justify-center overflow-auto p-4 sm:p-8"
+        >
           <div className="overflow-hidden rounded-sm border bg-white shadow-2xl">
             <Document
-              file={{ url: pdfUrl }}
+              file={pdfUrl}
               onLoadSuccess={onDocumentLoadSuccess}
+              className="flex w-full justify-center"
               options={{
                 cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
                 cMapPacked: true,
@@ -123,8 +182,9 @@ const PDFViewerModal = ({
                     <p className="text-destructive text-sm font-bold">
                       Failed to load PDF
                     </p>
-                    <p className="text-muted-foreground max-w-[200px] text-xs">
-                      The file might be missing or the link has expired.
+                    <p className="text-muted-foreground max-w-[300px] text-xs">
+                      The file might be missing, or Cloudinary is blocking
+                      access (401).
                     </p>
                   </div>
                 </div>
@@ -135,6 +195,8 @@ const PDFViewerModal = ({
                 scale={scale}
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
+                className="max-w-full"
+                width={containerWidth}
               />
             </Document>
           </div>
@@ -165,9 +227,9 @@ const PDFViewerModal = ({
             </Button>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
-export default PDFViewerModal;
+export default PDFViewerSheet;

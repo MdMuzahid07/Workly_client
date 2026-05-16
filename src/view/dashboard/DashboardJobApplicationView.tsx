@@ -2,6 +2,16 @@
 "use client";
 
 import PaginationBar from "@/components/shared/PaginationBar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,19 +23,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -46,7 +57,6 @@ import { ApplicationStatus, EmployerApplication } from "@/types/application";
 import debounce from "debounce";
 import {
   CheckCircle,
-  Download,
   Eye,
   FileText,
   Mail,
@@ -55,13 +65,20 @@ import {
   Phone,
   XCircle,
 } from "lucide-react";
-import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import ApplicationFiltersAndSearch from "../../components/dashboard/applications/ApplicationFiltersAndSearch";
 import ApplicationStatusCards from "../../components/dashboard/applications/ApplicationStatusCard";
 import DashboardApplicationsHeader from "../../components/dashboard/dashboard-nav/header/DashboardJobApplicationsHeader";
+
+const PDFViewerSheet = dynamic(
+  () => import("@/components/shared/PDFViewerSheet"),
+  {
+    ssr: false,
+  },
+);
 
 const STATUS_OPTIONS: Array<{ value: ApplicationStatus; label: string }> = [
   { value: "SUBMITTED", label: "Submitted" },
@@ -155,6 +172,13 @@ const DashboardJobApplicationView = () => {
   const [updatingApplicationId, setUpdatingApplicationId] = useState<
     string | null
   >(null);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [applicationToReject, setApplicationToReject] =
+    useState<EmployerApplication | null>(null);
+
+  const [resumeSheetOpen, setResumeSheetOpen] = useState(false);
+  const [applicationForResume, setApplicationForResume] =
+    useState<EmployerApplication | null>(null);
 
   const limit = 10;
   const debouncedSearch = useMemo(
@@ -254,8 +278,22 @@ const DashboardJobApplicationView = () => {
     status: ApplicationStatus,
   ) => {
     const isRejecting = status === "REJECTED";
-    if (isRejecting && !window.confirm("Reject this application?")) return;
 
+    // If it's a rejection, open the modal instead of updating directly
+    if (isRejecting) {
+      setApplicationToReject(application);
+      setRejectModalOpen(true);
+      return;
+    }
+
+    await performStatusUpdate(application, status);
+  };
+
+  const performStatusUpdate = async (
+    application: EmployerApplication,
+    status: ApplicationStatus,
+    rejectionReason?: string,
+  ) => {
     setUpdatingApplicationId(application.id);
     toast.loading("Updating application status...", {
       id: "application-status",
@@ -265,7 +303,7 @@ const DashboardJobApplicationView = () => {
       await updateApplicationStatus({
         id: application.id,
         status,
-        rejectionReason: isRejecting ? "Rejected by employer" : undefined,
+        rejectionReason,
       }).unwrap();
       toast.success("Application status updated", {
         id: "application-status",
@@ -280,6 +318,17 @@ const DashboardJobApplicationView = () => {
     } finally {
       setUpdatingApplicationId(null);
     }
+  };
+
+  const confirmReject = async () => {
+    if (!applicationToReject) return;
+    await performStatusUpdate(
+      applicationToReject,
+      "REJECTED",
+      "Rejected by employer",
+    );
+    setRejectModalOpen(false);
+    setApplicationToReject(null);
   };
 
   const handleStartChat = async (application: EmployerApplication) => {
@@ -335,7 +384,7 @@ const DashboardJobApplicationView = () => {
 
         <div className="rounded-2xl border px-4 py-6 md:px-6 md:py-8">
           <Tabs value={activeTab} onValueChange={handleTabChange}>
-            <TabsList className="bg-card h-auto w-full flex-wrap justify-start border p-1">
+            <TabsList className="bg-card h-10 w-full flex-wrap justify-start border p-0">
               {TAB_STATUSES.map((tab) => (
                 <TabsTrigger
                   className="min-w-32 rounded-full py-3"
@@ -506,15 +555,16 @@ const DashboardJobApplicationView = () => {
                                         View Details
                                       </DropdownMenuItem>
                                       {application.resumeUrl && (
-                                        <DropdownMenuItem asChild>
-                                          <Link
-                                            href={application.resumeUrl}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                          >
-                                            <Download className="mr-2 h-4 w-4" />
-                                            Open Resume
-                                          </Link>
+                                        <DropdownMenuItem
+                                          onClick={() => {
+                                            setApplicationForResume(
+                                              application,
+                                            );
+                                            setResumeSheetOpen(true);
+                                          }}
+                                        >
+                                          <FileText className="mr-2 h-4 w-4" />
+                                          View Resume
                                         </DropdownMenuItem>
                                       )}
                                       <DropdownMenuSeparator />
@@ -582,164 +632,201 @@ const DashboardJobApplicationView = () => {
         </div>
       </div>
 
-      <Dialog
+      <Sheet
         open={!!selectedApplication}
         onOpenChange={(open) => !open && setSelectedApplication(null)}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-          {selectedApplication && (
-            <>
-              <DialogHeader>
-                <DialogTitle>
-                  {getApplicantName(selectedApplication)}
-                </DialogTitle>
-                <DialogDescription>
-                  Application for {selectedApplication.job.title}
-                </DialogDescription>
-              </DialogHeader>
+        <SheetContent side="right" className="w-full p-0 sm:max-w-2xl">
+          <ScrollArea className="h-full px-6 py-6">
+            {selectedApplication && (
+              <>
+                <SheetHeader className="mb-6">
+                  <SheetTitle>
+                    {getApplicantName(selectedApplication)}
+                  </SheetTitle>
+                  <SheetDescription>
+                    Application for {selectedApplication.job.title}
+                  </SheetDescription>
+                </SheetHeader>
 
-              <div className="space-y-5">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge
-                    variant="outline"
-                    className={getStatusColor(selectedApplication.status)}
-                  >
-                    {statusLabels[selectedApplication.status]}
-                  </Badge>
-                  <span className="text-muted-foreground text-sm">
-                    Applied{" "}
-                    {new Date(selectedApplication.createdAt).toLocaleDateString(
-                      undefined,
-                      {
+                <div className="space-y-5">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge
+                      variant="outline"
+                      className={getStatusColor(selectedApplication.status)}
+                    >
+                      {statusLabels[selectedApplication.status]}
+                    </Badge>
+                    <span className="text-muted-foreground text-sm">
+                      Applied{" "}
+                      {new Date(
+                        selectedApplication.createdAt,
+                      ).toLocaleDateString(undefined, {
                         month: "long",
                         day: "numeric",
                         year: "numeric",
-                      },
-                    )}
-                  </span>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border p-4">
-                    <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
-                      <Mail className="h-4 w-4" />
-                      Email
-                    </div>
-                    <p className="mt-2 text-sm font-medium">
-                      {getApplicantEmail(selectedApplication)}
-                    </p>
+                      })}
+                    </span>
                   </div>
-                  <div className="rounded-xl border p-4">
-                    <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
-                      <Phone className="h-4 w-4" />
-                      Phone
-                    </div>
-                    <p className="mt-2 text-sm font-medium">
-                      {getApplicantPhone(selectedApplication) || "Not provided"}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border p-4">
+                      <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
+                        <Mail className="h-4 w-4" />
+                        Email
+                      </div>
+                      <p className="mt-2 text-sm font-medium">
+                        {getApplicantEmail(selectedApplication)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border p-4">
+                      <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
+                        <Phone className="h-4 w-4" />
+                        Phone
+                      </div>
+                      <p className="mt-2 text-sm font-medium">
+                        {getApplicantPhone(selectedApplication) ||
+                          "Not provided"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border p-4">
+                      <p className="text-muted-foreground text-xs font-bold uppercase">
+                        Current Location
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {selectedApplication.currentLocation ||
+                          selectedApplication.applicant.profile?.location ||
+                          "Not provided"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border p-4">
+                      <p className="text-muted-foreground text-xs font-bold uppercase">
+                        Experience
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {selectedApplication.yearsOfExperience ?? 0} years
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="rounded-xl border p-4">
                     <p className="text-muted-foreground text-xs font-bold uppercase">
-                      Current Location
+                      Cover Letter
                     </p>
-                    <p className="mt-2 text-sm font-medium">
-                      {selectedApplication.currentLocation ||
-                        selectedApplication.applicant.profile?.location ||
-                        "Not provided"}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border p-4">
-                    <p className="text-muted-foreground text-xs font-bold uppercase">
-                      Experience
-                    </p>
-                    <p className="mt-2 text-sm font-medium">
-                      {selectedApplication.yearsOfExperience ?? 0} years
+                    <p className="mt-3 text-sm leading-6 whitespace-pre-wrap">
+                      {selectedApplication.coverLetter ||
+                        "No cover letter provided."}
                     </p>
                   </div>
-                </div>
 
-                <div className="rounded-xl border p-4">
-                  <p className="text-muted-foreground text-xs font-bold uppercase">
-                    Cover Letter
-                  </p>
-                  <p className="mt-3 text-sm leading-6 whitespace-pre-wrap">
-                    {selectedApplication.coverLetter ||
-                      "No cover letter provided."}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  {selectedApplication.resumeUrl && (
-                    <Button asChild className="rounded-xl">
-                      <Link
-                        href={selectedApplication.resumeUrl}
-                        target="_blank"
-                        rel="noreferrer"
+                  <div className="flex flex-wrap gap-3">
+                    {selectedApplication.resumeUrl && (
+                      <Button
+                        className="rounded-xl"
+                        onClick={() => {
+                          setApplicationForResume(selectedApplication);
+                          setResumeSheetOpen(true);
+                        }}
                       >
-                        <Download className="mr-2 h-4 w-4" />
-                        Open Resume
-                      </Link>
-                    </Button>
-                  )}
-                  {NEXT_STATUS[selectedApplication.status] && (
-                    <Button
-                      variant="outline"
-                      className="rounded-xl"
-                      disabled={
-                        updatingApplicationId === selectedApplication.id
-                      }
-                      onClick={() =>
-                        handleUpdateStatus(
-                          selectedApplication,
-                          NEXT_STATUS[
-                            selectedApplication.status
-                          ] as ApplicationStatus,
-                        )
-                      }
-                    >
-                      Move to{" "}
-                      {
-                        statusLabels[
-                          NEXT_STATUS[
-                            selectedApplication.status
-                          ] as ApplicationStatus
-                        ]
-                      }
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    className="rounded-xl"
-                    disabled={isCreatingChat}
-                    onClick={() => handleStartChat(selectedApplication)}
-                  >
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Message
-                  </Button>
-                  {selectedApplication.status !== "REJECTED" &&
-                    selectedApplication.status !== "WITHDRAWN" && (
+                        <FileText className="mr-2 h-4 w-4" />
+                        View Resume
+                      </Button>
+                    )}
+                    {NEXT_STATUS[selectedApplication.status] && (
                       <Button
                         variant="outline"
-                        className="text-destructive hover:text-destructive rounded-xl"
+                        className="rounded-xl"
                         disabled={
                           updatingApplicationId === selectedApplication.id
                         }
                         onClick={() =>
-                          handleUpdateStatus(selectedApplication, "REJECTED")
+                          handleUpdateStatus(
+                            selectedApplication,
+                            NEXT_STATUS[
+                              selectedApplication.status
+                            ] as ApplicationStatus,
+                          )
                         }
                       >
-                        Reject
+                        Move to{" "}
+                        {
+                          statusLabels[
+                            NEXT_STATUS[
+                              selectedApplication.status
+                            ] as ApplicationStatus
+                          ]
+                        }
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      className="rounded-xl"
+                      disabled={isCreatingChat}
+                      onClick={() => handleStartChat(selectedApplication)}
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Message
+                    </Button>
+                    {selectedApplication.status !== "REJECTED" &&
+                      selectedApplication.status !== "WITHDRAWN" && (
+                        <Button
+                          variant="outline"
+                          className="text-destructive hover:text-destructive rounded-xl"
+                          disabled={
+                            updatingApplicationId === selectedApplication.id
+                          }
+                          onClick={() =>
+                            handleUpdateStatus(selectedApplication, "REJECTED")
+                          }
+                        >
+                          Reject
+                        </Button>
+                      )}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+              </>
+            )}
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
+      <AlertDialog open={rejectModalOpen} onOpenChange={setRejectModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject Application?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reject this application? The candidate
+              will be notified of this decision.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setApplicationToReject(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmReject}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Reject
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {applicationForResume && (
+        <PDFViewerSheet
+          isOpen={resumeSheetOpen}
+          onClose={() => {
+            setResumeSheetOpen(false);
+            setTimeout(() => setApplicationForResume(null), 300);
+          }}
+          pdfUrl={applicationForResume.resumeUrl || ""}
+          title={`${getApplicantName(applicationForResume)} - Resume`}
+        />
+      )}
     </div>
   );
 };
