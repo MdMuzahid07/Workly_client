@@ -20,7 +20,7 @@ import { useState } from "react";
 import JobDetailsSheet from "./DashboardJobDetails";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const DashboardJobCard = ({ job, onEdit, onDelete }: any) => {
+const DashboardJobCard = ({ job, onEdit, onDelete, onStatusChange }: any) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   return (
@@ -128,16 +128,29 @@ const DashboardJobCard = ({ job, onEdit, onDelete }: any) => {
                       Edit Job
                     </DropdownMenuItem>
                     {job.status === "draft" && (
-                      <DropdownMenuItem>Publish Job</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onStatusChange?.(job.id, "ACTIVE")}
+                      >
+                        Publish Job
+                      </DropdownMenuItem>
                     )}
                     {job.status === "active" && (
-                      <DropdownMenuItem className="text-orange-600">
+                      <DropdownMenuItem
+                        className="text-orange-600"
+                        onClick={() => onStatusChange?.(job.id, "DRAFT")}
+                      >
                         Move to Draft
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
                       className="text-red-600"
-                      onClick={() => onDelete?.(job.id)}
+                      onClick={() => {
+                        if (job.status === "active") {
+                          onStatusChange?.(job.id, "CLOSED");
+                        } else {
+                          onDelete?.(job.id);
+                        }
+                      }}
                     >
                       {job.status === "active" ? "Close Job" : "Delete Job"}
                     </DropdownMenuItem>

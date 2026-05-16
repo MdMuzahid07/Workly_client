@@ -27,6 +27,7 @@ interface JobManagementTabsProps {
   setActiveTab: (value: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onStatusChange?: (id: string, status: string) => void;
 }
 
 const JobManagementTabs = ({
@@ -36,6 +37,7 @@ const JobManagementTabs = ({
   setActiveTab,
   onEdit,
   onDelete,
+  onStatusChange,
 }: JobManagementTabsProps) => {
   const getJobsByStatus = (status: string) => {
     if (status === "all") return filteredJobs;
@@ -52,6 +54,7 @@ const JobManagementTabs = ({
       job={job}
       onEdit={onEdit}
       onDelete={onDelete}
+      onStatusChange={onStatusChange}
     />
   );
 

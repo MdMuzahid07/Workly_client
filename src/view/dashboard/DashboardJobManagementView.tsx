@@ -16,6 +16,7 @@ import {
 import {
   useDeleteJobMutation,
   useGetMyJobsQuery,
+  useUpdateJobMutation,
 } from "@/redux/feature/job/jobApi";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -108,6 +109,18 @@ const DashboardJobManagementView = () => {
   const [currentEditStep, setCurrentEditStep] = useState(1);
 
   const [deleteJob] = useDeleteJobMutation();
+  const [updateJob] = useUpdateJobMutation();
+
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      await updateJob({ id, status }).unwrap();
+      toast.success(
+        `Job ${status === "ACTIVE" ? "published" : "moved to draft"} successfully`,
+      );
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update job status");
+    }
+  };
 
   const handleEdit = (id: string) => {
     setEditingJobId(id);
@@ -249,6 +262,7 @@ const DashboardJobManagementView = () => {
               setActiveTab={setActiveTab}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onStatusChange={handleStatusChange}
             />
           </div>
         </Card>
