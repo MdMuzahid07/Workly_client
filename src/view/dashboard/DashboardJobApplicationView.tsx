@@ -824,6 +824,7 @@ const DashboardJobApplicationView = () => {
             setTimeout(() => setApplicationForResume(null), 300);
           }}
           pdfUrl={applicationForResume.resumeUrl || ""}
+          applicationId={applicationForResume.id}
           title={`${getApplicantName(applicationForResume)} - Resume`}
         />
       )}

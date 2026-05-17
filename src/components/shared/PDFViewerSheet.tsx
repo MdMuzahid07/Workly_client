@@ -19,6 +19,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useAuthenticatedPdf } from "@/hooks/useAuthenticatedPdf";
 import {
   ChevronLeft,
   ChevronRight,
@@ -33,7 +34,6 @@ import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-// Set worker for react-pdf
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PDFViewerSheetProps {
@@ -41,6 +41,8 @@ interface PDFViewerSheetProps {
   onClose: () => void;
   pdfUrl: string;
   title: string;
+  applicationId?: string;
+  resumeId?: string;
 }
 
 const PDFViewerSheet = ({
@@ -48,6 +50,8 @@ const PDFViewerSheet = ({
   onClose,
   pdfUrl,
   title,
+  applicationId,
+  resumeId,
 }: PDFViewerSheetProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -56,10 +60,24 @@ const PDFViewerSheet = ({
   const [isDownloading, setIsDownloading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const { pdfBlobUrl, isLoading, error } = useAuthenticatedPdf({
+    pdfUrl,
+    applicationId,
+    resumeId,
+    enabled: isOpen && !!pdfUrl,
+  });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setNumPages(0);
+    setPageNumber(1);
+    setScale(1.0);
+  }, [isOpen, pdfUrl, applicationId, resumeId]);
+
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.clientWidth - 32); // 32px for padding
+        setContainerWidth(containerRef.current.clientWidth - 32);
       }
     };
 
@@ -73,34 +91,33 @@ const PDFViewerSheet = ({
     setPageNumber(1);
   }
 
-  const handleDownload = async () => {
-    try {
-      setIsDownloading(true);
-      const response = await fetch(pdfUrl);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = `${title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("Download failed, opening in new tab instead", error);
-      window.open(pdfUrl, "_blank");
-    } finally {
-      setIsDownloading(false);
-    }
+  const scrollToPage = (page: number) => {
+    setPageNumber(page);
+    document.getElementById(`resume-page-${page}`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  const handleDownload = () => {
+    if (!pdfBlobUrl) return;
+    setIsDownloading(true);
+    const link = document.createElement("a");
+    link.href = pdfBlobUrl;
+    link.download = `${title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setIsDownloading(false);
   };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="flex h-full w-full max-w-5xl flex-col p-0 sm:max-w-[100%] xl:w-[60vw]"
+        className="flex h-full w-full max-w-5xl flex-col gap-0 overflow-hidden p-0 sm:max-w-full xl:w-[60vw]"
       >
-        <SheetHeader className="bg-card flex flex-row items-center justify-between space-y-0 border-b p-4">
+        <SheetHeader className="bg-card flex shrink-0 flex-row items-center justify-between space-y-0 border-b p-4">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 rounded-lg p-2">
               <SheetTitle className="max-w-[200px] truncate text-base font-bold sm:max-w-md">
@@ -139,7 +156,7 @@ const PDFViewerSheet = ({
               variant="default"
               size="sm"
               onClick={handleDownload}
-              disabled={isDownloading}
+              disabled={isDownloading || !pdfBlobUrl}
               className="bg-primary hover:bg-primary/90 hidden h-9 rounded-full px-4 font-bold sm:flex"
             >
               {isDownloading ? (
@@ -154,62 +171,77 @@ const PDFViewerSheet = ({
 
         <div
           ref={containerRef}
-          className="bg-muted/10 flex flex-1 justify-center overflow-auto p-4 sm:p-8"
+          className="bg-muted/10 min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-8"
         >
-          <div className="overflow-hidden rounded-sm border bg-white shadow-2xl">
-            <Document
-              file={pdfUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              className="flex w-full justify-center"
-              options={{
-                cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
-                cMapPacked: true,
-              }}
-              loading={
-                <div className="flex flex-col items-center justify-center gap-4 p-20">
-                  <Loader2 className="text-primary h-10 w-10 animate-spin" />
-                  <p className="text-muted-foreground text-sm font-bold">
-                    Preparing your resume...
+          <div className="mx-auto w-fit max-w-full rounded-sm border bg-white shadow-2xl">
+            {isLoading && (
+              <div className="flex flex-col items-center justify-center gap-4 p-20">
+                <Loader2 className="text-primary h-10 w-10 animate-spin" />
+                <p className="text-muted-foreground text-sm font-bold">
+                  Preparing your resume...
+                </p>
+              </div>
+            )}
+
+            {error && !isLoading && (
+              <div className="flex flex-col items-center justify-center gap-4 p-20 text-center">
+                <div className="bg-destructive/10 rounded-full p-4">
+                  <X className="text-destructive h-8 w-8" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-destructive text-sm font-bold">
+                    Failed to load PDF
+                  </p>
+                  <p className="text-muted-foreground max-w-[300px] text-xs">
+                    {error}
                   </p>
                 </div>
-              }
-              error={
-                <div className="flex flex-col items-center justify-center gap-4 p-20 text-center">
-                  <div className="bg-destructive/10 rounded-full p-4">
-                    <X className="text-destructive h-8 w-8" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-destructive text-sm font-bold">
-                      Failed to load PDF
-                    </p>
-                    <p className="text-muted-foreground max-w-[300px] text-xs">
-                      The file might be missing, or Cloudinary is blocking
-                      access (401).
-                    </p>
-                  </div>
-                </div>
-              }
-            >
-              <Page
-                pageNumber={pageNumber}
-                scale={scale}
-                renderAnnotationLayer={false}
-                renderTextLayer={false}
-                className="max-w-full"
-                width={containerWidth}
-              />
-            </Document>
+              </div>
+            )}
+
+            {pdfBlobUrl && !isLoading && !error && (
+              <Document
+                key={pdfBlobUrl}
+                file={pdfBlobUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                className="flex flex-col items-center"
+                options={{
+                  cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+                  cMapPacked: true,
+                }}
+              >
+                {Array.from({ length: numPages }, (_, index) => {
+                  const page = index + 1;
+                  return (
+                    <div
+                      key={`page-${page}`}
+                      id={`resume-page-${page}`}
+                      className="[&:not(:last-child)]:mb-4"
+                    >
+                      <Page
+                        pageNumber={page}
+                        scale={scale}
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                        className="max-w-full"
+                        width={containerWidth}
+                      />
+                    </div>
+                  );
+                })}
+              </Document>
+            )}
           </div>
         </div>
 
         {numPages > 1 && (
-          <div className="bg-card flex items-center justify-center gap-4 border-t p-4">
+          <div className="bg-card flex shrink-0 items-center justify-center gap-4 border-t p-4">
             <Button
               variant="outline"
               size="icon"
               className="rounded-full"
               disabled={pageNumber <= 1}
-              onClick={() => setPageNumber((p) => p - 1)}
+              onClick={() => scrollToPage(pageNumber - 1)}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -221,7 +253,7 @@ const PDFViewerSheet = ({
               size="icon"
               className="rounded-full"
               disabled={pageNumber >= numPages}
-              onClick={() => setPageNumber((p) => p + 1)}
+              onClick={() => scrollToPage(pageNumber + 1)}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

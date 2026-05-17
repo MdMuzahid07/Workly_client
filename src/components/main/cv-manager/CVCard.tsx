@@ -197,6 +197,7 @@ const CVCard = ({ resume, index }: CVCardProps) => {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         pdfUrl={resume.fileUrl}
+        resumeId={resume.id}
         title={resume.fileName}
       />
     </motion.div>
