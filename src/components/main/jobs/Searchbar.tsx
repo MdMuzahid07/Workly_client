@@ -1,6 +1,6 @@
 "use client";
 import { MapPin, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
@@ -13,6 +13,7 @@ interface searchbarProps {
   initialSearch?: string;
   initialLocation?: string;
   hidePadding?: boolean;
+  buttonLabel?: string;
   placeholder?: {
     search?: string;
     location?: string;
@@ -24,6 +25,7 @@ const Searchbar = ({
   initialSearch,
   initialLocation,
   hidePadding = false,
+  buttonLabel = "Find Job",
   placeholder = {
     search: "Job Title, Keywords, or Phrase",
     location: "City, State or ZIP",
@@ -34,6 +36,14 @@ const Searchbar = ({
     location: initialLocation || "",
     category: "",
   });
+
+  useEffect(() => {
+    setSearchData((prev) => ({
+      ...prev,
+      search: initialSearch || "",
+      location: initialLocation || "",
+    }));
+  }, [initialSearch, initialLocation]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +88,7 @@ const Searchbar = ({
           size="lg"
           className="bg-primary/20 text-primary sm:bg-primary hover:bg-primary/90 text-md h-14 w-full cursor-pointer rounded-xl px-8 font-bold transition-transform active:scale-95 sm:ml-4 sm:w-auto sm:rounded-full sm:text-base sm:text-white"
         >
-          Find Job
+          {buttonLabel}
         </Button>
       </form>
     </div>

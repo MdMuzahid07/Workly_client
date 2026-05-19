@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardCompanyJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardCompanyJobsHeader";
@@ -5,8 +6,32 @@ import JobFiltersAndSearch from "@/components/dashboard/job/JobFiltersAndSearch"
 import JobManagementTabs from "@/components/dashboard/job/JobManagementTabs";
 import JobStatusCards from "@/components/dashboard/job/JobStatusCards";
 import { Card } from "@/components/ui/card";
-import { useGetMyJobsQuery } from "@/redux/feature/job/jobApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  useDeleteJobMutation,
+  useGetMyJobsQuery,
+  useUpdateJobMutation,
+} from "@/redux/feature/job/jobApi";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import CreateNewJobForm from "../../components/dashboard/job/CreateNewJobForm";
+import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
 interface Job {
   id: string;
@@ -91,6 +116,61 @@ const DashboardJobManagementView = () => {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedExperience, setSelectedExperience] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+  const [currentEditStep, setCurrentEditStep] = useState(1);
+
+  const [deleteJob] = useDeleteJobMutation();
+  const [updateJob] = useUpdateJobMutation();
+
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [actionJobId, setActionJobId] = useState<string | null>(null);
+
+  const handleStatusChange = async (id: string, status: string) => {
+    if (status === "CLOSED") {
+      setActionJobId(id);
+      setAlertOpen(true);
+      return;
+    }
+
+    try {
+      await updateJob({ id, status }).unwrap();
+      toast.success(
+        `Job ${status === "ACTIVE" ? "published" : "moved to draft"} successfully`,
+      );
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update job status");
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingJobId(id);
+    setCurrentEditStep(1);
+  };
+
+  const handleDelete = (id: string) => {
+    setActionJobId(id);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmCloseAction = async () => {
+    if (!actionJobId) return;
+
+    try {
+      await updateJob({ id: actionJobId, status: "CLOSED" }).unwrap();
+      toast.success("Job closed successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to close job");
+    }
+    setAlertOpen(false);
+    setActionJobId(null);
+  };
+
+  const confirmDeleteAction = async () => {
+    if (!actionJobId) throw new Error("No job selected");
+    await deleteJob(actionJobId).unwrap();
+    setActionJobId(null);
+  };
   const queryParams = useMemo(() => {
     const params: Record<string, string> = {};
 
@@ -214,9 +294,62 @@ const DashboardJobManagementView = () => {
               filteredJobs={filteredJobs}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onStatusChange={handleStatusChange}
             />
           </div>
         </Card>
+
+        <Dialog
+          open={!!editingJobId}
+          onOpenChange={(open) => !open && setEditingJobId(null)}
+        >
+          <DialogContent className="bg-card max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Edit Job Posting</DialogTitle>
+              <DialogDescription>
+                Update the details below to modify your job posting
+              </DialogDescription>
+            </DialogHeader>
+            <CreateNewJobForm
+              jobId={editingJobId as string}
+              onClose={() => setEditingJobId(null)}
+              currentStep={currentEditStep}
+              onStepChange={setCurrentEditStep}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Close Job Posting</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to close this job posting? It will no
+                longer be visible to candidates, but you can still view past
+                applications.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmCloseAction}>
+                Close Job
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <DeleteConfirmationModal
+          open={deleteModalOpen}
+          onOpenChange={(open) => {
+            setDeleteModalOpen(open);
+            if (!open) setActionJobId(null);
+          }}
+          onConfirm={confirmDeleteAction}
+          title="Delete Job Posting"
+          description="Are you sure you want to delete this job posting? This action cannot be undone and will permanently remove the job and all its applications."
+        />
       </div>
     </div>
   );

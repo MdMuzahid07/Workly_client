@@ -12,7 +12,6 @@ import {
   Briefcase,
   Calendar,
   DollarSign,
-  Eye,
   MapPin,
   MoreHorizontal,
   Users,
@@ -21,7 +20,7 @@ import { useState } from "react";
 import JobDetailsSheet from "./DashboardJobDetails";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const DashboardJobCard = ({ job }: any) => {
+const DashboardJobCard = ({ job, onEdit, onDelete, onStatusChange }: any) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   return (
@@ -123,20 +122,36 @@ const DashboardJobCard = ({ job }: any) => {
                         setDetailsOpen(true);
                       }}
                     >
-                      <Eye className="mr-2 h-4 w-4" />
                       View Details
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Edit Job</DropdownMenuItem>
-                    <DropdownMenuItem>Duplicate</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEdit?.(job.id)}>
+                      Edit Job
+                    </DropdownMenuItem>
                     {job.status === "draft" && (
-                      <DropdownMenuItem>Publish Job</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onStatusChange?.(job.id, "ACTIVE")}
+                      >
+                        Publish Job
+                      </DropdownMenuItem>
                     )}
                     {job.status === "active" && (
-                      <DropdownMenuItem className="text-orange-600">
+                      <DropdownMenuItem
+                        className="text-orange-600"
+                        onClick={() => onStatusChange?.(job.id, "DRAFT")}
+                      >
                         Move to Draft
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem className="text-red-600">
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => {
+                        if (job.status === "active") {
+                          onStatusChange?.(job.id, "CLOSED");
+                        } else {
+                          onDelete?.(job.id);
+                        }
+                      }}
+                    >
                       {job.status === "active" ? "Close Job" : "Delete Job"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -148,7 +163,15 @@ const DashboardJobCard = ({ job }: any) => {
       </div>
 
       <JobDetailsSheet
-        job={job}
+        jobId={job.id}
+        initialData={{
+          title: job.title,
+          company: job.company,
+          location: job.location,
+          status: job.status,
+          isFeatured: job.isFeatured,
+          isRemote: job.isRemote,
+        }}
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
       />

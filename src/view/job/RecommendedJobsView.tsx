@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardRecommendedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardRecommendedJobsHeader";
@@ -13,39 +14,140 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockRecommendedJobs } from "@/data/mockRecommendedJobs";
+import { useGetRecommendedJobsQuery } from "@/redux/feature/job/jobApi";
+import { useAppSelector } from "@/redux/hooks";
 import { AnimatePresence, motion } from "framer-motion";
-import { Briefcase, MapPin, Search, Target } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Crown,
+  MapPin,
+  Search,
+  Sparkles,
+  Target,
+  Zap,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 const RecommendedJobsView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState("10");
 
-  const filteredJobs = useMemo(() => {
-    return mockRecommendedJobs.filter(
-      (job) =>
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [searchTerm]);
-
-  const jobsLimit = parseInt(limit);
-  const totalPages = Math.ceil(filteredJobs.length / jobsLimit);
-  const pagedJobs = filteredJobs.slice(
-    (currentPage - 1) * jobsLimit,
-    currentPage * jobsLimit,
-  );
-
-  const paginationMeta = {
+  const { data: recommendedData } = useGetRecommendedJobsQuery({
     page: currentPage,
-    limit: jobsLimit,
-    total: filteredJobs.length,
-    pages: totalPages,
+    limit: parseInt(limit),
+    search: searchTerm,
+  });
+
+  const jobs = recommendedData?.data || [];
+  const meta = recommendedData?.meta || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
   };
+
+  const user = useAppSelector((state) => state.auth.user);
+  const isPremium = user?.isPremium || false;
+
+  if (!isPremium) {
+    return (
+      <div className="min-h-screen pt-16">
+        <DashboardRecommendedJobsHeader />
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-card border-primary/10 relative overflow-hidden rounded-[2.5rem] border-2 p-8 sm:p-16"
+          >
+            {/* Premium Badge */}
+            <div className="mb-10 flex justify-center">
+              <div className="bg-primary/10 ring-primary/20 flex items-center gap-3 rounded-full px-6 py-2.5 ring-1 backdrop-blur-md">
+                <Crown className="text-primary h-5 w-5 animate-pulse" />
+                <span className="text-primary text-sm font-black tracking-widest uppercase">
+                  Premium Experience
+                </span>
+              </div>
+            </div>
+
+            <div className="relative z-10 text-center">
+              <h1 className="mb-6 text-4xl font-black tracking-tight sm:text-6xl lg:text-7xl">
+                Unlock <span className="text-primary">Advanced</span> <br />
+                Career Growth.
+              </h1>
+              <p className="text-muted-foreground mx-auto mb-12 max-w-2xl text-lg leading-relaxed font-medium opacity-80 sm:text-xl">
+                Get access to our advanced matching engine that surfaces the
+                most relevant job opportunities tailored specifically to your
+                expertise.
+              </p>
+
+              <div className="mx-auto mb-16 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-3">
+                {[
+                  {
+                    icon: Target,
+                    text: "99% Precision Match",
+                    desc: "Based on your exact skills",
+                  },
+                  {
+                    icon: Sparkles,
+                    text: "Smart Insights",
+                    desc: "Know why you're a fit",
+                  },
+                  {
+                    icon: Zap,
+                    text: "Priority Access",
+                    desc: "See new jobs before others",
+                  },
+                ].map((feature, i) => (
+                  <div
+                    key={i}
+                    className="bg-muted/30 group hover:bg-primary/5 hover:border-primary/20 rounded-3xl border p-6 transition-all"
+                  >
+                    <div className="bg-background mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-110">
+                      <feature.icon className="text-primary h-6 w-6" />
+                    </div>
+                    <h4 className="mb-1 text-sm font-black">{feature.text}</h4>
+                    <p className="text-muted-foreground text-[11px] leading-tight font-medium">
+                      {feature.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
+                <Button
+                  size="lg"
+                  className="shadow-primary/20 h-16 w-full rounded-2xl px-10 text-lg font-black shadow-2xl sm:w-auto"
+                >
+                  Go Premium Now
+                  <ArrowRight className="ml-3 h-5 w-5" />
+                </Button>
+                <Link
+                  href="/pricing"
+                  className="text-muted-foreground hover:text-foreground text-sm font-bold transition-colors"
+                >
+                  View all premium benefits
+                </Link>
+              </div>
+            </div>
+
+            {/* Decorative Background Elements */}
+            <div className="bg-primary/10 absolute -top-24 -right-24 h-96 w-96 rounded-full blur-[100px]" />
+            <div className="bg-primary/5 absolute -bottom-24 -left-24 h-96 w-96 rounded-full blur-[100px]" />
+          </motion.div>
+
+          <div className="mt-16 text-center">
+            <p className="text-muted-foreground text-sm font-medium opacity-60">
+              Trusted by 50,000+ professionals worldwide
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-16">
@@ -61,14 +163,14 @@ const RecommendedJobsView = () => {
           <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div className="space-y-3">
               <div className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase">
-                AI-Powered Matching
+                Smart Matching
               </div>
               <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
                 Tailored just for you.
               </h2>
               <p className="text-muted-foreground max-w-md text-sm font-medium opacity-80">
-                Our algorithm analyzes your skills, preferences, and career path
-                to surface the most relevant opportunities.
+                Our system analyzes your skills, preferences, and career path to
+                surface the most relevant opportunities.
               </p>
             </div>
             <div className="flex gap-4">
@@ -122,8 +224,8 @@ const RecommendedJobsView = () => {
         {/* Jobs List */}
         <div className="grid grid-cols-1 gap-4 sm:gap-6">
           <AnimatePresence mode="popLayout">
-            {pagedJobs.length > 0 ? (
-              pagedJobs.map((job, idx) => (
+            {jobs.length > 0 ? (
+              jobs.map((job: any, idx: number) => (
                 <motion.div
                   key={job.id}
                   initial={{ opacity: 0, y: 15 }}
@@ -146,12 +248,9 @@ const RecommendedJobsView = () => {
           </AnimatePresence>
         </div>
 
-        {totalPages > 1 && (
+        {meta.pages > 1 && (
           <div className="border-t pt-6">
-            <PaginationBar
-              meta={paginationMeta}
-              onPageChange={setCurrentPage}
-            />
+            <PaginationBar meta={meta} onPageChange={setCurrentPage} />
           </div>
         )}
       </div>
@@ -159,7 +258,6 @@ const RecommendedJobsView = () => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RecommendedJobCard = ({ job }: { job: any }) => (
   <Card className="group bg-card relative overflow-hidden rounded-xl border transition-all">
     <CardContent className="p-5 sm:p-6 md:p-8">
@@ -211,18 +309,15 @@ const RecommendedJobCard = ({ job }: { job: any }) => (
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              job.JobSkill.map((skill: any) => (
-                <Badge
-                  key={skill.id}
-                  variant="secondary"
-                  className="bg-primary/5 text-primary rounded-lg border-none px-2 py-0.5 text-[10px] font-bold tracking-tight"
-                >
-                  {skill.skillName}
-                </Badge>
-              ))
-            }
+            {job.JobSkill.map((skill: any) => (
+              <Badge
+                key={skill.id}
+                variant="secondary"
+                className="bg-primary/5 text-primary rounded-lg border-none px-2 py-0.5 text-[10px] font-bold tracking-tight"
+              >
+                {skill.skillName}
+              </Badge>
+            ))}
           </div>
 
           <div className="text-muted-foreground/70 flex items-center gap-4 text-[11px] font-bold tracking-tight">

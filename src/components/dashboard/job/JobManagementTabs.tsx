@@ -25,6 +25,9 @@ interface JobManagementTabsProps {
   filteredJobs: Job[];
   activeTab: string;
   setActiveTab: (value: string) => void;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onStatusChange?: (id: string, status: string) => void;
 }
 
 const JobManagementTabs = ({
@@ -32,6 +35,9 @@ const JobManagementTabs = ({
   filteredJobs,
   activeTab,
   setActiveTab,
+  onEdit,
+  onDelete,
+  onStatusChange,
 }: JobManagementTabsProps) => {
   const getJobsByStatus = (status: string) => {
     if (status === "all") return filteredJobs;
@@ -43,7 +49,13 @@ const JobManagementTabs = ({
   const draftCount = jobs.filter((job) => job.status === "draft").length;
 
   const renderJobCard = (job: Job) => (
-    <DashboardJobCard key={job.id} job={job} />
+    <DashboardJobCard
+      key={job.id}
+      job={job}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onStatusChange={onStatusChange}
+    />
   );
 
   return (

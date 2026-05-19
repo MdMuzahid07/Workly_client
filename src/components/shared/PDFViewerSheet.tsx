@@ -1,12 +1,24 @@
 "use client";
 
+if (typeof Promise.withResolvers === "undefined") {
+  // @ts-expect-error - Polyfill for Promise.withResolvers
+  Promise.withResolvers = function () {
+    let resolve, reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAuthenticatedPdf } from "@/hooks/useAuthenticatedPdf";
 import {
   ChevronLeft,
@@ -24,7 +36,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-interface PDFViewerModalProps {
+interface PDFViewerSheetProps {
   isOpen: boolean;
   onClose: () => void;
   pdfUrl: string;
@@ -33,19 +45,19 @@ interface PDFViewerModalProps {
   resumeId?: string;
 }
 
-const PDFViewerModal = ({
+const PDFViewerSheet = ({
   isOpen,
   onClose,
   pdfUrl,
   title,
   applicationId,
   resumeId,
-}: PDFViewerModalProps) => {
+}: PDFViewerSheetProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
+  const [containerWidth, setContainerWidth] = useState<number>(800);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(800);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { pdfBlobUrl, isLoading, error } = useAuthenticatedPdf({
@@ -81,7 +93,7 @@ const PDFViewerModal = ({
 
   const scrollToPage = (page: number) => {
     setPageNumber(page);
-    document.getElementById(`resume-modal-page-${page}`)?.scrollIntoView({
+    document.getElementById(`resume-page-${page}`)?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
@@ -92,7 +104,7 @@ const PDFViewerModal = ({
     setIsDownloading(true);
     const link = document.createElement("a");
     link.href = pdfBlobUrl;
-    link.download = title.endsWith(".pdf") ? title : `${title}.pdf`;
+    link.download = `${title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -100,14 +112,17 @@ const PDFViewerModal = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex h-[90vh] max-w-5xl flex-col overflow-hidden rounded-xl border-none p-0 shadow-2xl sm:rounded-xl xl:min-w-5xl">
-        <DialogHeader className="bg-card flex shrink-0 flex-row items-center justify-between space-y-0 border-b p-4">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent
+        side="right"
+        className="flex h-full w-full max-w-5xl flex-col gap-0 overflow-hidden p-0 sm:max-w-full xl:w-[60vw]"
+      >
+        <SheetHeader className="bg-card flex shrink-0 flex-row items-center justify-between space-y-0 border-b p-4">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 rounded-lg p-2">
-              <DialogTitle className="max-w-[200px] truncate text-base font-bold sm:max-w-md">
+              <SheetTitle className="max-w-[200px] truncate text-base font-bold sm:max-w-md">
                 {title}
-              </DialogTitle>
+              </SheetTitle>
             </div>
             <div className="bg-muted/30 hidden items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold sm:flex">
               Page {pageNumber} of {numPages}
@@ -149,10 +164,10 @@ const PDFViewerModal = ({
               ) : (
                 <Download className="mr-2 h-4 w-4" />
               )}
-              Download
+              {isDownloading ? "Downloading..." : "Download"}
             </Button>
           </div>
-        </DialogHeader>
+        </SheetHeader>
 
         <div
           ref={containerRef}
@@ -177,7 +192,7 @@ const PDFViewerModal = ({
                   <p className="text-destructive text-sm font-bold">
                     Failed to load PDF
                   </p>
-                  <p className="text-muted-foreground max-w-[200px] text-xs">
+                  <p className="text-muted-foreground max-w-[300px] text-xs">
                     {error}
                   </p>
                 </div>
@@ -200,7 +215,7 @@ const PDFViewerModal = ({
                   return (
                     <div
                       key={`page-${page}`}
-                      id={`resume-modal-page-${page}`}
+                      id={`resume-page-${page}`}
                       className="[&:not(:last-child)]:mb-4"
                     >
                       <Page
@@ -244,9 +259,9 @@ const PDFViewerModal = ({
             </Button>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
-export default PDFViewerModal;
+export default PDFViewerSheet;

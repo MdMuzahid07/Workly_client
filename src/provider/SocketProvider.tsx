@@ -1,53 +1,73 @@
 "use client";
 
-import baseApi from "@/redux/api/baseApi";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { io, type Socket } from "socket.io-client";
-import { useEffect, useRef } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { useAppSelector } from "../redux/hooks";
 
-function getBackendUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+interface SocketContextType {
+  socket: Socket | null;
+  isConnected: boolean;
 }
 
-export default function SocketProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const dispatch = useAppDispatch();
-  const { accessToken } = useAppSelector((s) => s.auth) || {};
-  const socketRef = useRef<Socket | null>(null);
+const SocketContext = createContext<SocketContextType>({
+  socket: null,
+  isConnected: false,
+});
+
+export const useSocket = () => useContext(SocketContext);
+
+export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const token = useAppSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
-    const token =
-      accessToken ||
-      (typeof window !== "undefined"
-        ? window.localStorage.getItem("accessToken")
-        : null);
+    if (!token) {
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+        setIsConnected(false);
+      }
+      return;
+    }
 
-    if (!token) return;
+    const socketUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
-    const socket = io(getBackendUrl(), {
-      transports: ["websocket"],
-      auth: { token },
+    const newSocket = io(socketUrl, {
+      auth: {
+        token: `Bearer ${token}`,
+      },
+      withCredentials: true,
     });
 
-    socketRef.current = socket;
-
-    socket.on("connect_error", () => {
-      // keep quiet; UI still works via polling/refresh
+    newSocket.on("connect", () => {
+      console.log("Socket connected");
+      setIsConnected(true);
     });
 
-    socket.on("notification:new", () => {
-      dispatch(baseApi.util.invalidateTags(["notifications"]));
+    newSocket.on("disconnect", () => {
+      console.log("Socket disconnected");
+      setIsConnected(false);
     });
+
+    newSocket.on("error", (err) => {
+      console.error("Socket error:", err);
+    });
+
+    setSocket(newSocket);
 
     return () => {
-      socket.off("notification:new");
-      socket.disconnect();
-      socketRef.current = null;
+      newSocket.disconnect();
     };
-  }, [accessToken, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
-  return children;
-}
+  return (
+    <SocketContext.Provider value={{ socket, isConnected }}>
+      {children}
+    </SocketContext.Provider>
+  );
+};
+
+export default SocketProvider;

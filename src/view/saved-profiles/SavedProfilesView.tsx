@@ -3,6 +3,7 @@
 
 import DashboardEmployerSavedProfilesHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerSavedProfilesHeader";
 import SavedProfileCard from "@/components/main/saved-profiles/SavedProfileCard";
+import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetSavedCandidatesQuery } from "@/redux/feature/candidate/candidateApi";
+import {
+  useGetSavedCandidatesQuery,
+  useToggleSaveCandidateMutation,
+} from "@/redux/feature/candidate/candidateApi";
 import { AnimatePresence } from "framer-motion";
 import { Bookmark, Search } from "lucide-react";
 import Link from "next/link";
@@ -22,6 +26,11 @@ import { useMemo, useState } from "react";
 const SavedProfilesView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [profileToRemove, setProfileToRemove] = useState<any>(null);
+
+  const [toggleSave] = useToggleSaveCandidateMutation();
 
   const { data: savedData, isLoading } = useGetSavedCandidatesQuery({
     page: 1,
@@ -190,7 +199,7 @@ const SavedProfilesView = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Link href="/employer/talent-management">
+              <Link href="/browse-candidates">
                 <Button className="h-11 rounded-full px-6 font-bold shadow-sm">
                   Browse Candidates
                 </Button>
@@ -208,6 +217,18 @@ const SavedProfilesView = () => {
                   key={profile.id}
                   profile={profile}
                   index={index}
+                  onRemove={() => {
+                    setProfileToRemove(profile);
+                    setDeleteModalOpen(true);
+                  }}
+                  onShortlist={() => {
+                    // Placeholder for future feature
+                    import("sonner").then((mod) =>
+                      mod.toast.info(
+                        "Select a job to shortlist this candidate for. (Feature coming soon)",
+                      ),
+                    );
+                  }}
                 />
               ))
             ) : (
@@ -230,6 +251,23 @@ const SavedProfilesView = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      <DeleteConfirmationModal
+        open={deleteModalOpen}
+        onOpenChange={(open) => {
+          setDeleteModalOpen(open);
+          if (!open) setProfileToRemove(null);
+        }}
+        onConfirm={async () => {
+          if (!profileToRemove?.id) return;
+          // toggleSave removes the profile since it's already saved
+          await toggleSave(profileToRemove.id).unwrap();
+          setProfileToRemove(null);
+        }}
+        title="Remove Saved Profile"
+        description="Are you sure you want to remove this profile from your saved list?"
+        itemName={profileToRemove?.fullName}
+      />
     </div>
   );
 };

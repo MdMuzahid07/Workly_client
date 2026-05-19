@@ -1,4 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -10,45 +22,63 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatDistanceToNow } from "date-fns";
 import {
   ArrowLeft,
+  CheckCircle2,
+  Crown,
+  DownloadIcon,
+  FileIcon,
   Info,
   MoreVertical,
   Paperclip,
   Send,
   ShieldAlert,
   Smile,
+  Sparkles,
   Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
-import { MediaGallery } from "../../components/main/message/MediaGallery";
-import ComingSoonAlert from "../../components/temp_components/ComingSoonAlert";
+import MediaGallery from "../../components/main/message/MediaGallery";
+import MediaLightbox from "../../components/main/message/MediaLightbox";
+import { useSocket } from "../../provider/SocketProvider";
+import {
+  useBlockUserMutation,
+  useDeleteConversationMutation,
+  useDeleteMessageMutation,
+  useGetConversationsQuery,
+  useGetMessageHistoryQuery,
+  useMarkAsReadMutation,
+  useSendMessageMutation,
+} from "../../redux/feature/message/messageApi";
+import { useAppSelector } from "../../redux/hooks";
 import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
 
 interface Message {
   id: string;
   senderId: string;
-  senderName: string;
-  senderAvatar: string;
   content: string;
-  timestamp: string;
-  isRead: boolean;
-}
-
-interface Conversation {
-  id: string;
-  participantName: string;
-  participantAvatar: string;
-  participantRole: string;
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  isOnline: boolean;
-  messages: Message[];
+  messageType: "TEXT" | "IMAGE" | "FILE" | "LINK";
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  createdAt: string;
+  status: string;
+  sender?: {
+    fullName: string;
+    profile?: {
+      avatarUrl?: string | null;
+    } | null;
+  } | null;
 }
 
 const MessageView = () => {
+  const { socket } = useSocket();
+  const currentUser = useAppSelector((state) => state.auth.user);
+
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
@@ -56,283 +86,301 @@ const MessageView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [lightboxState, setLightboxState] = useState<{
+    isOpen: boolean;
+    index: number;
+  }>({
+    isOpen: false,
+    index: 0,
+  });
+  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
 
-  // fake loading state for skeleton
-  const [isLoading, setIsLoading] = useState(true);
+  // API Queries
+  const { data: conversationsData, isLoading: isConversationsLoading } =
+    useGetConversationsQuery(undefined);
+  const { data: messagesData, isLoading: isMessagesLoading } =
+    useGetMessageHistoryQuery(selectedConversation as string, {
+      skip: !selectedConversation,
+    });
 
+  const [sendMessage] = useSendMessageMutation();
+  const [markAsRead] = useMarkAsReadMutation();
+  const [blockUser] = useBlockUserMutation();
+  const [deleteConversation] = useDeleteConversationMutation();
+  const [deleteMessage] = useDeleteMessageMutation();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const [allMessages, setAllMessages] = useState<Message[]>([]);
+
+  // Sync messages from query and clear on switch
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    if (messagesData?.data) {
+      setAllMessages(messagesData.data);
+    } else if (isMessagesLoading) {
+      setAllMessages([]);
+    }
+  }, [messagesData, isMessagesLoading, selectedConversation]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  // Socket event listeners
+  useEffect(() => {
+    if (!socket || !selectedConversation) return;
 
-  // fake data for conversations and messages
-  const conversations: Conversation[] = [
-    {
-      id: "1",
-      participantName: "Aisha Rahman",
-      participantAvatar: "/avatars/aisha-rahman.png",
-      participantRole: "HR Manager at NexGen Technologies",
-      lastMessage:
-        "We’d love to schedule an interview with you next week, Insha’Allah. Are you available?",
-      lastMessageTime: "45 minutes ago",
-      unreadCount: 1,
-      isOnline: true,
-      messages: [
-        {
-          id: "msg-1-1",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "Assalamu Alaikum! I reviewed your resume and your MERN stack skills are quite impressive.",
-          timestamp: "9:10 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-2",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "We'd love to schedule an interview with you next week, Insha'Allah. Are you available?",
-          timestamp: "9:15 AM",
-          isRead: false,
-        },
-        {
-          id: "msg-1-3",
-          senderId: "me",
-          senderName: "You",
-          senderAvatar: "/avatars/me.png",
-          content:
-            "Wa Alaikum Assalam! Thank you for reaching out. Yes, I'm available next week.",
-          timestamp: "9:20 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-4",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "Great! How about Tuesday at 2 PM? We can do it via Google Meet.",
-          timestamp: "9:25 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-5",
-          senderId: "me",
-          senderName: "You",
-          senderAvatar: "/avatars/me.png",
-          content:
-            "Tuesday at 2 PM works perfectly for me. Looking forward to it!",
-          timestamp: "9:30 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-6",
-          senderId: "aisha",
-          senderName: "Aisha Rahman",
-          senderAvatar: "/avatars/aisha-rahman.png",
-          content:
-            "Perfect! I'll send you the meeting link shortly. Have a blessed day!",
-          timestamp: "9:35 AM",
-          isRead: true,
-        },
-        {
-          id: "msg-1-7",
-          senderId: "me",
-          senderName: "You",
-          senderAvatar: "/avatars/me.png",
-          content: "JazakAllah Khair! You too.",
-          timestamp: "9:40 AM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "2",
-      participantName: "Omar Farooq",
-      participantAvatar: "/avatars/omar-farooq.png",
-      participantRole: "Recruiter at CloudAxis Solutions",
-      lastMessage:
-        "Could you please share your GitHub link and a short project summary?",
-      lastMessageTime: "3 hours ago",
-      unreadCount: 2,
-      isOnline: true,
-      messages: [
-        {
-          id: "3",
-          senderId: "omar",
-          senderName: "Omar Farooq",
-          senderAvatar: "/avatars/omar-farooq.png",
-          content:
-            "Salam Muzahid, we’re currently hiring a React Developer for our Dhaka team.",
-          timestamp: "7:20 AM",
-          isRead: true,
-        },
-        {
-          id: "4",
-          senderId: "omar",
-          senderName: "Omar Farooq",
-          senderAvatar: "/avatars/omar-farooq.png",
-          content:
-            "Could you please share your GitHub link and a short project summary?",
-          timestamp: "7:25 AM",
-          isRead: false,
-        },
-      ],
-    },
-    {
-      id: "3",
-      participantName: "Fatima Noor",
-      participantAvatar: "/avatars/fatima-noor.png",
-      participantRole: "Engineering Manager at CodeVista Labs",
-      lastMessage:
-        "JazakAllah khair for your time yesterday. We’ll follow up soon with feedback.",
-      lastMessageTime: "Yesterday",
+    const handleNewMessage = (message: any) => {
+      if (message.conversationId === selectedConversation) {
+        setAllMessages((prev) => {
+          const exists = prev.some((m) => m.id === message.id);
+          if (exists) return prev;
+          return [...prev, message];
+        });
+        markAsRead(selectedConversation);
+      }
+    };
+
+    const handleTyping = (data: {
+      conversationId: string;
+      userId: string;
+      isTyping: boolean;
+    }) => {
+      if (
+        data.conversationId === selectedConversation &&
+        data.userId !== currentUser?.id
+      ) {
+        setTypingUsers((prev) => ({ ...prev, [data.userId]: data.isTyping }));
+      }
+    };
+
+    const handleMessageDeleted = (data: {
+      messageId: string;
+      conversationId: string;
+    }) => {
+      if (data.conversationId === selectedConversation) {
+        setAllMessages((prev) =>
+          prev.map((m) =>
+            m.id === data.messageId
+              ? {
+                  ...m,
+                  status: "DELETED",
+                  content: "This message was deleted",
+                  fileUrl: undefined,
+                }
+              : m,
+          ),
+        );
+      }
+    };
+
+    socket.on("new_message", handleNewMessage);
+    socket.on("user_typing", handleTyping);
+    socket.on("message_deleted", handleMessageDeleted);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+      socket.off("user_typing", handleTyping);
+      socket.off("message_deleted", handleMessageDeleted);
+    };
+  }, [socket, selectedConversation, currentUser?.id, markAsRead]);
+
+  // Join/Leave conversation room
+  useEffect(() => {
+    if (socket && selectedConversation) {
+      socket.emit("join_conversation", selectedConversation);
+      markAsRead(selectedConversation);
+      return () => {
+        socket.emit("leave_conversation", selectedConversation);
+      };
+    }
+    return undefined;
+  }, [socket, selectedConversation, markAsRead]);
+
+  const conversations = (conversationsData?.data || []).map((conv: any) => {
+    const participant = conv.conversationParticipants.find(
+      (p: any) => p.userId !== currentUser?.id,
+    );
+    const myParticipant = conv.conversationParticipants.find(
+      (p: any) => p.userId === currentUser?.id,
+    );
+
+    return {
+      id: conv.id,
+      participantName: participant?.user?.fullName || "Unknown User",
+      participantAvatar:
+        participant?.user?.profile?.avatarUrl || "/placeholder.svg",
+      participantRole: participant?.user?.profile?.headline || "",
+      lastMessage: conv.lastMessage?.content || "No messages yet",
+      lastMessageTime: conv.lastMessage?.createdAt
+        ? formatDistanceToNow(new Date(conv.lastMessage.createdAt), {
+            addSuffix: true,
+          })
+        : "",
       unreadCount: 0,
       isOnline: false,
-      messages: [
-        {
-          id: "5",
-          senderId: "fatima",
-          senderName: "Fatima Noor",
-          senderAvatar: "/avatars/fatima-noor.png",
-          content:
-            "It was a pleasure talking about your full-stack experience yesterday. You have strong fundamentals.",
-          timestamp: "Yesterday, 4:10 PM",
-          isRead: true,
-        },
-        {
-          id: "6",
-          senderId: "fatima",
-          senderName: "Fatima Noor",
-          senderAvatar: "/avatars/fatima-noor.png",
-          content:
-            "JazakAllah khair for your time yesterday. We’ll follow up soon with feedback.",
-          timestamp: "Yesterday, 4:15 PM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "4",
-      participantName: "Ahmad Khan",
-      participantAvatar: "/avatars/ahmad-khan.png",
-      participantRole: "CTO at Crescent Innovations",
-      lastMessage:
-        "Looking forward to reviewing your approach to our dashboard redesign test.",
-      lastMessageTime: "2 days ago",
-      unreadCount: 0,
-      isOnline: true,
-      messages: [
-        {
-          id: "7",
-          senderId: "ahmad",
-          senderName: "Ahmad Khan",
-          senderAvatar: "/avatars/ahmad-khan.png",
-          content:
-            "Hi Muzahid, your UI portfolio is well-crafted — very clean and minimal.",
-          timestamp: "2 days ago, 10:40 AM",
-          isRead: true,
-        },
-        {
-          id: "8",
-          senderId: "ahmad",
-          senderName: "Ahmad Khan",
-          senderAvatar: "/avatars/ahmad-khan.png",
-          content:
-            "Looking forward to reviewing your approach to our dashboard redesign test.",
-          timestamp: "2 days ago, 10:45 AM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "5",
-      participantName: "Maryam Siddiqui",
-      participantAvatar: "/avatars/maryam-siddiqui.png",
-      participantRole: "HR Executive at StellarSoft",
-      lastMessage:
-        "Your application has been shortlisted, Alhamdulillah. Our team will contact you soon.",
-      lastMessageTime: "3 days ago",
-      unreadCount: 0,
-      isOnline: false,
-      messages: [
-        {
-          id: "9",
-          senderId: "maryam",
-          senderName: "Maryam Siddiqui",
-          senderAvatar: "/avatars/maryam-siddiqui.png",
-          content:
-            "Hello! We received your application for the React Developer position at StellarSoft.",
-          timestamp: "3 days ago, 1:50 PM",
-          isRead: true,
-        },
-        {
-          id: "10",
-          senderId: "maryam",
-          senderName: "Maryam Siddiqui",
-          senderAvatar: "/avatars/maryam-siddiqui.png",
-          content:
-            "Your application has been shortlisted, Alhamdulillah. Our team will contact you soon.",
-          timestamp: "3 days ago, 1:55 PM",
-          isRead: true,
-        },
-      ],
-    },
-    {
-      id: "6",
-      participantName: "Yusuf Ali",
-      participantAvatar: "/avatars/yusuf-ali.png",
-      participantRole: "Product Manager at BrightPath Digital",
-      lastMessage:
-        "Can we schedule a short meeting tomorrow to discuss your project availability?",
-      lastMessageTime: "4 days ago",
-      unreadCount: 1,
-      isOnline: false,
-      messages: [
-        {
-          id: "11",
-          senderId: "yusuf",
-          senderName: "Yusuf Ali",
-          senderAvatar: "/avatars/yusuf-ali.png",
-          content:
-            "Salam! Your Redux Toolkit experience is impressive. We might have a project match for you.",
-          timestamp: "4 days ago, 4:30 PM",
-          isRead: true,
-        },
-        {
-          id: "12",
-          senderId: "yusuf",
-          senderName: "Yusuf Ali",
-          senderAvatar: "/avatars/yusuf-ali.png",
-          content:
-            "Can we schedule a short meeting tomorrow to discuss your project availability?",
-          timestamp: "4 days ago, 4:35 PM",
-          isRead: false,
-        },
-      ],
-    },
-  ];
+      recipientId: participant?.userId,
+      isBlocked: myParticipant?.isBlocked || false,
+    };
+  });
 
   const filteredConversations = conversations.filter(
-    (conv) =>
+    (conv: any) =>
       conv.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const currentConversation = conversations.find(
-    (conv) => conv.id === selectedConversation,
+    (conv: any) => conv.id === selectedConversation,
   );
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() && selectedConversation) {
-      console.log("Sending message:", newMessage);
-      setNewMessage("");
+  const handleSendMessage = async (payloadOverride?: any) => {
+    if ((newMessage.trim() || payloadOverride) && selectedConversation) {
+      const messageContent = payloadOverride?.content || newMessage;
+      const recipientId = currentConversation?.recipientId;
+
+      try {
+        setNewMessage("");
+        // Optimistic update for UI feedback
+        const tempId = Date.now().toString();
+        const optimisticMessage: Message = {
+          id: tempId,
+          senderId: currentUser?.id || "",
+          content: messageContent,
+          messageType: payloadOverride?.messageType || "TEXT",
+          fileUrl: payloadOverride?.fileUrl,
+          fileName: payloadOverride?.fileName,
+          fileSize: payloadOverride?.fileSize,
+          createdAt: new Date().toISOString(),
+          status: "SENT",
+          sender: {
+            fullName: currentUser?.fullName || "You",
+            profile: { avatarUrl: currentUser?.profile?.avatarUrl },
+          },
+        };
+        setAllMessages((prev) => [...prev, optimisticMessage]);
+
+        await sendMessage({
+          conversationId: selectedConversation,
+          content: messageContent,
+          recipientId,
+          ...payloadOverride,
+        }).unwrap();
+
+        // Notify socket about typing stop
+        socket?.emit("typing", {
+          conversationId: selectedConversation,
+          userId: currentUser?.id,
+          isTyping: false,
+        });
+      } catch (err: any) {
+        console.error("Error sending message:", err);
+        toast.error(err?.data?.message || "Failed to send message");
+        // Remove optimistic message on failure
+        setAllMessages((prev) => prev.filter((m) => m.id.length > 15));
+      }
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const isImage = file.type.startsWith("image/");
+
+      let fileUrl = "";
+      if (isImage) {
+        // Convert to Base64 for persistence in this demo/mock environment
+        fileUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      } else {
+        fileUrl = URL.createObjectURL(file);
+      }
+
+      await handleSendMessage({
+        content: isImage ? "Shared an image" : `Shared a file: ${file.name}`,
+        messageType: isImage ? "IMAGE" : "FILE",
+        fileUrl,
+        fileName: file.name,
+        fileSize: file.size,
+      });
+
+      toast.success("File uploaded successfully");
+    } catch (err) {
+      toast.error("Failed to upload file");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleBlockUser = async () => {
+    if (!selectedConversation) return;
+    try {
+      await blockUser(selectedConversation).unwrap();
+      toast.success("User block status updated");
+    } catch (err) {
+      toast.error("Failed to update block status");
+    }
+  };
+
+  const allImages = useMemo(
+    () =>
+      allMessages.filter(
+        (m) => m.messageType === "IMAGE" && m.status !== "DELETED",
+      ),
+    [allMessages],
+  );
+
+  const openLightbox = (imageIndex: number) => {
+    setLightboxState({ isOpen: true, index: imageIndex });
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!selectedConversation) return;
+    try {
+      await deleteConversation(selectedConversation).unwrap();
+      setSelectedConversation(null);
+      toast.success("Conversation deleted");
+    } catch (err) {
+      toast.error("Failed to delete conversation");
+    }
+  };
+
+  const handleDeleteMessage = async () => {
+    if (!messageToDelete) return;
+    try {
+      await deleteMessage(messageToDelete).unwrap();
+      setAllMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageToDelete
+            ? {
+                ...m,
+                status: "DELETED",
+                content: "This message was deleted",
+                fileUrl: undefined,
+              }
+            : m,
+        ),
+      );
+      toast.success("Message deleted");
+      setMessageToDelete(null);
+    } catch (err) {
+      toast.error("Failed to delete message");
+    }
+  };
+
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    if (socket && selectedConversation) {
+      socket.emit("typing", {
+        conversationId: selectedConversation,
+        userId: currentUser?.id,
+        isTyping: e.target.value.length > 0,
+      });
     }
   };
 
@@ -346,7 +394,63 @@ const MessageView = () => {
     setSelectedConversation(null);
   };
 
-  if (isLoading) {
+  if (!currentUser?.isPremium) {
+    return (
+      <div className="bg-background flex min-h-screen items-center justify-center p-4">
+        <Card className="max-w-2xl overflow-hidden border">
+          <CardContent className="p-12 text-center">
+            <div className="bg-primary/10 mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full">
+              <Crown className="text-primary h-12 w-12" />
+            </div>
+            <h1 className="text-foreground mb-4 text-4xl font-black tracking-tight">
+              Unlock Professional Messaging
+            </h1>
+            <p className="text-muted-foreground mx-auto mb-10 max-w-md text-lg leading-relaxed font-medium">
+              Connect directly with top employers and candidates. Messaging is a
+              premium feature designed for serious professionals.
+            </p>
+
+            <div className="mb-10 grid grid-cols-1 gap-4 text-left md:grid-cols-2">
+              {[
+                "Direct 1-on-1 conversations",
+                "Share documents and portfolios",
+                "Real-time typing indicators",
+                "Priority message delivery",
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className="bg-primary/20 flex h-6 w-6 items-center justify-center rounded-full">
+                    <CheckCircle2 className="text-primary h-4 w-4" />
+                  </div>
+                  <span className="text-foreground text-sm font-bold">
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+              <Button
+                size="lg"
+                className="bg-primary text-primary-foreground h-14 rounded-2xl px-10 text-lg font-black shadow-xl transition-all hover:scale-105 active:scale-95"
+              >
+                Upgrade to Premium
+                <Sparkles className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                className="text-muted-foreground h-14 rounded-2xl px-10 text-lg font-bold"
+              >
+                Learn More
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isConversationsLoading) {
     return <MessageViewSkeleton />;
   }
 
@@ -375,7 +479,9 @@ const MessageView = () => {
                 <div className="flex items-center space-x-1.5">
                   <span className="bg-success h-1.5 w-1.5 animate-pulse rounded-full" />
                   <p className="text-muted-foreground/80 text-[10px] font-black tracking-[0.15em] uppercase">
-                    Active Now
+                    {Object.values(typingUsers).some(Boolean)
+                      ? "Typing..."
+                      : "Active Now"}
                   </p>
                 </div>
               </div>
@@ -428,7 +534,7 @@ const MessageView = () => {
                           <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
                             {currentConversation.participantName
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
@@ -443,7 +549,9 @@ const MessageView = () => {
                         <div className="flex items-center space-x-2">
                           <span className="bg-success flex h-2 w-2 animate-pulse rounded-full" />
                           <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                            {currentConversation.participantRole}
+                            {Object.values(typingUsers).some(Boolean)
+                              ? "Typing..."
+                              : currentConversation.participantRole}
                           </p>
                         </div>
                       </div>
@@ -477,11 +585,21 @@ const MessageView = () => {
                             <Paperclip className="text-primary mr-3 h-4 w-4" />
                             Shared Files
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer rounded-lg py-2.5">
-                            <ShieldAlert className="text-warning mr-3 h-4 w-4" />
-                            Block User
+                          <DropdownMenuItem
+                            className="cursor-pointer rounded-lg py-2.5"
+                            onClick={handleBlockUser}
+                          >
+                            <ShieldAlert
+                              className={`${currentConversation.isBlocked ? "text-primary" : "text-warning"} mr-3 h-4 w-4`}
+                            />
+                            {currentConversation.isBlocked
+                              ? "Unblock User"
+                              : "Block User"}
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer rounded-lg py-2.5">
+                          <DropdownMenuItem
+                            className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer rounded-lg py-2.5"
+                            onClick={handleDeleteConversation}
+                          >
                             <Trash2 className="mr-3 h-4 w-4" />
                             Delete Conversation
                           </DropdownMenuItem>
@@ -501,18 +619,16 @@ const MessageView = () => {
                           <div className="border-border/40 w-full border-t"></div>
                         </div>
                         <span className="bg-background/80 border-border/60 text-muted-foreground/80 relative z-10 rounded-full border px-5 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase shadow-md backdrop-blur-sm">
-                          February 05, 2026
+                          Chat Started
                         </span>
                       </div>
 
                       <div className="space-y-4">
-                        {currentConversation.messages.map((message, index) => {
+                        {allMessages.map((message, index) => {
                           const isCurrentUser =
-                            message.senderId === "current-user";
-                          const nextMessage =
-                            currentConversation.messages[index + 1];
-                          const prevMessage =
-                            currentConversation.messages[index - 1];
+                            message.senderId === currentUser?.id;
+                          const nextMessage = allMessages[index + 1];
+                          const prevMessage = allMessages[index - 1];
 
                           const isNewGroup =
                             !prevMessage ||
@@ -520,6 +636,17 @@ const MessageView = () => {
                           const isLastInGroup =
                             !nextMessage ||
                             nextMessage.senderId !== message.senderId;
+
+                          const senderName =
+                            message.sender?.fullName ||
+                            (isCurrentUser
+                              ? "You"
+                              : currentConversation.participantName);
+                          const senderAvatar =
+                            message.sender?.profile?.avatarUrl ||
+                            (isCurrentUser
+                              ? "/placeholder.svg"
+                              : currentConversation.participantAvatar);
 
                           return (
                             <div
@@ -533,22 +660,18 @@ const MessageView = () => {
                                     : ""
                                 }`}
                               >
-                                {/* Grouped Avatars */}
                                 {!isCurrentUser && (
                                   <div className="w-8 shrink-0">
                                     {isLastInGroup && (
                                       <Avatar className="ring-background ring-offset-border/10 h-8 w-8 shadow-lg ring-2 ring-offset-1">
                                         <AvatarImage
-                                          src={
-                                            message.senderAvatar ||
-                                            "/placeholder.svg"
-                                          }
+                                          src={senderAvatar}
                                           className="object-cover"
                                         />
                                         <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-black">
-                                          {message.senderName
+                                          {senderName
                                             .split(" ")
-                                            .map((n) => n[0])
+                                            .map((n: string) => n[0])
                                             .join("")}
                                         </AvatarFallback>
                                       </Avatar>
@@ -561,20 +684,129 @@ const MessageView = () => {
                                 >
                                   <div
                                     className={`group relative px-4 py-2.5 shadow-sm transition-all duration-300 hover:shadow-md md:px-5 md:py-3 ${
-                                      isCurrentUser
-                                        ? `bg-primary text-primary-foreground ${isNewGroup ? "rounded-t-2xl rounded-br-lg rounded-bl-2xl" : isLastInGroup ? "rounded-tl-2xl rounded-tr-lg rounded-b-2xl" : "rounded-2xl rounded-r-lg"}`
-                                        : `bg-card border-border/60 text-foreground/90 border ${isNewGroup ? "rounded-t-2xl rounded-br-2xl rounded-bl-lg" : isLastInGroup ? "rounded-tl-lg rounded-tr-2xl rounded-b-2xl" : "rounded-2xl rounded-l-lg"}`
+                                      message.status === "DELETED"
+                                        ? "bg-muted/50 text-muted-foreground italic"
+                                        : isCurrentUser
+                                          ? `bg-primary text-primary-foreground ${isNewGroup ? "rounded-t-2xl rounded-br-lg rounded-bl-2xl" : isLastInGroup ? "rounded-tl-2xl rounded-tr-lg rounded-b-2xl" : "rounded-2xl rounded-r-lg"}`
+                                          : `bg-card border-border/60 text-foreground/90 border ${isNewGroup ? "rounded-t-2xl rounded-br-2xl rounded-bl-lg" : isLastInGroup ? "rounded-tl-lg rounded-tr-2xl rounded-b-2xl" : "rounded-2xl rounded-l-lg"}`
                                     }`}
                                   >
-                                    <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap md:text-[14px]">
-                                      {message.content}
-                                    </p>
+                                    {isCurrentUser &&
+                                      message.status !== "DELETED" && (
+                                        <div className="absolute top-1/2 -left-10 flex -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 data-[state=open]:opacity-100">
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="hover:bg-muted data-[state=open]:bg-muted h-8 w-8 rounded-full"
+                                              >
+                                                <MoreVertical className="text-muted-foreground h-4 w-4" />
+                                              </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                              align="end"
+                                              className="z-[100]"
+                                            >
+                                              <DropdownMenuItem
+                                                className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                                                onClick={() =>
+                                                  setMessageToDelete(message.id)
+                                                }
+                                              >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete
+                                              </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
+                                        </div>
+                                      )}
 
-                                    {/* Tick Status for Current User */}
-                                    {isCurrentUser && (
-                                      <div className="absolute -bottom-1.5 -left-1 opacity-0 transition-opacity group-hover:opacity-100">
-                                        <div className="bg-success border-background h-3 w-3 rounded-full border-2 shadow-sm" />
+                                    {!isCurrentUser &&
+                                      message.status !== "DELETED" && (
+                                        <div className="absolute top-1/2 -right-10 flex -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="hover:bg-muted h-8 w-8 rounded-full"
+                                            onClick={() =>
+                                              toast.info("Coming soon!")
+                                            }
+                                          >
+                                            <Smile className="text-muted-foreground h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      )}
+                                    {message.status === "DELETED" ? (
+                                      <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap italic opacity-80 md:text-[14px]">
+                                        {message.content}
+                                      </p>
+                                    ) : message.messageType === "IMAGE" ? (
+                                      <div
+                                        className="cursor-pointer space-y-2"
+                                        onClick={() => {
+                                          const idx = allImages.findIndex(
+                                            (img: Message) =>
+                                              img.id === message.id,
+                                          );
+                                          openLightbox(idx);
+                                        }}
+                                      >
+                                        <div className="border-border/20 relative aspect-video w-full min-w-[200px] overflow-hidden rounded-lg border shadow-sm transition-opacity hover:opacity-90">
+                                          <Image
+                                            src={
+                                              message.fileUrl ||
+                                              "/placeholder.svg"
+                                            }
+                                            alt={
+                                              message.fileName || "Shared image"
+                                            }
+                                            fill
+                                            className="object-cover"
+                                            unoptimized={
+                                              message.fileUrl?.startsWith(
+                                                "data:",
+                                              ) ||
+                                              message.fileUrl?.startsWith(
+                                                "blob:",
+                                              )
+                                            }
+                                          />
+                                        </div>
+                                        <p className="text-[13px] font-medium opacity-90">
+                                          {message.content}
+                                        </p>
                                       </div>
+                                    ) : message.messageType === "FILE" ? (
+                                      <div className="bg-background/10 flex items-center gap-3 rounded-xl border border-white/10 p-2">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+                                          <FileIcon className="h-5 w-5" />
+                                        </div>
+                                        <div className="min-w-0">
+                                          <p className="max-w-[200px] truncate text-[13px] font-bold">
+                                            {message.fileName}
+                                          </p>
+                                          <p className="text-[10px] opacity-70">
+                                            {message.fileSize
+                                              ? (
+                                                  message.fileSize / 1024
+                                                ).toFixed(1)
+                                              : 0}{" "}
+                                            KB
+                                          </p>
+                                        </div>
+                                        <a
+                                          href={message.fileUrl || "#"}
+                                          download
+                                          className="rounded-full p-2 transition-colors hover:bg-white/20"
+                                        >
+                                          <DownloadIcon className="h-4 w-4" />
+                                        </a>
+                                      </div>
+                                    ) : (
+                                      <p className="text-[13px] leading-relaxed font-medium tracking-tight wrap-break-word whitespace-pre-wrap md:text-[14px]">
+                                        {message.content}
+                                      </p>
                                     )}
                                   </div>
 
@@ -582,7 +814,13 @@ const MessageView = () => {
                                     <span
                                       className={`mt-2 px-1 text-[9px] font-black tracking-widest uppercase opacity-60 md:text-[10px] ${isCurrentUser ? "text-primary/70" : "text-muted-foreground"}`}
                                     >
-                                      {message.timestamp} • Delivered
+                                      {new Date(
+                                        message.createdAt,
+                                      ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}{" "}
+                                      • {message.status}
                                     </span>
                                   )}
                                 </div>
@@ -597,17 +835,27 @@ const MessageView = () => {
 
                 <div className="bg-background/80 md:bg-card/60 border-border/10 md:border-border/40 sticky bottom-0 z-10 border-t px-4 pt-4 pb-10 backdrop-blur-3xl md:p-8">
                   <div className="group bg-muted/40 md:bg-muted/40 border-border/40 md:border-border/40 focus-within:bg-muted/60 focus-within:ring-primary/5 focus-within:border-primary/20 rounded-3x relative mx-auto flex max-w-4xl items-center space-x-2 rounded-full border p-1.5 pl-4 transition-all duration-300 focus-within:ring-4 md:space-x-3 md:p-2.5 md:pl-6">
+                    <input
+                      type="file"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
+                      disabled={isUploading}
+                      onClick={() => fileInputRef.current?.click()}
                       className="text-muted-foreground/50 hover:bg-primary/10 hover:text-primary h-9 w-9 shrink-0 rounded-full transition-all md:h-10 md:w-10"
                     >
-                      <Paperclip className="h-5 w-5" />
+                      <Paperclip
+                        className={`h-5 w-5 ${isUploading ? "animate-spin" : ""}`}
+                      />
                     </Button>
                     <Input
                       placeholder="Message..."
                       value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
+                      onChange={handleTyping}
                       onKeyPress={(e) =>
                         e.key === "Enter" && handleSendMessage()
                       }
@@ -655,15 +903,50 @@ const MessageView = () => {
         </div>
       </div>
 
-      <ComingSoonAlert />
-
       {currentConversation && (
         <MediaGallery
           isOpen={showMediaGallery}
           onClose={() => setShowMediaGallery(false)}
+          messages={allMessages}
           participantName={currentConversation.participantName}
+          onImageClick={(idx) => {
+            setShowMediaGallery(false);
+            openLightbox(idx);
+          }}
         />
       )}
+
+      <MediaLightbox
+        isOpen={lightboxState.isOpen}
+        onClose={() => setLightboxState({ ...lightboxState, isOpen: false })}
+        mediaItems={allImages}
+        initialIndex={lightboxState.index}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog
+        open={!!messageToDelete}
+        onOpenChange={(open) => !open && setMessageToDelete(null)}
+      >
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot
+              be undone and it will be removed for everyone in the chat.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteMessage}
+              className="bg-destructive hover:bg-destructive/90 rounded-xl"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -4,31 +4,106 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, LayoutGrid, List } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import CompanyCard from "../../components/main/company/CompanyCard";
 import CompanyFilter from "../../components/main/company/CompanyFilter";
 import Searchbar from "../../components/main/jobs/Searchbar";
+import { useGetCompaniesQuery } from "../../redux/feature/company/companyApi";
 import CompanyCardSkeleton from "../../skeleton/company/CompanyCardSkeleton";
 
-const CompanyView = ({ companies }: { companies?: any[] }) => {
-  const [visibleCompaniesCount, setVisibleCompaniesCount] = useState(12);
+const CompanyView = ({
+  companies: initialCompanies,
+}: {
+  companies?: any[];
+}) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const currentSearch = searchParams.get("q") || "";
+  const currentLocation = searchParams.get("location") || "";
+  const currentIndustry = searchParams.get("industry") || "";
+  const currentSize = searchParams.get("size") || "";
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allCompanies, setAllCompanies] = useState<any[]>(
+    initialCompanies || [],
+  );
   const [viewType, setViewType] = useState<"grid" | "list">("grid");
-  const companiesPerLoad = 6;
+  const limit = 12;
+
+  // Sync state when props change (initial load or filter change)
+  useEffect(() => {
+    if (initialCompanies) {
+      setAllCompanies(initialCompanies);
+      setCurrentPage(1);
+    }
+  }, [initialCompanies]);
+
+  const params = useMemo(
+    () => ({
+      page: currentPage,
+      limit,
+      search: currentSearch,
+      location: currentLocation,
+      industry: currentIndustry,
+      size: currentSize,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    }),
+    [currentPage, currentSearch, currentLocation, currentIndustry, currentSize],
+  );
+
+  const { data, isLoading } = useGetCompaniesQuery(params, {
+    // Skip fetching the first page if we already have initialCompanies from the server
+    skip: currentPage === 1 && !!initialCompanies,
+  });
+
+  useEffect(() => {
+    if (data?.data && currentPage > 1) {
+      setAllCompanies((prev) => [...prev, ...data.data]);
+    }
+  }, [data, currentPage]);
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) params.set(name, value);
+      else params.delete(name);
+      return params.toString();
+    },
+    [searchParams],
+  );
 
   const handleSearch = (searchData: { search: string; location: string }) => {
-    console.log(searchData);
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchData.search) params.set("q", searchData.search);
+    else params.delete("q");
+
+    if (searchData.location) params.set("location", searchData.location);
+    else params.delete("location");
+
+    router.push(`${pathname}?${params.toString()}`);
   };
 
-  const hasMoreCompanies = companies
-    ? visibleCompaniesCount < companies.length
-    : false;
+  const handleFilterChange = (value: string) => {
+    router.push(`${pathname}?${createQueryString("industry", value)}`);
+  };
 
   const loadMoreCompanies = () => {
-    setVisibleCompaniesCount((prev) => prev + companiesPerLoad);
+    if (data?.meta && currentPage < data.meta.pages) {
+      setCurrentPage((prev) => prev + 1);
+    } else if (!data && initialCompanies && initialCompanies.length === limit) {
+      // If we only have initial data and haven't fetched more yet
+      setCurrentPage(2);
+    }
   };
 
-  const visibleCompanies = companies?.slice(0, visibleCompaniesCount) || [];
+  const hasMoreCompanies = data?.meta
+    ? currentPage < data.meta.pages
+    : initialCompanies?.length === limit;
 
   return (
     <div className="bg-background min-h-screen">
@@ -63,15 +138,21 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
       <div className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 pb-20">
         <Searchbar
           onSearch={handleSearch}
+          initialSearch={currentSearch}
+          initialLocation={currentLocation}
+          buttonLabel="Find Company"
           hidePadding
           placeholder={{
-            search: "Search by company name...",
-            location: "Location",
+            search: "Company Name or Keywords",
+            location: "City or Country",
           }}
         />
 
         <div className="mt-8 flex flex-col items-center justify-between gap-6 md:flex-row">
-          <CompanyFilter />
+          <CompanyFilter
+            selectedFilter={currentIndustry}
+            onFilterChange={handleFilterChange}
+          />
 
           <div className="flex items-center gap-1.5 self-center rounded-full border bg-gray-50 p-1 md:self-end dark:bg-slate-900">
             <Button
@@ -100,14 +181,14 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
                 Featured Partners
               </h2>
               <p className="text-muted-foreground mt-1 text-sm font-medium">
-                Showing {visibleCompanies.length} of {companies?.length || 0}{" "}
-                companies
+                Showing {allCompanies.length} of{" "}
+                {data?.meta?.total || allCompanies.length} companies
               </p>
             </div>
           </div>
 
           <InfiniteScroll
-            dataLength={visibleCompanies.length}
+            dataLength={allCompanies.length}
             next={loadMoreCompanies}
             hasMore={hasMoreCompanies}
             loader={
@@ -133,17 +214,23 @@ const CompanyView = ({ companies }: { companies?: any[] }) => {
                   : "flex flex-col gap-5"
               }
             >
-              {companies && companies.length > 0
-                ? visibleCompanies.map((company, index) => (
-                    <CompanyCard
-                      key={company.id || index}
-                      company={company}
-                      viewType={viewType}
-                    />
-                  ))
-                : [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
-                    <CompanyCardSkeleton key={index} />
-                  ))}
+              {allCompanies.length > 0 ? (
+                allCompanies.map((company, index) => (
+                  <CompanyCard
+                    key={company.id || index}
+                    company={company}
+                    viewType={viewType}
+                  />
+                ))
+              ) : isLoading ? (
+                [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
+                  <CompanyCardSkeleton key={index} />
+                ))
+              ) : (
+                <div className="col-span-full py-20 text-center font-medium opacity-50">
+                  No companies found matching your criteria.
+                </div>
+              )}
             </div>
           </InfiniteScroll>
 
