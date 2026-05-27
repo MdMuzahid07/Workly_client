@@ -4,7 +4,7 @@ export const PRICING_TIERS = [
   {
     id: "free",
     name: "Free",
-    price: "$0",
+    price: "৳0",
     description:
       "Ideal for individuals or small startups looking for basic hiring.",
     features: [
@@ -12,7 +12,7 @@ export const PRICING_TIERS = [
       "Standard candidate management",
       "Basic company profile",
       "Community support",
-      "Email notifications",
+      "In-app notifications",
     ],
     cta: "Current Plan",
     variant: "outline" as const,
@@ -24,7 +24,7 @@ export const PRICING_TIERS = [
   {
     id: "starter",
     name: "Starter",
-    price: "$19",
+    price: "৳4,999",
     period: "/month",
     description: "Best for small teams with occasional hiring needs.",
     features: [
@@ -44,17 +44,18 @@ export const PRICING_TIERS = [
   {
     id: "pro",
     name: "Professional",
-    price: "$49",
+    price: "৳14,999",
     period: "/month",
     description:
-      "Built for growing companies needing advanced recruitment tools.",
+      "Recruiters' top choice. Built for growing companies needing advanced recruitment tools.",
     features: [
-      "20 active job postings",
+      "15 active job postings",
       "Priority candidate filtering",
       "Premium company branding",
-      "Priority chat support",
+      "Premium email & chat notifications",
       "Advanced analytics dashboard",
       "Custom screening questions",
+      "AI matching score (BETA)",
     ],
     cta: "Upgrade to Pro",
     variant: "primary" as const,
@@ -72,11 +73,12 @@ export const PRICING_TIERS = [
       "Full-scale solution for large organizations and high-volume hiring.",
     features: [
       "Unlimited active job postings",
-      "AI-powered talent matching",
-      "Dedicated account manager",
+      "AI-powered talent matching (RFTA)",
+      "Dedicated local client manager",
       "Custom integration options",
       "Full team permissions",
       "White-labeled career site",
+      "Dedicated onboarding support",
     ],
     cta: "Contact Sales",
     variant: "outline" as const,
@@ -95,7 +97,7 @@ export const COMPARISON_FEATURES = [
         name: "Active Jobs",
         free: "1",
         starter: "5",
-        pro: "20",
+        pro: "15",
         enterprise: "Unlimited",
       },
       {
@@ -142,7 +144,7 @@ export const COMPARISON_FEATURES = [
         name: "AI Match Score",
         free: false,
         starter: false,
-        pro: false,
+        pro: "Beta",
         enterprise: true,
       },
     ],
@@ -190,5 +192,166 @@ export const PRICING_FAQ = [
     question: "Do you offer custom pricing for nonprofits?",
     answer:
       "We sure do! Contact our support team with your organization details to receive a 25% discount on any paid plan.",
+  },
+];
+
+export const CANDIDATE_PRICING_TIERS = [
+  {
+    id: "free",
+    name: "Free Seeker",
+    price: "৳0",
+    description:
+      "Standard job search and profile builder for everyday candidates.",
+    features: [
+      "Standard profile visibility",
+      "Up to 40 job applications/month",
+      "Single resume upload",
+      "In-app notifications",
+      "Community support",
+    ],
+    cta: "Current Plan",
+    variant: "outline" as const,
+    icon: Package,
+    color: "text-slate-500",
+    borderColor: "border-slate-200 dark:border-slate-800",
+    bgColor: "bg-slate-50/50 dark:bg-slate-900/20",
+  },
+  {
+    id: "pro",
+    name: "Pro Candidate",
+    price: "৳199",
+    period: "/month",
+    description:
+      "Perfect for active job seekers looking for profile boosts and direct HR connections.",
+    features: [
+      "Top-tier profile visibility boost",
+      "Up to 120 job applications/month",
+      "Multiple resume uploads",
+      "Direct messaging to Hiring Managers",
+      "Profile Views tracker (Who viewed you)",
+      "Premium resume & cover letter templates",
+      "Real-time instant job email alerts",
+    ],
+    cta: "Upgrade to Pro",
+    variant: "primary" as const,
+    popular: true,
+    icon: Zap,
+    color: "text-primary",
+    borderColor: "border-primary/30",
+    bgColor: "bg-primary/5",
+  },
+  {
+    id: "elite",
+    name: "Elite Seeker",
+    price: "৳499",
+    period: "/month",
+    description:
+      "Complete career acceleration package including mock interviews and direct counseling.",
+    features: [
+      "5x profile visibility (Featured Seeker)",
+      "Unlimited job applications",
+      "Unlimited resume uploads & all premium features",
+      "Dedicated professional resume review",
+      "1-on-1 monthly career counseling session",
+      "1 Mock Interview prep session / month",
+      "Direct HR chat & application trackers",
+      "Guaranteed response tracking on 5 jobs",
+    ],
+    cta: "Upgrade to Elite",
+    variant: "outline" as const,
+    icon: Shield,
+    color: "text-violet-500",
+    borderColor: "border-violet-200 dark:border-violet-900/50",
+    bgColor: "bg-violet-50/50 dark:bg-violet-900/10",
+  },
+];
+
+export const CANDIDATE_COMPARISON_FEATURES = [
+  {
+    category: "Job Applications & CVs",
+    features: [
+      {
+        name: "Monthly Applications",
+        free: "40",
+        pro: "120",
+        elite: "Unlimited",
+      },
+      {
+        name: "Resume Uploads Limit",
+        free: "Single Resume Upload",
+        pro: "Multiple Resumes Upload",
+        elite: "Unlimited Resumes",
+      },
+      {
+        name: "Guaranteed Response Tracking",
+        free: false,
+        pro: false,
+        elite: "5 Jobs/mo",
+      },
+    ],
+  },
+  {
+    category: "Profile Visibility & Messaging",
+    features: [
+      {
+        name: "Profile Visibility",
+        free: "Standard",
+        pro: "Priority Boost",
+        elite: "5x Featured Boost",
+      },
+      {
+        name: "Direct HR Messaging",
+        free: false,
+        pro: true,
+        elite: true,
+      },
+      {
+        name: "Who Viewed My Profile",
+        free: "Last 7 Days (anonymous)",
+        pro: "Full Details",
+        elite: "Full Details & Company Info",
+      },
+    ],
+  },
+  {
+    category: "Career Assistance",
+    features: [
+      {
+        name: "Resume Templates",
+        free: "Basic",
+        pro: "Premium",
+        elite: "Premium & Custom",
+      },
+      {
+        name: "Resume Expert Review",
+        free: false,
+        pro: false,
+        elite: "1 Session/mo",
+      },
+      {
+        name: "1-on-1 Career Counseling",
+        free: false,
+        pro: false,
+        elite: "1 Session/mo",
+      },
+    ],
+  },
+];
+
+export const CANDIDATE_PRICING_FAQ = [
+  {
+    question: "How does the Profile Visibility Boost work?",
+    answer:
+      "When employers search for talent or review job applications, Pro and Elite Candidates are automatically shown at the very top of their dashboard view, dramatically increasing your chances of getting noticed by 3x to 5x.",
+  },
+  {
+    question: "What is 1-on-1 Career Counseling?",
+    answer:
+      "Elite Seekers can book a private 45-minute video call every month with our senior talent acquisition managers to review their CV, optimize their cover letters, and strategize their job search.",
+  },
+  {
+    question: "Can I cancel my candidate subscription anytime?",
+    answer:
+      "Absolutely! All paid plans are billed month-to-month and can be canceled anytime with a single click from your Billing Details page. No hidden fees.",
   },
 ];

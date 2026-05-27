@@ -1,7 +1,7 @@
 "use client";
 
-import BillingHistoryTable from "@/components/dashboard/billing/BillingHistoryTable";
-import DashboardEmployerBillingHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerBillingHeader";
+import CandidateBillingHistoryTable from "@/components/dashboard/billing/CandidateBillingHistoryTable";
+import DashboardCandidateBillingHeader from "@/components/dashboard/dashboard-nav/header/DashboardCandidateBillingHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +12,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { MOCK_BILLING_SUMMARY, MOCK_INVOICES } from "@/constants/billing";
+import {
+  CANDIDATE_MOCK_BILLING_SUMMARY,
+  CANDIDATE_MOCK_INVOICES,
+} from "@/constants/billing";
 import { cn } from "@/lib/utils";
 import { Calendar, ShieldCheck, Sparkles } from "lucide-react";
 import { useState } from "react";
 
-export default function EmployerBillingView() {
-  const [autoRenew, setAutoRenew] = useState(MOCK_BILLING_SUMMARY.autoRenew);
+export default function JobSeekerBillingView() {
+  const [autoRenew, setAutoRenew] = useState(
+    CANDIDATE_MOCK_BILLING_SUMMARY.autoRenew,
+  );
   const [selectedMethod, setSelectedMethod] = useState("bkash");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -77,7 +82,7 @@ export default function EmployerBillingView() {
 
   return (
     <div className="min-h-screen bg-slate-50/30 pt-15 pb-20 dark:bg-transparent">
-      <DashboardEmployerBillingHeader />
+      <DashboardCandidateBillingHeader />
 
       <div className="animate-in fade-in px-4 py-8 duration-500 sm:px-6 lg:px-8">
         <div className="space-y-10">
@@ -89,11 +94,11 @@ export default function EmployerBillingView() {
                 <div className="text-primary flex items-center gap-2">
                   <Sparkles className="h-5 w-5" />
                   <CardTitle className="text-base font-bold">
-                    Employer Subscription
+                    Premium Subscription
                   </CardTitle>
                 </div>
                 <CardDescription className="text-xs">
-                  Manage employer recruiting packages
+                  Manage seeker subscription renewal
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 p-6">
@@ -103,7 +108,7 @@ export default function EmployerBillingView() {
                   </span>
                   <div className="flex items-center gap-2">
                     <h3 className="text-foreground text-2xl font-black">
-                      {MOCK_BILLING_SUMMARY.currentPlan}
+                      {CANDIDATE_MOCK_BILLING_SUMMARY.currentPlan}
                     </h3>
                     <Badge className="bg-primary/10 text-primary border-none">
                       Active
@@ -119,7 +124,7 @@ export default function EmployerBillingView() {
                     <div className="flex items-center gap-1.5">
                       <Calendar className="text-muted-foreground h-4 w-4" />
                       <span className="text-foreground text-sm font-semibold">
-                        {MOCK_BILLING_SUMMARY.nextBillingDate}
+                        {CANDIDATE_MOCK_BILLING_SUMMARY.nextBillingDate}
                       </span>
                     </div>
                   </div>
@@ -128,8 +133,7 @@ export default function EmployerBillingView() {
                       Amount Due
                     </span>
                     <span className="text-foreground block font-mono text-sm font-bold">
-                      ৳{MOCK_BILLING_SUMMARY.amountDue.toLocaleString("en-BD")}{" "}
-                      BDT
+                      ৳{CANDIDATE_MOCK_BILLING_SUMMARY.amountDue} BDT
                     </span>
                   </div>
                 </div>
@@ -255,7 +259,7 @@ export default function EmployerBillingView() {
                   >
                     {isProcessing
                       ? "Connecting to Gateway..."
-                      : `Pay ৳${MOCK_BILLING_SUMMARY.amountDue.toLocaleString("en-BD")} via SSLCommerz`}
+                      : `Pay ৳${CANDIDATE_MOCK_BILLING_SUMMARY.amountDue} via SSLCommerz`}
                   </Button>
                 </div>
               </CardContent>
@@ -267,10 +271,10 @@ export default function EmployerBillingView() {
             <div className="flex items-center gap-3 px-1">
               <div className="h-6 w-1 rounded-full bg-emerald-500" />
               <h2 className="text-foreground/70 text-sm font-black tracking-[0.2em] uppercase">
-                Billing History
+                Invoice History
               </h2>
             </div>
-            <BillingHistoryTable invoices={MOCK_INVOICES} />
+            <CandidateBillingHistoryTable invoices={CANDIDATE_MOCK_INVOICES} />
           </section>
         </div>
       </div>

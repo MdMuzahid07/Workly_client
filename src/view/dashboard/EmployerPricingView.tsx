@@ -8,7 +8,7 @@ import { PRICING_TIERS } from "@/constants/pricing";
 
 export default function EmployerPricingView() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-15">
       <DashboardEmployerPricingHeader />
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="space-y-10">

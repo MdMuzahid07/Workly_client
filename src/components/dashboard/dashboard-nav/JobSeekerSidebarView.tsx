@@ -29,6 +29,8 @@ import {
   LogOut,
   Menu,
   MessageCircle,
+  Package,
+  Receipt,
   Search,
   Settings,
   User,
@@ -379,6 +381,17 @@ export default function JobSeekerSidebarView({
           badge: "2",
         },
         { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+      ],
+    },
+    {
+      title: "Billing & Upgrades",
+      items: [
+        {
+          icon: Package,
+          label: "Pricing Packages",
+          href: "/dashboard/pricing",
+        },
+        { icon: Receipt, label: "Billing Details", href: "/dashboard/billing" },
       ],
     },
   ];

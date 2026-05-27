@@ -4,20 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Invoice } from "@/types/billing";
-import { Download, Eye, FileText, Loader2 } from "lucide-react";
+import { Download, Eye, FileText } from "lucide-react";
+import { useState } from "react";
+import InvoiceViewDialog from "./InvoiceViewDialog";
 
-interface BillingHistoryTableProps {
+interface CandidateBillingHistoryTableProps {
   invoices: Invoice[];
 }
 
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { useState } from "react";
-import InvoicePDF from "./InvoicePDF";
-import InvoiceViewDialog from "./InvoiceViewDialog";
-
-export default function BillingHistoryTable({
+export default function CandidateBillingHistoryTable({
   invoices,
-}: BillingHistoryTableProps) {
+}: CandidateBillingHistoryTableProps) {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
 
@@ -101,27 +98,17 @@ export default function BillingHistoryTable({
                       <Eye className="h-4 w-4" />
                       View
                     </Button>
-
-                    <PDFDownloadLink
-                      document={<InvoicePDF invoice={invoice} />}
-                      fileName={`Invoice-${invoice.number}.pdf`}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        alert("Invoice download initiated.");
+                      }}
+                      className="text-primary hover:text-primary-foreground hover:bg-primary shadow-primary/10 h-9 gap-2 rounded-xl px-3 font-bold transition-all hover:shadow-lg"
                     >
-                      {({ loading }) => (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={loading}
-                          className="text-primary hover:text-primary-foreground hover:bg-primary shadow-primary/10 h-9 gap-2 rounded-xl px-3 font-bold transition-all hover:shadow-lg"
-                        >
-                          {loading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Download className="h-4 w-4" />
-                          )}
-                          Download
-                        </Button>
-                      )}
-                    </PDFDownloadLink>
+                      <Download className="h-4 w-4" />
+                      Download
+                    </Button>
                   </div>
                 </td>
               </tr>
