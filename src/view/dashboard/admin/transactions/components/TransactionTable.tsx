@@ -119,8 +119,9 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="text-base font-bold">
-                    {tx.currency} {tx.amount.toFixed(2)}
+                  <div className="text-foreground text-base font-bold">
+                    {tx.currency === "BDT" || tx.currency === "৳" ? "৳" : "$"}
+                    {tx.amount.toLocaleString("en-BD")}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -172,7 +173,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-primary cursor-pointer rounded-lg py-2 font-bold">
                           <ExternalLink className="mr-2 h-4 w-4" />
-                          View Stripe
+                          View SSLCommerz
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="my-1 border-dashed" />
                         <DropdownMenuItem className="cursor-pointer rounded-lg py-2 font-bold">

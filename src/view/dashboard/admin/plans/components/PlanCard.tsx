@@ -115,7 +115,12 @@ export function PlanCard({ plan, onEdit, onToggleStatus }: PlanCardProps) {
       <CardContent className="flex-1 space-y-7 pb-6">
         <div className="flex items-baseline gap-1">
           <span className="text-4xl font-bold tracking-tight">
-            ${plan.price}
+            {plan.currency === "BDT" || plan.currency === "৳"
+              ? "৳"
+              : plan.currency === "USD"
+                ? "$"
+                : ""}
+            {plan.price.toLocaleString("en-US")}
           </span>
           <span className="text-muted-foreground text-xs font-bold tracking-widest uppercase opacity-40">
             /{plan.interval}
