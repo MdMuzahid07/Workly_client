@@ -3,6 +3,10 @@ import dynamic from "next/dynamic";
 import LandingFeatures from "../../components/landing/LandingFeatures";
 import LandingHero from "../../components/landing/LandingHero";
 import LandingStatus from "../../components/landing/LandingStatus";
+import LandingJobCategories from "../../components/landing/LandingJobCategories";
+import LandingFeaturedJobs from "../../components/landing/LandingFeaturedJobs";
+import LandingHowItWorks from "../../components/landing/LandingHowItWorks";
+import LandingFeaturedCompanies from "../../components/landing/LandingFeaturedCompanies";
 import GlobeSkeleton from "../../skeleton/landing/GlobeSkeleton";
 
 const World = dynamic(
@@ -18,7 +22,11 @@ const LandingView = () => {
   return (
     <div className="overflow-hidden">
       <LandingHero World={World} />
+      <LandingFeaturedCompanies />
+      <LandingJobCategories />
+      <LandingFeaturedJobs />
       <LandingFeatures />
+      <LandingHowItWorks />
       <LandingStatus />
     </div>
   );

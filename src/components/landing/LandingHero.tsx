@@ -3,7 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { GlobeConfig } from "@/components/ui/globe";
-import { Briefcase, Building2, Compass, TrendingUp, Users } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  Compass,
+  TrendingUp,
+  Users,
+  Search,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
 import { motion } from "motion/react";
 import type { ComponentType } from "react";
 import { Suspense } from "react";
@@ -137,11 +146,68 @@ const LandingHero = ({ World }: LandingHeroProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-muted-foreground mb-10 max-w-xl text-base leading-relaxed sm:text-lg"
+              className="text-muted-foreground mb-8 max-w-xl text-base leading-relaxed sm:text-lg"
             >
               Connect with top companies worldwide. Access thousands of job
               opportunities tailored to your skills and ambitions.
             </motion.p>
+
+            {/* Interactive Job Search & Filter Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="mb-10 max-w-2xl"
+            >
+              <div className="bg-card/85 border-border/60 shadow-primary/5 hover:border-primary/30 flex flex-col gap-2 rounded-2xl border p-2 shadow-2xl backdrop-blur-xl transition-all sm:flex-row sm:items-center sm:gap-0">
+                {/* Keyword Search */}
+                <div className="relative flex-1">
+                  <Search className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Job title, keywords..."
+                    className="placeholder:text-muted-foreground text-foreground h-12 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
+                  />
+                </div>
+
+                {/* Divider */}
+                <div className="bg-border/60 hidden h-8 w-px sm:block" />
+
+                {/* Location Search */}
+                <div className="relative flex-1">
+                  <MapPin className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Location or Remote..."
+                    className="placeholder:text-muted-foreground text-foreground h-12 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
+                  />
+                </div>
+
+                {/* Action CTA */}
+                <button className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl sm:w-auto">
+                  <Search className="h-4 w-4" />
+                  <span>Search Jobs</span>
+                </button>
+              </div>
+
+              {/* Trending Keywords */}
+              <div className="mt-4 flex flex-wrap items-center gap-2 px-1">
+                <span className="text-muted-foreground flex items-center gap-1 text-xs font-semibold">
+                  <Sparkles className="text-primary h-3 w-3" />
+                  Trending:
+                </span>
+                {["React", "UI/UX", "Python", "Remote", "DevOps"].map(
+                  (keyword, i) => (
+                    <button
+                      key={i}
+                      className="bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground hover:border-primary/20 rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium transition-all"
+                    >
+                      {keyword}
+                    </button>
+                  ),
+                )}
+              </div>
+            </motion.div>
 
             {/* Stats Grid */}
             <motion.div
