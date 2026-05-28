@@ -38,6 +38,7 @@ export type AdminJobListArgs = {
   limit?: number;
   q?: string;
   type?: string | null;
+  status?: "ACTIVE" | "DRAFT" | "CLOSED" | "EXPIRED" | null;
 };
 
 const adminApi = baseApi.injectEndpoints({
@@ -157,6 +158,7 @@ const adminApi = baseApi.injectEndpoints({
           limit: args.limit ?? 20,
           q: args.q || undefined,
           type: args.type || undefined,
+          status: args.status || undefined,
         },
       }),
       providesTags: ["jobs"],
@@ -255,7 +257,14 @@ const adminApi = baseApi.injectEndpoints({
         url: `/admin/jobs/${jobId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["admin"],
+      invalidatesTags: ["admin", "jobs"],
+    }),
+    approveJobAdmin: builder.mutation<Envelope<unknown>, string>({
+      query: (jobId) => ({
+        url: `/admin/jobs/${jobId}/approve`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["admin", "jobs"],
     }),
     getSystemSettings: builder.query<Envelope<any>, void>({
       query: () => ({ url: "/admin/settings", method: "GET" }),
@@ -299,6 +308,7 @@ export const {
   useUpdateJobReportStatusMutation,
   useDeactivateJobMutation,
   useDeleteJobListingMutation,
+  useApproveJobAdminMutation,
   useGetSystemSettingsQuery,
   useUpdateSystemSettingsMutation,
 } = adminApi;

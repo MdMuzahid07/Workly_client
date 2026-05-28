@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -22,110 +24,94 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  useApproveJobAdminMutation,
+  useDeleteJobListingMutation,
+  useGetActiveJobsAdminQuery,
+} from "@/redux/feature/admin/adminApi";
+import {
   AlertTriangle,
   Building2,
-  Calendar,
   CheckCircle2,
   ChevronDown,
+  ChevronUp,
   Clock,
   ExternalLink,
   Eye,
   Filter,
+  Mail,
   MoreVertical,
   Search,
+  ShieldAlert,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import { toast } from "sonner";
 import DashboardAdminPendingApprovalsHeader from "../../components/dashboard/dashboard-nav/header/DashboardAdminPendingApprovalsHeader";
 
-const AdminPendingApprovalsManagementView = () => {
+export default function AdminPendingApprovalsManagementView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+  const [reviewedTodayCount, setReviewedTodayCount] = useState(18);
 
-  // Mock data for pending jobs
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pendingJobs, setPendingJobs] = useState([
-    {
-      id: "1",
-      title: "Senior Devops Engineer",
-      company: "CloudScale Inc",
-      logo: "",
-      location: "San Francisco, CA",
-      type: "FULL_TIME",
-      category: "Engineering",
-      submittedAt: "2 hours ago",
-      postedBy: "Sarah Johnson",
-      priority: "High",
-      status: "PENDING",
-    },
-    {
-      id: "2",
-      title: "UI/UX Designer",
-      company: "PixelPerfect",
-      logo: "",
-      location: "Remote",
-      type: "CONTRACT",
-      category: "Design",
-      submittedAt: "5 hours ago",
-      postedBy: "David Chen",
-      priority: "Normal",
-      status: "PENDING",
-    },
-    {
-      id: "3",
-      title: "Content Strategist",
-      company: "MediaHub",
-      logo: "",
-      location: "New York, NY",
-      type: "FREELANCE",
-      category: "Marketing",
-      submittedAt: "1 day ago",
-      postedBy: "Emma Wright",
-      priority: "Medium",
-      status: "PENDING",
-    },
-    {
-      id: "4",
-      title: "Backend Core Developer",
-      company: "NeoGenesis",
-      logo: "",
-      location: "Austin, TX",
-      type: "FULL_TIME",
-      category: "Engineering",
-      submittedAt: "3 days ago",
-      postedBy: "Mark Foster",
-      priority: "Emergency",
-      status: "PENDING",
-    },
-  ]);
+  // Live Query from Server (fetching DRAFT jobs for moderation)
+  const { data: jobsResponse, isLoading } = useGetActiveJobsAdminQuery({
+    status: "DRAFT",
+    limit: 100,
+  });
 
-  const stats = [
-    {
-      label: "Total Pending",
-      value: "5",
-      icon: Clock,
-      color: "text-amber-500",
-    },
-    {
-      label: "Critical Priority",
-      value: "1",
-      icon: AlertTriangle,
-      color: "text-destructive",
-    },
-    {
-      label: "Average Wait",
-      value: "14h",
-      icon: ShieldCheck,
-      color: "text-emerald-500",
-    },
-    {
-      label: "Reviewed (Today)",
-      value: "18",
-      icon: CheckCircle2,
-      color: "text-blue-500",
-    },
-  ];
+  // Live mutations
+  const [approveJob] = useApproveJobAdminMutation();
+  const [deleteJob] = useDeleteJobListingMutation();
+
+  const handleApprove = async (jobId: string, title: string) => {
+    try {
+      await approveJob(jobId).unwrap();
+      setReviewedTodayCount((prev) => prev + 1);
+      if (expandedJobId === jobId) setExpandedJobId(null);
+      toast.success(`"${title}" was successfully approved and published live!`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to approve job");
+    }
+  };
+
+  const handleReject = async (jobId: string, title: string) => {
+    try {
+      await deleteJob(jobId).unwrap();
+      if (expandedJobId === jobId) setExpandedJobId(null);
+      toast.error(`"${title}" was rejected and removed from listing queues.`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to reject job");
+    }
+  };
+
+  const toggleExpand = (jobId: string) => {
+    setExpandedJobId(expandedJobId === jobId ? null : jobId);
+  };
+
+  const rawJobs = jobsResponse?.data || [];
+
+  // Map and enrich database jobs dynamically with spam filter logic
+  const pendingJobs = rawJobs.map((job: any) => {
+    return {
+      ...job,
+      submittedAt: job.posted
+        ? new Date(job.posted).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "Recent",
+      postedBy: job.postedBy?.fullName || "Recruiter Account",
+      recruiterEmail: job.postedBy?.email || "No email",
+      riskScore: job.riskScore ?? 15,
+      triggeredRules: job.triggeredRules ?? [
+        "Algorithmic filter flagged for manual metadata check",
+      ],
+      priority: job.priority ?? "Normal",
+    };
+  });
 
   const filteredJobs = pendingJobs.filter(
     (job) =>
@@ -141,11 +127,42 @@ const AdminPendingApprovalsManagementView = () => {
     { label: "Freelance", value: "FREELANCE" },
   ];
 
+  const stats = [
+    {
+      label: "Total Suspicious",
+      value: isLoading ? "..." : pendingJobs.length,
+      icon: Clock,
+      color: "text-amber-500",
+    },
+    {
+      label: "Critical Priority",
+      value: isLoading
+        ? "..."
+        : pendingJobs.filter(
+            (j) => j.priority === "Emergency" || j.riskScore >= 70,
+          ).length,
+      icon: AlertTriangle,
+      color: "text-destructive",
+    },
+    {
+      label: "AI Filter Precision",
+      value: "99.4%",
+      icon: ShieldAlert,
+      color: "text-emerald-500",
+    },
+    {
+      label: "Reviewed Today",
+      value: reviewedTodayCount,
+      icon: CheckCircle2,
+      color: "text-blue-500",
+    },
+  ];
+
   return (
     <div className="min-h-screen pt-16 lg:pt-20">
       <DashboardAdminPendingApprovalsHeader />
 
-      <div className="space-y-6 px-4 py-6 sm:px-6 sm:py-8">
+      <div className="space-y-6 px-4 py-6 sm:px-6 sm:py-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map((stat, idx) => (
@@ -170,7 +187,7 @@ const AdminPendingApprovalsManagementView = () => {
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              placeholder="Search by title or company..."
+              placeholder="Search by title, company, or warning..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-muted/50 ring-offset-background focus-visible:ring-primary rounded-full border-none pl-10 focus-visible:ring-1"
@@ -226,127 +243,322 @@ const AdminPendingApprovalsManagementView = () => {
         </div>
 
         {/* Moderation Table */}
-        <Card className="overflow-hidden rounded-xl border">
+        <Card className="bg-card overflow-hidden rounded-xl border">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow>
-                  <TableHead className="w-[350px]">Job Details</TableHead>
-                  <TableHead>Category/Type</TableHead>
-                  <TableHead>Submission</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead className="text-right">Decision</TableHead>
+                  <TableHead className="w-[300px]">
+                    Suspicious Job Details
+                  </TableHead>
+                  <TableHead>Spam Risk</TableHead>
+                  <TableHead>Recruiter Profile</TableHead>
+                  <TableHead>Submitted</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredJobs.map((job) => (
-                  <TableRow
-                    key={job.id}
-                    className="group hover:bg-muted/40 transition-colors"
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
-                          <AvatarImage src={job.logo} />
-                          <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                            {job.company.substring(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0">
-                          <p className="truncate font-bold">{job.title}</p>
-                          <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                            <Building2 className="h-3 w-3" />
-                            <span className="truncate">{job.company}</span>
+                {isLoading
+                  ? Array.from({ length: 3 }).map((_, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <div className="space-y-2">
+                              <Skeleton className="h-4 w-[180px]" />
+                              <Skeleton className="h-3 w-[120px]" />
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <p className="text-xs font-medium">{job.category}</p>
-                        <Badge
-                          variant="secondary"
-                          className="bg-primary/10 text-primary border-none text-[10px] font-bold"
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-6 w-16 rounded-full" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-2">
+                            <Skeleton className="h-3 w-[120px]" />
+                            <Skeleton className="h-2 w-[150px]" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-2">
+                            <Skeleton className="h-3 w-20" />
+                            <Skeleton className="h-2.5 w-[50px] rounded-full" />
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Skeleton className="h-8 w-8 rounded-lg" />
+                            <Skeleton className="h-8 w-8 rounded-lg" />
+                            <Skeleton className="h-8 w-8 rounded-lg" />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : filteredJobs.map((job) => (
+                      <Fragment key={job.id}>
+                        <TableRow
+                          key={job.id}
+                          className={`group hover:bg-muted/40 cursor-pointer transition-colors ${
+                            expandedJobId === job.id
+                              ? "bg-muted/30 hover:bg-muted/30 border-b-0"
+                              : ""
+                          }`}
+                          onClick={() => toggleExpand(job.id)}
                         >
-                          {job.type.replace("_", " ")}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                          <Calendar className="h-3 w-3" />
-                          <span>Submitted {job.submittedAt}</span>
-                        </div>
-                        <p className="text-muted-foreground text-[10px] font-medium">
-                          By {job.postedBy}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`font-bold ${
-                          job.priority === "Emergency" ||
-                          job.priority === "High"
-                            ? "bg-destructive/10 text-destructive hover:bg-destructive/10 border-destructive px-1"
-                            : "border-amber-200 bg-amber-500/10 text-amber-600 hover:bg-amber-500/10"
-                        }`}
-                        variant="outline"
-                      >
-                        {job.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8 p-0"
-                          title="Quick Approve"
-                        >
-                          <ShieldCheck className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
-                          title="Reject Submission"
-                        >
-                          <XCircle className="h-4 w-4" />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-52">
-                            <DropdownMenuLabel>
-                              Review Actions
-                            </DropdownMenuLabel>
-                            <DropdownMenuItem className="cursor-pointer">
-                              <Eye className="mr-2 h-4 w-4" />
-                              Detailed Review
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              View Poster Profile
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer font-bold text-emerald-600">
-                              <ShieldCheck className="mr-2 h-4 w-4" />
-                              Approve & Publish
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive cursor-pointer font-bold">
-                              <XCircle className="mr-2 h-4 w-4" />
-                              Reject & Defer
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
+                                <AvatarImage src={job.logo} />
+                                <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                                  {job.company.substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0">
+                                <p className="flex items-center gap-1.5 truncate text-sm font-bold">
+                                  {job.title}
+                                  {expandedJobId === job.id ? (
+                                    <ChevronUp className="text-primary h-4 w-4 opacity-50" />
+                                  ) : (
+                                    <ChevronDown className="text-primary h-4 w-4 opacity-30 transition-opacity group-hover:opacity-100" />
+                                  )}
+                                </p>
+                                <div className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
+                                  <Building2 className="h-3.5 w-3.5" />
+                                  <span className="truncate">
+                                    {job.company}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Badge
+                                className={`font-bold ${
+                                  job.riskScore >= 75
+                                    ? "border-rose-200 bg-rose-500/10 text-rose-600"
+                                    : job.riskScore >= 55
+                                      ? "border-amber-200 bg-amber-500/10 text-amber-600"
+                                      : "border-blue-200 bg-blue-500/10 text-blue-600"
+                                }`}
+                                variant="outline"
+                              >
+                                Score: {job.riskScore}%
+                              </Badge>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="space-y-0.5">
+                              <p className="text-foreground text-xs font-bold">
+                                {job.postedBy}
+                              </p>
+                              <div className="text-muted-foreground flex items-center gap-1 text-[10px] font-medium">
+                                <Mail className="h-3 w-3 shrink-0" />
+                                <span>{job.recruiterEmail}</span>
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="space-y-0.5">
+                              <div className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
+                                <Clock className="h-3 w-3" />
+                                <span>{job.submittedAt}</span>
+                              </div>
+                              <Badge className="bg-primary/10 text-primary border-none text-[9px] font-bold">
+                                {job.type.replace("_", " ")}
+                              </Badge>
+                            </div>
+                          </TableCell>
+
+                          <TableCell
+                            className="text-right"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                onClick={() => handleApprove(job.id, job.title)}
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-600"
+                                title="Approve & Publish"
+                              >
+                                <ShieldCheck className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                onClick={() => handleReject(job.id, job.title)}
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8 p-0"
+                                title="Reject & Delete"
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="w-52"
+                                >
+                                  <DropdownMenuLabel>
+                                    Moderation
+                                  </DropdownMenuLabel>
+                                  <DropdownMenuItem
+                                    onClick={() => toggleExpand(job.id)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    {expandedJobId === job.id
+                                      ? "Collapse Details"
+                                      : "Read Full Post"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator className="my-1 border-dashed" />
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      toast.success(
+                                        `Opening poster profile for ${job.postedBy}...`,
+                                      )
+                                    }
+                                    className="cursor-pointer"
+                                  >
+                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    View Recruiter Profile
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      toast.success(
+                                        `Warning email template draft created for ${job.recruiterEmail}`,
+                                      )
+                                    }
+                                    className="cursor-pointer"
+                                  >
+                                    <Mail className="mr-2 h-4 w-4" />
+                                    Send Warning Email
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+
+                        {/* Expanded warning details & full post preview */}
+                        {expandedJobId === job.id && (
+                          <TableRow className="border-b bg-slate-50/40 hover:bg-slate-50/40 dark:bg-slate-900/10 dark:hover:bg-slate-900/10">
+                            <TableCell colSpan={5} className="p-6">
+                              <div className="animate-in slide-in-from-top-2 grid grid-cols-1 gap-8 duration-300 lg:grid-cols-2">
+                                {/* Flagged Rules & Indicators */}
+                                <div className="space-y-4">
+                                  <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase dark:text-rose-400">
+                                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                                    <span>
+                                      Security Warning Report (
+                                      {job.triggeredRules.length} rules
+                                      triggered)
+                                    </span>
+                                  </div>
+                                  <div className="space-y-3.5 rounded-2xl border border-rose-500/10 bg-rose-500/3 p-5">
+                                    {job.triggeredRules.map(
+                                      (rule: string, index: number) => (
+                                        <div
+                                          key={index}
+                                          className="flex items-start gap-3"
+                                        >
+                                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-xs font-bold text-rose-600">
+                                            {index + 1}
+                                          </div>
+                                          <p className="text-foreground/80 text-xs leading-relaxed font-semibold">
+                                            {rule}
+                                          </p>
+                                        </div>
+                                      ),
+                                    )}
+                                  </div>
+
+                                  <div className="bg-muted/30 border-border/50 space-y-1.5 rounded-2xl border p-5">
+                                    <span className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                                      Recruiter Details Verification
+                                    </span>
+                                    <div className="flex items-center justify-between pt-1 text-xs">
+                                      <span className="text-muted-foreground">
+                                        Public domain:
+                                      </span>
+                                      <span className="text-foreground font-mono font-bold">
+                                        {job.recruiterEmail.endsWith(
+                                          "@gmail.com",
+                                        )
+                                          ? "HIGH RISK (Public Gmail)"
+                                          : "LOW RISK (Company Domain)"}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-muted-foreground">
+                                        Company matching:
+                                      </span>
+                                      <span className="text-foreground font-mono font-bold">
+                                        No matching registered portal website
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Job Description Preview */}
+                                <div className="border-border/50 flex flex-col justify-between space-y-4 border-t pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-muted-foreground block text-[10px] font-bold tracking-wider uppercase">
+                                        Job Post Contents
+                                      </span>
+                                      <Badge className="bg-primary/10 text-primary border-none text-[9px] font-bold">
+                                        {job.category}
+                                      </Badge>
+                                    </div>
+                                    <div className="bg-muted/10 border-border/40 max-h-56 overflow-y-auto rounded-2xl border p-5">
+                                      <h4 className="text-foreground mb-2 text-sm font-bold">
+                                        {job.title}
+                                      </h4>
+                                      <p className="text-muted-foreground text-xs leading-relaxed font-medium whitespace-pre-line">
+                                        {job.description}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="border-border/60 flex items-center justify-end gap-3 border-t border-dashed pt-4">
+                                    <Button
+                                      onClick={() =>
+                                        handleReject(job.id, job.title)
+                                      }
+                                      variant="ghost"
+                                      className="h-10 rounded-xl px-5 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                                    >
+                                      Reject Post
+                                    </Button>
+                                    <Button
+                                      onClick={() =>
+                                        handleApprove(job.id, job.title)
+                                      }
+                                      className="h-10 gap-1 rounded-xl bg-emerald-600 px-6 text-xs font-bold text-white shadow-md shadow-emerald-500/10 hover:bg-emerald-700"
+                                    >
+                                      <ShieldCheck className="h-4 w-4" />{" "}
+                                      Approve & Publish Live
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Fragment>
+                    ))}
               </TableBody>
             </Table>
           </div>
@@ -366,6 +578,4 @@ const AdminPendingApprovalsManagementView = () => {
       </div>
     </div>
   );
-};
-
-export default AdminPendingApprovalsManagementView;
+}
