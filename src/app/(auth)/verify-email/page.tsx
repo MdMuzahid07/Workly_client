@@ -5,10 +5,13 @@ import { motion } from "motion/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useVerifyEmailMutation } from "../../../redux/feature/auth/authApi";
-import { updateUser } from "../../../redux/feature/auth/authSlice";
+import {
+  setCredentials,
+  updateUser,
+} from "../../../redux/feature/auth/authSlice";
 import { useAppDispatch } from "../../../redux/hooks";
 
-type VerificationStatus = "loading" | "success" | "error";
+type VerificationStatus = "loading" | "success" | "error" | "pending";
 
 const VerifyEmailPage = () => {
   const router = useRouter();
@@ -19,12 +22,12 @@ const VerifyEmailPage = () => {
 
   const [status, setStatus] = useState<VerificationStatus>("loading");
   const [errorMessage, setErrorMessage] = useState("");
+  const [targetRedirect, setTargetRedirect] = useState("/login");
 
   useEffect(() => {
     const handleVerification = async () => {
       if (!token) {
-        setStatus("error");
-        setErrorMessage("Invalid verification link");
+        setStatus("pending");
         return;
       }
 
@@ -32,11 +35,38 @@ const VerifyEmailPage = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result: any = await verifyEmail({ token }).unwrap();
         const data = result.data;
-        console.log(data, "result");
-        if (result?.success) {
+
+        if (data?.accessToken && data?.user) {
+          localStorage.setItem("accessToken", data.accessToken);
+          dispatch(
+            setCredentials({
+              user: {
+                id: data.user.id,
+                email: data.user.email,
+                fullName: data.user.fullName,
+                isVerified: true,
+                role: data.user.role,
+                companyId: data.user.companyId,
+                isActive: true,
+              },
+              accessToken: data.accessToken,
+              refreshToken: null,
+            }),
+          );
+
+          const redirectUrl =
+            data.user.role === "EMPLOYER"
+              ? "/employer/company-profile"
+              : "/dashboard/profile";
+          setTargetRedirect(redirectUrl);
+
+          setTimeout(() => {
+            router.push(redirectUrl);
+          }, 3000);
+        } else {
           dispatch(
             updateUser({
-              isVerified: data.isVerified,
+              isVerified: true,
             }),
           );
         }
@@ -54,10 +84,10 @@ const VerifyEmailPage = () => {
     };
 
     handleVerification();
-  }, [token, verifyEmail, dispatch]);
+  }, [token, verifyEmail, dispatch, router]);
 
   const handleContinue = () => {
-    router.push("/login");
+    router.push(targetRedirect);
   };
 
   const handleSignUpAgain = () => {
@@ -82,6 +112,29 @@ const VerifyEmailPage = () => {
         </div>
       )}
 
+      {status === "pending" && (
+        <div className="space-y-6 text-center">
+          <div className="bg-primary/10 mx-auto flex h-20 w-20 items-center justify-center rounded-full">
+            <CheckCircle className="text-primary h-12 w-12 animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Check Your Inbox!
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {`We've`} sent a verification link to your email address. Please
+              click the link in the email to verify and activate your account.
+            </p>
+          </div>
+          <Button
+            onClick={() => router.push("/login")}
+            className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-all duration-200"
+          >
+            Back to Sign In
+          </Button>
+        </div>
+      )}
+
       {status === "success" && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -102,15 +155,15 @@ const VerifyEmailPage = () => {
               Email Verified!
             </h1>
             <p className="text-muted-foreground text-sm">
-              Your email has been verified. You can now sign in to your account
-              and start exploring opportunities.
+              Your email has been successfully verified! You are now
+              automatically signed in. Redirecting you to update your profile...
             </p>
           </div>
           <Button
             onClick={handleContinue}
             className="bg-primary w-full cursor-pointer rounded-full py-3 font-semibold text-white shadow-sm transition-all duration-200"
           >
-            Continue to Sign In
+            Go to Profile Now
           </Button>
         </motion.div>
       )}
