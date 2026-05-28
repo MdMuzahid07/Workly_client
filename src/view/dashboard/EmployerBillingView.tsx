@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { MOCK_BILLING_SUMMARY, MOCK_INVOICES } from "@/constants/billing";
+import { MOCK_BILLING_SUMMARY } from "@/constants/billing";
 import { cn } from "@/lib/utils";
 import { Calendar, ShieldCheck, Sparkles } from "lucide-react";
 import { useState } from "react";
@@ -270,7 +270,7 @@ export default function EmployerBillingView() {
                 Billing History
               </h2>
             </div>
-            <BillingHistoryTable invoices={MOCK_INVOICES} />
+            <BillingHistoryTable />
           </section>
         </div>
       </div>

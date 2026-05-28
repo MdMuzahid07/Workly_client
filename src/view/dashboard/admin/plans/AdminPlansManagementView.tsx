@@ -6,11 +6,18 @@ import AdvancedPlanBuilderDialog from "@/components/dashboard/plans/AdvancedPlan
 import EditPlanDialog from "@/components/dashboard/plans/EditPlanDialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Cloud, Rocket, ShieldCheck } from "lucide-react";
+import { Cloud, Rocket, ShieldCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { CustomPlanBanner } from "./components/CustomPlanBanner";
 import { PlanCard } from "./components/PlanCard";
 import { PlanStatsGrid } from "./components/PlanStatsGrid";
+import {
+  useGetPlansQuery,
+  useCreatePlanMutation,
+  useUpdatePlanMutation,
+  useTogglePlanStatusMutation,
+} from "@/redux/feature/plan/planApi";
+import { toast } from "sonner";
 
 const AdminPlansManagementView = () => {
   const [activeTab, setActiveTab] = useState("employer");
@@ -20,189 +27,130 @@ const AdminPlansManagementView = () => {
   const [isAdvancedBuilderOpen, setIsAdvancedBuilderOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
 
-  // Mock data for employer plans
-  const [employerPlans, setEmployerPlans] = useState([
-    {
-      id: "emp_free",
-      name: "Free Package",
-      description:
-        "Get started with professional local recruiting at zero cost.",
-      price: 0,
-      currency: "BDT",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 1,
-      maxUsers: 1,
-      subscriberCount: 842,
-      color: "bg-slate-500",
-      icon: Cloud,
-      features: [
-        "1 Active Job Listing",
-        "Basic Recruiting Tools",
-        "Standard Resume Search",
-        "Email Support",
-      ],
-    },
-    {
-      id: "emp_starter",
-      name: "Starter Package",
-      description:
-        "Best for growing teams and focused local recruiting campaigns.",
-      price: 4999,
-      currency: "BDT",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 5,
-      maxUsers: 2,
-      subscriberCount: 382,
-      color: "bg-primary",
-      icon: Rocket,
-      featured: true,
-      features: [
-        "5 Active Job Listings",
-        "Priority Support",
-        "Instant Candidate Alerts",
-        "Advanced Applicant Filters",
-      ],
-    },
-    {
-      id: "emp_pro",
-      name: "Professional Package",
-      description: "The ultimate recruiting solution with high discount rates.",
-      price: 14999,
-      currency: "BDT",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 15,
-      maxUsers: 5,
-      subscriberCount: 154,
-      color: "bg-indigo-600",
-      icon: ShieldCheck,
-      features: [
-        "15 Active Job Listings",
-        "Featured Postings Badge",
-        "Full HR Pipeline Tool",
-        "1-on-1 Recruiting Counsel",
-      ],
-    },
-  ]);
+  // Dynamic API integration
+  const { data: plansRes, isLoading } = useGetPlansQuery({
+    type: activeTab as any,
+  });
+  const [createPlan] = useCreatePlanMutation();
+  const [updatePlan] = useUpdatePlanMutation();
+  const [togglePlanStatus] = useTogglePlanStatusMutation();
 
-  // Mock data for candidate plans
-  const [candidatePlans, setCandidatePlans] = useState([
-    {
-      id: "cand_free",
-      name: "Free Seeker",
-      description:
-        "Standard job search and profile builder for everyday candidates.",
-      price: 0,
-      currency: "BDT",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 40,
-      maxUsers: 1,
-      subscriberCount: 1420,
-      color: "bg-slate-400",
-      icon: Cloud,
-      features: [
-        "Up to 40 Job Applications/mo",
-        "Single Resume Upload",
-        "Standard Profile Search",
-        "In-App Notifications",
-      ],
-    },
-    {
-      id: "cand_pro",
-      name: "Pro Candidate",
-      description:
-        "Perfect for active job seekers looking for profile boosts and direct HR connections.",
-      price: 199,
-      currency: "BDT",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 120,
-      maxUsers: 5,
-      subscriberCount: 680,
-      color: "bg-primary",
-      icon: Rocket,
-      featured: true,
-      features: [
-        "Up to 120 Job Applications/mo",
-        "Multiple Resumes Uploads",
-        "Priority Profile Boost",
-        "Direct Messaging to HRs",
-        "Who Viewed My Profile Tracker",
-      ],
-    },
-    {
-      id: "cand_elite",
-      name: "Elite Seeker",
-      description:
-        "Complete career acceleration package including mock interviews and direct counseling.",
-      price: 499,
-      currency: "BDT",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 9999,
-      maxUsers: 9999,
-      subscriberCount: 290,
-      color: "bg-violet-600",
-      icon: ShieldCheck,
-      features: [
-        "Unlimited Job Applications",
-        "Unlimited Resume Uploads",
-        "5x Profile Featured Boost",
-        "1-on-1 Monthly Counseling",
-        "1 Mock Interview prep/mo",
-      ],
-    },
-  ]);
+  const plans = plansRes?.data || [];
 
-  const handleToggleStatus = (id: string) => {
-    if (activeTab === "employer") {
-      setEmployerPlans(
-        employerPlans.map((p) =>
-          p.id === id ? { ...p, active: !p.active } : p,
-        ),
-      );
-    } else {
-      setCandidatePlans(
-        candidatePlans.map((p) =>
-          p.id === id ? { ...p, active: !p.active } : p,
-        ),
-      );
+  const handleToggleStatus = async (id: string) => {
+    try {
+      await togglePlanStatus(id).unwrap();
+      toast.success("Plan status toggled successfully!");
+    } catch (err) {
+      console.error("Failed to toggle status:", err);
+      toast.error("Failed to toggle plan status. Please try again.");
     }
   };
 
-  const handleEditPlan = (updatedPlan: any) => {
-    if (activeTab === "employer") {
-      setEmployerPlans(
-        employerPlans.map((p) =>
-          p.id === updatedPlan.id
-            ? { ...updatedPlan, price: parseFloat(updatedPlan.price) }
-            : p,
-        ),
-      );
-    } else {
-      setCandidatePlans(
-        candidatePlans.map((p) =>
-          p.id === updatedPlan.id
-            ? { ...updatedPlan, price: parseFloat(updatedPlan.price) }
-            : p,
-        ),
-      );
+  const handleEditPlan = async (updatedPlan: any) => {
+    try {
+      const original = plans.find((p: any) => p.id === updatedPlan.id);
+      await updatePlan({
+        id: updatedPlan.id,
+        name: original?.name || updatedPlan.name,
+        price: parseFloat(updatedPlan.price),
+        description: updatedPlan.description,
+        features: updatedPlan.features,
+      }).unwrap();
+      toast.success("Plan updated successfully!");
+    } catch (err) {
+      console.error("Failed to edit plan:", err);
+      toast.error("Failed to edit plan features. Please try again.");
     }
   };
 
-  const handleCreatePlan = (newPlan: any) => {
-    if (activeTab === "employer") {
-      setEmployerPlans([...employerPlans, newPlan]);
-    } else {
-      setCandidatePlans([...candidatePlans, newPlan]);
+  const handleCreatePlan = async (newPlan: any) => {
+    try {
+      const prefix = activeTab === "employer" ? "emp_" : "cand_";
+      const cleanName =
+        prefix + newPlan.name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
+      await createPlan({
+        name: cleanName,
+        price: parseFloat(newPlan.price),
+        description: newPlan.description,
+        features: newPlan.features,
+        maxActiveJobs: newPlan.maxActiveJobs,
+        maxUsers: newPlan.maxUsers,
+        interval: "month",
+        isActive: true,
+      }).unwrap();
+      toast.success("Custom plan deployed successfully!");
+    } catch (err) {
+      console.error("Failed to create plan:", err);
+      toast.error("Failed to deploy new custom plan. Please try again.");
     }
   };
 
-  const activePlansList =
-    activeTab === "employer" ? employerPlans : candidatePlans;
+  const mapPlanForCard = (p: any) => {
+    const nameLower = p.name.toLowerCase();
+    let icon = Cloud;
+    let color = "bg-slate-500";
+    let featured = false;
+
+    if (nameLower.includes("starter")) {
+      icon = Rocket;
+      color = "bg-primary";
+      featured = true;
+    } else if (nameLower.includes("pro")) {
+      icon = ShieldCheck;
+      color = "bg-indigo-600";
+      featured = true;
+    } else if (
+      nameLower.includes("elite") ||
+      nameLower.includes("enterprise")
+    ) {
+      icon = ShieldCheck;
+      color = "bg-violet-600";
+    }
+
+    let parsedFeatures: string[] = [];
+    if (Array.isArray(p.features)) {
+      parsedFeatures = p.features;
+    } else if (typeof p.features === "string") {
+      try {
+        parsedFeatures = JSON.parse(p.features);
+      } catch {
+        parsedFeatures = [];
+      }
+    }
+
+    const readableName = p.name
+      .replace("emp_", "")
+      .replace("cand_", "")
+      .split("_")
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+    return {
+      id: p.id,
+      dbName: p.name,
+      name: readableName,
+      description: p.description || "",
+      price: p.price,
+      currency: p.currency || "BDT",
+      interval: p.interval || "month",
+      active: p.isActive,
+      maxActiveJobs: p.maxActiveJobs,
+      maxUsers: p.maxUsers,
+      subscriberCount: p.name.includes("free")
+        ? 842
+        : p.name.includes("starter")
+          ? 382
+          : 154,
+      color,
+      icon,
+      featured,
+      features: parsedFeatures,
+    };
+  };
+
+  const activePlansList = plans.map(mapPlanForCard);
 
   return (
     <div className="min-h-screen min-w-0 pt-16 lg:pt-20">
@@ -243,19 +191,25 @@ const AdminPlansManagementView = () => {
         </div>
 
         {/* Plans Management Grid */}
-        <div className="grid min-w-0 grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {activePlansList.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              onEdit={(p) => {
-                setSelectedPlan(p);
-                setIsEditPlanOpen(true);
-              }}
-              onToggleStatus={handleToggleStatus}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex h-60 items-center justify-center">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid min-w-0 grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {activePlansList.map((plan: any) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                onEdit={(p) => {
+                  setSelectedPlan(p);
+                  setIsEditPlanOpen(true);
+                }}
+                onToggleStatus={handleToggleStatus}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Action Banner */}
         <CustomPlanBanner onClick={() => setIsAdvancedBuilderOpen(true)} />

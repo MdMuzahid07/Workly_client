@@ -24,6 +24,7 @@ import {
   Briefcase,
   Building2,
   Clock,
+  Crown,
   Eye,
   FileText,
   LogOut,
@@ -201,9 +202,17 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="text-foreground truncate text-sm font-semibold">
-              {profileData?.data?.fullName || user?.fullName || "User"}
-            </p>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="text-foreground truncate text-sm font-semibold">
+                {profileData?.data?.fullName || user?.fullName || "User"}
+              </p>
+              {(profileData?.data?.isPremium || (user as any)?.isPremium) && (
+                <span className="inline-flex shrink-0 animate-pulse items-center gap-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-amber-500 uppercase shadow-xs">
+                  <Crown className="h-2.5 w-2.5 fill-amber-500" />
+                  Pro
+                </span>
+              )}
+            </div>
             <div className="mt-1.5 flex items-center gap-2">
               <Progress value={profileCompletion} className="h-1.5 flex-1" />
               <span className="text-muted-foreground text-[10px] font-medium">
