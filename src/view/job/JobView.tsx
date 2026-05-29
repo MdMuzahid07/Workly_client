@@ -12,6 +12,7 @@ import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
+import FeaturedJobsSlider from "../../components/main/jobs/FeaturedJobsSlider";
 import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
 import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
@@ -134,6 +135,25 @@ const JobView = () => {
 
   const { data, isLoading, error } = useGetJobsQuery(params);
 
+  // Fetch premium/featured jobs for the slider
+  const { data: featuredData, isLoading: featuredLoading } = useGetJobsQuery({
+    limit: 10,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const featuredJobs = useMemo(() => {
+    if (!featuredData?.data) return [];
+    // Filter jobs that are marked as featured, premium, or high paying
+    const filtered = featuredData.data.filter(
+      (job: any) => job.isFeatured || job.isPremium || job.salaryMin > 100000,
+    );
+    // If we have featured jobs, return them, otherwise fallback to latest jobs as featured slots
+    return filtered.length > 0
+      ? filtered.slice(0, 6)
+      : featuredData.data.slice(0, 6);
+  }, [featuredData]);
+
   useEffect(() => {
     if (data?.data) {
       if (currentPage === 1) {
@@ -216,6 +236,9 @@ const JobView = () => {
             isLoading={categoriesLoading}
           />
         </div>
+
+        {/* Featured Elite Opportunities Slider Component */}
+        <FeaturedJobsSlider jobs={featuredJobs} isLoading={featuredLoading} />
 
         <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
           <h2 className="text-foreground text-xl font-bold tracking-tight uppercase">
