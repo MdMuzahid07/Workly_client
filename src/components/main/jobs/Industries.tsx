@@ -58,6 +58,31 @@ const Industries = ({
 
   return (
     <div className="mx-auto mt-4 max-w-7xl md:mt-7 xl:p-0">
+      {/* Premium Category Header with Navigation Controls */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-foreground text-sm font-bold tracking-wider uppercase">
+            Popular Industries
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="icon"
+            className="swiper-button-prev-2 border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="swiper-button-next-2 border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
       <Swiper
         modules={[Navigation, Autoplay]}
         spaceBetween={12}
@@ -93,25 +118,6 @@ const Industries = ({
           );
         })}
       </Swiper>
-
-      <div className="mt-4 flex items-center justify-between sm:mt-6">
-        <Button
-          variant="outline"
-          size="sm"
-          className="swiper-button-prev-2 border-border/40 hover:bg-primary/5 hover:text-primary h-9 cursor-pointer rounded-full px-4"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          <span className="hidden sm:inline">Previous</span>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="swiper-button-next-2 border-border/40 hover:bg-primary/5 hover:text-primary h-9 cursor-pointer rounded-full px-4"
-        >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight className="ml-1 h-4 w-4" />
-        </Button>
-      </div>
     </div>
   );
 };

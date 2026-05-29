@@ -7,12 +7,12 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import FeaturedJobsSlider from "../../components/main/jobs/FeaturedJobsSlider";
 import Industries from "../../components/main/jobs/Industries";
 import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
-import FeaturedJobsSlider from "../../components/main/jobs/FeaturedJobsSlider";
 import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
 import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
@@ -228,6 +228,8 @@ const JobView = () => {
       <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:-mt-10">
         <Searchbar onSearch={handleSearch} hidePadding />
 
+        {/* Featured Elite Opportunities Slider Component */}
+        <FeaturedJobsSlider jobs={featuredJobs} isLoading={featuredLoading} />
         <div className="mt-8">
           <Industries
             onCategorySelect={handleCategorySelect}
@@ -236,10 +238,6 @@ const JobView = () => {
             isLoading={categoriesLoading}
           />
         </div>
-
-        {/* Featured Elite Opportunities Slider Component */}
-        <FeaturedJobsSlider jobs={featuredJobs} isLoading={featuredLoading} />
-
         <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
           <h2 className="text-foreground text-xl font-bold tracking-tight uppercase">
             {data?.meta?.total || 0} JOBS FOUND

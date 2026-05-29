@@ -1,12 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, LayoutGrid, List } from "lucide-react";
+import {
+  ArrowUpRight,
+  BadgeCheck,
+  ChevronRight,
+  Crown,
+  LayoutGrid,
+  List,
+  MapPin,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import "swiper/css";
+import { Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import CompanyCard from "../../components/main/company/CompanyCard";
 import CompanyFilter from "../../components/main/company/CompanyFilter";
 import Searchbar from "../../components/main/jobs/Searchbar";
@@ -60,6 +72,19 @@ const CompanyView = ({
     // Skip fetching the first page if we already have initialCompanies from the server
     skip: currentPage === 1 && !!initialCompanies,
   });
+
+  // Fetch featured / verified companies
+  const { data: featuredData } = useGetCompaniesQuery({
+    isVerified: true,
+    limit: 6,
+  });
+
+  const featuredCompanies = useMemo(() => {
+    const list = featuredData?.data?.result || featuredData?.data || [];
+    if (list.length >= 2) return list;
+    // Fallback to first few from the general list
+    return allCompanies.slice(0, 6);
+  }, [featuredData, allCompanies]);
 
   useEffect(() => {
     if (data?.data && currentPage > 1) {
@@ -148,105 +173,237 @@ const CompanyView = ({
           }}
         />
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-6 md:flex-row">
-          <CompanyFilter
-            selectedFilter={currentIndustry}
-            onFilterChange={handleFilterChange}
-          />
-
-          <div className="flex items-center gap-1.5 self-center rounded-full border bg-gray-50 p-1 md:self-end dark:bg-slate-900">
-            <Button
-              variant={viewType === "list" ? "default" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-              onClick={() => setViewType("list")}
-            >
-              <List className="h-5 w-5" />
-            </Button>
-            <Button
-              variant={viewType === "grid" ? "default" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-              onClick={() => setViewType("grid")}
-            >
-              <LayoutGrid className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-
-        <main className="mt-12">
-          <div className="mb-8 flex items-end justify-between">
-            <div>
-              <h2 className="text-foreground text-2xl font-bold">
+        {/* Featured Partners Section */}
+        {featuredCompanies.length > 0 && (
+          <div className="mt-16">
+            <div className="mb-6 flex items-center gap-2">
+              <Crown className="text-primary h-5.5 w-5.5 shrink-0" />
+              <h2 className="text-foreground text-xl font-bold tracking-tight">
                 Featured Partners
+              </h2>
+            </div>
+
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={20}
+              slidesPerView={1}
+              loop={featuredCompanies.length > 2}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              breakpoints={{
+                768: { slidesPerView: 1.5 },
+                1024: { slidesPerView: 2 },
+              }}
+              className="w-full py-4"
+            >
+              {featuredCompanies.map((company: any, index: number) => {
+                const logoBgOptions = [
+                  "bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
+                  "bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400",
+                  "bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
+                  "bg-emerald-600/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
+                ];
+                const randomBg = logoBgOptions[index % logoBgOptions.length];
+                const initial = company.name
+                  ? company.name[0].toUpperCase()
+                  : "C";
+
+                return (
+                  <SwiperSlide key={company.id || index} className="h-auto">
+                    <div
+                      onClick={() => router.push(`/companies/${company.slug}`)}
+                      className="group hover:border-primary/50 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+                    >
+                      <div className="relative z-10 flex-1 space-y-4">
+                        {/* Header Row */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            {company.logoUrl ? (
+                              <div className="border-border/30 relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border bg-white p-1 shadow-sm dark:bg-slate-800">
+                                <Image
+                                  src={company.logoUrl}
+                                  alt={`${company.name} logo`}
+                                  fill
+                                  sizes="48px"
+                                  className="object-contain p-1"
+                                  loading="lazy"
+                                />
+                              </div>
+                            ) : (
+                              <div
+                                className={`ring-primary/5 border-background flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-lg font-black shadow-xs ring-2 transition-all duration-300 ${randomBg}`}
+                              >
+                                {initial}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold tracking-tight">
+                                {company.name}
+                                {company.isVerified && (
+                                  <BadgeCheck className="text-primary fill-primary/10 h-4 w-4 shrink-0" />
+                                )}
+                              </h4>
+                              <span className="text-primary mt-0.5 block text-[11px] font-bold">
+                                {company.industry?.name || "Verified Partner"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Top-Right Arrow Action */}
+                          <div className="text-muted-foreground/50 group-hover:text-primary p-1 transition-colors duration-300">
+                            <ArrowUpRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-muted-foreground/80 line-clamp-2 text-xs leading-relaxed">
+                          {company.description ||
+                            "Building powerful and innovative digital solutions."}
+                        </p>
+
+                        {/* Bullet Divided Metadata Row (LinkedIn/Google style - Extremely Clean) */}
+                        <div className="text-muted-foreground/90 border-border/40 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-4 text-xs font-semibold">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="text-primary/60 h-3.5 w-3.5" />
+                            {company.location || "Remote"}
+                          </span>
+                          <span className="text-muted-foreground/30">•</span>
+                          <span className="flex items-center gap-1">
+                            <Users className="text-primary/60 h-3.5 w-3.5" />
+                            {company.size || "11-50"} employees
+                          </span>
+                          <span className="text-muted-foreground/30">•</span>
+                          {company.openJobs > 0 ? (
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                              {company.openJobs} Openings
+                            </span>
+                          ) : company.openJobs === 0 ? (
+                            <span className="text-muted-foreground/60 font-semibold">
+                              No Openings
+                            </span>
+                          ) : (
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                              Hiring Actively
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </div>
+        )}
+
+        {/* All Companies Section */}
+        <div className="border-border/40 mt-16 border-t pt-16">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <h2 className="text-foreground text-2xl font-extrabold tracking-tight">
+                All Companies
               </h2>
               <p className="text-muted-foreground mt-1 text-sm font-medium">
                 Showing {allCompanies.length} of{" "}
                 {data?.meta?.total || allCompanies.length} companies
               </p>
             </div>
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <CompanyFilter
+                selectedFilter={currentIndustry}
+                onFilterChange={handleFilterChange}
+              />
+
+              <div className="flex items-center gap-1.5 self-start rounded-full border bg-gray-50 p-1 sm:self-auto dark:bg-slate-900">
+                <Button
+                  variant={viewType === "list" ? "default" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
+                  onClick={() => setViewType("list")}
+                >
+                  <List className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant={viewType === "grid" ? "default" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
+                  onClick={() => setViewType("grid")}
+                >
+                  <LayoutGrid className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <InfiniteScroll
-            dataLength={allCompanies.length}
-            next={loadMoreCompanies}
-            hasMore={hasMoreCompanies}
-            loader={
+          <main className="mt-10">
+            <InfiniteScroll
+              dataLength={allCompanies.length}
+              next={loadMoreCompanies}
+              hasMore={hasMoreCompanies}
+              loader={
+                <div
+                  className={
+                    viewType === "grid"
+                      ? "mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                      : "mt-6 flex flex-col gap-5"
+                  }
+                >
+                  {[...Array(3)].map((_, index) => (
+                    <CompanyCardSkeleton key={`loading-${index}`} />
+                  ))}
+                </div>
+              }
+              scrollThreshold={0.8}
+              style={{ overflow: "visible" }}
+            >
               <div
                 className={
                   viewType === "grid"
-                    ? "mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                    : "mt-6 flex flex-col gap-5"
+                    ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    : "flex flex-col gap-5"
                 }
               >
-                {[...Array(3)].map((_, index) => (
-                  <CompanyCardSkeleton key={`loading-${index}`} />
-                ))}
+                {allCompanies.length > 0 ? (
+                  allCompanies.map((company, index) => (
+                    <CompanyCard
+                      key={company.id || index}
+                      company={{
+                        ...company,
+                        logo: company.logoUrl || company.logo,
+                      }}
+                      viewType={viewType}
+                    />
+                  ))
+                ) : isLoading ? (
+                  [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
+                    <CompanyCardSkeleton key={index} />
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 text-center font-medium opacity-50">
+                    No companies found matching your criteria.
+                  </div>
+                )}
               </div>
-            }
-            scrollThreshold={0.8}
-            style={{ overflow: "visible" }}
-          >
-            <div
-              className={
-                viewType === "grid"
-                  ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                  : "flex flex-col gap-5"
-              }
-            >
-              {allCompanies.length > 0 ? (
-                allCompanies.map((company, index) => (
-                  <CompanyCard
-                    key={company.id || index}
-                    company={company}
-                    viewType={viewType}
-                  />
-                ))
-              ) : isLoading ? (
-                [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
-                  <CompanyCardSkeleton key={index} />
-                ))
-              ) : (
-                <div className="col-span-full py-20 text-center font-medium opacity-50">
-                  No companies found matching your criteria.
-                </div>
-              )}
-            </div>
-          </InfiniteScroll>
+            </InfiniteScroll>
 
-          {hasMoreCompanies && (
-            <div className="mt-16 border-t border-gray-50 pt-16 text-center dark:border-slate-800">
-              <Button
-                variant="default"
-                size="lg"
-                className="shadow-primary/20 transform rounded-full px-12 font-bold shadow-xl transition-all hover:scale-105"
-                onClick={loadMoreCompanies}
-              >
-                Load More Companies
-              </Button>
-            </div>
-          )}
-        </main>
+            {hasMoreCompanies && (
+              <div className="mt-16 border-t border-gray-50 pt-16 text-center dark:border-slate-800">
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="shadow-primary/20 transform rounded-full px-12 font-bold shadow-xl transition-all hover:scale-105"
+                  onClick={loadMoreCompanies}
+                >
+                  Load More Companies
+                </Button>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
