@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, LayoutGrid, List } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Industries from "../../components/main/jobs/Industries";
@@ -55,6 +56,47 @@ const JobView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allJobs, setAllJobs] = useState<any[]>([]);
   const [viewType, setViewType] = useState<"grid" | "list">("list");
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const search = searchParams.get("search") || "";
+    const location = searchParams.get("location") || "";
+    const category = searchParams.get("category") || "";
+    const industry = searchParams.get("industry") || "";
+
+    if (search || location || category || industry) {
+      setFilters((prev) => {
+        const updated = { ...prev };
+        if (search) updated.search = search;
+        if (location) updated.location = location;
+
+        if (category) {
+          const catId = Object.keys(CATEGORY_MAP).find(
+            (key) =>
+              CATEGORY_MAP[Number(key)].toLowerCase() ===
+              category.toLowerCase(),
+          );
+          if (catId) {
+            updated.categories = [Number(catId)];
+          }
+        }
+        if (industry) {
+          const catId = Object.keys(CATEGORY_MAP).find(
+            (key) =>
+              CATEGORY_MAP[Number(key)].toLowerCase() ===
+              industry.toLowerCase(),
+          );
+          if (catId) {
+            updated.categories = [Number(catId)];
+          }
+        }
+        return updated;
+      });
+      setCurrentPage(1);
+      setAllJobs([]);
+    }
+  }, [searchParams]);
 
   const { data: categories, isLoading: categoriesLoading } =
     useGetCategoriesQuery(undefined);

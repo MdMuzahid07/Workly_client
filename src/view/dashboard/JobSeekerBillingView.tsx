@@ -17,7 +17,7 @@ import {
   CANDIDATE_MOCK_INVOICES,
 } from "@/constants/billing";
 import { cn } from "@/lib/utils";
-import { Calendar, ShieldCheck, Sparkles } from "lucide-react";
+import { Calendar, Crown, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
 export default function JobSeekerBillingView() {
@@ -92,7 +92,7 @@ export default function JobSeekerBillingView() {
             <Card className="border-primary/10 from-card to-background overflow-hidden bg-linear-to-br lg:col-span-1">
               <CardHeader className="border-border/50 border-b pb-4">
                 <div className="text-primary flex items-center gap-2">
-                  <Sparkles className="h-5 w-5" />
+                  <Crown className="h-5 w-5" />
                   <CardTitle className="text-base font-bold">
                     Premium Subscription
                   </CardTitle>

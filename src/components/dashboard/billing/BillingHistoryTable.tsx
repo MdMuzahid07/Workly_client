@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useGetTransactionsQuery } from "@/redux/feature/payment/paymentApi";
-import { CreditCard, FileText, Loader2, Printer, Sparkles } from "lucide-react";
+import { CreditCard, FileText, Loader2, Printer } from "lucide-react";
 import { useState } from "react";
 
 export default function BillingHistoryTable() {
@@ -176,7 +176,7 @@ export default function BillingHistoryTable() {
             <div className="mb-6 flex items-start justify-between border-b pb-4">
               <div>
                 <h3 className="text-foreground flex items-center gap-2 text-lg font-bold tracking-tight">
-                  <Sparkles className="text-primary h-5 w-5" />
+                  <CreditCard className="text-primary h-5 w-5" />
                   Premium Invoice Receipt
                 </h3>
                 <p className="text-muted-foreground mt-0.5 font-mono text-xs">

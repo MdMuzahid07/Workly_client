@@ -35,7 +35,6 @@ import {
   Send,
   ShieldAlert,
   Smile,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
@@ -434,7 +433,7 @@ const MessageView = () => {
                 className="bg-primary text-primary-foreground h-14 rounded-2xl px-10 text-lg font-black shadow-xl transition-all hover:scale-105 active:scale-95"
               >
                 Upgrade to Premium
-                <Sparkles className="ml-2 h-5 w-5" />
+                <Crown className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"

@@ -18,7 +18,7 @@ import {
   useUpdateSystemSettingsMutation,
 } from "@/redux/feature/admin/adminApi";
 import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
-import { ArrowLeft, Camera, Globe, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, Briefcase, Camera, Globe, Mail } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -149,7 +149,7 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <Sparkles className="h-10 w-10 text-white" />
+                  <Briefcase className="h-10 w-10 text-white" />
                 )}
                 <div className="bg-primary/40 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100">
                   <Camera className="h-6 w-6 text-white" />

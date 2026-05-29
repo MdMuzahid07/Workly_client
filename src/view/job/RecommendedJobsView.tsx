@@ -21,9 +21,9 @@ import {
   ArrowRight,
   Briefcase,
   Crown,
+  Lightbulb,
   MapPin,
   Search,
-  Sparkles,
   Target,
   Zap,
 } from "lucide-react";
@@ -92,7 +92,7 @@ const RecommendedJobsView = () => {
                     desc: "Based on your exact skills",
                   },
                   {
-                    icon: Sparkles,
+                    icon: Lightbulb,
                     text: "Smart Insights",
                     desc: "Know why you're a fit",
                   },

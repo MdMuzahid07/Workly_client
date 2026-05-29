@@ -13,10 +13,10 @@ import {
 import {
   BellRing,
   ChevronRight,
+  Cpu,
   Globe,
   Lock,
   Monitor,
-  Sparkles,
   Trash2,
   User,
   Zap,
@@ -40,7 +40,7 @@ const platformControlsSeed: SettingItem[] = [
     id: "aiMatchmaking",
     label: "AI Matchmaking Engine",
     description: "Real-time candidate-to-job scoring using LLMs",
-    icon: <Sparkles className="h-5 w-5" />,
+    icon: <Cpu className="h-5 w-5" />,
     enabled: true,
   },
   {

@@ -1,18 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { motion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
-  Code2,
-  Palette,
-  Layers,
-  TrendingUp,
-  CircleDollarSign,
-  Headset,
   BarChart3,
   Briefcase,
+  CircleDollarSign,
+  Code2,
+  Compass,
+  Headset,
+  Layers,
+  Palette,
+  TrendingUp,
 } from "lucide-react";
+import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
+import getIconComponent from "../../helper/getIconComponent";
+import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 
 const categories = [
   {
@@ -82,6 +87,36 @@ const categories = [
 ];
 
 const LandingJobCategories = () => {
+  const router = useRouter();
+  const { data: categoriesData } = useGetCategoriesQuery(undefined);
+  const fetchedCategories = categoriesData?.data || [];
+
+  const displayCategories =
+    fetchedCategories?.length > 0
+      ? fetchedCategories.slice(0, 8).map((cat: any) => {
+          const { icon: IconComponent, color } = getIconComponent(cat.icon);
+          return {
+            icon: IconComponent,
+            title: cat.name,
+            count: cat.count
+              ? `${cat.count.split(" ")[0]} open positions`
+              : `${Math.floor(Math.random() * 50) + 10} open positions`,
+            color: color || "bg-emerald-500",
+            isReal: true,
+          };
+        })
+      : categories.map((cat) => ({
+          icon: cat.icon,
+          title: cat.title,
+          count: cat.count,
+          color: cat.color === "primary" ? "bg-primary" : "bg-accent",
+          isReal: false,
+        }));
+
+  const handleCategoryClick = (cat: any) => {
+    router.push(`/jobs?category=${encodeURIComponent(cat.title)}`);
+  };
+
   return (
     <section className="bg-background/95 relative overflow-hidden py-24 sm:py-32">
       {/* Interactive Background Atmosphere */}
@@ -101,6 +136,7 @@ const LandingJobCategories = () => {
             className="mb-4 inline-flex"
           >
             <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
+              <Compass className="h-4 w-4" />
               Explore by Industry
             </Badge>
           </motion.div>
@@ -132,7 +168,7 @@ const LandingJobCategories = () => {
 
         {/* Categories Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((cat, index) => (
+          {displayCategories.map((cat: any, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -145,21 +181,20 @@ const LandingJobCategories = () => {
               }}
             >
               <Card
-                className={`group border-border/40 bg-card/45 hover:border-primary/30 relative overflow-hidden p-6 backdrop-blur-md transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl`}
+                onClick={() => handleCategoryClick(cat)}
+                className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative cursor-pointer overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500 hover:shadow-lg"
               >
-                {/* Decorative Hover Radial Light */}
-                <div className="from-primary/10 pointer-events-none absolute -inset-px bg-linear-to-br to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                {/* Dynamic Gradient Overlay */}
+                <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                 <div className="relative z-10">
                   {/* Category Icon Container */}
-                  <div
-                    className={`bg-muted/65 group-hover:bg-primary mb-6 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500 group-hover:text-white`}
-                  >
-                    <cat.icon className="h-6 w-6 transition-transform duration-500 group-hover:scale-110" />
+                  <div className="bg-muted/65 group-hover:bg-primary mb-6 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500 group-hover:text-white">
+                    <cat.icon className="h-6 w-6 transition-transform duration-500" />
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-foreground group-hover:text-primary text-lg font-bold tracking-tight transition-colors duration-300">
+                  <h3 className="text-foreground group-hover:text-primary text-lg font-bold tracking-tight transition-all duration-500">
                     {cat.title}
                   </h3>
                   <p className="text-muted-foreground mt-2 text-sm">

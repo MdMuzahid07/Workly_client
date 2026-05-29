@@ -1,16 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
   ArrowUpRight,
+  Award,
+  BadgeCheck,
   Building2,
   Clock,
+  Crown,
   DollarSign,
   MapPin,
-  Sparkles,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
+import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
 
 const featuredJobs = [
   {
@@ -63,7 +68,85 @@ const featuredJobs = [
   },
 ];
 
+const formatJobType = (type: string) => {
+  if (!type) return "";
+  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 const LandingFeaturedJobs = () => {
+  const router = useRouter();
+  const { data: jobsData } = useGetJobsQuery({
+    limit: 6,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const fetchedJobs = jobsData?.data || [];
+
+  const displayJobs =
+    fetchedJobs?.length > 0
+      ? fetchedJobs.slice(0, 4).map((job: any) => {
+          const logoBgOptions = [
+            "bg-blue-600/10 text-blue-600",
+            "bg-pink-600/10 text-pink-600",
+            "bg-purple-600/10 text-purple-600",
+            "bg-emerald-600/10 text-emerald-600",
+          ];
+          const randomBg =
+            logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
+
+          // Format salary
+          let salaryStr = "Competitive";
+          if (job.salaryMin !== undefined && job.salaryMax !== undefined) {
+            salaryStr = `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k / year`;
+          } else if (job.salaryMin !== undefined) {
+            salaryStr = `$${Math.round(job.salaryMin / 1000)}k+ / year`;
+          }
+
+          // Calculate relative posted time
+          let postedStr = "Recently";
+          if (job.createdAt) {
+            const diffMs = Date.now() - new Date(job.createdAt).getTime();
+            const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+            if (diffHrs < 1) {
+              postedStr = "Just now";
+            } else if (diffHrs < 24) {
+              postedStr = `${diffHrs} hour${diffHrs > 1 ? "s" : ""} ago`;
+            } else {
+              const diffDays = Math.floor(diffHrs / 24);
+              postedStr = `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+            }
+          }
+
+          return {
+            id: job.id,
+            title: job.title,
+            company: job.company?.name || "Verified Partner",
+            logoBg: randomBg,
+            companyInitial: job.company?.name
+              ? job.company.name[0].toUpperCase()
+              : "J",
+            location: job.location || "Remote",
+            salary: salaryStr,
+            type: job.jobType || "Full-Time",
+            postedTime: postedStr,
+            tags: job.skills
+              ? job.skills.split(",").slice(0, 3)
+              : ["React", "TypeScript", "Node.js"],
+            isPremium: job.isPremium || job.salaryMin > 120000 || false,
+            isReal: true,
+          };
+        })
+      : featuredJobs;
+
+  const handleJobClick = (job: any) => {
+    if (job.isReal) {
+      router.push(`/jobs/${job.id}`);
+    } else {
+      router.push(`/jobs`);
+    }
+  };
+
   return (
     <section className="bg-background relative overflow-hidden py-24 sm:py-32">
       {/* Dynamic Background Atmospheric Orbs */}
@@ -83,7 +166,7 @@ const LandingFeaturedJobs = () => {
               className="mb-4 inline-flex"
             >
               <Badge className="border-accent/20 bg-accent/5 text-accent hover:bg-accent/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
-                <Sparkles className="h-4 w-4" />
+                <Award className="h-4 w-4" />
                 Featured Career Positions
               </Badge>
             </motion.div>
@@ -120,7 +203,10 @@ const LandingFeaturedJobs = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <button className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl">
+            <button
+              onClick={() => router.push("/jobs")}
+              className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex cursor-pointer items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl"
+            >
               <span>View All Careers</span>
               <ArrowUpRight className="h-4 w-4" />
             </button>
@@ -129,7 +215,7 @@ const LandingFeaturedJobs = () => {
 
         {/* Featured Jobs Feed Grid */}
         <div className="grid gap-6">
-          {featuredJobs.map((job, index) => (
+          {displayJobs.map((job: any, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -141,55 +227,63 @@ const LandingFeaturedJobs = () => {
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-              <Card className="group border-border/40 bg-card/45 hover:border-primary/30 relative flex flex-col justify-between gap-6 overflow-hidden p-6 backdrop-blur-md transition-all duration-500 hover:shadow-2xl md:flex-row md:items-center">
+              <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary/20 hover:shadow-primary/5 relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border bg-linear-to-b p-6 backdrop-blur-md transition-all duration-500 hover:shadow-xl md:flex-row md:items-center">
+                {/* Dynamic Gradient Overlay */}
+                <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
                 {/* Accent line on premium cards */}
                 {job.isPremium && (
-                  <div className="from-primary to-accent absolute top-0 bottom-0 left-0 w-1 bg-linear-to-b" />
+                  <div className="from-primary to-accent w-1.2 absolute top-0 bottom-0 left-0 rounded-l-2xl bg-linear-to-b" />
                 )}
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+                <div className="relative z-10 flex w-full flex-col gap-5 sm:flex-row sm:items-center sm:gap-6 md:w-auto">
                   {/* Company Logo container */}
                   <div
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold ${job.logoBg}`}
+                    className={`ring-primary/5 border-background flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 text-xl font-black shadow-xs ring-2 transition-all duration-500 ${job.logoBg}`}
                   >
                     {job.companyInitial}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-foreground group-hover:text-primary text-xl font-bold tracking-tight transition-colors duration-300">
+                      <h3
+                        onClick={() => handleJobClick(job)}
+                        className="text-foreground group-hover:text-primary cursor-pointer text-xl font-bold tracking-tight transition-colors duration-300"
+                      >
                         {job.title}
                       </h3>
                       {job.isPremium && (
-                        <Badge className="bg-primary/10 text-primary border-primary/20 border px-2 py-0.5 text-xs font-semibold">
-                          Premium
-                        </Badge>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-amber-600 uppercase shadow-xs dark:text-amber-500">
+                          <Crown className="h-3 w-3 fill-amber-500/20 text-amber-500" />
+                          PRO
+                        </span>
                       )}
                     </div>
 
-                    {/* Metadata Items */}
-                    <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium">
-                      <span className="flex items-center gap-1">
-                        <Building2 className="h-4 w-4" />
+                    {/* Metadata Badges Row */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="bg-secondary/40 text-muted-foreground/90 border-border/40 flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-semibold">
+                        <Building2 className="text-primary/70 h-3.5 w-3.5" />
                         {job.company}
+                        <BadgeCheck className="text-primary fill-primary/10 ml-0.5 h-3.5 w-3.5" />
                       </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
+                      <span className="bg-secondary/40 text-muted-foreground/90 border-border/40 flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-semibold">
+                        <MapPin className="text-primary/70 h-3.5 w-3.5" />
                         {job.location}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
+                      <span className="flex items-center gap-1 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 shadow-xs dark:text-emerald-400">
+                        <DollarSign className="h-3.5 w-3.5" />
                         {job.salary}
                       </span>
                     </div>
 
                     {/* Keyword Tags */}
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      {job.tags.map((tag, i) => (
+                      {job.tags.map((tag: string, i: number) => (
                         <Badge
                           key={i}
                           variant="secondary"
-                          className="bg-muted/65 hover:bg-primary/5 text-muted-foreground text-xs font-medium"
+                          className="bg-primary/5 hover:bg-primary/10 text-primary border-primary/10 animate-none rounded-lg border px-2.5 py-1 text-xs font-bold transition-colors"
                         >
                           {tag}
                         </Badge>
@@ -198,20 +292,24 @@ const LandingFeaturedJobs = () => {
                   </div>
                 </div>
 
-                <div className="border-border/40 flex flex-wrap items-center justify-between gap-4 border-t pt-4 md:flex-col md:items-end md:justify-center md:border-0 md:pt-0">
+                {/* Right Area: Job Type, Posted Time, Apply Button */}
+                <div className="border-border/40 relative z-10 flex flex-wrap items-center justify-between gap-5 border-t pt-4 md:flex-col md:items-end md:justify-center md:border-0 md:pt-0">
                   {/* Job Type & Post details */}
-                  <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium md:mb-2">
-                    <span className="bg-primary/10 text-primary rounded-md px-2 py-1 font-bold">
-                      {job.type}
+                  <div className="flex flex-wrap items-center gap-2.5 md:mb-3">
+                    <span className="bg-primary/10 text-primary border-primary/20 rounded-lg border px-2.5 py-1 text-xs font-bold shadow-xs">
+                      {formatJobType(job.type)}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" />
+                    <span className="text-muted-foreground/80 flex items-center gap-1 text-xs font-semibold">
+                      <Clock className="text-primary/70 h-3.5 w-3.5" />
                       {job.postedTime}
                     </span>
                   </div>
 
-                  {/* Quick Action button */}
-                  <button className="bg-muted/75 hover:bg-primary text-foreground ring-border group-hover:ring-primary/20 flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-bold shadow-xs ring-1 transition-all duration-300 hover:text-white">
+                  {/* Premium Action Button */}
+                  <button
+                    onClick={() => handleJobClick(job)}
+                    className="bg-primary text-primary-foreground hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex cursor-pointer items-center justify-center gap-1.5 rounded-xl px-5 py-3 text-sm font-extrabold shadow-md transition-all duration-300"
+                  >
                     <span>Quick Apply</span>
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </button>

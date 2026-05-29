@@ -11,11 +11,11 @@ import {
   Users,
   Search,
   MapPin,
-  Sparkles,
 } from "lucide-react";
 import { motion } from "motion/react";
-import type { ComponentType } from "react";
+import { useState, type ComponentType } from "react";
 import { Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { globeConfig, globeSampleAreas } from "../../constants";
 import GlobeSkeleton from "../../skeleton/landing/GlobeSkeleton";
 
@@ -29,6 +29,23 @@ interface LandingHeroProps {
 }
 
 const LandingHero = ({ World }: LandingHeroProps) => {
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
+  const [location, setLocation] = useState("");
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const queryParams = new URLSearchParams();
+    if (keyword) queryParams.set("search", keyword);
+    if (location) queryParams.set("location", location);
+    router.push(`/jobs?${queryParams.toString()}`);
+  };
+
+  const handleTrendingClick = (term: string) => {
+    setKeyword(term);
+    router.push(`/jobs?search=${encodeURIComponent(term)}`);
+  };
+
   return (
     <section className="bg-background border-primary/30 relative min-h-screen overflow-hidden border-b">
       {/* Refined Background Pattern */}
@@ -159,12 +176,17 @@ const LandingHero = ({ World }: LandingHeroProps) => {
               transition={{ delay: 0.5, duration: 0.6 }}
               className="mb-10 max-w-2xl"
             >
-              <div className="bg-card/85 border-border/60 shadow-primary/5 hover:border-primary/30 flex flex-col gap-2 rounded-2xl border p-2 shadow-2xl backdrop-blur-xl transition-all sm:flex-row sm:items-center sm:gap-0">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="bg-card/85 border-border/60 shadow-primary/5 hover:border-primary/30 flex flex-col gap-2 rounded-2xl border p-2 shadow-2xl backdrop-blur-xl transition-all sm:flex-row sm:items-center sm:gap-0"
+              >
                 {/* Keyword Search */}
                 <div className="relative flex-1">
                   <Search className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
                   <input
                     type="text"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
                     placeholder="Job title, keywords..."
                     className="placeholder:text-muted-foreground text-foreground h-12 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
                   />
@@ -178,31 +200,38 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   <MapPin className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
                   <input
                     type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     placeholder="Location or Remote..."
                     className="placeholder:text-muted-foreground text-foreground h-12 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
                   />
                 </div>
 
                 {/* Action CTA */}
-                <button className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl sm:w-auto">
+                <button
+                  type="submit"
+                  className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl sm:w-auto"
+                >
                   <Search className="h-4 w-4" />
                   <span>Search Jobs</span>
                 </button>
-              </div>
+              </form>
 
               {/* Trending Keywords */}
               <div className="mt-4 flex flex-wrap items-center gap-2 px-1">
                 <span className="text-muted-foreground flex items-center gap-1 text-xs font-semibold">
-                  <Sparkles className="text-primary h-3 w-3" />
+                  <TrendingUp className="text-primary h-3 w-3" />
                   Trending:
                 </span>
                 {["React", "UI/UX", "Python", "Remote", "DevOps"].map(
-                  (keyword, i) => (
+                  (term, i) => (
                     <button
                       key={i}
-                      className="bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground hover:border-primary/20 rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium transition-all"
+                      type="button"
+                      onClick={() => handleTrendingClick(term)}
+                      className="bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground hover:border-primary/20 cursor-pointer rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium transition-all"
                     >
-                      {keyword}
+                      {term}
                     </button>
                   ),
                 )}

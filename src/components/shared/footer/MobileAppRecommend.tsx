@@ -1,7 +1,8 @@
 "use client";
-import { Apple, Play } from "lucide-react";
+import { Apple, Play, Smartphone } from "lucide-react";
 import { motion } from "motion/react";
 import HoverHint from "../HoverHint";
+import { Badge } from "@/components/ui/badge";
 
 const MobileAppRecommend = () => {
   return (
@@ -45,12 +46,12 @@ const MobileAppRecommend = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="bg-primary/10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm"
+              className="mb-6 inline-flex"
             >
-              <span className="bg-primary flex h-2 w-2 rounded-full" />
-              <span className="text-foreground/80">
+              <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
+                <Smartphone className="text-primary h-4 w-4" />
                 Available on iOS & Android
-              </span>
+              </Badge>
             </motion.div>
 
             <motion.h2
@@ -80,13 +81,17 @@ const MobileAppRecommend = () => {
             >
               {/* App Store Button */}
               <HoverHint hint="Coming soon">
-                <button className="group relative flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-white ring-1 ring-white/20 transition-all hover:scale-105 hover:bg-zinc-900 active:scale-95 sm:gap-3 sm:rounded-2xl sm:px-8 sm:py-4">
-                  <Apple className="h-6 w-6 transition-transform group-hover:scale-110 sm:h-8 sm:w-8" />
-                  <div className="flex flex-col items-start leading-none">
-                    <span className="mb-0.5 text-[8px] font-medium text-zinc-400 sm:mb-1 sm:text-[10px]">
+                <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-3.5 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-4.5">
+                  {/* Dynamic Gradient Overlay */}
+                  <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                  <Apple className="relative z-10 h-6 w-6 text-white transition-colors duration-300 sm:h-8 sm:w-8" />
+
+                  <div className="relative z-10 flex flex-col items-start leading-none">
+                    <span className="mb-0.5 text-[8px] font-extrabold tracking-widest text-zinc-400 uppercase sm:mb-1.5 sm:text-[10px]">
                       Download on the
                     </span>
-                    <span className="text-base font-bold tracking-wide sm:text-xl">
+                    <span className="text-sm font-black tracking-wide sm:text-xl">
                       App Store
                     </span>
                   </div>
@@ -95,13 +100,17 @@ const MobileAppRecommend = () => {
 
               {/* Play Store Button */}
               <HoverHint hint="Coming soon">
-                <button className="group relative flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-white ring-1 ring-white/20 transition-all hover:scale-105 hover:bg-zinc-900 active:scale-95 sm:gap-3 sm:rounded-2xl sm:px-8 sm:py-4">
-                  <Play className="h-6 w-6 fill-white transition-transform group-hover:scale-110 sm:h-8 sm:w-8" />
-                  <div className="flex flex-col items-start leading-none">
-                    <span className="mb-0.5 text-[8px] font-medium text-zinc-400 sm:mb-1 sm:text-[10px]">
+                <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-3.5 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-4.5">
+                  {/* Dynamic Gradient Overlay */}
+                  <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                  <Play className="relative z-10 h-6 w-6 fill-white text-white transition-colors duration-300 sm:h-8 sm:w-8" />
+
+                  <div className="relative z-10 flex flex-col items-start leading-none">
+                    <span className="mb-0.5 text-[8px] font-extrabold tracking-widest text-zinc-400 uppercase sm:mb-1.5 sm:text-[10px]">
                       Get it on
                     </span>
-                    <span className="text-base font-bold tracking-wide sm:text-xl">
+                    <span className="text-sm font-black tracking-wide sm:text-xl">
                       Google Play
                     </span>
                   </div>

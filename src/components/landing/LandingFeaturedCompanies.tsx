@@ -1,12 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowUpRight, Briefcase, Crown, MapPin, Sparkles } from "lucide-react";
+import {
+  ArrowUpRight,
+  BadgeCheck,
+  Briefcase,
+  Crown,
+  MapPin,
+} from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import "swiper/css";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useGetCompaniesQuery } from "../../redux/feature/company/companyApi";
 
 const premiumCompanies = [
   {
@@ -66,6 +75,52 @@ const premiumCompanies = [
 ];
 
 const LandingFeaturedCompanies = () => {
+  const router = useRouter();
+  const { data: companiesData } = useGetCompaniesQuery({ limit: 10 });
+
+  const fetchedCompanies =
+    companiesData?.data?.result || companiesData?.data || [];
+
+  const displayCompanies =
+    fetchedCompanies?.length > 0
+      ? fetchedCompanies.slice(0, 8).map((comp: any) => {
+          const logoBgOptions = [
+            "bg-primary/10 text-primary",
+            "bg-accent/10 text-accent",
+            "bg-blue-600/10 text-blue-600",
+            "bg-purple-600/10 text-purple-600",
+            "bg-orange-500/10 text-orange-500",
+            "bg-indigo-600/10 text-indigo-600",
+          ];
+          const randomBg =
+            logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
+          return {
+            name: comp.name,
+            slug: comp.slug || comp.id,
+            industry: comp.industry?.name || comp.industry || "Technology",
+            location: comp.location || "Remote",
+            jobsCount:
+              comp.openJobs !== undefined
+                ? `${comp.openJobs} active jobs`
+                : "Hiring actively",
+            initial: comp.name ? comp.name[0].toUpperCase() : "C",
+            logoBg: randomBg,
+            tagline: comp.description
+              ? comp.description.slice(0, 75) + "..."
+              : "Building elite digital solutions.",
+            isReal: true,
+          };
+        })
+      : premiumCompanies;
+
+  const handleCompanyClick = (company: any) => {
+    if (company.isReal) {
+      router.push(`/companies/${company.slug}`);
+    } else {
+      router.push(`/jobs?search=${encodeURIComponent(company.name)}`);
+    }
+  };
+
   return (
     <section className="bg-background border-border/40 relative overflow-hidden border-b py-24 sm:py-32">
       {/* Background Atmosphere */}
@@ -84,7 +139,7 @@ const LandingFeaturedCompanies = () => {
             className="mb-4 inline-flex"
           >
             <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
-              <Sparkles className="h-4 w-4" />
+              <BadgeCheck className="h-4 w-4" />
               Verified Premium Partners
             </Badge>
           </motion.div>
@@ -133,17 +188,17 @@ const LandingFeaturedCompanies = () => {
             }}
             className="premium-employers-slider w-full py-4"
           >
-            {premiumCompanies.map((company, index) => (
+            {displayCompanies.map((company: any, index: number) => (
               <SwiperSlide key={index} className="h-auto">
-                <Card className="group border-border/40 bg-card/45 hover:border-primary/30 relative flex h-full flex-col justify-between overflow-hidden p-6 backdrop-blur-md transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl">
-                  {/* Visual Accent Corner Glow */}
-                  <div className="from-primary/10 pointer-events-none absolute -inset-px bg-linear-to-br to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <Card className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500 hover:shadow-lg">
+                  {/* Dynamic Gradient Overlay */}
+                  <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                   <div className="relative z-10 space-y-4">
                     {/* Company Header Row */}
                     <div className="flex items-start justify-between">
                       <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-xl text-lg font-extrabold ${company.logoBg}`}
+                        className={`flex h-12 w-12 items-center justify-center rounded-xl text-lg font-extrabold transition-all duration-500 ${company.logoBg}`}
                       >
                         {company.initial}
                       </div>
@@ -157,7 +212,7 @@ const LandingFeaturedCompanies = () => {
 
                     {/* Company Information */}
                     <div>
-                      <h3 className="text-foreground group-hover:text-primary text-lg font-bold tracking-tight transition-colors duration-300">
+                      <h3 className="text-foreground group-hover:text-primary text-lg font-bold tracking-tight transition-all duration-500">
                         {company.name}
                       </h3>
                       <p className="text-muted-foreground mt-1 text-xs font-semibold">
@@ -182,7 +237,11 @@ const LandingFeaturedCompanies = () => {
                       </span>
                     </div>
 
-                    <button className="text-foreground group-hover:text-primary mt-2 flex w-full items-center justify-between text-xs font-bold transition-all duration-300">
+                    <button
+                      type="button"
+                      onClick={() => handleCompanyClick(company)}
+                      className="text-foreground group-hover:text-primary mt-2 flex w-full cursor-pointer items-center justify-between text-xs font-bold transition-all duration-300"
+                    >
                       <span>Browse Careers</span>
                       <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </button>

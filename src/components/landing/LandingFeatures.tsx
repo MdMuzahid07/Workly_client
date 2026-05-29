@@ -64,18 +64,18 @@ const LandingFeatures = () => {
                 ease: [0.21, 1.02, 0.47, 0.98],
               }}
             >
-              <Card className="group border-border/40 bg-card/40 hover:border-primary/40 hover:bg-card/60 hover:shadow-primary/10 relative h-full overflow-hidden p-8 backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                {/* Interactive Background Glow */}
-                <div className="from-primary/10 pointer-events-none absolute -inset-px bg-linear-to-br to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <Card className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative h-full overflow-hidden rounded-2xl border p-8 backdrop-blur-md transition-all duration-500 hover:shadow-lg">
+                {/* Dynamic Gradient Overlay */}
+                <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                 <div className="relative z-10 flex h-full flex-col">
                   {/* Premium Icon Container */}
-                  <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary group-hover:shadow-primary/30 mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl ring-1 transition-all duration-500 group-hover:scale-110 group-hover:text-white group-hover:shadow-xl">
-                    <feature.icon className="h-8 w-8 transition-transform duration-500 group-hover:rotate-12" />
+                  <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary group-hover:shadow-primary/30 mb-8 inline-flex h-16 w-16 origin-center items-center justify-center rounded-2xl ring-1 transition-all duration-500 will-change-transform group-hover:rotate-12 group-hover:text-white group-hover:shadow-xl">
+                    <feature.icon className="h-8 w-8" />
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-foreground group-hover:text-primary mb-4 text-2xl font-bold tracking-tight transition-colors duration-300">
+                  <h3 className="text-foreground group-hover:text-primary mb-4 text-2xl font-bold tracking-tight transition-all duration-500">
                     {feature.title}
                   </h3>
                   <p className="text-muted-foreground group-hover:text-foreground/80 text-base leading-relaxed transition-colors duration-300">
