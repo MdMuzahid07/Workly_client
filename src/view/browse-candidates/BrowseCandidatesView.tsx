@@ -1,15 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, LayoutGrid, List, Users } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import {
+  ArrowUpRight,
+  BadgeCheck,
+  Briefcase,
+  LayoutGrid,
+  List,
+  MapPin,
+  Star,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import "swiper/css";
+import { Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import CandidateCard from "../../components/main/candidates/CandidateCard";
 import CandidateSidebarFilter from "../../components/main/candidates/filter/CandidateSidebarFilter";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
+import PageHero from "../../components/shared/PageHero";
 import { useGetCandidatesQuery } from "../../redux/feature/candidate/candidateApi";
 import CandidateCardSkeleton from "../../skeleton/candidate/CandidateCardSkeleton";
 
@@ -58,9 +73,149 @@ const BrowseCandidatesView = () => {
     return p;
   }, [filters, currentPage]);
 
+  const router = useRouter();
+
   const { data, isLoading, error } = useGetCandidatesQuery(params);
 
+  // Fetch featured / top candidates
+  const { data: featuredData } = useGetCandidatesQuery({
+    limit: 6,
+    sortBy: "fullName",
+    sortOrder: "desc",
+  });
+
+  const featuredCandidates = useMemo(() => {
+    const list = featuredData?.data || [];
+    if (list.length >= 2) return list;
+    return allCandidates.slice(0, 6);
+  }, [featuredData, allCandidates]);
+
   console.log("Candidates Data:", data);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const renderFeaturedCard = (candidate: any, index?: number) => {
+    const initials = candidate.fullName
+      ? candidate.fullName
+          .split(" ")
+          .filter(Boolean)
+          .map((n: string) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2)
+      : "C";
+
+    const isPlaceholderAvatar =
+      !candidate.profile?.avatarUrl ||
+      candidate.profile.avatarUrl.includes("placeholder") ||
+      !candidate.profile.avatarUrl.startsWith("http");
+
+    const rawHeadline = candidate.profile?.headline || "";
+    const displayHeadline =
+      !rawHeadline || rawHeadline.toUpperCase() === "JOB_SEEKER"
+        ? candidate.profile?.skills?.length
+          ? `${candidate.profile.skills
+              .map((s: any) => s.skillName)
+              .slice(0, 2)
+              .join(" & ")} Specialist`
+          : "Verified Talent"
+        : rawHeadline;
+
+    const experienceText =
+      candidate.profile?.totalExperienceYears !== undefined &&
+      candidate.profile.totalExperienceYears > 0
+        ? `${candidate.profile.totalExperienceYears} Yrs Exp`
+        : "Entry-level Talent";
+
+    return (
+      <Card
+        onClick={() => router.push(`/browse-candidates/${candidate.id}`)}
+        className="group hover:border-primary/50 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+      >
+        <div className="relative z-10 flex-1 space-y-4">
+          {/* Header Row */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-50 p-0 dark:bg-slate-800">
+                {!isPlaceholderAvatar ? (
+                  <Image
+                    src={candidate.profile.avatarUrl!}
+                    alt={candidate.fullName}
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="bg-primary/5 text-primary border-primary/10 flex h-full w-full items-center justify-center rounded-xl border text-lg font-bold">
+                    {initials}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0">
+                <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold tracking-tight">
+                  {candidate.fullName}
+                  <BadgeCheck className="h-4 w-4 shrink-0 fill-emerald-500/10 text-emerald-500" />
+                  {candidate.profile?.totalExperienceYears &&
+                    candidate.profile.totalExperienceYears > 5 && (
+                      <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-400 text-yellow-400" />
+                    )}
+                </h4>
+                <span className="text-muted-foreground block truncate text-[11px] font-semibold">
+                  {displayHeadline}
+                </span>
+              </div>
+            </div>
+
+            {/* Top-Right Arrow Action */}
+            <div className="text-muted-foreground/50 group-hover:text-primary p-1 transition-colors duration-300">
+              <ArrowUpRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </div>
+          </div>
+
+          {/* Bullet Divided Metadata Row (LinkedIn style) */}
+          <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold">
+            <span className="flex items-center gap-1">
+              <MapPin className="text-primary/60 h-3.5 w-3.5" />
+              {candidate.profile?.location || "Not specified"}
+            </span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="flex items-center gap-1">
+              <Briefcase className="text-primary/60 h-3.5 w-3.5" />
+              {experienceText}
+            </span>
+            {candidate.profile?.preference?.jobType && (
+              <>
+                <span className="text-muted-foreground/30">•</span>
+                <span className="text-primary font-bold">
+                  {candidate.profile.preference.jobType.replace("_", " ")}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Skills Badges */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-2">
+            {(candidate.profile?.skills?.slice(0, 3) || []).map(
+              (skill: any) => (
+                <Badge
+                  key={skill.id}
+                  variant="secondary"
+                  className="bg-primary/5 text-primary/95 border-primary/10 rounded-lg border px-2.5 py-1 text-[10px] font-extrabold tracking-wide uppercase transition-colors"
+                >
+                  {skill.skillName}
+                </Badge>
+              ),
+            )}
+            {!candidate.profile?.skills?.length && (
+              <span className="text-muted-foreground text-[10px]">
+                No skills listed
+              </span>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  };
 
   useEffect(() => {
     if (data?.data) {
@@ -96,36 +251,60 @@ const BrowseCandidatesView = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      {/* Hero Section */}
-      <div className="relative h-[250px] w-full overflow-hidden bg-slate-900 md:h-[300px]">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1535957998253-26ae1ef29506?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Candidates background"
-            className="h-full w-full object-cover opacity-40 grayscale"
-            fill
-          />
-          <div className="absolute inset-0 bg-linear-to-b from-slate-900/40 via-slate-900/60 to-slate-900" />
-        </div>
+      <PageHero
+        title="Discover Top Talent"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Browse Candidates" },
+        ]}
+        backgroundImage="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400&auto=format&fit=crop"
+      />
 
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-4 text-3xl font-bold text-white md:text-5xl">
-            Discover Top Talent
-          </h1>
-
-          <nav className="flex items-center gap-2 text-sm text-gray-300">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="font-medium text-white">Browse Candidates</span>
-          </nav>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
       <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:-mt-10">
         <Searchbar onSearch={handleSearch} hidePadding />
+
+        {/* Featured Profiles Section */}
+        {featuredCandidates.length > 0 && (
+          <div className="mt-12">
+            <div className="mb-6 flex items-center gap-2">
+              <Users className="text-primary h-5.5 w-5.5 shrink-0" />
+              <h2 className="text-foreground text-xl font-bold tracking-tight">
+                Featured Profiles
+              </h2>
+            </div>
+
+            {featuredCandidates.length < 2 ? (
+              <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
+                {featuredCandidates.map((candidate: any, index: number) =>
+                  renderFeaturedCard(candidate, index),
+                )}
+              </div>
+            ) : (
+              <Swiper
+                modules={[Autoplay]}
+                spaceBetween={20}
+                slidesPerView={1}
+                loop={featuredCandidates.length > 2}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                breakpoints={{
+                  768: { slidesPerView: 1.5 },
+                  1024: { slidesPerView: 2 },
+                }}
+                className="w-full py-4"
+              >
+                {featuredCandidates.map((candidate: any, index: number) => (
+                  <SwiperSlide key={candidate.id || index} className="h-auto">
+                    {renderFeaturedCard(candidate, index)}
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </div>
+        )}
 
         <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
           <div className="flex items-center gap-3">

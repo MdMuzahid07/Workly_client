@@ -135,6 +135,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-[10px] font-bold uppercase">
               {user?.fullName
                 ?.split(" ")
+                .filter(Boolean)
                 .map((n) => n[0])
                 .join("")}
             </div>

@@ -9,13 +9,14 @@ import {
   Calendar,
   Globe,
   GraduationCap,
-  Heart,
+  Bookmark,
   Mail,
   MapPin,
   MessageSquare,
   Share2,
   Shield,
   User,
+  BadgeCheck,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -116,6 +117,32 @@ const CandidateDetailsView = () => {
   const candidate = response.data;
   const profile = candidate.profile || {};
 
+  const initials = candidate.fullName
+    ? candidate.fullName
+        .split(" ")
+        .filter(Boolean)
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "C";
+
+  const isPlaceholderAvatar =
+    !profile.avatarUrl ||
+    profile.avatarUrl.includes("placeholder") ||
+    !profile.avatarUrl.startsWith("http");
+
+  const rawHeadline = profile.headline || "";
+  const displayHeadline =
+    !rawHeadline || rawHeadline.toUpperCase() === "JOB_SEEKER"
+      ? profile.skills?.length
+        ? `${profile.skills
+            .map((s: any) => s.skillName)
+            .slice(0, 2)
+            .join(" & ")} Specialist`
+        : "Verified Talent"
+      : rawHeadline;
+
   return (
     <div className="bg-background min-h-screen pb-20">
       {/* Dynamic Banner Section */}
@@ -142,16 +169,16 @@ const CandidateDetailsView = () => {
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="bg-card relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-2xl md:h-32 md:w-32 dark:border-slate-800">
-                      {profile.avatarUrl ? (
+                      {!isPlaceholderAvatar ? (
                         <Image
-                          src={profile.avatarUrl}
+                          src={profile.avatarUrl!}
                           alt={candidate.fullName}
                           fill
                           className="object-cover"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <User className="text-primary/40 h-12 w-12" />
+                        <div className="bg-primary/5 text-primary border-primary/10 flex h-full w-full items-center justify-center text-3xl font-bold">
+                          {initials}
                         </div>
                       )}
                     </div>
@@ -168,11 +195,12 @@ const CandidateDetailsView = () => {
                           {profile.totalExperienceYears || 0} Years Exp
                         </Badge>
                       </div>
-                      <h1 className="text-foreground text-3xl font-bold tracking-tight md:text-4xl">
+                      <h1 className="text-foreground flex items-center gap-2 text-3xl font-bold tracking-tight md:text-4xl">
                         {candidate.fullName}
+                        <BadgeCheck className="h-6 w-6 shrink-0 fill-emerald-500/10 text-emerald-500" />
                       </h1>
                       <p className="text-muted-foreground text-lg font-medium">
-                        {profile.headline || "Professional Candidate"}
+                        {displayHeadline}
                       </p>
                       <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
                         <div className="flex items-center gap-1.5">
@@ -195,16 +223,18 @@ const CandidateDetailsView = () => {
                         variant="outline"
                         size="icon"
                         className={`rounded-xl border-gray-200 transition-colors ${
-                          candidate.isSaved ? "bg-red-50" : ""
+                          candidate.isSaved
+                            ? "bg-primary/10 text-primary border-primary/20"
+                            : "hover:bg-primary/10 hover:text-primary"
                         }`}
                         onClick={handleSave}
                         disabled={isSaving}
                       >
-                        <Heart
+                        <Bookmark
                           className={`h-5 w-5 ${
                             candidate.isSaved
-                              ? "fill-rose-500 text-rose-500"
-                              : "text-gray-400"
+                              ? "fill-current"
+                              : "text-slate-400"
                           }`}
                         />
                       </Button>
