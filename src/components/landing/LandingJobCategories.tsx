@@ -3,6 +3,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   BarChart3,
   Briefcase,
@@ -86,9 +87,41 @@ const categories = [
   },
 ];
 
+const LandingJobCategoriesSkeleton = () => {
+  return (
+    <section className="bg-background/95 relative overflow-hidden py-24 sm:py-32">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Header Skeleton */}
+        <div className="mb-16 flex flex-col items-center text-center sm:mb-20">
+          <Skeleton className="mb-4 h-9 w-44 rounded-full" />
+          <Skeleton className="mb-4 h-10 w-96 rounded-md" />
+          <Skeleton className="h-5 w-80 rounded-md" />
+        </div>
+
+        {/* Categories Grid Skeleton */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(8)].map((_, index) => (
+            <Card
+              key={index}
+              className="border-border/40 bg-card/50 relative rounded-2xl border p-6 backdrop-blur-md"
+            >
+              <div className="space-y-4">
+                <Skeleton className="h-12 w-12 rounded-xl" />
+                <Skeleton className="h-6 w-3/4 rounded-md" />
+                <Skeleton className="h-4 w-1/2 rounded-md" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const LandingJobCategories = () => {
   const router = useRouter();
-  const { data: categoriesData } = useGetCategoriesQuery(undefined);
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetCategoriesQuery(undefined);
   const fetchedCategories = categoriesData?.data || [];
 
   const displayCategories =
@@ -98,9 +131,10 @@ const LandingJobCategories = () => {
           return {
             icon: IconComponent,
             title: cat.name,
-            count: cat.count
-              ? `${cat.count.split(" ")[0]} open positions`
-              : `${Math.floor(Math.random() * 50) + 10} open positions`,
+            count:
+              cat._count?.jobs !== undefined
+                ? `${cat._count.jobs} open positions`
+                : `${Math.floor(Math.random() * 50) + 10} open positions`,
             color: color || "bg-emerald-500",
             isReal: true,
           };
@@ -116,6 +150,10 @@ const LandingJobCategories = () => {
   const handleCategoryClick = (cat: any) => {
     router.push(`/jobs?category=${encodeURIComponent(cat.title)}`);
   };
+
+  if (categoriesLoading) {
+    return <LandingJobCategoriesSkeleton />;
+  }
 
   return (
     <section className="bg-background/95 relative overflow-hidden py-24 sm:py-32">

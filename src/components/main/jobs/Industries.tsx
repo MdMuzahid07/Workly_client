@@ -10,17 +10,20 @@ import IndustriesSkeleton from "../../../skeleton/job/IndustriesSkeleton ";
 import { Button } from "../../ui/button";
 
 export type Category = {
-  id: number;
+  id: string | number;
   name: string;
   icon: string;
   count: string;
   color: string;
   description: string;
+  _count?: {
+    jobs: number;
+  };
 };
 
 export type IndustriesProps = {
   categories?: Category[];
-  onCategorySelect?: (selectedIds: number[]) => void;
+  onCategorySelect?: (selectedIds: (string | number)[]) => void;
   multipleSelect?: boolean;
   className?: string;
   isLoading?: boolean;
@@ -32,15 +35,15 @@ const Industries = ({
   multipleSelect = true,
   isLoading,
 }: IndustriesProps) => {
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<(string | number)[]>([]);
 
-  const toggleSelection = (id: number) => {
+  const toggleSelection = (id: string | number) => {
     setSelected((prev) => {
-      let newSelected: number[];
+      let newSelected: (string | number)[];
 
       if (multipleSelect) {
         newSelected = prev.includes(id)
-          ? prev.filter((industryId: number) => industryId !== id)
+          ? prev.filter((industryId) => industryId !== id)
           : [...prev, id];
       } else {
         newSelected = prev.includes(id) ? [] : [id];
@@ -106,7 +109,13 @@ const Industries = ({
                   className={`h-5 w-5 ${color} rounded-full p-0.5 text-white`}
                 />
                 {category.name}
-                {category.count ? (
+                {category._count?.jobs !== undefined ? (
+                  <p
+                    className={`text-foreground ml-2 text-xs ${isSelected ? "text-white" : ""}`}
+                  >
+                    {category._count.jobs}
+                  </p>
+                ) : category.count ? (
                   <p
                     className={`text-foreground ml-2 text-xs ${isSelected ? "text-white" : ""}`}
                   >

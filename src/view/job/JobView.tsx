@@ -26,7 +26,7 @@ type Filters = {
   skills: string[];
   postedWithin: string;
   isRemote?: boolean;
-  categories?: number[];
+  categories?: (string | number)[];
 };
 
 const DEFAULT_FILTERS: Filters = {
@@ -60,6 +60,9 @@ const JobView = () => {
 
   const searchParams = useSearchParams();
 
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery(undefined);
+
   useEffect(() => {
     const search = searchParams.get("search") || "";
     const location = searchParams.get("location") || "";
@@ -72,24 +75,25 @@ const JobView = () => {
         if (search) updated.search = search;
         if (location) updated.location = location;
 
-        if (category) {
-          const catId = Object.keys(CATEGORY_MAP).find(
-            (key) =>
-              CATEGORY_MAP[Number(key)].toLowerCase() ===
-              category.toLowerCase(),
+        const targetCategoryName = category || industry;
+        if (targetCategoryName && categories?.data) {
+          const matchedCategory = categories.data.find(
+            (c: any) =>
+              c.name.toLowerCase() === targetCategoryName.toLowerCase() ||
+              c.slug.toLowerCase() === targetCategoryName.toLowerCase(),
           );
-          if (catId) {
-            updated.categories = [Number(catId)];
-          }
-        }
-        if (industry) {
-          const catId = Object.keys(CATEGORY_MAP).find(
-            (key) =>
-              CATEGORY_MAP[Number(key)].toLowerCase() ===
-              industry.toLowerCase(),
-          );
-          if (catId) {
-            updated.categories = [Number(catId)];
+          if (matchedCategory) {
+            updated.categories = [matchedCategory.id];
+          } else {
+            // Fallback to static mapping if not found in backend categories
+            const catId = Object.keys(CATEGORY_MAP).find(
+              (key) =>
+                CATEGORY_MAP[Number(key)].toLowerCase() ===
+                targetCategoryName.toLowerCase(),
+            );
+            if (catId) {
+              updated.categories = [Number(catId)];
+            }
           }
         }
         return updated;
@@ -97,10 +101,7 @@ const JobView = () => {
       setCurrentPage(1);
       setAllJobs([]);
     }
-  }, [searchParams]);
-
-  const { data: categories, isLoading: categoriesLoading } =
-    useGetCategoriesQuery(undefined);
+  }, [searchParams, categories?.data]);
 
   const params = useMemo(() => {
     const p: any = {
@@ -120,7 +121,16 @@ const JobView = () => {
 
     if (filters.categories && filters.categories.length > 0) {
       const industries = filters.categories
-        .map((id) => CATEGORY_MAP[id])
+        .map((catId) => {
+          // Look up matched category in loaded backend categories first
+          const matched = categories?.data?.find(
+            (c: any) => String(c.id) === String(catId),
+          );
+          if (matched) return matched.name;
+
+          // Fallback to static mapping
+          return CATEGORY_MAP[Number(catId)];
+        })
         .filter(Boolean);
       if (industries.length > 0) {
         p.industry = industries.join(",");
@@ -131,27 +141,20 @@ const JobView = () => {
     if (filters.budgetRange[1] < 10000) p.salaryMax = filters.budgetRange[1];
 
     return p;
-  }, [filters, currentPage]);
+  }, [filters, currentPage, categories?.data]);
 
   const { data, isLoading, error } = useGetJobsQuery(params);
 
-  // Fetch premium/featured jobs for the slider
+  // Fetch premium/featured jobs for the slider directly from the backend
   const { data: featuredData, isLoading: featuredLoading } = useGetJobsQuery({
-    limit: 10,
+    isFeatured: true,
+    limit: 6,
     sortBy: "createdAt",
     sortOrder: "desc",
   });
 
   const featuredJobs = useMemo(() => {
-    if (!featuredData?.data) return [];
-    // Filter jobs that are marked as featured, premium, or high paying
-    const filtered = featuredData.data.filter(
-      (job: any) => job.isFeatured || job.isPremium || job.salaryMin > 100000,
-    );
-    // If we have featured jobs, return them, otherwise fallback to latest jobs as featured slots
-    return filtered.length > 0
-      ? filtered.slice(0, 6)
-      : featuredData.data.slice(0, 6);
+    return featuredData?.data || [];
   }, [featuredData]);
 
   useEffect(() => {
@@ -186,7 +189,7 @@ const JobView = () => {
     setAllJobs([]);
   };
 
-  const handleCategorySelect = (selectedCategoryIds: number[]) => {
+  const handleCategorySelect = (selectedCategoryIds: (string | number)[]) => {
     setFilters((prev) => ({
       ...prev,
       categories: selectedCategoryIds,

@@ -1,12 +1,12 @@
 "use client";
 import dynamic from "next/dynamic";
+import LandingFeaturedCompanies from "../../components/landing/LandingFeaturedCompanies";
+import LandingFeaturedJobs from "../../components/landing/LandingFeaturedJobs";
 import LandingFeatures from "../../components/landing/LandingFeatures";
 import LandingHero from "../../components/landing/LandingHero";
-import LandingStatus from "../../components/landing/LandingStatus";
-import LandingJobCategories from "../../components/landing/LandingJobCategories";
-import LandingFeaturedJobs from "../../components/landing/LandingFeaturedJobs";
 import LandingHowItWorks from "../../components/landing/LandingHowItWorks";
-import LandingFeaturedCompanies from "../../components/landing/LandingFeaturedCompanies";
+import LandingJobCategories from "../../components/landing/LandingJobCategories";
+import LandingStatus from "../../components/landing/LandingStatus";
 import GlobeSkeleton from "../../skeleton/landing/GlobeSkeleton";
 
 const World = dynamic(

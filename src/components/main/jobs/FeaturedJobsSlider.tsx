@@ -3,6 +3,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUpRight, Award, BadgeCheck, Clock, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import "swiper/css";
@@ -19,6 +20,58 @@ const formatJobType = (type: string) => {
   return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
+const FeaturedJobsSliderSkeleton = () => {
+  return (
+    <div className="relative mt-12 overflow-hidden">
+      {/* Clean Minimalist Header Skeleton */}
+      <div className="mb-6 flex items-center gap-2">
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <Skeleton className="h-6 w-44 rounded-md" />
+      </div>
+
+      <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
+        {[1, 2].map((i) => (
+          <Card
+            key={i}
+            className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
+          >
+            <div className="space-y-4">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-28 rounded-md" />
+                    <Skeleton className="h-3.5 w-20 rounded-md" />
+                  </div>
+                </div>
+                <Skeleton className="h-5 w-5 rounded-md" />
+              </div>
+
+              {/* Title & Metadata */}
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-4/5 rounded-md" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-16 rounded-md" />
+                  <Skeleton className="h-4 w-24 rounded-md" />
+                  <Skeleton className="h-4 w-20 rounded-md" />
+                </div>
+              </div>
+
+              {/* Skills */}
+              <div className="flex gap-1.5 pt-2">
+                <Skeleton className="h-6 w-16 rounded-lg" />
+                <Skeleton className="h-6 w-20 rounded-lg" />
+                <Skeleton className="h-6 w-14 rounded-lg" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const FeaturedJobsSlider = ({ jobs, isLoading }: FeaturedJobsSliderProps) => {
   const router = useRouter();
 
@@ -26,7 +79,11 @@ const FeaturedJobsSlider = ({ jobs, isLoading }: FeaturedJobsSliderProps) => {
     router.push(`/jobs/${job.id || job.slug}`);
   };
 
-  if (isLoading || !jobs || jobs.length === 0) {
+  if (isLoading) {
+    return <FeaturedJobsSliderSkeleton />;
+  }
+
+  if (!jobs || jobs.length === 0) {
     return null;
   }
 

@@ -2,6 +2,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -42,6 +43,54 @@ const DEFAULT_FILTERS: Filters = {
   skills: [],
 };
 
+const FeaturedCandidatesSkeleton = () => {
+  return (
+    <div className="mt-12">
+      <div className="mb-6 flex items-center gap-2">
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <Skeleton className="h-6 w-40 rounded-md" />
+      </div>
+
+      <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
+        {[1, 2].map((i) => (
+          <Card
+            key={i}
+            className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
+          >
+            <div className="space-y-4">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32 rounded-md" />
+                    <Skeleton className="h-3.5 w-24 rounded-md" />
+                  </div>
+                </div>
+                <Skeleton className="h-5 w-5 rounded-md" />
+              </div>
+
+              {/* Metadata */}
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-16 rounded-md" />
+                <Skeleton className="h-4 w-20 rounded-md" />
+                <Skeleton className="h-4 w-24 rounded-md" />
+              </div>
+
+              {/* Skills */}
+              <div className="flex gap-1.5 pt-2">
+                <Skeleton className="h-6 w-14 rounded-lg" />
+                <Skeleton className="h-6 w-18 rounded-lg" />
+                <Skeleton className="h-6 w-12 rounded-lg" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const BrowseCandidatesView = () => {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,11 +125,12 @@ const BrowseCandidatesView = () => {
   const { data, isLoading, error } = useGetCandidatesQuery(params);
 
   // Fetch featured / top candidates
-  const { data: featuredData } = useGetCandidatesQuery({
-    limit: 6,
-    sortBy: "fullName",
-    sortOrder: "desc",
-  });
+  const { data: featuredData, isLoading: featuredLoading } =
+    useGetCandidatesQuery({
+      limit: 6,
+      sortBy: "fullName",
+      sortOrder: "desc",
+    });
 
   const featuredCandidates = useMemo(() => {
     const list = featuredData?.data || [];
@@ -262,46 +312,50 @@ const BrowseCandidatesView = () => {
         <Searchbar onSearch={handleSearch} hidePadding />
 
         {/* Featured Profiles Section */}
-        {featuredCandidates.length > 0 && (
-          <div className="mt-12">
-            <div className="mb-6 flex items-center gap-2">
-              <Users className="text-primary h-5.5 w-5.5 shrink-0" />
-              <h2 className="text-foreground text-xl font-bold tracking-tight">
-                Featured Profiles
-              </h2>
-            </div>
-
-            {featuredCandidates.length < 2 ? (
-              <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
-                {featuredCandidates.map((candidate: any, index: number) =>
-                  renderFeaturedCard(candidate, index),
-                )}
+        {featuredLoading ? (
+          <FeaturedCandidatesSkeleton />
+        ) : (
+          featuredCandidates.length > 0 && (
+            <div className="mt-12">
+              <div className="mb-6 flex items-center gap-2">
+                <Users className="text-primary h-5.5 w-5.5 shrink-0" />
+                <h2 className="text-foreground text-xl font-bold tracking-tight">
+                  Featured Profiles
+                </h2>
               </div>
-            ) : (
-              <Swiper
-                modules={[Autoplay]}
-                spaceBetween={20}
-                slidesPerView={1}
-                loop={featuredCandidates.length > 2}
-                autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
-                breakpoints={{
-                  768: { slidesPerView: 1.5 },
-                  1024: { slidesPerView: 2 },
-                }}
-                className="w-full py-4"
-              >
-                {featuredCandidates.map((candidate: any, index: number) => (
-                  <SwiperSlide key={candidate.id || index} className="h-auto">
-                    {renderFeaturedCard(candidate, index)}
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            )}
-          </div>
+
+              {featuredCandidates.length < 2 ? (
+                <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
+                  {featuredCandidates.map((candidate: any, index: number) =>
+                    renderFeaturedCard(candidate, index),
+                  )}
+                </div>
+              ) : (
+                <Swiper
+                  modules={[Autoplay]}
+                  spaceBetween={20}
+                  slidesPerView={1}
+                  loop={featuredCandidates.length > 2}
+                  autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }}
+                  breakpoints={{
+                    768: { slidesPerView: 1.5 },
+                    1024: { slidesPerView: 2 },
+                  }}
+                  className="w-full py-4"
+                >
+                  {featuredCandidates.map((candidate: any, index: number) => (
+                    <SwiperSlide key={candidate.id || index} className="h-auto">
+                      {renderFeaturedCard(candidate, index)}
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              )}
+            </div>
+          )
         )}
 
         <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
