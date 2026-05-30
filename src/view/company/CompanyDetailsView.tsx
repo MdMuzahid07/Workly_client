@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  ArrowUpRight,
   Award,
   Briefcase,
   Building,
@@ -19,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CompanyDetails } from "../../app/(main)/companies/[slug]/page";
@@ -407,15 +409,18 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
             )}
 
             {/* Open Positions */}
-            {transformedJobs.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
-                    Open Positions ({transformedJobs.length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+            <Card
+              id="open-positions"
+              className="border-primary/10 bg-background/60 scroll-mt-24 backdrop-blur-xl"
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="text-primary h-5 w-5" />
+                  Open Positions ({transformedJobs.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {transformedJobs.length > 0 ? (
                   <InfiniteScroll
                     dataLength={visibleJobs.length}
                     next={loadMoreJobs}
@@ -425,11 +430,11 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                         {[...Array(2)].map((_, index) => (
                           <div
                             key={`loading-${index}`}
-                            className="animate-pulse rounded-lg border border-gray-200 p-4"
+                            className="bg-card animate-pulse rounded-2xl border border-gray-200 p-5 dark:border-slate-800"
                           >
-                            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
-                            <div className="mb-2 h-3 w-1/2 rounded bg-gray-200"></div>
-                            <div className="h-3 w-1/4 rounded bg-gray-200"></div>
+                            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200 dark:bg-slate-700"></div>
+                            <div className="mb-2 h-3 w-1/2 rounded bg-gray-200 dark:bg-slate-700"></div>
+                            <div className="h-3 w-1/4 rounded bg-gray-200 dark:bg-slate-700"></div>
                           </div>
                         ))}
                       </div>
@@ -437,7 +442,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                     endMessage={
                       visibleJobs.length > 0 && (
                         <div className="py-6 text-center">
-                          <p className="text-sm text-gray-500">
+                          <p className="text-muted-foreground text-sm font-medium">
                             All {companyDetails.jobs.length} jobs loaded
                           </p>
                         </div>
@@ -450,47 +455,96 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                       {visibleJobs.map((job) => (
                         <div
                           key={job.id}
-                          className="hover:bg-primary/2 rounded-lg border border-gray-200 p-4 transition-colors"
+                          className="hover:border-primary/30 border-primary/10 bg-card group/job rounded-2xl border p-5 transition-all duration-300"
                         >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h4 className="text-secondary-foreground mb-1 font-medium">
-                                {job.title}
-                              </h4>
-                              <div className="text-foreground/60 mb-2 flex items-center gap-4 text-sm">
-                                <span>{job.department}</span>
-                                <span>•</span>
-                                <span>{job.type}</span>
-                                <span>•</span>
-                                <span>{job.location}</span>
+                          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                            <div className="flex-1 space-y-2">
+                              <div className="flex flex-wrap items-start gap-2 sm:items-center">
+                                <h4 className="text-foreground group-hover/job:text-primary text-lg font-bold tracking-tight transition-colors">
+                                  {job.title}
+                                </h4>
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-primary/5 text-primary hover:bg-primary/10 border-none text-xs font-semibold capitalize"
+                                >
+                                  {job.type.replace("_", " ").toLowerCase()}
+                                </Badge>
                               </div>
-                              <div className="flex items-center gap-4 text-sm">
-                                {job.salary && (
-                                  <span className="font-medium text-green-600">
+                              <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium">
+                                <span className="flex items-center gap-1.5">
+                                  <MapPin className="text-primary/70 h-4 w-4" />
+                                  {job.location}
+                                </span>
+                                <span className="hidden sm:inline">•</span>
+                                <span>{job.department}</span>
+                                <span className="hidden sm:inline">•</span>
+                                <span className="text-xs">
+                                  Posted {job.posted}
+                                </span>
+                              </div>
+                              {job.salary && (
+                                <div className="flex items-center gap-1.5 pt-1 text-sm font-semibold text-emerald-600 dark:text-emerald-500">
+                                  <span className="rounded-md bg-emerald-500/10 px-2.5 py-0.5 dark:bg-emerald-500/20">
                                     {job.salary}
                                   </span>
-                                )}
-                                {job.posted && (
-                                  <span className="text-secondary-foreground">
-                                    Posted {job.posted}
-                                  </span>
-                                )}
-                              </div>
+                                </div>
+                              )}
                             </div>
-                            <Button
-                              size="sm"
-                              className="bg-primary hover:bg-primary text-white"
+                            <Link
+                              href={`/jobs/${job.id}`}
+                              className="sm:self-center"
                             >
-                              Apply
-                            </Button>
+                              <Button
+                                size="sm"
+                                className="bg-primary hover:bg-primary/90 flex w-full items-center gap-1.5 rounded-xl px-5 font-bold text-white shadow-sm transition-transform active:scale-95 sm:w-auto"
+                              >
+                                View Details
+                                <ArrowUpRight className="h-4 w-4" />
+                              </Button>
+                            </Link>
                           </div>
                         </div>
                       ))}
                     </div>
                   </InfiniteScroll>
-                </CardContent>
-              </Card>
-            )}
+                ) : (
+                  <div className="border-primary/20 bg-primary/5 flex flex-col items-center justify-center rounded-2xl border border-dashed px-4 py-12 text-center select-none">
+                    <div className="bg-primary/10 text-primary mb-4 flex h-16 w-16 animate-pulse items-center justify-center rounded-full">
+                      <Briefcase className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-foreground mb-2 text-xl font-bold tracking-tight">
+                      No active openings right now
+                    </h3>
+                    <p className="text-muted-foreground mb-6 max-w-md text-sm leading-relaxed">
+                      {companyDetails.name} {`isn't`} hiring for any open roles
+                      at this moment. However, team needs expand quickly! Follow
+                      this company to receive immediate notifications when new
+                      positions are posted.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button
+                        className="bg-primary hover:bg-primary/95 rounded-xl px-6 font-bold text-white shadow-sm transition-all duration-300"
+                        onClick={() => {
+                          const buttons = Array.from(
+                            document.querySelectorAll("button"),
+                          );
+                          const followBtnMain = buttons.find(
+                            (b) =>
+                              b.textContent?.includes("Follow Company") ||
+                              b.textContent?.includes("Unfollow Company"),
+                          );
+                          if (followBtnMain) {
+                            followBtnMain.click();
+                          }
+                        }}
+                      >
+                        Follow Company
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
