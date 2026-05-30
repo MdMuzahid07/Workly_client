@@ -32,7 +32,17 @@ import {
 import { ApplicationStatus, MyAppliedJob } from "@/types/application";
 import debounce from "debounce";
 import { AnimatePresence } from "framer-motion";
-import { FilterX, Search } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AlertTriangle, FilterX, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -52,6 +62,12 @@ const MyAppliedJobsView = () => {
   // UI State for search
   const [searchValue, setSearchValue] = useState("");
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+
+  // Custom dialog state for confirmation
+  const [selectedWithdrawId, setSelectedWithdrawId] = useState<string | null>(
+    null,
+  );
+  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
 
   const jobsLimit = parseInt(limit);
 
@@ -131,18 +147,24 @@ const MyAppliedJobsView = () => {
     setCurrentPage(1);
   };
 
-  const handleWithdraw = async (applicationId: string) => {
-    const shouldWithdraw = window.confirm(
-      "Withdraw this application? You cannot undo this action.",
-    );
+  const handleWithdrawClick = (applicationId: string) => {
+    setSelectedWithdrawId(applicationId);
+    setIsWithdrawDialogOpen(true);
+  };
 
-    if (!shouldWithdraw) return;
+  const handleConfirmWithdraw = async () => {
+    if (!selectedWithdrawId) return;
+    const targetId = selectedWithdrawId;
 
-    setWithdrawingId(applicationId);
+    // Close modal immediately for smooth responsiveness
+    setIsWithdrawDialogOpen(false);
+    setSelectedWithdrawId(null);
+
+    setWithdrawingId(targetId);
     toast.loading("Withdrawing application...", { id: "withdraw-application" });
 
     try {
-      await withdrawApplication(applicationId).unwrap();
+      await withdrawApplication(targetId).unwrap();
       toast.success("Application withdrawn", { id: "withdraw-application" });
     } catch (error: unknown) {
       const message =
@@ -390,7 +412,7 @@ const MyAppliedJobsView = () => {
                           key={app.id}
                           app={app}
                           isWithdrawing={withdrawingId === app.id}
-                          onWithdraw={handleWithdraw}
+                          onWithdraw={handleWithdrawClick}
                         />
                       ))
                     ) : (
@@ -434,6 +456,39 @@ const MyAppliedJobsView = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Premium Custom Withdrawal Confirmation Modal */}
+      <AlertDialog
+        open={isWithdrawDialogOpen}
+        onOpenChange={setIsWithdrawDialogOpen}
+      >
+        <AlertDialogContent className="bg-card max-w-md overflow-hidden rounded-2xl border-none p-6 shadow-2xl">
+          <AlertDialogHeader className="flex flex-col items-center text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 text-amber-500 ring-8 ring-amber-500/5">
+              <AlertTriangle className="h-8 w-8 animate-pulse" />
+            </div>
+            <AlertDialogTitle className="text-foreground text-xl font-black tracking-tight">
+              Withdraw Application?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground mt-2 max-w-sm text-sm leading-relaxed font-medium">
+              Are you sure you want to withdraw your application? This action is
+              permanent and cannot be undone. You will lose your spot in the
+              recruitment pool.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center sm:gap-4">
+            <AlertDialogCancel className="border-border hover:bg-muted text-foreground h-11 flex-1 rounded-full border bg-transparent px-6 font-bold transition-all sm:flex-none">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmWithdraw}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-11 flex-1 rounded-full border-none px-6 font-bold shadow-sm transition-all hover:shadow sm:flex-none"
+            >
+              Yes, Withdraw
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

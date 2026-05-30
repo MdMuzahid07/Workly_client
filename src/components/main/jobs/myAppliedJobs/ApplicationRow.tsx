@@ -7,6 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { ApplicationStatus, MyAppliedJob } from "@/types/application";
 import { Building2, MoreVertical } from "lucide-react";
 import Image from "next/image";
@@ -128,7 +134,7 @@ export const ApplicationRow = ({
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52 rounded-xl p-2">
+          <DropdownMenuContent align="end" className="w-56 rounded-xl p-2">
             <DropdownMenuItem
               asChild
               className="h-10 cursor-pointer rounded-lg font-medium"
@@ -143,13 +149,52 @@ export const ApplicationRow = ({
                 <Link href={companyHref}>Company Details</Link>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem
-              disabled={app.status === "WITHDRAWN" || isWithdrawing}
-              onClick={() => onWithdraw(app.id)}
-              className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium"
-            >
-              {isWithdrawing ? "Withdrawing..." : "Withdraw Application"}
-            </DropdownMenuItem>
+            {(() => {
+              const isWithdrawable =
+                (app.status === "SUBMITTED" || app.status === "REVIEWING") &&
+                !isWithdrawing;
+              return (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    if (!isWithdrawable) {
+                      e.preventDefault();
+                      return;
+                    }
+                    onWithdraw(app.id);
+                  }}
+                  className={cn(
+                    "flex h-10 w-full items-center justify-between rounded-lg font-medium transition-colors",
+                    isWithdrawable
+                      ? "text-destructive focus:text-destructive hover:bg-destructive/5 focus:bg-destructive/5 cursor-pointer"
+                      : "text-muted-foreground/50 focus:text-muted-foreground/50 pointer-events-none cursor-default opacity-60 select-none hover:bg-transparent focus:bg-transparent",
+                  )}
+                >
+                  <span>
+                    {isWithdrawing ? "Withdrawing..." : "Withdraw Application"}
+                  </span>
+                  {!isWithdrawable && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="bg-destructive/10 text-destructive hover:bg-destructive/20 ring-destructive/5 pointer-events-auto ml-2 flex h-5 w-5 shrink-0 cursor-help items-center justify-center rounded-full text-xs font-black ring-2 transition-all select-none"
+                        >
+                          !
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="left"
+                        className="bg-destructive text-destructive-foreground pointer-events-auto max-w-[220px] rounded-lg border-none p-2.5 text-xs font-semibold shadow-xl"
+                      >
+                        {app.status === "WITHDRAWN"
+                          ? "This application has already been withdrawn."
+                          : "Cannot withdraw once shortlisted or processed by the employer."}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </DropdownMenuItem>
+              );
+            })()}
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

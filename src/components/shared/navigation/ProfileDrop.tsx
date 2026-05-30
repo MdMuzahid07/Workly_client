@@ -7,7 +7,7 @@ import {
   Building2,
   ChevronDown,
   FileText,
-  Heart,
+  Bookmark,
   LogOut,
   User,
   Settings,
@@ -106,7 +106,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
       ? [
           { icon: Briefcase, label: "Dashboard", href: "/dashboard" },
           {
-            icon: Heart,
+            icon: Bookmark,
             label: "Saved Jobs",
             href: "/dashboard/saved-jobs",
             badge: 12,

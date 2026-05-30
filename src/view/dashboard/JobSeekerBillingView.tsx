@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Calendar, Crown, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function JobSeekerBillingView() {
   const [autoRenew, setAutoRenew] = useState(
@@ -29,10 +30,12 @@ export default function JobSeekerBillingView() {
 
   const handleSSLCommerzPayment = () => {
     setIsProcessing(true);
+    const toastId = toast.loading("Initiating secure payment gateway...");
     setTimeout(() => {
       setIsProcessing(false);
-      alert(
+      toast.success(
         `Redirecting securely to SSLCommerz ${selectedMethod.toUpperCase()} gateway...`,
+        { id: toastId },
       );
     }, 1200);
   };

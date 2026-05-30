@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetRecommendedJobsQuery } from "@/redux/feature/job/jobApi";
+import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
 import { useAppSelector } from "@/redux/hooks";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -50,8 +51,9 @@ const RecommendedJobsView = () => {
     pages: 0,
   };
 
+  const { data: profileData } = useGetProfileQuery(undefined);
   const user = useAppSelector((state) => state.auth.user);
-  const isPremium = user?.isPremium || false;
+  const isPremium = profileData?.data?.isPremium || user?.isPremium || false;
 
   if (!isPremium) {
     return (

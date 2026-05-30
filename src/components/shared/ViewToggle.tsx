@@ -1,6 +1,6 @@
 "use client";
-import { LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LayoutGrid, List } from "lucide-react";
 
 interface ViewToggleProps {
   viewType: "grid" | "list";
@@ -20,18 +20,18 @@ const ViewToggle = ({
       <Button
         variant={viewType === "list" ? "default" : "ghost"}
         size="icon"
-        className="h-8 w-8 cursor-pointer rounded-full transition-all duration-300 active:scale-95"
+        className="h-6 w-6 cursor-pointer rounded-full transition-all duration-300 active:scale-95"
         onClick={() => onViewChange("list")}
       >
-        <List className="h-4 w-4" />
+        <List className="h-2 w-2" />
       </Button>
       <Button
         variant={viewType === "grid" ? "default" : "ghost"}
         size="icon"
-        className="h-8 w-8 cursor-pointer rounded-full transition-all duration-300 active:scale-95"
+        className="h-6 w-6 cursor-pointer rounded-full transition-all duration-300 active:scale-95"
         onClick={() => onViewChange("grid")}
       >
-        <LayoutGrid className="h-4 w-4" />
+        <LayoutGrid className="h-2 w-2" />
       </Button>
     </div>
   );

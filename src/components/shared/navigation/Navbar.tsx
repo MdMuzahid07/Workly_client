@@ -6,8 +6,8 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 import {
   Briefcase,
   Building2,
+  Bookmark,
   FileText,
-  Heart,
   LogOut,
   Menu,
   User,
@@ -115,8 +115,8 @@ const Navbar = () => {
       ? [
           { icon: Briefcase, label: "Dashboard", href: "/dashboard" },
           {
-            icon: Heart,
-            label: "Saved",
+            icon: Bookmark,
+            label: "Saved Jobs",
             href: "/dashboard/saved-jobs",
             badge: 12,
           },

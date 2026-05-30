@@ -3,14 +3,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   Award,
+  Bookmark,
   Building,
   Clock,
   DollarSign,
   FileText,
   Globe,
-  Heart,
   MapPin,
   Share2,
   Shield,
@@ -192,12 +193,20 @@ const JobDetailsView = () => {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="rounded-xl border-gray-200"
+                      className={cn(
+                        "rounded-xl border-gray-200 transition-colors",
+                        job.isSaved
+                          ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                          : "hover:bg-primary/5 hover:text-primary",
+                      )}
                       onClick={handleJobSave}
                       disabled={isSaving}
                     >
-                      <Heart
-                        className={`h-5 w-5 ${job.isSaved ? "fill-rose-500 text-rose-500" : "text-gray-400"}`}
+                      <Bookmark
+                        className={cn(
+                          "h-5 w-5 transition-all duration-200",
+                          job.isSaved ? "fill-primary" : "text-gray-400",
+                        )}
                       />
                     </Button>
                     <Button

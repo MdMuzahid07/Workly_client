@@ -53,6 +53,7 @@ import {
   useMarkAsReadMutation,
   useSendMessageMutation,
 } from "../../redux/feature/message/messageApi";
+import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import { useAppSelector } from "../../redux/hooks";
 import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
 
@@ -76,7 +77,10 @@ interface Message {
 
 const MessageView = () => {
   const { socket } = useSocket();
+  const { data: profileData } = useGetProfileQuery(undefined);
   const currentUser = useAppSelector((state) => state.auth.user);
+  const isPremium =
+    profileData?.data?.isPremium || currentUser?.isPremium || false;
 
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
@@ -393,7 +397,7 @@ const MessageView = () => {
     setSelectedConversation(null);
   };
 
-  if (!currentUser?.isPremium) {
+  if (!isPremium) {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center p-4">
         <Card className="max-w-2xl overflow-hidden border">

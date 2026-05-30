@@ -16,6 +16,7 @@ import { MOCK_BILLING_SUMMARY } from "@/constants/billing";
 import { cn } from "@/lib/utils";
 import { Calendar, Crown, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function EmployerBillingView() {
   const [autoRenew, setAutoRenew] = useState(MOCK_BILLING_SUMMARY.autoRenew);
@@ -24,10 +25,12 @@ export default function EmployerBillingView() {
 
   const handleSSLCommerzPayment = () => {
     setIsProcessing(true);
+    const toastId = toast.loading("Initiating secure payment gateway...");
     setTimeout(() => {
       setIsProcessing(false);
-      alert(
+      toast.success(
         `Redirecting securely to SSLCommerz ${selectedMethod.toUpperCase()} gateway...`,
+        { id: toastId },
       );
     }, 1200);
   };
