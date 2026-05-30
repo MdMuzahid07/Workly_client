@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Button } from "@/components/ui/button";
-import { ChevronRight, LayoutGrid, List } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -13,6 +12,7 @@ import JobCard from "../../components/main/jobs/JobCard";
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../components/main/jobs/filter/SidebarFilter";
+import ViewToggle from "../../components/shared/ViewToggle";
 import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
 import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
 import JobCardSkeleton from "../../skeleton/job/JobCardSkeleton";
@@ -243,24 +243,7 @@ const JobView = () => {
             {data?.meta?.total || 0} JOBS FOUND
           </h2>
 
-          <div className="flex items-center gap-1 rounded-full border bg-gray-50 p-1 sm:gap-1.5 dark:bg-slate-900">
-            <Button
-              variant={viewType === "list" ? "default" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-              onClick={() => setViewType("list")}
-            >
-              <List className="h-5 w-5" />
-            </Button>
-            <Button
-              variant={viewType === "grid" ? "default" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-              onClick={() => setViewType("grid")}
-            >
-              <LayoutGrid className="h-5 w-5" />
-            </Button>
-          </div>
+          <ViewToggle viewType={viewType} onViewChange={setViewType} />
         </div>
 
         <div className="grid grid-cols-12 gap-8">

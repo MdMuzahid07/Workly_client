@@ -6,8 +6,6 @@ import {
   BadgeCheck,
   ChevronRight,
   Crown,
-  LayoutGrid,
-  List,
   MapPin,
   Users,
 } from "lucide-react";
@@ -16,6 +14,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import ViewToggle from "../../components/shared/ViewToggle";
 import "swiper/css";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -318,24 +317,11 @@ const CompanyView = ({
                 onFilterChange={handleFilterChange}
               />
 
-              <div className="flex items-center gap-1.5 self-start rounded-full border bg-gray-50 p-1 sm:self-auto dark:bg-slate-900">
-                <Button
-                  variant={viewType === "list" ? "default" : "ghost"}
-                  size="icon"
-                  className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-                  onClick={() => setViewType("list")}
-                >
-                  <List className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant={viewType === "grid" ? "default" : "ghost"}
-                  size="icon"
-                  className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-                  onClick={() => setViewType("grid")}
-                >
-                  <LayoutGrid className="h-5 w-5" />
-                </Button>
-              </div>
+              <ViewToggle
+                viewType={viewType}
+                onViewChange={setViewType}
+                className="self-start sm:self-auto"
+              />
             </div>
           </div>
 

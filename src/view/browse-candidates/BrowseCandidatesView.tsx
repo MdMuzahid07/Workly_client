@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   ArrowUpRight,
   BadgeCheck,
   Briefcase,
-  LayoutGrid,
-  List,
   MapPin,
   Star,
   Users,
@@ -25,6 +22,7 @@ import CandidateSidebarFilter from "../../components/main/candidates/filter/Cand
 import Searchbar from "../../components/main/jobs/Searchbar";
 import Sidebar from "../../components/main/jobs/Sidebar";
 import PageHero from "../../components/shared/PageHero";
+import ViewToggle from "../../components/shared/ViewToggle";
 import { useGetCandidatesQuery } from "../../redux/feature/candidate/candidateApi";
 import CandidateCardSkeleton from "../../skeleton/candidate/CandidateCardSkeleton";
 
@@ -321,24 +319,7 @@ const BrowseCandidatesView = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-1 rounded-full border bg-gray-50 p-1 sm:gap-1.5 dark:bg-slate-900">
-            <Button
-              variant={viewType === "list" ? "default" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-              onClick={() => setViewType("list")}
-            >
-              <List className="h-5 w-5" />
-            </Button>
-            <Button
-              variant={viewType === "grid" ? "default" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-full transition-all sm:h-10 sm:w-10"
-              onClick={() => setViewType("grid")}
-            >
-              <LayoutGrid className="h-5 w-5" />
-            </Button>
-          </div>
+          <ViewToggle viewType={viewType} onViewChange={setViewType} />
         </div>
 
         <div className="grid grid-cols-12 gap-8">
