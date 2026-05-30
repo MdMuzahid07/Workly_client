@@ -96,7 +96,7 @@ const SidebarSkeleton = () => (
 const JobDetailsSkeleton = () => {
   return (
     <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
+      <div className="container mx-auto px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <JobHeaderSkeleton />

@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   UploadCloud,
 } from "lucide-react";
+import { CVManagerSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
 import Link from "next/link";
 import { useRef } from "react";
 import { toast } from "sonner";
@@ -69,14 +70,6 @@ const CVManagerView = () => {
     fileInputRef.current?.click();
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="text-primary h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen pt-16">
       <DashboardCVManagerHeader />
@@ -89,125 +82,129 @@ const CVManagerView = () => {
         accept=".pdf"
       />
 
-      <div className="space-y-8 px-4 sm:px-6 sm:py-8">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight">Your Resumes</h2>
-            <p className="text-muted-foreground text-sm font-medium">
-              You have {resumes.length} active resumes on file.
-            </p>
+      {isLoading ? (
+        <CVManagerSkeleton />
+      ) : (
+        <div className="space-y-8 px-4 sm:px-6 sm:py-8">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">Your Resumes</h2>
+              <p className="text-muted-foreground text-sm font-medium">
+                You have {resumes.length} active resumes on file.
+              </p>
+            </div>
+            <Button
+              className="shadow-primary/10 h-11 rounded-full px-6 font-bold shadow-lg"
+              onClick={triggerUpload}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 h-4 w-4" />
+              )}
+              Upload New Version
+            </Button>
           </div>
-          <Button
-            className="shadow-primary/10 h-11 rounded-full px-6 font-bold shadow-lg"
-            onClick={triggerUpload}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="mr-2 h-4 w-4" />
-            )}
-            Upload New Version
-          </Button>
-        </div>
 
-        {/* CV Grid */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {resumes.map((resume: any, index: number) => (
-            <CVCard key={resume.id} resume={resume} index={index} />
-          ))}
+          {/* CV Grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {resumes.map((resume: any, index: number) => (
+              <CVCard key={resume.id} resume={resume} index={index} />
+            ))}
 
-          {/* Upload Placeholder Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: resumes.length * 0.1 }}
-            onClick={triggerUpload}
-            className={cn(isUploading && "pointer-events-none opacity-50")}
-          >
-            <Card className="group border-border bg-muted/5 hover:bg-muted/10 hover:border-primary/50 flex h-full min-h-[200px] cursor-pointer flex-col items-center justify-center border-2 border-dashed text-center transition-all">
-              <CardContent className="flex flex-col items-center gap-4 p-6">
-                <div className="bg-muted/20 group-hover:bg-primary/10 rounded-full p-4 transition-colors">
-                  {isUploading ? (
-                    <Loader2 className="text-primary h-8 w-8 animate-spin" />
-                  ) : (
-                    <UploadCloud className="text-muted-foreground group-hover:text-primary h-8 w-8 transition-colors" />
-                  )}
+            {/* Upload Placeholder Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: resumes.length * 0.1 }}
+              onClick={triggerUpload}
+              className={cn(isUploading && "pointer-events-none opacity-50")}
+            >
+              <Card className="group border-border bg-muted/5 hover:bg-muted/10 hover:border-primary/50 flex h-full min-h-[200px] cursor-pointer flex-col items-center justify-center border-2 border-dashed text-center transition-all">
+                <CardContent className="flex flex-col items-center gap-4 p-6">
+                  <div className="bg-muted/20 group-hover:bg-primary/10 rounded-full p-4 transition-colors">
+                    {isUploading ? (
+                      <Loader2 className="text-primary h-8 w-8 animate-spin" />
+                    ) : (
+                      <UploadCloud className="text-muted-foreground group-hover:text-primary h-8 w-8 transition-colors" />
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold">Add another resume</p>
+                    <p className="text-muted-foreground text-xs">
+                      Drop your PDF here or click to browse
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Premium Upgrade Hint for Free Users */}
+          {!isPremium && isJobSeeker && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="from-primary/10 via-background border-primary/10 to-primary/5 relative overflow-hidden rounded-2xl border-2 bg-linear-to-br p-8"
+            >
+              <div className="relative z-10 flex flex-col justify-between gap-8 md:flex-row md:items-center">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                  <div className="bg-primary shadow-primary/20 flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg">
+                    <Crown className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-2xl font-black tracking-tight">
+                      Version Control is a{" "}
+                      <span className="text-primary">Premium</span> Perk
+                    </h3>
+                    <p className="text-muted-foreground max-w-xl text-sm leading-relaxed font-medium opacity-80">
+                      Maintain multiple versions of your resume tailored for
+                      different roles. Premium members can upload up to 10
+                      distinct resumes for maximum application precision.
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-bold">Add another resume</p>
-                  <p className="text-muted-foreground text-xs">
-                    Drop your PDF here or click to browse
-                  </p>
+                <Button
+                  asChild
+                  size="lg"
+                  className="shadow-primary/20 h-14 rounded-2xl px-8 font-black shadow-xl"
+                >
+                  <Link href="/pricing" className="flex items-center gap-2">
+                    Upgrade to Premium
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+              {/* Background Decoration */}
+              <div className="bg-primary/5 absolute -top-12 -right-12 h-48 w-48 rounded-full blur-3xl" />
+            </motion.div>
+          )}
+
+          {/* Standard Tip Card (only if premium or no resumes yet) */}
+          {(isPremium || resumes.length === 0) && (
+            <Card className="bg-primary/5 border-primary/20 overflow-hidden rounded-2xl border">
+              <CardContent className="p-6 sm:p-8">
+                <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                  <div className="bg-primary/10 text-primary h-12 w-12 shrink-0 rounded-full p-3">
+                    <ShieldCheck className="h-full w-full" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold">
+                      Pro Tip: Strategic Tailoring
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed font-medium opacity-80">
+                      Landing a dream role often requires highlighting different
+                      strengths. Managing multiple resumes allows you to pivot
+                      your profile for different career paths instantly.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          )}
         </div>
-
-        {/* Premium Upgrade Hint for Free Users */}
-        {!isPremium && isJobSeeker && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="from-primary/10 via-background border-primary/10 to-primary/5 relative overflow-hidden rounded-2xl border-2 bg-linear-to-br p-8"
-          >
-            <div className="relative z-10 flex flex-col justify-between gap-8 md:flex-row md:items-center">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center">
-                <div className="bg-primary shadow-primary/20 flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg">
-                  <Crown className="h-8 w-8 text-white" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-2xl font-black tracking-tight">
-                    Version Control is a{" "}
-                    <span className="text-primary">Premium</span> Perk
-                  </h3>
-                  <p className="text-muted-foreground max-w-xl text-sm leading-relaxed font-medium opacity-80">
-                    Maintain multiple versions of your resume tailored for
-                    different roles. Premium members can upload up to 10
-                    distinct resumes for maximum application precision.
-                  </p>
-                </div>
-              </div>
-              <Button
-                asChild
-                size="lg"
-                className="shadow-primary/20 h-14 rounded-2xl px-8 font-black shadow-xl"
-              >
-                <Link href="/pricing" className="flex items-center gap-2">
-                  Upgrade to Premium
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
-            {/* Background Decoration */}
-            <div className="bg-primary/5 absolute -top-12 -right-12 h-48 w-48 rounded-full blur-3xl" />
-          </motion.div>
-        )}
-
-        {/* Standard Tip Card (only if premium or no resumes yet) */}
-        {(isPremium || resumes.length === 0) && (
-          <Card className="bg-primary/5 border-primary/20 overflow-hidden rounded-2xl border">
-            <CardContent className="p-6 sm:p-8">
-              <div className="flex flex-col gap-6 md:flex-row md:items-center">
-                <div className="bg-primary/10 text-primary h-12 w-12 shrink-0 rounded-full p-3">
-                  <ShieldCheck className="h-full w-full" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-lg font-bold">
-                    Pro Tip: Strategic Tailoring
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed font-medium opacity-80">
-                    Landing a dream role often requires highlighting different
-                    strengths. Managing multiple resumes allows you to pivot
-                    your profile for different career paths instantly.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      )}
     </div>
   );
 };

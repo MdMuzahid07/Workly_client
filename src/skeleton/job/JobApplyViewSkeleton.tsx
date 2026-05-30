@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const JobApplyViewSkeleton = () => {
   return (
     <div className="bg-background min-h-screen pb-20">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:mt-10 lg:px-8">
+      <div className="mx-auto px-4 py-6 sm:px-6 md:mt-10 lg:px-8">
         {/* Header Skeleton */}
         <div className="border-border/50 bg-card flex flex-col justify-between gap-6 rounded-xl border p-4 sm:p-6 md:flex-row md:items-center lg:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">

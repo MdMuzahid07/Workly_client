@@ -43,7 +43,7 @@ const ApplicationCardSkeleton = () => {
 const MyAppliedJobsSkeleton = () => {
   return (
     <div className="bg-primary/2 min-h-screen">
-      <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
+      <div className="space-y-8 px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-72" />

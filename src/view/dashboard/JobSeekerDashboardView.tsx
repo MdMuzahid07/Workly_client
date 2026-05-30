@@ -20,6 +20,8 @@ import { Bookmark, FileText, Search, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import DashboardJobSeekerHeader from "../../components/dashboard/dashboard-nav/header/DashboardJobSeekerHeader";
 
+import { JobSeekerDashboardSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
+
 interface ProfileCompletionData {
   profile?: {
     bio?: string | null;
@@ -50,15 +52,22 @@ export default function JobSeekerDashboardView() {
   const { user } = useAppSelector((state) => state.auth) || {};
   const userId = user?.id;
 
-  const { data: profileData } = useGetProfileQuery(undefined, {
-    skip: !userId,
-  });
-  const { data: applicationsData } = useGetMyApplicationsQuery(undefined, {
-    skip: !userId,
-  });
-  const { data: savedJobsData } = useGetSavedJobsQuery(undefined, {
-    skip: !userId,
-  });
+  const { data: profileData, isLoading: isProfileLoading } = useGetProfileQuery(
+    undefined,
+    {
+      skip: !userId,
+    },
+  );
+  const { data: applicationsData, isLoading: isApplicationsLoading } =
+    useGetMyApplicationsQuery(undefined, {
+      skip: !userId,
+    });
+  const { data: savedJobsData, isLoading: isSavedLoading } =
+    useGetSavedJobsQuery(undefined, {
+      skip: !userId,
+    });
+
+  const isLoading = isProfileLoading || isApplicationsLoading || isSavedLoading;
 
   const profileCompletion = computeProfileCompletion(profileData?.data);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,198 +80,202 @@ export default function JobSeekerDashboardView() {
   return (
     <div className="mt-16 min-h-screen">
       <DashboardJobSeekerHeader />
-      <div className="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-          <Card className="bg-card border transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
-                Profile completion
-              </CardTitle>
-              <User className="text-muted-foreground h-4 w-4 shrink-0" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-primary text-xl font-bold sm:text-2xl">
-                {profileCompletion}%
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                Complete your profile to get better matches
-              </p>
-              <Link href="/dashboard/profile">
-                <Button
-                  variant="link"
-                  className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
-                >
-                  Edit profile
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
-                Applications
-              </CardTitle>
-              <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-primary text-xl font-bold sm:text-2xl">
-                {appliedCount}
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                Total applications submitted
-              </p>
-              <Link href="/dashboard/applied-jobs">
-                <Button
-                  variant="link"
-                  className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
-                >
-                  View applied jobs
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
-                Saved jobs
-              </CardTitle>
-              <Bookmark className="text-muted-foreground h-4 w-4 shrink-0" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-primary text-xl font-bold sm:text-2xl">
-                {savedCount}
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                Jobs {`you've`} saved for later
-              </p>
-              <Link href="/dashboard/saved-jobs">
-                <Button
-                  variant="link"
-                  className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
-                >
-                  View saved jobs
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
-                Recommended
-              </CardTitle>
-              <TrendingUp className="text-muted-foreground h-4 w-4 shrink-0" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                Jobs matched to your profile and preferences
-              </p>
-              <Link href="/dashboard/recommended-jobs">
-                <Button
-                  variant="link"
-                  className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
-                >
-                  See recommendations
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
-          <ProfileViewsChart />
-          <JobApplicationsChart />
-        </div>
-
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-          <Card className="bg-card border transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg">
-                Quick actions
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Shortcuts to common tasks
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
-              <Link href="/dashboard/find-jobs" className="w-full sm:w-auto">
-                <Button className="w-full touch-manipulation sm:w-auto">
-                  <Search className="mr-2 h-4 w-4" />
-                  Find jobs
-                </Button>
-              </Link>
-              <Link href="/dashboard/profile" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  className="w-full touch-manipulation sm:w-auto"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Edit profile
-                </Button>
-              </Link>
-              <Link href="/dashboard/cv-manager" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  className="w-full touch-manipulation sm:w-auto"
-                >
-                  <FileText className="mr-2 h-4 w-4" />
-                  CV Manager
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg">
-                Recent activity
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Your latest applications and saves
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {appliedCount === 0 && savedCount === 0 ? (
-                <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
-                  You {`haven't`} applied or saved any jobs yet.{" "}
-                  <Link
-                    href="/dashboard/find-jobs"
-                    className="text-primary touch-manipulation hover:underline active:opacity-70"
-                  >
-                    Start exploring
-                  </Link>
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {appliedCount > 0 && (
-                    <p className="text-xs sm:text-sm">
-                      <span className="font-medium">{appliedCount}</span>{" "}
-                      application
-                      {appliedCount !== 1 ? "s" : ""} submitted
-                    </p>
-                  )}
-                  {savedCount > 0 && (
-                    <p className="text-xs sm:text-sm">
-                      <span className="font-medium">{savedCount}</span> job
-                      {savedCount !== 1 ? "s" : ""} saved
-                    </p>
-                  )}
-                  <Link href="/dashboard/applied-jobs">
-                    <Button
-                      variant="link"
-                      className="h-auto touch-manipulation p-0 text-xs active:opacity-70 sm:text-sm"
-                    >
-                      View all activity
-                    </Button>
-                  </Link>
+      {isLoading ? (
+        <JobSeekerDashboardSkeleton />
+      ) : (
+        <div className="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+            <Card className="bg-card border transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs font-medium sm:text-sm">
+                  Profile completion
+                </CardTitle>
+                <User className="text-muted-foreground h-4 w-4 shrink-0" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-primary text-xl font-bold sm:text-2xl">
+                  {profileCompletion}%
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                  Complete your profile to get better matches
+                </p>
+                <Link href="/dashboard/profile">
+                  <Button
+                    variant="link"
+                    className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
+                  >
+                    Edit profile
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs font-medium sm:text-sm">
+                  Applications
+                </CardTitle>
+                <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-primary text-xl font-bold sm:text-2xl">
+                  {appliedCount}
+                </div>
+                <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                  Total applications submitted
+                </p>
+                <Link href="/dashboard/applied-jobs">
+                  <Button
+                    variant="link"
+                    className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
+                  >
+                    View applied jobs
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs font-medium sm:text-sm">
+                  Saved jobs
+                </CardTitle>
+                <Bookmark className="text-muted-foreground h-4 w-4 shrink-0" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-primary text-xl font-bold sm:text-2xl">
+                  {savedCount}
+                </div>
+                <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                  Jobs {`you've`} saved for later
+                </p>
+                <Link href="/dashboard/saved-jobs">
+                  <Button
+                    variant="link"
+                    className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
+                  >
+                    View saved jobs
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs font-medium sm:text-sm">
+                  Recommended
+                </CardTitle>
+                <TrendingUp className="text-muted-foreground h-4 w-4 shrink-0" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Jobs matched to your profile and preferences
+                </p>
+                <Link href="/dashboard/recommended-jobs">
+                  <Button
+                    variant="link"
+                    className="h-auto touch-manipulation p-0 text-xs active:opacity-70"
+                  >
+                    See recommendations
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+            <ProfileViewsChart />
+            <JobApplicationsChart />
+          </div>
+
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            <Card className="bg-card border transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Quick actions
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Shortcuts to common tasks
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+                <Link href="/dashboard/find-jobs" className="w-full sm:w-auto">
+                  <Button className="w-full touch-manipulation sm:w-auto">
+                    <Search className="mr-2 h-4 w-4" />
+                    Find jobs
+                  </Button>
+                </Link>
+                <Link href="/dashboard/profile" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    className="w-full touch-manipulation sm:w-auto"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Edit profile
+                  </Button>
+                </Link>
+                <Link href="/dashboard/cv-manager" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    className="w-full touch-manipulation sm:w-auto"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    CV Manager
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Recent activity
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Your latest applications and saves
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {appliedCount === 0 && savedCount === 0 ? (
+                  <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                    You {`haven't`} applied or saved any jobs yet.{" "}
+                    <Link
+                      href="/dashboard/find-jobs"
+                      className="text-primary touch-manipulation hover:underline active:opacity-70"
+                    >
+                      Start exploring
+                    </Link>
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {appliedCount > 0 && (
+                      <p className="text-xs sm:text-sm">
+                        <span className="font-medium">{appliedCount}</span>{" "}
+                        application
+                        {appliedCount !== 1 ? "s" : ""} submitted
+                      </p>
+                    )}
+                    {savedCount > 0 && (
+                      <p className="text-xs sm:text-sm">
+                        <span className="font-medium">{savedCount}</span> job
+                        {savedCount !== 1 ? "s" : ""} saved
+                      </p>
+                    )}
+                    <Link href="/dashboard/applied-jobs">
+                      <Button
+                        variant="link"
+                        className="h-auto touch-manipulation p-0 text-xs active:opacity-70 sm:text-sm"
+                      >
+                        View all activity
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

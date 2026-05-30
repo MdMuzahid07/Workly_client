@@ -9,7 +9,8 @@ import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
 import { useGetMyApplicationsQuery } from "@/redux/feature/application/applicationApi";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
 import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
-import { Loader2, Package, Shield, Zap } from "lucide-react";
+import { JobSeekerPricingSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
+import { Package, Shield, Zap } from "lucide-react";
 
 export default function JobSeekerPricingView() {
   const { data: profileRes, isLoading: isProfileLoading } =
@@ -100,12 +101,10 @@ export default function JobSeekerPricingView() {
   return (
     <div className="min-h-screen pt-15">
       <DashboardCandidatePricingHeader />
-      <div className="px-4 py-8 sm:px-6 lg:px-8">
-        {isLoading ? (
-          <div className="flex h-60 items-center justify-center">
-            <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          </div>
-        ) : (
+      {isLoading ? (
+        <JobSeekerPricingSkeleton />
+      ) : (
+        <div className="px-4 py-8 sm:px-6 lg:px-8">
           <div className="space-y-10">
             {/* Current Subscription Status */}
             <CandidateSubscriptionStatusCard
@@ -150,8 +149,8 @@ export default function JobSeekerPricingView() {
             {/* FAQ Section */}
             <CandidatePricingFAQ />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

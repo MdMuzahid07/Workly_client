@@ -48,6 +48,8 @@ import { toast } from "sonner";
 
 export type DateFilter = "all" | "today" | "last_7_days" | "this_month";
 
+import MyAppliedJobsSkeleton from "@/skeleton/job/MyAppliedJobsSkeleton";
+
 const MyAppliedJobsView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
@@ -195,6 +197,10 @@ const MyAppliedJobsView = () => {
 
   const hasActiveFilters =
     searchValue !== "" || statusFilter !== "all" || dateFilter !== "all";
+
+  if (isLoading && !applicationsResponse) {
+    return <MyAppliedJobsSkeleton />;
+  }
 
   if (isError) {
     return <ErrorState onRetry={refetch} />;

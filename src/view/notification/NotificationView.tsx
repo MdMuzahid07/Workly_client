@@ -1,5 +1,6 @@
 "use client";
 import DashboardNotificationHeader from "@/components/dashboard/dashboard-nav/header/DashboardNotificationHeader";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import NotificationCard from "../../components/main/notification/NotificationCard";
+import { NotificationsSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
 
 interface Notification {
   id: string;
@@ -77,10 +79,11 @@ const NotificationView = () => {
   const { user } = useAppSelector((s) => s.auth) || {};
   const skip = !user?.id;
 
-  const { data: envelope } = useGetMyNotificationsQuery(
-    { page: 1, limit: 100 },
-    { skip, refetchOnMountOrArgChange: true },
-  );
+  const { data: envelope, isLoading: isNotifLoading } =
+    useGetMyNotificationsQuery(
+      { page: 1, limit: 100 },
+      { skip, refetchOnMountOrArgChange: true },
+    );
   const raw = Array.isArray(envelope?.data) ? envelope!.data : [];
 
   const notifications: Notification[] = raw.map((n) => ({
@@ -144,83 +147,91 @@ const NotificationView = () => {
     <div className="min-h-screen pt-16">
       <DashboardNotificationHeader />
 
-      <div className="space-y-6 px-4 py-8 sm:px-6">
-        <div>
-          {/* Filter Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="bg-muted/20 border-border inline-flex h-10 w-full items-center justify-start rounded-full border p-0 sm:w-auto">
-              <TabsTrigger
-                value="all"
-                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
-              >
-                All ({notifications.length})
-              </TabsTrigger>
-              <TabsTrigger
-                value="unread"
-                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
-              >
-                Unread ({unreadCount})
-              </TabsTrigger>
-              <TabsTrigger
-                value="applications"
-                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
-              >
-                Applications
-              </TabsTrigger>
-              <TabsTrigger
-                value="messages"
-                className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 text-sm font-bold transition-all"
-              >
-                Messages
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+      {isNotifLoading ? (
+        <NotificationsSkeleton />
+      ) : (
+        <div className="space-y-6 px-4 py-8 sm:px-6">
+          <div>
+            {/* Filter Tabs */}
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="mb-8"
+            >
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <TabsList className="bg-muted/10 h-10 w-full max-w-lg rounded-full border p-1 sm:w-auto">
+                  <TabsTrigger
+                    value="all"
+                    className="cursor-pointer rounded-full font-bold"
+                  >
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="unread"
+                    className="cursor-pointer rounded-full font-bold"
+                  >
+                    Unread {unreadCount > 0 && `(${unreadCount})`}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="applications"
+                    className="cursor-pointer rounded-full font-bold"
+                  >
+                    Applications
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="messages"
+                    className="cursor-pointer rounded-full font-bold"
+                  >
+                    Messages
+                  </TabsTrigger>
+                </TabsList>
 
-          {unreadCount > 0 && (
-            <div className="mb-6 flex justify-end">
-              <button
-                type="button"
-                onClick={handleMarkAll}
-                className="text-primary hover:text-primary/80 text-sm font-bold"
-              >
-                Mark all as read
-              </button>
+                {unreadCount > 0 && (
+                  <Button
+                    variant="outline"
+                    onClick={handleMarkAll}
+                    className="h-10 rounded-full font-bold shadow-xs transition-all active:scale-95"
+                  >
+                    <BellRing className="mr-2 h-4 w-4" />
+                    Mark all read
+                  </Button>
+                )}
+              </div>
+            </Tabs>
+
+            <div className="space-y-4">
+              {filteredNotifications.length > 0 ? (
+                filteredNotifications.map((notif) => (
+                  <NotificationCard
+                    key={notif.id}
+                    notification={notif}
+                    getNotificationColor={getNotificationColor}
+                    getNotificationIcon={getNotificationIcon}
+                    deleteNotification={deleteNotification}
+                    markAsRead={markAsRead}
+                  />
+                ))
+              ) : (
+                <Card className="bg-card rounded-xl border-2 border-dashed py-24 text-center">
+                  <CardContent className="flex flex-col items-center gap-4 p-0">
+                    <div className="bg-muted/20 rounded-full p-6">
+                      <Bell className="text-muted-foreground/20 h-10 w-10" />
+                    </div>
+                    <h3 className="text-foreground text-lg font-black tracking-tight">
+                      No notifications
+                    </h3>
+                    <p className="text-muted-foreground text-sm font-medium opacity-80">
+                      {activeTab === "unread"
+                        ? "You're all caught up! No unread notifications."
+                        : "You don't have any notifications yet."}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-          )}
-
-          {/* Notifications List */}
-          <div className="space-y-4">
-            {filteredNotifications.length > 0 ? (
-              filteredNotifications.map((notification) => (
-                <NotificationCard
-                  key={notification.id}
-                  notification={notification}
-                  getNotificationColor={getNotificationColor}
-                  getNotificationIcon={getNotificationIcon}
-                  deleteNotification={deleteNotification}
-                  markAsRead={markAsRead}
-                />
-              ))
-            ) : (
-              <Card className="bg-card rounded-xl border-2 border-dashed py-24 text-center">
-                <CardContent className="flex flex-col items-center gap-4 p-0">
-                  <div className="bg-muted/20 rounded-full p-6">
-                    <Bell className="text-muted-foreground/20 h-10 w-10" />
-                  </div>
-                  <h3 className="text-foreground text-lg font-black tracking-tight">
-                    No notifications
-                  </h3>
-                  <p className="text-muted-foreground text-sm font-medium opacity-80">
-                    {activeTab === "unread"
-                      ? "You're all caught up! No unread notifications."
-                      : "You don't have any notifications yet."}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

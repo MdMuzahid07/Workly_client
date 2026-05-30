@@ -9,7 +9,7 @@ const CandidateDetailsSkeleton = () => {
       {/* Banner Skeleton */}
       <Skeleton className="h-64 w-full lg:h-80" />
 
-      <div className="relative mx-auto -mt-32 max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative container mx-auto -mt-32 px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             {/* Header Card Skeleton */}

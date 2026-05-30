@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const IndustriesSkeleton = () => {
   return (
-    <div className="mx-auto mt-4 max-w-7xl p-4 md:mt-7 xl:p-0">
+    <div className="container mx-auto mt-4 p-4 md:mt-7 xl:p-0">
       <div className="flex gap-3 overflow-hidden">
         {[...Array(10)].map((_, index) => (
           <div key={index} className="w-auto">
