@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
 
-interface EmployeeFiltersAndSearchProps {
+interface TeamMemberFiltersAndSearchProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
   selectedDepartment: string;
@@ -17,13 +17,13 @@ interface EmployeeFiltersAndSearchProps {
   departments: string[];
 }
 
-const EmployeeFiltersAndSearch = ({
+const TeamMemberFiltersAndSearch = ({
   searchTerm,
   setSearchTerm,
   selectedDepartment,
   setSelectedDepartment,
   departments,
-}: EmployeeFiltersAndSearchProps) => {
+}: TeamMemberFiltersAndSearchProps) => {
   return (
     <Card className="mb-6">
       <CardContent className="p-4 sm:p-6">
@@ -32,7 +32,7 @@ const EmployeeFiltersAndSearch = ({
             <div className="relative">
               <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input
-                placeholder="Search employees by name, email, or role..."
+                placeholder="Search team members by name, email, or role..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="h-10 pl-10 sm:h-11"
@@ -61,4 +61,4 @@ const EmployeeFiltersAndSearch = ({
   );
 };
 
-export default EmployeeFiltersAndSearch;
+export default TeamMemberFiltersAndSearch;

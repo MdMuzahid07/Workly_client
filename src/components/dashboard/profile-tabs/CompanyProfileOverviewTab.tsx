@@ -43,8 +43,8 @@ const CompanyProfileOverviewTab = ({
         iconColor: "text-emerald-600",
       },
       {
-        label: "Employees",
-        value: currentProfile?.stats?.totalEmployees || 0,
+        label: "Team members",
+        value: currentProfile?.stats?.totalTeamMembers || 0,
         icon: Users,
         color: "",
         iconColor: "text-orange-600",

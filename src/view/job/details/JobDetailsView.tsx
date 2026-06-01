@@ -421,7 +421,9 @@ const JobDetailsView = () => {
                     {job.company?._count?.employees && (
                       <div className="flex items-center gap-1.5 text-sm font-medium">
                         <Users className="text-primary h-4 w-4" />
-                        <span>{job.company._count.employees}+ Employees</span>
+                        <span>
+                          {job.company._count.employees}+ team members
+                        </span>
                       </div>
                     )}
                     {job.company?.websiteUrl && (

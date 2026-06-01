@@ -2,14 +2,14 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import EmployeeManagementSkeleton from "@/skeleton/dashboard/employer/employees/EmployeeManagementSkeleton";
+import TeamMemberManagementSkeleton from "@/skeleton/dashboard/employer/team-members/TeamMemberManagementSkeleton";
 import { useEffect, useState } from "react";
-import DashboardEmployeeManagementHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployeeManagementHeader";
-import EmployeeFiltersAndSearch from "@/components/dashboard/employee/EmployeeFiltersAndSearch";
-import EmployeeManagementTabs from "@/components/dashboard/employee/EmployeeManagementTabs";
-import EmployeeStatusCards from "@/components/dashboard/employee/EmployeeStatusCards";
+import DashboardTeamMemberManagementHeader from "@/components/dashboard/dashboard-nav/header/DashboardTeamMemberManagementHeader";
+import TeamMemberFiltersAndSearch from "@/components/dashboard/team-member/TeamMemberFiltersAndSearch";
+import TeamMemberManagementTabs from "@/components/dashboard/team-member/TeamMemberManagementTabs";
+import TeamMemberStatusCards from "@/components/dashboard/team-member/TeamMemberStatusCards";
 
-interface Employee {
+interface TeamMember {
   id: string;
   fullName: string;
   email: string;
@@ -25,11 +25,11 @@ interface Employee {
   skills: string[];
 }
 
-export function EmployeeManagementView() {
+export function TeamMemberManagementView() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
-  const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
+  const [isAddTeamMemberOpen, setIsAddTeamMemberOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -40,18 +40,18 @@ export function EmployeeManagementView() {
   if (isLoading) {
     return (
       <div className="min-h-screen pt-16">
-        <DashboardEmployeeManagementHeader
-          isAddEmployeeOpen={isAddEmployeeOpen}
-          setIsAddEmployeeOpen={setIsAddEmployeeOpen}
+        <DashboardTeamMemberManagementHeader
+          isAddTeamMemberOpen={isAddTeamMemberOpen}
+          setIsAddTeamMemberOpen={setIsAddTeamMemberOpen}
         />
-        <EmployeeManagementSkeleton />
+        <TeamMemberManagementSkeleton />
       </div>
     );
   }
 
   // fake data
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [employees, setEmployees] = useState<Employee[]>([
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     {
       id: "1",
       fullName: "John Doe",
@@ -146,20 +146,19 @@ export function EmployeeManagementView() {
     "Marketing Manager",
   ];
 
-  const filteredEmployees = employees.filter((employee) => {
+  const filteredTeamMembers = teamMembers.filter((member) => {
     const matchesSearch =
-      employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.role.toLowerCase().includes(searchTerm.toLowerCase());
+      member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment =
-      selectedDepartment === "all" ||
-      employee.department === selectedDepartment;
-    const matchesTab = activeTab === "all" || employee.status === activeTab;
+      selectedDepartment === "all" || member.department === selectedDepartment;
+    const matchesTab = activeTab === "all" || member.status === activeTab;
 
     return matchesSearch && matchesDepartment && matchesTab;
   });
 
-  const getStatusBadge = (status: Employee["status"]) => {
+  const getStatusBadge = (status: TeamMember["status"]) => {
     switch (status) {
       case "active":
         return (
@@ -181,31 +180,34 @@ export function EmployeeManagementView() {
   };
 
   const handleStatusChange = (
-    employeeId: string,
-    newStatus: Employee["status"],
+    memberId: string,
+    newStatus: TeamMember["status"],
   ) => {
-    setEmployees((prev) =>
-      prev.map((emp) =>
-        emp.id === employeeId ? { ...emp, status: newStatus } : emp,
+    setTeamMembers((prev) =>
+      prev.map((member) =>
+        member.id === memberId ? { ...member, status: newStatus } : member,
       ),
     );
   };
 
-  const handleDeleteEmployee = (employeeId: string) => {
-    setEmployees((prev) => prev.filter((emp) => emp.id !== employeeId));
+  const handleDeleteTeamMember = (memberId: string) => {
+    setTeamMembers((prev) => prev.filter((member) => member.id !== memberId));
   };
 
   return (
     <div className="min-h-screen">
-      <DashboardEmployeeManagementHeader
-        isAddEmployeeOpen={isAddEmployeeOpen}
-        setIsAddEmployeeOpen={setIsAddEmployeeOpen}
+      <DashboardTeamMemberManagementHeader
+        isAddTeamMemberOpen={isAddTeamMemberOpen}
+        setIsAddTeamMemberOpen={setIsAddTeamMemberOpen}
       />
 
       <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        <EmployeeStatusCards employees={employees} departments={departments} />
+        <TeamMemberStatusCards
+          teamMembers={teamMembers}
+          departments={departments}
+        />
 
-        <EmployeeFiltersAndSearch
+        <TeamMemberFiltersAndSearch
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           selectedDepartment={selectedDepartment}
@@ -213,20 +215,20 @@ export function EmployeeManagementView() {
           departments={departments}
         />
 
-        <EmployeeManagementTabs
+        <TeamMemberManagementTabs
           searchTerm={searchTerm}
           selectedDepartment={selectedDepartment}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          employees={employees}
-          filteredEmployees={filteredEmployees}
+          teamMembers={teamMembers}
+          filteredTeamMembers={filteredTeamMembers}
           getStatusBadge={getStatusBadge}
           handleStatusChange={handleStatusChange}
-          handleDeleteEmployee={handleDeleteEmployee}
+          handleDeleteTeamMember={handleDeleteTeamMember}
         />
       </div>
     </div>
   );
 }
 
-export default EmployeeManagementView;
+export default TeamMemberManagementView;

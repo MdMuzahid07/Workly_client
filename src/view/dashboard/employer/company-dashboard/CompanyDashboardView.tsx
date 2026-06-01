@@ -29,7 +29,7 @@ const CompanyDashboardView = () => {
       totalJobs: 12,
       activeJobs: 8,
       totalApplications: 156,
-      totalEmployees: 250,
+      totalTeamMembers: 250,
     },
   };
 
@@ -57,7 +57,7 @@ const CompanyDashboardView = () => {
     },
   ];
 
-  const recentEmployees = [
+  const recentTeamMembers = [
     {
       id: 1,
       name: "John Doe",
@@ -141,13 +141,13 @@ const CompanyDashboardView = () => {
           <Card className="bg-card transition-shadow hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
-                Employees
+                Team members
               </CardTitle>
               <Users className="text-muted-foreground h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
             </CardHeader>
             <CardContent>
               <div className="text-primary text-xl font-bold sm:text-2xl">
-                {companyData.stats.totalEmployees}
+                {companyData.stats.totalTeamMembers}
               </div>
               <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
                 +5 this quarter
@@ -203,25 +203,25 @@ const CompanyDashboardView = () => {
           <Card className="bg-card transition-shadow hover:shadow-md">
             <CardHeader>
               <CardTitle className="text-base sm:text-lg lg:text-xl">
-                Recent Employees
+                Recent team members
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
                 Newest team members
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
-              {recentEmployees.map((employee) => (
+              {recentTeamMembers.map((member) => (
                 <div
-                  key={employee.id}
+                  key={member.id}
                   className="hover:bg-accent/50 flex items-center gap-3 rounded-xl border p-3 transition-colors"
                 >
                   <Avatar className="h-10 w-10 shrink-0 sm:h-12 sm:w-12">
                     <AvatarImage
-                      src={employee.avatar || "/placeholder.svg"}
-                      alt={employee.name}
+                      src={member.avatar || "/placeholder.svg"}
+                      alt={member.name}
                     />
                     <AvatarFallback className="text-xs">
-                      {employee.name
+                      {member.name
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
@@ -229,23 +229,23 @@ const CompanyDashboardView = () => {
                   </Avatar>
                   <div className="min-w-0 flex-1 space-y-1">
                     <p className="truncate text-sm font-medium sm:text-base">
-                      {employee.name}
+                      {member.name}
                     </p>
                     <p className="text-muted-foreground truncate text-xs sm:text-sm">
-                      {employee.role}
+                      {member.role}
                     </p>
                   </div>
                   <p className="text-muted-foreground hidden shrink-0 text-xs sm:block">
-                    {new Date(employee.joined).toLocaleDateString()}
+                    {new Date(member.joined).toLocaleDateString()}
                   </p>
                 </div>
               ))}
-              <Link href="/employer/employees">
+              <Link href="/employer/team-members">
                 <Button
                   variant="outline"
                   className="w-full touch-manipulation active:opacity-70"
                 >
-                  View Employees
+                  View team members
                 </Button>
               </Link>
             </CardContent>

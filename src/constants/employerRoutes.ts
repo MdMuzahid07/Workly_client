@@ -11,7 +11,7 @@ export const EMPLOYER_ROUTES = {
   savedProfiles: "/employer/saved-profiles",
   companyProfile: "/employer/company-profile",
   analytics: "/employer/analytics",
-  employees: "/employer/employees",
+  teamMembers: "/employer/team-members",
   settings: "/employer/settings",
 } as const;
 

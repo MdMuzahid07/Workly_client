@@ -67,7 +67,7 @@ src/
 │   └── store.ts          # Configured Redux store with persist middlewares
 ├── skeleton/             # One folder per screen; mirrors view/ paths
 │   ├── dashboard/
-│   │   ├── employer/     # e.g. hiring-pipeline/, employees/, dashboard/
+│   │   ├── employer/     # e.g. hiring-pipeline/, team-members/, dashboard/
 │   │   └── job-seeker/   # e.g. billing/, profile-views/, settings/
 │   ├── job/              # e.g. browse/, apply/, details/, applied/
 │   ├── saved-jobs/

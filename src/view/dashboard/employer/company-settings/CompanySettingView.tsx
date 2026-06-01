@@ -81,7 +81,7 @@ const privacySettingsSeed: SettingItem[] = [
   },
   {
     id: "showEmployeeCount",
-    label: "Show Employee Count",
+    label: "Show team member count",
     description: "Display your size on your public profile",
     icon: <Eye className="h-5 w-5" />,
     enabled: true,

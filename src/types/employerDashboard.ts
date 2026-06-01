@@ -8,11 +8,11 @@ export interface EmployerDashboardTrends {
   jobsCreatedPrevious30Days: number;
   applicationsLast7Days: number;
   applicationsPrevious7Days: number;
-  employeesJoinedLast90Days: number;
-  employeesJoinedPrevious90Days: number;
+  teamMembersJoinedLast90Days: number;
+  teamMembersJoinedPrevious90Days: number;
 }
 
-export interface RecentEmployee {
+export interface RecentTeamMember {
   id: string;
   fullName: string;
   role: string;
@@ -26,8 +26,8 @@ export interface CompanyOverviewStatistics {
   activeJobs: number;
   totalApplications: number;
   pendingApplications: number;
-  totalEmployees: number;
-  recentEmployees?: RecentEmployee[];
+  totalTeamMembers: number;
+  recentTeamMembers?: RecentTeamMember[];
   trends?: EmployerDashboardTrends;
 }
 
@@ -59,7 +59,7 @@ export interface CompanyApplicationSummary {
 
 export const COMPANY_USER_ROLE_LABELS: Record<string, string> = {
   EMPLOYER: "Employer",
-  JOB_SEEKER: "Team member",
+  JOB_SEEKER: "Job seeker",
   ADMIN: "Admin",
   SUPER_ADMIN: "Super admin",
 } as const;

@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { UserCheck, Users, UserX } from "lucide-react";
 
-interface Employee {
+interface TeamMember {
   id: string;
   fullName: string;
   email: string;
@@ -17,15 +17,15 @@ interface Employee {
   skills: string[];
 }
 
-interface EmployeeStatusCardsProps {
-  employees: Employee[];
+interface TeamMemberStatusCardsProps {
+  teamMembers: TeamMember[];
   departments: string[];
 }
 
-const EmployeeStatusCards = ({
-  employees,
+const TeamMemberStatusCards = ({
+  teamMembers,
   departments,
-}: EmployeeStatusCardsProps) => {
+}: TeamMemberStatusCardsProps) => {
   return (
     <div className="mb-6 grid grid-cols-2 gap-3 sm:mb-8 sm:gap-4 lg:grid-cols-4 lg:gap-6">
       <Card>
@@ -33,10 +33,10 @@ const EmployeeStatusCards = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-xs font-medium sm:text-sm">
-                Total Employees
+                Total team members
               </p>
               <p className="text-primary text-xl font-bold sm:text-2xl">
-                {employees.length}
+                {teamMembers.length}
               </p>
             </div>
             <Users className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
@@ -51,7 +51,7 @@ const EmployeeStatusCards = ({
                 Active
               </p>
               <p className="text-xl font-bold text-green-600 sm:text-2xl">
-                {employees.filter((e) => e.status === "active").length}
+                {teamMembers.filter((m) => m.status === "active").length}
               </p>
             </div>
             <UserCheck className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
@@ -66,7 +66,7 @@ const EmployeeStatusCards = ({
                 Pending
               </p>
               <p className="text-xl font-bold text-yellow-600 sm:text-2xl">
-                {employees.filter((e) => e.status === "pending").length}
+                {teamMembers.filter((m) => m.status === "pending").length}
               </p>
             </div>
             <UserX className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
@@ -92,4 +92,4 @@ const EmployeeStatusCards = ({
   );
 };
 
-export default EmployeeStatusCards;
+export default TeamMemberStatusCards;

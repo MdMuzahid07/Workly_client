@@ -272,7 +272,7 @@ const CompanyView = ({
                           <span className="text-muted-foreground/30">•</span>
                           <span className="flex items-center gap-1">
                             <Users className="text-primary/60 h-3.5 w-3.5" />
-                            {company.size || "11-50"} employees
+                            {company.size || "11-50"} staff
                           </span>
                           <span className="text-muted-foreground/30">•</span>
                           {company.openJobs > 0 ? (

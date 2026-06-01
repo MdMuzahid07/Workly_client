@@ -77,9 +77,9 @@ const PrivacySettingTab = ({
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Show employee count</Label>
+              <Label>Show team member count</Label>
               <p className="text-muted-foreground text-sm">
-                Display the number of employees on your profile
+                Display how many employer accounts are linked to your company
               </p>
             </div>
             <Switch

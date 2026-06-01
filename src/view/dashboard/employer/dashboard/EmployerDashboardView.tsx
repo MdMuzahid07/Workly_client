@@ -3,7 +3,7 @@
 import { EmployerApplicationActivity } from "@/components/dashboard/employer/EmployerApplicationActivity";
 import { EmployerDashboardAlerts } from "@/components/dashboard/employer/EmployerDashboardAlerts";
 import { EmployerQuickActions } from "@/components/dashboard/employer/EmployerQuickActions";
-import { EmployerRecentEmployees } from "@/components/dashboard/employer/EmployerRecentEmployees";
+import { EmployerRecentTeamMembers } from "@/components/dashboard/employer/EmployerRecentTeamMembers";
 import { EmployerRecentJobs } from "@/components/dashboard/employer/EmployerRecentJobs";
 import { EmployerStatCards } from "@/components/dashboard/employer/EmployerStatCards";
 import { useEmployerDashboard } from "@/hooks/useEmployerDashboard";
@@ -24,7 +24,7 @@ export default function EmployerDashboardView() {
     statsBlocking,
     detailBlocking,
     recentJobs,
-    recentEmployees,
+    recentTeamMembers,
     summary,
     refetchDashboard,
     isRefreshing,
@@ -61,8 +61,8 @@ export default function EmployerDashboardView() {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <EmployerRecentJobs jobs={recentJobs} isLoading={detailBlocking} />
-          <EmployerRecentEmployees
-            members={recentEmployees}
+          <EmployerRecentTeamMembers
+            members={recentTeamMembers}
             isLoading={detailBlocking}
           />
         </div>

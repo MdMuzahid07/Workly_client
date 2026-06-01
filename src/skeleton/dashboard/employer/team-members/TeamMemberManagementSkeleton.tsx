@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function EmployeeManagementSkeleton() {
+export default function TeamMemberManagementSkeleton() {
   return (
     <div className="container mx-auto space-y-6 px-4 py-6 sm:px-6 sm:py-8">
       {/* Status Cards Skeletons */}

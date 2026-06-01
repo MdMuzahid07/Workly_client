@@ -81,7 +81,7 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-secondary-foreground">Employees</span>
+            <span className="text-secondary-foreground">Team members</span>
             <span className="font-medium">
               {company?._count?.employees || 0}
             </span>

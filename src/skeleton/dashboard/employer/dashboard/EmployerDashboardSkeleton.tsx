@@ -30,7 +30,7 @@ export function EmployerListRowSkeleton({ rows = 3 }: { rows?: number }) {
   );
 }
 
-export function EmployerEmployeeRowSkeleton({ rows = 4 }: { rows?: number }) {
+export function EmployerTeamMemberRowSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
@@ -75,7 +75,7 @@ export default function EmployerDashboardSkeleton() {
             <Skeleton className="h-4 w-52" />
           </CardHeader>
           <CardContent>
-            <EmployerEmployeeRowSkeleton rows={4} />
+            <EmployerTeamMemberRowSkeleton rows={4} />
           </CardContent>
         </Card>
       </div>

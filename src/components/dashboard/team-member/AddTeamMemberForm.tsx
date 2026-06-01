@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
-const AddEmployeeForm = ({ onClose }: { onClose: () => void }) => {
+const AddTeamMemberForm = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -186,11 +186,11 @@ const AddEmployeeForm = ({ onClose }: { onClose: () => void }) => {
           Cancel
         </Button>
         <Button type="submit" className="w-full sm:w-auto">
-          Add Employee
+          Add team member
         </Button>
       </div>
     </form>
   );
 };
 
-export default AddEmployeeForm;
+export default AddTeamMemberForm;

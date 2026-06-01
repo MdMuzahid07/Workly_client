@@ -7,13 +7,13 @@ type EmployerStatCardsProps = {
     totalJobs: number;
     activeJobs: number;
     totalApplications: number;
-    totalEmployees: number;
+    totalTeamMembers: number;
     pendingApplications: number;
   };
   trendCopy: {
     jobsTrendLine: string;
     applicationsTrendLine: string;
-    employeesTrendLine: string;
+    teamMembersTrendLine: string;
   };
 };
 
@@ -56,13 +56,13 @@ export function EmployerStatCards({
         ctaLabel="View applications"
       />
       <StatCard
-        testId="stat-employees"
-        title="Employees"
-        value={stats.totalEmployees}
-        description={trendCopy.employeesTrendLine}
+        testId="stat-team-members"
+        title="Team members"
+        value={stats.totalTeamMembers}
+        description={trendCopy.teamMembersTrendLine}
         icon={<Users className="h-4 w-4" />}
-        ctaHref={EMPLOYER_ROUTES.employees}
-        ctaLabel="View employees"
+        ctaHref={EMPLOYER_ROUTES.teamMembers}
+        ctaLabel="View team members"
       />
     </div>
   );

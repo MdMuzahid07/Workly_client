@@ -225,7 +225,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4" />
                           <span>
-                            {companyDetails._count?.employees || 0} Employees
+                            {companyDetails._count?.employees || 0} team members
                           </span>
                         </div>
                         <div className="flex items-center gap-2">

@@ -115,7 +115,7 @@ const CompanyProfileBenefitsTab = ({
   return (
     <TabsContent value="benefits" className="space-y-10 focus:outline-none">
       <SectionCard
-        title="Employee Perks & Benefits"
+        title="Company perks & benefits"
         isCompleted={activeBenefits.length > 0}
         onAdd={
           isEditing

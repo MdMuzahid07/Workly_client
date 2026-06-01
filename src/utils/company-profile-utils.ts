@@ -104,7 +104,7 @@ export const mapApiDataToProfile = (
     benefits: parseBenefitsFromApi(company.benefits || []),
     socialLinks: company.socialLinks || [],
     stats: {
-      totalEmployees: company._count?.employees || 0,
+      totalTeamMembers: company._count?.employees || 0,
       totalJobs: company._count?.jobs || 0,
       totalApplications: 0,
       profileViews: 0,

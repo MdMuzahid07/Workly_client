@@ -8,42 +8,44 @@ import {
 } from "@/components/ui/card";
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { humanizeJobOrApplicationStatus } from "@/lib/employerDashboardFormat";
-import { EmployerEmployeeRowSkeleton } from "@/skeleton/dashboard/employer/dashboard/EmployerDashboardSkeleton";
+import { EmployerTeamMemberRowSkeleton } from "@/skeleton/dashboard/employer/dashboard/EmployerDashboardSkeleton";
 import {
   COMPANY_USER_ROLE_LABELS,
-  type RecentEmployee,
+  type RecentTeamMember,
 } from "@/types/employerDashboard";
 import { format } from "date-fns";
 import { Users } from "lucide-react";
 import Link from "next/link";
 import { MemberInitialsAvatar } from "./MemberInitialsAvatar";
 
-type EmployerRecentEmployeesProps = {
-  members: RecentEmployee[];
+type EmployerRecentTeamMembersProps = {
+  members: RecentTeamMember[];
   isLoading: boolean;
 };
 
-export function EmployerRecentEmployees({
+export function EmployerRecentTeamMembers({
   members,
   isLoading,
-}: EmployerRecentEmployeesProps) {
+}: EmployerRecentTeamMembersProps) {
   return (
     <Card className="bg-card border">
       <CardHeader>
-        <CardTitle className="text-base sm:text-lg">Recent Employees</CardTitle>
+        <CardTitle className="text-base sm:text-lg">
+          Recent team members
+        </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
           Newest members linked to your company
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading ? (
-          <EmployerEmployeeRowSkeleton rows={4} />
+          <EmployerTeamMemberRowSkeleton rows={4} />
         ) : members.length === 0 ? (
           <p className="text-muted-foreground text-sm">
-            No employees yet. Invite team members from company settings.
+            No team members yet. Invite colleagues from company settings.
           </p>
         ) : (
-          <ul className="space-y-3" aria-label="Recent employees">
+          <ul className="space-y-3" aria-label="Recent team members">
             {members.map((member) => (
               <li
                 key={member.id}
@@ -73,10 +75,10 @@ export function EmployerRecentEmployees({
             ))}
           </ul>
         )}
-        <Link href={EMPLOYER_ROUTES.employees}>
+        <Link href={EMPLOYER_ROUTES.teamMembers}>
           <Button variant="outline" className="w-full rounded-full font-bold">
             <Users className="mr-2 h-4 w-4" aria-hidden />
-            View All Employees
+            View all team members
           </Button>
         </Link>
       </CardContent>

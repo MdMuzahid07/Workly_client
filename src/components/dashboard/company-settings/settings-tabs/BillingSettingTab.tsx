@@ -110,7 +110,7 @@ const BillingSettingTab = ({
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete
                   your company account and remove all associated data including
-                  jobs, applications, and employee records.
+                  jobs, applications, and team member records.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

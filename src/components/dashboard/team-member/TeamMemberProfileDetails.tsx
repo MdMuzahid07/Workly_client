@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 
-interface Employee {
+interface TeamMember {
   id: string;
   fullName: string;
   email: string;
@@ -67,8 +67,8 @@ interface Employee {
   salary?: string;
 }
 
-interface EmployeeProfileSheetProps {
-  employee: Employee;
+interface TeamMemberProfileSheetProps {
+  teamMember: TeamMember;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -127,22 +127,22 @@ function IconInfoCard({
   );
 }
 
-const EmployeeProfileDetails = ({
-  employee,
+const TeamMemberProfileDetails = ({
+  teamMember,
   open,
   onOpenChange,
-}: EmployeeProfileSheetProps) => {
+}: TeamMemberProfileSheetProps) => {
   const statusColor = useMemo(
-    () => getStatusColor(employee.isActive, employee.isVerified),
-    [employee.isActive, employee.isVerified],
+    () => getStatusColor(teamMember.isActive, teamMember.isVerified),
+    [teamMember.isActive, teamMember.isVerified],
   );
   const statusText = useMemo(
-    () => getStatusText(employee.isActive, employee.isVerified),
-    [employee.isActive, employee.isVerified],
+    () => getStatusText(teamMember.isActive, teamMember.isVerified),
+    [teamMember.isActive, teamMember.isVerified],
   );
   const initials = useMemo(
-    () => getInitials(employee.fullName),
-    [employee.fullName],
+    () => getInitials(teamMember.fullName),
+    [teamMember.fullName],
   );
 
   return (
@@ -158,7 +158,7 @@ const EmployeeProfileDetails = ({
                 <div className="flex items-start gap-4">
                   <Avatar className="border-primary/20 h-16 w-16 border-2">
                     <AvatarImage
-                      src={employee.profile?.avatarUrl || "/placeholder.svg"}
+                      src={teamMember.profile?.avatarUrl || "/placeholder.svg"}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground text-lg">
                       {initials}
@@ -167,25 +167,25 @@ const EmployeeProfileDetails = ({
                   <div className="flex-1 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <SheetTitle className="text-xl">
-                        {employee.fullName}
+                        {teamMember.fullName}
                       </SheetTitle>
                       <Badge className={statusColor}>{statusText}</Badge>
                     </div>
                     <div className="space-y-1">
                       <p className="text-foreground flex items-center gap-2 text-sm font-medium">
                         <Briefcase className="h-4 w-4" />
-                        {employee.role.replace("_", " ")}
+                        {teamMember.role.replace("_", " ")}
                       </p>
                       <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
-                        {employee.profile?.location && (
+                        {teamMember.profile?.location && (
                           <span className="flex items-center gap-1.5">
                             <MapPin className="h-3.5 w-3.5" />
-                            {employee.profile.location}
+                            {teamMember.profile.location}
                           </span>
                         )}
                         <span className="flex items-center gap-1.5">
                           <Building2 className="h-3.5 w-3.5" />
-                          {employee.department || "No department"}
+                          {teamMember.department || "No department"}
                         </span>
                       </div>
                     </div>
@@ -210,7 +210,7 @@ const EmployeeProfileDetails = ({
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive">
                         <UserX className="mr-2 h-4 w-4" />
-                        {employee.isActive ? "Deactivate" : "Activate"}
+                        {teamMember.isActive ? "Deactivate" : "Activate"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -229,44 +229,44 @@ const EmployeeProfileDetails = ({
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <IconInfoCard
                   label="Email"
-                  value={employee.email}
+                  value={teamMember.email}
                   Icon={Mail}
                   truncate
                 />
 
-                {employee.phone && (
+                {teamMember.phone && (
                   <IconInfoCard
                     label="Phone"
-                    value={employee.phone}
+                    value={teamMember.phone}
                     Icon={Phone}
                   />
                 )}
 
                 <IconInfoCard
                   label="Role"
-                  value={employee.role.replace("_", " ")}
+                  value={teamMember.role.replace("_", " ")}
                   Icon={Briefcase}
                 />
 
                 <IconInfoCard
                   label="Join Date"
-                  value={employee.joinDate}
+                  value={teamMember.joinDate}
                   Icon={Calendar}
                 />
 
-                {employee.profile?.linkedInUrl && (
+                {teamMember.profile?.linkedInUrl && (
                   <IconInfoCard
                     label="LinkedIn"
-                    value={employee.profile.linkedInUrl}
+                    value={teamMember.profile.linkedInUrl}
                     Icon={Linkedin}
                     truncate
                   />
                 )}
 
-                {employee.profile?.websiteUrl && (
+                {teamMember.profile?.websiteUrl && (
                   <IconInfoCard
                     label="Website"
-                    value={employee.profile.websiteUrl}
+                    value={teamMember.profile.websiteUrl}
                     Icon={Globe}
                     truncate
                   />
@@ -291,7 +291,7 @@ const EmployeeProfileDetails = ({
               <Separator />
 
               {/* Bio */}
-              {employee.profile?.bio && (
+              {teamMember.profile?.bio && (
                 <>
                   <div className="space-y-3">
                     <h3 className="flex items-center gap-2 font-semibold">
@@ -299,7 +299,7 @@ const EmployeeProfileDetails = ({
                       About
                     </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
-                      {employee.profile.bio}
+                      {teamMember.profile.bio}
                     </p>
                   </div>
                   <Separator />
@@ -307,8 +307,8 @@ const EmployeeProfileDetails = ({
               )}
 
               {/* Skills */}
-              {employee.profile?.skills &&
-                employee.profile.skills.length > 0 && (
+              {teamMember.profile?.skills &&
+                teamMember.profile.skills.length > 0 && (
                   <>
                     <div className="space-y-3">
                       <h3 className="flex items-center gap-2 font-semibold">
@@ -316,7 +316,7 @@ const EmployeeProfileDetails = ({
                         Skills & Expertise
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {employee.profile.skills.map((skill) => (
+                        {teamMember.profile.skills.map((skill) => (
                           <Badge
                             key={skill.skillName}
                             variant="secondary"
@@ -336,10 +336,10 @@ const EmployeeProfileDetails = ({
                 <CardContent className="flex items-center gap-2 p-4">
                   <Clock className="text-success h-4 w-4" />
                   <span className="text-sm font-medium">
-                    {employee.isActive ? "Active" : "Inactive"} since{" "}
-                    {employee.joinDate}
-                    {employee.lastLogin &&
-                      ` • Last login: ${employee.lastLogin}`}
+                    {teamMember.isActive ? "Active" : "Inactive"} since{" "}
+                    {teamMember.joinDate}
+                    {teamMember.lastLogin &&
+                      ` • Last login: ${teamMember.lastLogin}`}
                   </span>
                 </CardContent>
               </Card>
@@ -351,4 +351,4 @@ const EmployeeProfileDetails = ({
   );
 };
 
-export default EmployeeProfileDetails;
+export default TeamMemberProfileDetails;

@@ -125,7 +125,7 @@ export function CompanyCard({
             </Badge>
             <Badge variant="outline" className="gap-1.5">
               <Users className="h-3 w-3" />
-              <span className="text-xs">{company.size ?? "N/A"} employees</span>
+              <span className="text-xs">{company.size ?? "N/A"} staff</span>
             </Badge>
           </div>
 
