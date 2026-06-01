@@ -6,6 +6,7 @@ import AddSubcategoryDialog from "@/components/dashboard/categories/AddSubcatego
 import DashboardAdminCategoriesHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminCategoriesHeader";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import AdminCategoriesSkeleton from "@/skeleton/dashboard/admin/AdminCategoriesSkeleton";
 import { CategoryFilterBar } from "./components/CategoryFilterBar";
 import { CategoryStatsGrid } from "./components/CategoryStatsGrid";
 import { CategoryTable } from "./components/CategoryTable";
@@ -37,6 +38,10 @@ const AdminCategoriesManagementView = () => {
 
   const categories = data?.data?.categories || [];
   const summary = data?.data?.summary;
+
+  if (isLoading) {
+    return <AdminCategoriesSkeleton />;
+  }
 
   if (error) {
     const err = error as any;

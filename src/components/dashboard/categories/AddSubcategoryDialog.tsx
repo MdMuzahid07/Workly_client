@@ -15,6 +15,7 @@ import { useUpdateCategoryMutation } from "@/redux/feature/category/categoryApi"
 import { Loader2, Plus, Tag } from "lucide-react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/types/api";
 
 interface AddSubcategoryDialogProps {
   open: boolean;
@@ -43,9 +44,8 @@ const AddSubcategoryDialog = ({
       toast.success("Subcategory added successfully");
       onSuccess(data);
       onOpenChange(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to add subcategory");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to add subcategory"));
     }
   };
 

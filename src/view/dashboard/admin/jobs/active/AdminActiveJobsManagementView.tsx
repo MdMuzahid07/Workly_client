@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import AdminJobsSkeleton from "@/skeleton/dashboard/admin/AdminJobsSkeleton";
 import {
   Table,
   TableBody,
@@ -107,6 +107,10 @@ const AdminActiveJobsManagementView = () => {
     { label: "Remote", value: "REMOTE" },
   ];
 
+  if (isStatsLoading || isJobsLoading) {
+    return <AdminJobsSkeleton />;
+  }
+
   if (statsError || jobsError) {
     const error = (statsError || jobsError) as any;
     const errorMessage =
@@ -141,13 +145,9 @@ const AdminActiveJobsManagementView = () => {
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                {isStatsLoading ? (
-                  <Skeleton className="h-8 w-20" />
-                ) : (
-                  <div className="text-2xl font-bold tracking-tight sm:text-3xl">
-                    {stat.value}
-                  </div>
-                )}
+                <div className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  {stat.value}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -228,133 +228,121 @@ const AdminActiveJobsManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isJobsLoading
-                  ? Array.from({ length: 5 }).map((_, i) => (
-                      <TableRow key={i}>
-                        {Array.from({ length: 6 }).map((_, j) => (
-                          <TableCell key={j}>
-                            <Skeleton className="h-6 w-full" />
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  : jobs.map((job) => (
-                      <TableRow
-                        key={job.id}
-                        className="group hover:bg-muted/40 transition-colors"
-                      >
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
-                              <AvatarImage src={job.logo} />
-                              <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                                {job.company.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                              <p className="truncate font-bold">{job.title}</p>
-                              <div className="text-muted-foreground flex items-center gap-1 text-xs outline-none">
-                                <Building2 className="h-3 w-3" />
-                                <span className="truncate">{job.company}</span>
-                              </div>
-                            </div>
+                {jobs.map((job) => (
+                  <TableRow
+                    key={job.id}
+                    className="group hover:bg-muted/40 transition-colors"
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
+                          <AvatarImage src={job.logo} />
+                          <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                            {job.company.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="truncate font-bold">{job.title}</p>
+                          <div className="text-muted-foreground flex items-center gap-1 text-xs outline-none">
+                            <Building2 className="h-3 w-3" />
+                            <span className="truncate">{job.company}</span>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <p className="text-xs font-medium">
-                              {job.category}
-                            </p>
-                            <Badge
-                              variant="secondary"
-                              className="bg-primary/10 text-primary border-none text-[10px] font-bold"
-                            >
-                              {job.type.replace("_", " ")}
-                            </Badge>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium">{job.category}</p>
+                        <Badge
+                          variant="secondary"
+                          className="bg-primary/10 text-primary border-none text-[10px] font-bold"
+                        >
+                          {job.type.replace("_", " ")}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {job.location}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <p className="text-xs font-bold">{job.views}</p>
+                          <p className="text-muted-foreground text-[10px]">
+                            Views
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-primary text-xs font-bold">
+                            {job.applications}
+                          </p>
+                          <p className="text-muted-foreground text-[10px]">
+                            Applies
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                          <Clock className="h-3 w-3" />
+                          <span>
+                            Posted{" "}
+                            {formatDistanceToNow(new Date(job.posted), {
+                              addSuffix: true,
+                            })}
+                          </span>
+                        </div>
+                        {job.expires && (
+                          <div className="flex items-center gap-1 text-xs font-bold text-amber-600">
+                            <AlertTriangle className="h-3 w-3" />
+                            <span>
+                              {formatDistanceToNow(new Date(job.expires), {
+                                addSuffix: true,
+                              })}
+                            </span>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {job.location}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-4">
-                            <div className="text-center">
-                              <p className="text-xs font-bold">{job.views}</p>
-                              <p className="text-muted-foreground text-[10px]">
-                                Views
-                              </p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-primary text-xs font-bold">
-                                {job.applications}
-                              </p>
-                              <p className="text-muted-foreground text-[10px]">
-                                Applies
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                              <Clock className="h-3 w-3" />
-                              <span>
-                                Posted{" "}
-                                {formatDistanceToNow(new Date(job.posted), {
-                                  addSuffix: true,
-                                })}
-                              </span>
-                            </div>
-                            {job.expires && (
-                              <div className="flex items-center gap-1 text-xs font-bold text-amber-600">
-                                <AlertTriangle className="h-3 w-3" />
-                                <span>
-                                  {formatDistanceToNow(new Date(job.expires), {
-                                    addSuffix: true,
-                                  })}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-52">
-                              <DropdownMenuLabel>Management</DropdownMenuLabel>
-                              <DropdownMenuItem className="cursor-pointer">
-                                <Eye className="mr-2 h-4 w-4" />
-                                Preview Listing
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="cursor-pointer">
-                                <ExternalLink className="mr-2 h-4 w-4" />
-                                View Applications
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="cursor-pointer">
-                                <TrendingUp className="mr-2 h-4 w-4" />
-                                Performance Report
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="cursor-pointer text-amber-600">
-                                <Clock className="mr-2 h-4 w-4" />
-                                Extend Expiry
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive cursor-pointer">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Unpublish Job
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-52">
+                          <DropdownMenuLabel>Management</DropdownMenuLabel>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <Eye className="mr-2 h-4 w-4" />
+                            Preview Listing
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            View Applications
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <TrendingUp className="mr-2 h-4 w-4" />
+                            Performance Report
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="cursor-pointer text-amber-600">
+                            <Clock className="mr-2 h-4 w-4" />
+                            Extend Expiry
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive cursor-pointer">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Unpublish Job
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

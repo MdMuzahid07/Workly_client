@@ -56,8 +56,7 @@ interface TeamMemberManagementTabsProps {
   setActiveTab: (value: string) => void;
   teamMembers: TeamMember[];
   filteredTeamMembers: TeamMember[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getStatusBadge: (status: TeamMember["status"]) => any;
+  getStatusBadge: (status: TeamMember["status"]) => React.ReactNode;
   handleStatusChange: (
     memberId: string,
     newStatus: TeamMember["status"],

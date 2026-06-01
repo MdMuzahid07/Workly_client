@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -19,8 +18,18 @@ import WkTextArea from "../../form/WkTextArea";
 interface EditPlanDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  plan: any;
-  onSuccess: (data: any) => void;
+  plan: {
+    name: string;
+    price: number | string;
+    description: string;
+    features?: string[];
+  } | null;
+  onSuccess: (data: {
+    name: string;
+    price: number | string;
+    description: string;
+    features?: string[];
+  }) => void;
 }
 
 const EditPlanDialog = ({
@@ -49,7 +58,11 @@ const EditPlanDialog = ({
     setFeatures(features.filter((_, i) => i !== index));
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: {
+    name: string;
+    price: string;
+    description: string;
+  }) => {
     onSuccess({
       ...plan,
       ...data,

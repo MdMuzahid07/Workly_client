@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -167,7 +166,18 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   pathname: string;
   user: { fullName?: string; avatar?: string; profilePicture?: string } | null;
   profile: { avatarUrl?: string | null } | undefined;
-  profileData?: any;
+  profileData?: {
+    data?: {
+      fullName?: string;
+      isPremium?: boolean;
+      profile?: {
+        bio?: string | null;
+        location?: string | null;
+        avatarUrl?: string | null;
+        resumeUrl?: string | null;
+      };
+    };
+  };
   profileCompletion: number;
   onSignOut: () => void;
   onItemClick: () => void;
@@ -206,7 +216,8 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
               <p className="text-foreground truncate text-sm font-semibold">
                 {profileData?.data?.fullName || user?.fullName || "User"}
               </p>
-              {(profileData?.data?.isPremium || (user as any)?.isPremium) && (
+              {(profileData?.data?.isPremium ||
+                (user as { isPremium?: boolean })?.isPremium) && (
                 <span className="inline-flex shrink-0 animate-pulse items-center gap-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-amber-500 uppercase shadow-xs">
                   <Crown className="h-2.5 w-2.5 fill-amber-500" />
                   Pro

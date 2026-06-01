@@ -110,8 +110,7 @@ export const AddressForm = ({
   return (
     <WkForm<AddressDetailsFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
+      defaultValues={defaultValues as unknown as AddressDetailsFormData}
       resolver={zodResolver(addressDetailsSchema)}
     >
       <AddressFormContent onCancel={onCancel} isLoading={isLoading} />

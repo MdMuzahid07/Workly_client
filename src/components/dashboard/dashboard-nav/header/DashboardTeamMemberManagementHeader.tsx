@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,10 @@ import DashboardHeaderContainer from "./DashboardHeaderContainer";
 const DashboardTeamMemberManagementHeader = ({
   isAddTeamMemberOpen,
   setIsAddTeamMemberOpen,
-}: any) => {
+}: {
+  isAddTeamMemberOpen: boolean;
+  setIsAddTeamMemberOpen: (open: boolean) => void;
+}) => {
   return (
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">

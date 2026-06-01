@@ -49,9 +49,17 @@ export default function FeatureComparisonTable() {
                       {section.category}
                     </td>
                   </tr>
-                  {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    section.features.map((feature: any, fIdx) => (
+                  {section.features.map(
+                    (
+                      feature: {
+                        name: string;
+                        free: boolean | string;
+                        starter: boolean | string;
+                        pro: boolean | string;
+                        enterprise: boolean | string;
+                      },
+                      fIdx: number,
+                    ) => (
                       <tr
                         key={fIdx}
                         className="hover:bg-muted/5 transition-colors"
@@ -77,8 +85,8 @@ export default function FeatureComparisonTable() {
                           />
                         </td>
                       </tr>
-                    ))
-                  }
+                    ),
+                  )}
                 </React.Fragment>
               ))}
             </tbody>
@@ -93,8 +101,7 @@ function ComparisonCell({
   value,
   isEnterprise,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
+  value: boolean | string | number;
   isEnterprise?: boolean;
 }) {
   if (value === true)

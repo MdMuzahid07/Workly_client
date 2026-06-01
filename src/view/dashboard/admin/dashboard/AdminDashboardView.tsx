@@ -12,8 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/shared/StatCard";
+import AdminDashboardSkeleton from "@/skeleton/dashboard/admin/AdminDashboardSkeleton";
 import {
   useGetDashboardOverviewStatsQuery,
   useGetModerationQueueQuery,
@@ -77,6 +77,10 @@ const AdminDashboardView = () => {
     ];
   }, [statsData]);
 
+  if (isStatsLoading || isUsersLoading || isModerationLoading) {
+    return <AdminDashboardSkeleton />;
+  }
+
   const moderationQueue = moderationQueueData?.data || [];
   const recentUsers = recentUsersData?.data || [];
 
@@ -87,31 +91,18 @@ const AdminDashboardView = () => {
       <div className="space-y-6 px-4 pb-8 sm:px-6 sm:pt-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {isStatsLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="rounded-xl border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-4 rounded-full" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="mb-2 h-8 w-16" />
-                    <Skeleton className="h-3 w-32" />
-                  </CardContent>
-                </Card>
-              ))
-            : stats.map((stat, idx) => (
-                <StatCard
-                  key={idx}
-                  title={stat.title}
-                  value={stat.value}
-                  icon={<stat.icon className="h-4 w-4" />}
-                  trend={{
-                    value: stat.change,
-                    type: stat.trend as "up" | "down" | "neutral",
-                  }}
-                />
-              ))}
+          {stats.map((stat, idx) => (
+            <StatCard
+              key={idx}
+              title={stat.title}
+              value={stat.value}
+              icon={<stat.icon className="h-4 w-4" />}
+              trend={{
+                value: stat.change,
+                type: stat.trend as "up" | "down" | "neutral",
+              }}
+            />
+          ))}
         </div>
 
         {/* Quick Actions & Activity Grid */}
@@ -192,23 +183,7 @@ const AdminDashboardView = () => {
                 </Link>
               </CardHeader>
               <CardContent className="space-y-4">
-                {isModerationLoading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className="space-y-2">
-                          <Skeleton className="h-4 w-48" />
-                          <Skeleton className="h-3 w-32" />
-                        </div>
-                      </div>
-                      <Skeleton className="h-6 w-20 rounded-full" />
-                    </div>
-                  ))
-                ) : moderationQueue.length === 0 ? (
+                {moderationQueue.length === 0 ? (
                   <div className="text-muted-foreground py-8 text-center">
                     No jobs in moderation queue
                   </div>
@@ -269,26 +244,7 @@ const AdminDashboardView = () => {
                 </Link>
               </CardHeader>
               <CardContent className="space-y-4">
-                {isUsersLoading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className="space-y-2">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-48" />
-                        </div>
-                      </div>
-                      <div className="space-y-2 text-right">
-                        <Skeleton className="ml-auto h-3 w-16" />
-                        <Skeleton className="ml-auto h-4 w-20 rounded-full" />
-                      </div>
-                    </div>
-                  ))
-                ) : recentUsers.length === 0 ? (
+                {recentUsers.length === 0 ? (
                   <div className="text-muted-foreground py-8 text-center">
                     No recent users
                   </div>

@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import AdminJobsSkeleton from "@/skeleton/dashboard/admin/AdminJobsSkeleton";
 import {
   Table,
   TableBody,
@@ -64,6 +64,10 @@ export default function AdminPendingApprovalsManagementView() {
   // Live mutations
   const [approveJob] = useApproveJobAdminMutation();
   const [deleteJob] = useDeleteJobListingMutation();
+
+  if (isLoading) {
+    return <AdminJobsSkeleton />;
+  }
 
   const handleApprove = async (jobId: string, title: string) => {
     try {
@@ -258,307 +262,258 @@ export default function AdminPendingApprovalsManagementView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading
-                  ? Array.from({ length: 3 }).map((_, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Skeleton className="h-10 w-10 rounded-full" />
-                            <div className="space-y-2">
-                              <Skeleton className="h-4 w-[180px]" />
-                              <Skeleton className="h-3 w-[120px]" />
+                {filteredJobs.map((job) => (
+                  <Fragment key={job.id}>
+                    <TableRow
+                      key={job.id}
+                      className={`group hover:bg-muted/40 cursor-pointer transition-colors ${
+                        expandedJobId === job.id
+                          ? "bg-muted/30 hover:bg-muted/30 border-b-0"
+                          : ""
+                      }`}
+                      onClick={() => toggleExpand(job.id)}
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
+                            <AvatarImage src={job.logo} />
+                            <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                              {job.company.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="flex items-center gap-1.5 truncate text-sm font-bold">
+                              {job.title}
+                              {expandedJobId === job.id ? (
+                                <ChevronUp className="text-primary h-4 w-4 opacity-50" />
+                              ) : (
+                                <ChevronDown className="text-primary h-4 w-4 opacity-30 transition-opacity group-hover:opacity-100" />
+                              )}
+                            </p>
+                            <div className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
+                              <Building2 className="h-3.5 w-3.5" />
+                              <span className="truncate">{job.company}</span>
                             </div>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-6 w-16 rounded-full" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-2">
-                            <Skeleton className="h-3 w-[120px]" />
-                            <Skeleton className="h-2 w-[150px]" />
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            className={`font-bold ${
+                              job.riskScore >= 75
+                                ? "border-rose-200 bg-rose-500/10 text-rose-600"
+                                : job.riskScore >= 55
+                                  ? "border-amber-200 bg-amber-500/10 text-amber-600"
+                                  : "border-blue-200 bg-blue-500/10 text-blue-600"
+                            }`}
+                            variant="outline"
+                          >
+                            Score: {job.riskScore}%
+                          </Badge>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <p className="text-foreground text-xs font-bold">
+                            {job.postedBy}
+                          </p>
+                          <div className="text-muted-foreground flex items-center gap-1 text-[10px] font-medium">
+                            <Mail className="h-3 w-3 shrink-0" />
+                            <span>{job.recruiterEmail}</span>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-2">
-                            <Skeleton className="h-3 w-20" />
-                            <Skeleton className="h-2.5 w-[50px] rounded-full" />
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <div className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
+                            <Clock className="h-3 w-3" />
+                            <span>{job.submittedAt}</span>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Skeleton className="h-8 w-8 rounded-lg" />
-                            <Skeleton className="h-8 w-8 rounded-lg" />
-                            <Skeleton className="h-8 w-8 rounded-lg" />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  : filteredJobs.map((job) => (
-                      <Fragment key={job.id}>
-                        <TableRow
-                          key={job.id}
-                          className={`group hover:bg-muted/40 cursor-pointer transition-colors ${
-                            expandedJobId === job.id
-                              ? "bg-muted/30 hover:bg-muted/30 border-b-0"
-                              : ""
-                          }`}
-                          onClick={() => toggleExpand(job.id)}
-                        >
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
-                                <AvatarImage src={job.logo} />
-                                <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                                  {job.company.substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="min-w-0">
-                                <p className="flex items-center gap-1.5 truncate text-sm font-bold">
-                                  {job.title}
-                                  {expandedJobId === job.id ? (
-                                    <ChevronUp className="text-primary h-4 w-4 opacity-50" />
-                                  ) : (
-                                    <ChevronDown className="text-primary h-4 w-4 opacity-30 transition-opacity group-hover:opacity-100" />
-                                  )}
-                                </p>
-                                <div className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
-                                  <Building2 className="h-3.5 w-3.5" />
-                                  <span className="truncate">
-                                    {job.company}
+                          <Badge className="bg-primary/10 text-primary border-none text-[9px] font-bold">
+                            {job.type.replace("_", " ")}
+                          </Badge>
+                        </div>
+                      </TableCell>
+
+                      <TableCell
+                        className="text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            onClick={() => handleApprove(job.id, job.title)}
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-600"
+                            title="Approve & Publish"
+                          >
+                            <ShieldCheck className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            onClick={() => handleReject(job.id, job.title)}
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8 p-0"
+                            title="Reject & Delete"
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-52">
+                              <DropdownMenuLabel>Moderation</DropdownMenuLabel>
+                              <DropdownMenuItem
+                                onClick={() => toggleExpand(job.id)}
+                                className="cursor-pointer"
+                              >
+                                <Eye className="mr-2 h-4 w-4" />
+                                {expandedJobId === job.id
+                                  ? "Collapse Details"
+                                  : "Read Full Post"}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator className="my-1 border-dashed" />
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  toast.success(
+                                    `Opening poster profile for ${job.postedBy}...`,
+                                  )
+                                }
+                                className="cursor-pointer"
+                              >
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                                View Recruiter Profile
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  toast.success(
+                                    `Warning email template draft created for ${job.recruiterEmail}`,
+                                  )
+                                }
+                                className="cursor-pointer"
+                              >
+                                <Mail className="mr-2 h-4 w-4" />
+                                Send Warning Email
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Expanded warning details & full post preview */}
+                    {expandedJobId === job.id && (
+                      <TableRow className="border-b bg-slate-50/40 hover:bg-slate-50/40 dark:bg-slate-900/10 dark:hover:bg-slate-900/10">
+                        <TableCell colSpan={5} className="p-6">
+                          <div className="animate-in slide-in-from-top-2 grid grid-cols-1 gap-8 duration-300 lg:grid-cols-2">
+                            {/* Flagged Rules & Indicators */}
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase dark:text-rose-400">
+                                <AlertTriangle className="h-4 w-4 shrink-0" />
+                                <span>
+                                  Security Warning Report (
+                                  {job.triggeredRules.length} rules triggered)
+                                </span>
+                              </div>
+                              <div className="space-y-3.5 rounded-2xl border border-rose-500/10 bg-rose-500/3 p-5">
+                                {job.triggeredRules.map(
+                                  (rule: string, index: number) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-start gap-3"
+                                    >
+                                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-xs font-bold text-rose-600">
+                                        {index + 1}
+                                      </div>
+                                      <p className="text-foreground/80 text-xs leading-relaxed font-semibold">
+                                        {rule}
+                                      </p>
+                                    </div>
+                                  ),
+                                )}
+                              </div>
+
+                              <div className="bg-muted/30 border-border/50 space-y-1.5 rounded-2xl border p-5">
+                                <span className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                                  Recruiter Details Verification
+                                </span>
+                                <div className="flex items-center justify-between pt-1 text-xs">
+                                  <span className="text-muted-foreground">
+                                    Public domain:
+                                  </span>
+                                  <span className="text-foreground font-mono font-bold">
+                                    {job.recruiterEmail.endsWith("@gmail.com")
+                                      ? "HIGH RISK (Public Gmail)"
+                                      : "LOW RISK (Company Domain)"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="text-muted-foreground">
+                                    Company matching:
+                                  </span>
+                                  <span className="text-foreground font-mono font-bold">
+                                    No matching registered portal website
                                   </span>
                                 </div>
                               </div>
                             </div>
-                          </TableCell>
 
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Badge
-                                className={`font-bold ${
-                                  job.riskScore >= 75
-                                    ? "border-rose-200 bg-rose-500/10 text-rose-600"
-                                    : job.riskScore >= 55
-                                      ? "border-amber-200 bg-amber-500/10 text-amber-600"
-                                      : "border-blue-200 bg-blue-500/10 text-blue-600"
-                                }`}
-                                variant="outline"
-                              >
-                                Score: {job.riskScore}%
-                              </Badge>
-                            </div>
-                          </TableCell>
-
-                          <TableCell>
-                            <div className="space-y-0.5">
-                              <p className="text-foreground text-xs font-bold">
-                                {job.postedBy}
-                              </p>
-                              <div className="text-muted-foreground flex items-center gap-1 text-[10px] font-medium">
-                                <Mail className="h-3 w-3 shrink-0" />
-                                <span>{job.recruiterEmail}</span>
+                            {/* Job Description Preview */}
+                            <div className="border-border/50 flex flex-col justify-between space-y-4 border-t pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-muted-foreground block text-[10px] font-bold tracking-wider uppercase">
+                                    Job Post Contents
+                                  </span>
+                                  <Badge className="bg-primary/10 text-primary border-none text-[9px] font-bold">
+                                    {job.category}
+                                  </Badge>
+                                </div>
+                                <div className="bg-muted/10 border-border/40 max-h-56 overflow-y-auto rounded-2xl border p-5">
+                                  <h4 className="text-foreground mb-2 text-sm font-bold">
+                                    {job.title}
+                                  </h4>
+                                  <p className="text-muted-foreground text-xs leading-relaxed font-medium whitespace-pre-line">
+                                    {job.description}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
 
-                          <TableCell>
-                            <div className="space-y-0.5">
-                              <div className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
-                                <Clock className="h-3 w-3" />
-                                <span>{job.submittedAt}</span>
-                              </div>
-                              <Badge className="bg-primary/10 text-primary border-none text-[9px] font-bold">
-                                {job.type.replace("_", " ")}
-                              </Badge>
-                            </div>
-                          </TableCell>
-
-                          <TableCell
-                            className="text-right"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                onClick={() => handleApprove(job.id, job.title)}
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-600"
-                                title="Approve & Publish"
-                              >
-                                <ShieldCheck className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                onClick={() => handleReject(job.id, job.title)}
-                                size="sm"
-                                variant="ghost"
-                                className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8 p-0"
-                                title="Reject & Delete"
-                              >
-                                <XCircle className="h-4 w-4" />
-                              </Button>
-
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    className="h-8 w-8 p-0"
-                                  >
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                  align="end"
-                                  className="w-52"
+                              <div className="border-border/60 flex items-center justify-end gap-3 border-t border-dashed pt-4">
+                                <Button
+                                  onClick={() =>
+                                    handleReject(job.id, job.title)
+                                  }
+                                  variant="ghost"
+                                  className="h-10 rounded-xl px-5 text-xs font-bold text-rose-600 hover:bg-rose-50"
                                 >
-                                  <DropdownMenuLabel>
-                                    Moderation
-                                  </DropdownMenuLabel>
-                                  <DropdownMenuItem
-                                    onClick={() => toggleExpand(job.id)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    {expandedJobId === job.id
-                                      ? "Collapse Details"
-                                      : "Read Full Post"}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator className="my-1 border-dashed" />
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      toast.success(
-                                        `Opening poster profile for ${job.postedBy}...`,
-                                      )
-                                    }
-                                    className="cursor-pointer"
-                                  >
-                                    <ExternalLink className="mr-2 h-4 w-4" />
-                                    View Recruiter Profile
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      toast.success(
-                                        `Warning email template draft created for ${job.recruiterEmail}`,
-                                      )
-                                    }
-                                    className="cursor-pointer"
-                                  >
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    Send Warning Email
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-
-                        {/* Expanded warning details & full post preview */}
-                        {expandedJobId === job.id && (
-                          <TableRow className="border-b bg-slate-50/40 hover:bg-slate-50/40 dark:bg-slate-900/10 dark:hover:bg-slate-900/10">
-                            <TableCell colSpan={5} className="p-6">
-                              <div className="animate-in slide-in-from-top-2 grid grid-cols-1 gap-8 duration-300 lg:grid-cols-2">
-                                {/* Flagged Rules & Indicators */}
-                                <div className="space-y-4">
-                                  <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase dark:text-rose-400">
-                                    <AlertTriangle className="h-4 w-4 shrink-0" />
-                                    <span>
-                                      Security Warning Report (
-                                      {job.triggeredRules.length} rules
-                                      triggered)
-                                    </span>
-                                  </div>
-                                  <div className="space-y-3.5 rounded-2xl border border-rose-500/10 bg-rose-500/3 p-5">
-                                    {job.triggeredRules.map(
-                                      (rule: string, index: number) => (
-                                        <div
-                                          key={index}
-                                          className="flex items-start gap-3"
-                                        >
-                                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-xs font-bold text-rose-600">
-                                            {index + 1}
-                                          </div>
-                                          <p className="text-foreground/80 text-xs leading-relaxed font-semibold">
-                                            {rule}
-                                          </p>
-                                        </div>
-                                      ),
-                                    )}
-                                  </div>
-
-                                  <div className="bg-muted/30 border-border/50 space-y-1.5 rounded-2xl border p-5">
-                                    <span className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
-                                      Recruiter Details Verification
-                                    </span>
-                                    <div className="flex items-center justify-between pt-1 text-xs">
-                                      <span className="text-muted-foreground">
-                                        Public domain:
-                                      </span>
-                                      <span className="text-foreground font-mono font-bold">
-                                        {job.recruiterEmail.endsWith(
-                                          "@gmail.com",
-                                        )
-                                          ? "HIGH RISK (Public Gmail)"
-                                          : "LOW RISK (Company Domain)"}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-xs">
-                                      <span className="text-muted-foreground">
-                                        Company matching:
-                                      </span>
-                                      <span className="text-foreground font-mono font-bold">
-                                        No matching registered portal website
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Job Description Preview */}
-                                <div className="border-border/50 flex flex-col justify-between space-y-4 border-t pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
-                                  <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-muted-foreground block text-[10px] font-bold tracking-wider uppercase">
-                                        Job Post Contents
-                                      </span>
-                                      <Badge className="bg-primary/10 text-primary border-none text-[9px] font-bold">
-                                        {job.category}
-                                      </Badge>
-                                    </div>
-                                    <div className="bg-muted/10 border-border/40 max-h-56 overflow-y-auto rounded-2xl border p-5">
-                                      <h4 className="text-foreground mb-2 text-sm font-bold">
-                                        {job.title}
-                                      </h4>
-                                      <p className="text-muted-foreground text-xs leading-relaxed font-medium whitespace-pre-line">
-                                        {job.description}
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  <div className="border-border/60 flex items-center justify-end gap-3 border-t border-dashed pt-4">
-                                    <Button
-                                      onClick={() =>
-                                        handleReject(job.id, job.title)
-                                      }
-                                      variant="ghost"
-                                      className="h-10 rounded-xl px-5 text-xs font-bold text-rose-600 hover:bg-rose-50"
-                                    >
-                                      Reject Post
-                                    </Button>
-                                    <Button
-                                      onClick={() =>
-                                        handleApprove(job.id, job.title)
-                                      }
-                                      className="h-10 gap-1 rounded-xl bg-emerald-600 px-6 text-xs font-bold text-white shadow-md shadow-emerald-500/10 hover:bg-emerald-700"
-                                    >
-                                      <ShieldCheck className="h-4 w-4" />{" "}
-                                      Approve & Publish Live
-                                    </Button>
-                                  </div>
-                                </div>
+                                  Reject Post
+                                </Button>
+                                <Button
+                                  onClick={() =>
+                                    handleApprove(job.id, job.title)
+                                  }
+                                  className="h-10 gap-1 rounded-xl bg-emerald-600 px-6 text-xs font-bold text-white shadow-md shadow-emerald-500/10 hover:bg-emerald-700"
+                                >
+                                  <ShieldCheck className="h-4 w-4" /> Approve &
+                                  Publish Live
+                                </Button>
                               </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </Fragment>
-                    ))}
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
+                ))}
               </TableBody>
             </Table>
           </div>

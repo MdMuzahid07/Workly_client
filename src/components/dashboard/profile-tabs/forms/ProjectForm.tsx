@@ -80,8 +80,7 @@ export const ProjectForm = ({
         {
           ...defaultValues,
           technologies: defaultValues?.technologies || [],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any
+        } as unknown as ProjectFormData
       }
       resolver={zodResolver(projectSchema)}
     >

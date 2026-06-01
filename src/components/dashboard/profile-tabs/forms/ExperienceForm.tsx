@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import WKCheckbox from "@/components/form/WKCheckbox";
 import WKDatePicker from "@/components/form/WKDatePicker";
@@ -49,10 +50,8 @@ export const ExperienceForm = ({
   return (
     <WkForm<ExperienceFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      resolver={zodResolver(experienceSchema as any)}
+      defaultValues={defaultValues as unknown as ExperienceFormData}
+      resolver={zodResolver(experienceSchema) as any}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <WKInput

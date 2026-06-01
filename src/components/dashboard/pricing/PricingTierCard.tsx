@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -84,10 +83,11 @@ export default function PricingTierCard({
       if (res?.data?.gatewayUrl) {
         window.location.href = res.data.gatewayUrl;
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Payment session initiation failed:", err);
+      const error = err as { data?: { message?: string } };
       toast.error(
-        err?.data?.message ||
+        error?.data?.message ||
           "Failed to contact payment server. Please try again later.",
       );
     }

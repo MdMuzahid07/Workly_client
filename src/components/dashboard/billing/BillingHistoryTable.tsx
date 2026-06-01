@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -7,10 +6,24 @@ import { useGetTransactionsQuery } from "@/redux/feature/payment/paymentApi";
 import { CreditCard, FileText, Loader2, Printer } from "lucide-react";
 import { useState } from "react";
 
+export interface Transaction {
+  id: string;
+  tranId: string;
+  createdAt: string;
+  planId: string;
+  amount: number;
+  cardType?: string;
+  status: string;
+  user?: {
+    fullName: string;
+    email: string;
+  };
+}
+
 export default function BillingHistoryTable() {
   const [page, setPage] = useState(1);
   const { data, isLoading } = useGetTransactionsQuery({ page, limit: 10 });
-  const [selectedTx, setSelectedTx] = useState<any>(null);
+  const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
   const transactions = data?.data || [];
   const meta = data?.meta || { totalPages: 1, total: 0 };
@@ -93,7 +106,7 @@ export default function BillingHistoryTable() {
                 </tr>
               </thead>
               <tbody className="divide-border divide-y">
-                {transactions.map((tx: any) => (
+                {transactions.map((tx: Transaction) => (
                   <tr
                     key={tx.id}
                     className="transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-900/10"

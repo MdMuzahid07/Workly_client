@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -137,7 +136,14 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
   pathname: string;
   user: { fullName?: string; profilePicture?: string } | null;
   profile: { avatarUrl?: string | null } | undefined;
-  profileData?: any;
+  profileData?: {
+    data?: {
+      fullName?: string;
+      profile?: {
+        avatarUrl?: string | null;
+      };
+    };
+  };
   onSignOut: () => void;
   onItemClick: () => void;
 }) {

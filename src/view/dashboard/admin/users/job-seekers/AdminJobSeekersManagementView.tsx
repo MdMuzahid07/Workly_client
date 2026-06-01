@@ -49,7 +49,7 @@ import {
   useReactivateJobSeekerAdminMutation,
   useSuspendJobSeekerAdminMutation,
 } from "@/redux/feature/admin/adminApi";
-import { Skeleton } from "@/components/ui/skeleton";
+import AdminUsersSkeleton from "@/skeleton/dashboard/admin/AdminUsersSkeleton";
 
 const AdminJobSeekersManagementView = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -129,6 +129,10 @@ const AdminJobSeekersManagementView = () => {
   const [remove, { isLoading: deleting }] = useDeleteJobSeekerAdminMutation();
   const busy = suspending || reactivating || deleting;
 
+  if (statsLoading || listLoading) {
+    return <AdminUsersSkeleton />;
+  }
+
   return (
     <div className="min-h-screen pt-16">
       <DashboardAdminJobSeekersHeader />
@@ -146,11 +150,7 @@ const AdminJobSeekersManagementView = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold sm:text-3xl">
-                  {statsLoading ? (
-                    <Skeleton className="h-8 w-20" />
-                  ) : (
-                    stat.value
-                  )}
+                  {stat.value}
                 </div>
                 {statsError && (
                   <p className="text-destructive mt-2 text-xs font-medium">
@@ -246,21 +246,6 @@ const AdminJobSeekersManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(listLoading || isFetching) &&
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={`sk-${i}`}>
-                      <TableCell colSpan={6}>
-                        <div className="flex items-center gap-3 py-2">
-                          <Skeleton className="h-10 w-10 rounded-full" />
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-56" />
-                            <Skeleton className="h-3 w-40" />
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-
                 {jobSeekers.map((js) => (
                   <TableRow
                     key={js.id}

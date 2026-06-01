@@ -75,7 +75,7 @@ export const projectSchema = z.object({
 // --- Resume Schema ---
 export const resumeSchema = z.object({
   name: z.string().min(1, "Resume name is required"),
-  file: z.any().optional(), // File validation would typically happen on change
+  file: z.unknown().optional(), // File validation would typically happen on change
   isDefault: z.boolean().optional(),
 });
 
@@ -83,7 +83,7 @@ export const resumeSchema = z.object({
 export const videoResumeSchema = z
   .object({
     videoUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-    file: z.any().optional(),
+    file: z.unknown().optional(),
   })
   .refine((data) => data.videoUrl || data.file, {
     message: "Either a video URL or a video file is required",
@@ -98,7 +98,7 @@ export const certificationSchema = z.object({
   expirationDate: z.string().optional(),
   credentialId: z.string().optional(),
   credentialUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  file: z.any().optional(), // For PDF upload
+  file: z.unknown().optional(), // For PDF upload
 });
 
 // --- Social Links Schema ---

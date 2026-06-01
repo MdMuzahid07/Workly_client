@@ -2,8 +2,11 @@ import { Plus, Tag } from "lucide-react";
 import { Button } from "../../../ui/button";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const DashboardCategoryHeader = ({ setIsAddOpen }: any) => {
+const DashboardCategoryHeader = ({
+  setIsAddOpen,
+}: {
+  setIsAddOpen: (open: boolean) => void;
+}) => {
   return (
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

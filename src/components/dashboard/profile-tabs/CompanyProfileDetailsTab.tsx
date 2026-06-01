@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -39,6 +38,8 @@ import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import AddCompanySocialLink from "../company-settings/AddCompanySocialLink";
 
+import type { CompanyProfile } from "@/types/company-profile";
+
 const CompanyProfileDetailsTab = ({
   updateField,
   isEditing,
@@ -47,10 +48,10 @@ const CompanyProfileDetailsTab = ({
   socialLinks,
   onSocialLinksChange,
 }: {
-  updateField: any;
+  updateField: (field: string, value: unknown) => void;
   isEditing: boolean;
-  editedProfile: any;
-  currentProfile: any;
+  editedProfile: Partial<CompanyProfile>;
+  currentProfile: CompanyProfile;
   socialLinks?: Array<{ id?: string; platform: string; url: string }>;
   onSocialLinksChange?: (
     links: Array<{ id?: string; platform: string; url: string }>,
@@ -60,9 +61,10 @@ const CompanyProfileDetailsTab = ({
   const { data: categories, isLoading: categoriesLoading } =
     useGetCategoriesQuery(undefined);
 
-  const getIndustryId = (industry: any): string => {
+  const getIndustryId = (industry: unknown): string => {
     if (!industry) return "";
-    if (typeof industry === "object" && industry.id) return industry.id;
+    if (typeof industry === "object" && industry && "id" in industry)
+      return (industry as { id: string }).id;
     if (typeof industry === "string") return industry;
     return "";
   };
@@ -77,21 +79,24 @@ const CompanyProfileDetailsTab = ({
 
   useEffect(() => {
     const subscription = methods.watch((value, { name }) => {
-      if (name && value[name] !== undefined) {
-        updateField(name, value[name]);
+      if (name && value[name as keyof typeof value] !== undefined) {
+        updateField(name, value[name as keyof typeof value]);
       }
     });
     return () => subscription.unsubscribe();
   }, [methods, updateField]);
 
-  const getIndustryDisplayName = (industry: any): string => {
+  const getIndustryDisplayName = (industry: unknown): string => {
     if (!industry) return "Not specified";
-    if (typeof industry === "object" && industry.name) return industry.name;
+    if (typeof industry === "object" && industry && "name" in industry)
+      return (industry as { name: string }).name;
     if (typeof industry === "string" && categories?.data) {
-      const category = categories.data.find((cat: any) => cat.id === industry);
+      const category = categories.data.find(
+        (cat: { id: string; name: string }) => cat.id === industry,
+      );
       return category?.name || industry;
     }
-    return industry;
+    return industry as string;
   };
 
   const formatDateDisplay = (date: string): string => {
@@ -109,7 +114,7 @@ const CompanyProfileDetailsTab = ({
 
   const industryOptions = useMemo(() => {
     if (!categories?.data) return [];
-    return categories.data.map((category: any) => ({
+    return categories.data.map((category: { id: string; name: string }) => ({
       value: category.id,
       label: category.name,
     }));

@@ -2,6 +2,7 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { CompanyProfile } from "@/types/company-profile";
 import { PROFILE_TABS } from "@/constants/company-mock-data";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import Loading from "../../../../app/loading";
@@ -92,14 +93,14 @@ const ManageCompanyProfileView = () => {
               currentProfile={currentProfile}
               isEditing={isEditing}
               updateField={updateField as any}
-              editedProfile={editedProfile}
+              editedProfile={editedProfile as Partial<CompanyProfile>}
             />
 
             <CompanyProfileDetailsTab
               currentProfile={currentProfile}
               isEditing={isEditing}
               updateField={updateField as any}
-              editedProfile={editedProfile}
+              editedProfile={editedProfile as Partial<CompanyProfile>}
               socialLinks={socialLinks}
               onSocialLinksChange={handleSocialLinksChange}
             />
@@ -122,7 +123,7 @@ const ManageCompanyProfileView = () => {
               isEditing={isEditing}
               currentProfile={currentProfile}
               updateField={updateField as any}
-              editedProfile={editedProfile}
+              editedProfile={editedProfile as Partial<CompanyProfile>}
             />
           </div>
         </Tabs>

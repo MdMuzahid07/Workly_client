@@ -24,6 +24,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AdminBrandingView from "./AdminBrandingView";
+import AdminSettingsSkeleton from "@/skeleton/dashboard/admin/AdminSettingsSkeleton";
 import AdminPersonalInformationView from "./AdminPersonalInformationView";
 import AdminSecurityView from "./AdminSecurityView";
 
@@ -70,7 +71,7 @@ const AdminSettingsView = () => {
   const [activeSection, setActiveSection] = useState<
     "main" | "personal" | "security" | "branding"
   >("main");
-  const { data: settingsData } = useGetSystemSettingsQuery();
+  const { data: settingsData, isLoading } = useGetSystemSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] =
     useUpdateSystemSettingsMutation();
 
@@ -113,6 +114,10 @@ const AdminSettingsView = () => {
       toast.error(err?.data?.message || "Failed to update settings");
     }
   };
+
+  if (isLoading) {
+    return <AdminSettingsSkeleton />;
+  }
 
   if (activeSection === "personal") {
     return (

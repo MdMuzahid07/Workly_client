@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Label } from "@radix-ui/react-label";
 import { Switch } from "@radix-ui/react-switch";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -11,12 +10,21 @@ import {
 } from "../../../ui/card";
 import { Input } from "../../../ui/input";
 
+import type { CompanySettings } from "@/types/company-settings";
+
 const JobPostingManagementTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <
+    K extends keyof CompanySettings,
+    F extends keyof CompanySettings[K],
+  >(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="general" className="space-y-6">

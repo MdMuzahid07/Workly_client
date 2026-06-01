@@ -30,6 +30,7 @@ const CompanyDashboardView = () => {
       activeJobs: 8,
       totalApplications: 156,
       totalTeamMembers: 250,
+      profileViews: 1200,
     },
   };
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -135,7 +134,14 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
   pathname: string;
   user: { fullName?: string; profilePicture?: string } | null;
   profile: { avatarUrl?: string | null } | undefined;
-  profileData?: any;
+  profileData?: {
+    data?: {
+      fullName?: string;
+      profile?: {
+        avatarUrl?: string | null;
+      };
+    };
+  };
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
@@ -253,7 +259,8 @@ export default function AdminSidebarView({
   const { data: reportStatsData } = useGetJobReportStatsQuery();
   const { data: unreadNotificationsData } = useGetUnreadCountQuery();
 
-  const pendingCount = (pendingJobsData as any)?.meta?.total ?? 0;
+  const pendingCount =
+    (pendingJobsData as { meta?: { total?: number } })?.meta?.total ?? 0;
   const reportedCount = reportStatsData?.data?.openReports ?? 0;
   const unreadCount = unreadNotificationsData?.data?.unreadCount ?? 0;
 

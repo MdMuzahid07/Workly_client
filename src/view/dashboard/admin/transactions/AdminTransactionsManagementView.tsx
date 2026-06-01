@@ -2,11 +2,13 @@
 
 import DashboardAdminTransactionsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminTransactionsHeader";
 import { useState } from "react";
+import AdminPlansSkeleton from "@/skeleton/dashboard/admin/AdminPlansSkeleton";
 import { FinancialStatsGrid } from "./components/FinancialStatsGrid";
 import { TransactionFilterBar } from "./components/TransactionFilterBar";
 import { TransactionTable } from "./components/TransactionTable";
 
 const AdminTransactionsManagementView = () => {
+  const isLoading = false;
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
@@ -80,6 +82,10 @@ const AdminTransactionsManagementView = () => {
       method: "Rocket (SSLCommerz)",
     },
   ]);
+
+  if (isLoading) {
+    return <AdminPlansSkeleton showTransactions={true} />;
+  }
 
   const filteredTransactions = transactions.filter(
     (tx) =>

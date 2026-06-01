@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
@@ -7,7 +6,13 @@ import Link from "next/link";
 import { Button } from "../../../ui/button";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
-const DashboardOverviewHeader = ({ companyData }: { companyData: any }) => {
+import type { CompanyProfile } from "@/types/company-profile";
+
+const DashboardOverviewHeader = ({
+  companyData,
+}: {
+  companyData: Partial<CompanyProfile>;
+}) => {
   return (
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

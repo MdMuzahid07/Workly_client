@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import WKTextArea from "@/components/form/WkTextArea";
 import { SectionCard } from "@/components/main/profile/SectionCard";
@@ -102,6 +101,8 @@ function RocketIcon({ className }: { className?: string }) {
   );
 }
 
+import type { CompanyProfile } from "@/types/company-profile";
+
 const CompanyProfileCultureValuesTab = ({
   currentProfile,
   isEditing,
@@ -109,7 +110,7 @@ const CompanyProfileCultureValuesTab = ({
   onValuesChange,
   initialValues = [],
 }: {
-  currentProfile: any;
+  currentProfile: CompanyProfile;
   isEditing: boolean;
   onMissionChange?: (mission: string) => void;
   onValuesChange?: (values: string[]) => void;

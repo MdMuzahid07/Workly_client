@@ -6,8 +6,9 @@ import AdvancedPlanBuilderDialog from "@/components/dashboard/plans/AdvancedPlan
 import EditPlanDialog from "@/components/dashboard/plans/EditPlanDialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Cloud, Rocket, ShieldCheck, Loader2 } from "lucide-react";
+import { Cloud, Rocket, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import AdminPlansSkeleton from "@/skeleton/dashboard/admin/AdminPlansSkeleton";
 import { CustomPlanBanner } from "./components/CustomPlanBanner";
 import { PlanCard } from "./components/PlanCard";
 import { PlanStatsGrid } from "./components/PlanStatsGrid";
@@ -36,6 +37,10 @@ const AdminPlansManagementView = () => {
   const [togglePlanStatus] = useTogglePlanStatusMutation();
 
   const plans = plansRes?.data || [];
+
+  if (isLoading) {
+    return <AdminPlansSkeleton />;
+  }
 
   const handleToggleStatus = async (id: string) => {
     try {
@@ -191,25 +196,19 @@ const AdminPlansManagementView = () => {
         </div>
 
         {/* Plans Management Grid */}
-        {isLoading ? (
-          <div className="flex h-60 items-center justify-center">
-            <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          <div className="grid min-w-0 grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-            {activePlansList.map((plan: any) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                onEdit={(p) => {
-                  setSelectedPlan(p);
-                  setIsEditPlanOpen(true);
-                }}
-                onToggleStatus={handleToggleStatus}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid min-w-0 grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+          {activePlansList.map((plan: any) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              onEdit={(p) => {
+                setSelectedPlan(p);
+                setIsEditPlanOpen(true);
+              }}
+              onToggleStatus={handleToggleStatus}
+            />
+          ))}
+        </div>
 
         {/* Action Banner */}
         <CustomPlanBanner onClick={() => setIsAdvancedBuilderOpen(true)} />

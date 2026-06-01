@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import AdminUsersSkeleton from "@/skeleton/dashboard/admin/AdminUsersSkeleton";
 import {
   Table,
   TableBody,
@@ -136,6 +136,10 @@ const AdminAdministratorsManagementView = () => {
     ];
   }, [statsData]);
 
+  if (isStaffLoading || isStatsLoading || isAuditLoading) {
+    return <AdminUsersSkeleton showAuditLogs={true} />;
+  }
+
   const onAddAdminSubmit = async (data: any) => {
     try {
       await createStaff(data).unwrap();
@@ -180,11 +184,7 @@ const AdminAdministratorsManagementView = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  {isStatsLoading ? (
-                    <Skeleton className="h-9 w-16" />
-                  ) : (
-                    stat.value
-                  )}
+                  {stat.value}
                 </div>
               </CardContent>
             </Card>
@@ -264,27 +264,7 @@ const AdminAdministratorsManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isStaffLoading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <Skeleton className="h-12 w-48" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-24" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-32" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-20" />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Skeleton className="ml-auto h-8 w-8" />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : staffMembers.length === 0 ? (
+                {staffMembers.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
@@ -407,27 +387,7 @@ const AdminAdministratorsManagementView = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isAuditLoading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <Skeleton className="h-6 w-24" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-20" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-32" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-24" />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Skeleton className="ml-auto h-6 w-32" />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : auditLogs.length === 0 ? (
+                {auditLogs.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}

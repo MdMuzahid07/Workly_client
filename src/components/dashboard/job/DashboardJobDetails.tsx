@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -330,18 +329,24 @@ const JobDetailsSheet = ({
                     <div className="space-y-3">
                       <h3 className="font-semibold">Required Skills</h3>
                       <div className="flex flex-wrap gap-2">
-                        {job.JobSkill.map((skill: any) => (
-                          <Badge
-                            key={skill.id}
-                            variant="secondary"
-                            className="flex items-center gap-1.5 px-3 py-1"
-                          >
-                            {skill.skillName}
-                            <span className="text-[10px] opacity-60">
-                              ({skill.experienceYears}y)
-                            </span>
-                          </Badge>
-                        ))}
+                        {job.JobSkill.map(
+                          (skill: {
+                            id: string;
+                            skillName: string;
+                            experienceYears: number;
+                          }) => (
+                            <Badge
+                              key={skill.id}
+                              variant="secondary"
+                              className="flex items-center gap-1.5 px-3 py-1"
+                            >
+                              {skill.skillName}
+                              <span className="text-[10px] opacity-60">
+                                ({skill.experienceYears}y)
+                              </span>
+                            </Badge>
+                          ),
+                        )}
                       </div>
                     </div>
                   </>
