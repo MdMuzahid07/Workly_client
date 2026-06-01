@@ -1,4 +1,4 @@
-import UserAgreementView from "@/view/legal/UserAgreementView";
+import UserAgreementView from "@/view/legal/user-agreement/UserAgreementView";
 
 export const metadata = {
   title: "User Agreement | Workly_job",

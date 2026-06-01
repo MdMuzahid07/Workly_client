@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import EmployerDashboardView from "../../../view/dashboard/EmployerDashboardView";
+import EmployerDashboardView from "../../../view/dashboard/employer/dashboard/EmployerDashboardView";
 
 export const metadata: Metadata = {
   title: "Employer Dashboard",

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import CompanyDetailsView from "../../../../view/company/CompanyDetailsView";
+import CompanyDetailsView from "../../../../view/company/details/CompanyDetailsView";
 
 export const revalidate = 3600;
 

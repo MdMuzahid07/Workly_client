@@ -1,4 +1,4 @@
-import PrivacyPolicyView from "@/view/legal/PrivacyPolicyView";
+import PrivacyPolicyView from "@/view/legal/privacy-policy/PrivacyPolicyView";
 
 export const metadata = {
   title: "Privacy Policy | Workly_job",

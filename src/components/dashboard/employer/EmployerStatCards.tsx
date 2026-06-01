@@ -1,65 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { Briefcase, Eye, TrendingUp, Users } from "lucide-react";
-import Link from "next/link";
-import type { ReactNode } from "react";
-
-type StatCardProps = {
-  title: string;
-  value: number;
-  description: string;
-  icon: ReactNode;
-  ctaHref: string;
-  ctaLabel: string;
-  testId?: string;
-};
-
-function StatCard({
-  title,
-  value,
-  description,
-  icon,
-  ctaHref,
-  ctaLabel,
-  testId,
-}: StatCardProps) {
-  return (
-    <Card className="bg-card border">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle
-          id={testId ? `${testId}-title` : undefined}
-          className="text-xs font-medium sm:text-sm"
-        >
-          {title}
-        </CardTitle>
-        <span className="text-muted-foreground shrink-0" aria-hidden>
-          {icon}
-        </span>
-      </CardHeader>
-      <CardContent>
-        <p
-          className="text-primary text-2xl font-bold tabular-nums"
-          aria-labelledby={testId ? `${testId}-title` : undefined}
-        >
-          {value}
-        </p>
-        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-          {description}
-        </p>
-        <Link href={ctaHref}>
-          <Button
-            variant="link"
-            className="h-auto p-0 text-xs font-medium"
-            aria-describedby={testId ? `${testId}-title` : undefined}
-          >
-            {ctaLabel}
-          </Button>
-        </Link>
-      </CardContent>
-    </Card>
-  );
-}
+import { StatCard } from "@/components/shared/StatCard";
 
 type EmployerStatCardsProps = {
   stats: {

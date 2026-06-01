@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import NotificationCard from "../../components/main/notification/NotificationCard";
-import { NotificationsSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
+import NotificationsSkeleton from "@/skeleton/notification/NotificationsSkeleton";
 
 interface Notification {
   id: string;

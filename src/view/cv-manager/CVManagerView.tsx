@@ -18,7 +18,7 @@ import {
   ShieldCheck,
   UploadCloud,
 } from "lucide-react";
-import { CVManagerSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
+import CVManagerSkeleton from "@/skeleton/cv-manager/CVManagerSkeleton";
 import Link from "next/link";
 import { useRef } from "react";
 import { toast } from "sonner";

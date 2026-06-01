@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import JobDetailsView from "../../../../view/job/JobDetailsView";
+import JobDetailsView from "../../../../view/job/details/JobDetailsView";
 
 export const metadata: Metadata = {
   title: "Job Details",

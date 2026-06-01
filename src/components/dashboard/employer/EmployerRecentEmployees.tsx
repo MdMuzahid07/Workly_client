@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { humanizeJobOrApplicationStatus } from "@/lib/employerDashboardFormat";
+import { EmployerEmployeeRowSkeleton } from "@/skeleton/dashboard/employer/dashboard/EmployerDashboardSkeleton";
 import {
   COMPANY_USER_ROLE_LABELS,
   type RecentEmployee,
@@ -16,7 +17,6 @@ import { format } from "date-fns";
 import { Users } from "lucide-react";
 import Link from "next/link";
 import { MemberInitialsAvatar } from "./MemberInitialsAvatar";
-import { EmployerEmployeeRowSkeleton } from "./EmployerDashboardSkeleton";
 
 type EmployerRecentEmployeesProps = {
   members: RecentEmployee[];

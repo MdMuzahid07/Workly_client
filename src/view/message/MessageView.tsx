@@ -55,7 +55,7 @@ import {
 } from "../../redux/feature/message/messageApi";
 import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import { useAppSelector } from "../../redux/hooks";
-import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
+import MessageViewSkeleton from "../../skeleton/message/inbox/MessageViewSkeleton";
 
 interface Message {
   id: string;

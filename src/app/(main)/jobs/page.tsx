@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import JobView from "../../../view/job/JobView";
+import JobView from "../../../view/job/browse/JobView";
 
 export const metadata: Metadata = {
   title: "Jobs",

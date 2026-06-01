@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import getIconComponent from "../../../helper/getIconComponent";
-import IndustriesSkeleton from "../../../skeleton/job/IndustriesSkeleton ";
+import IndustriesSkeleton from "../../../skeleton/job/industries/IndustriesSkeleton";
 import { Button } from "../../ui/button";
 
 export type Category = {

@@ -1,4 +1,4 @@
-import HelpCenterView from "@/view/landing/HelpCenterView";
+import HelpCenterView from "@/view/landing/help-center/HelpCenterView";
 
 export const metadata = {
   title: "Help Center | Workly_job",

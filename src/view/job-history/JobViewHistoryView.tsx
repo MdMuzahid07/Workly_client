@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useGetJobViewHistoryQuery } from "@/redux/feature/jobView/jobViewApi";
 import { AnimatePresence } from "framer-motion";
-import { JobViewHistorySkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
+import JobViewHistorySkeleton from "@/skeleton/job-history/JobViewHistorySkeleton";
 import { Briefcase, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";

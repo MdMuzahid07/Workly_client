@@ -1,4 +1,4 @@
-import ContactView from "@/view/landing/ContactView";
+import ContactView from "@/view/landing/contact/ContactView";
 
 export const metadata = {
   title: "Contact Us | Workly_job",

@@ -1,4 +1,4 @@
-import CandidateDetailsView from "@/view/browse-candidates/CandidateDetailsView";
+import CandidateDetailsView from "@/view/browse-candidates/details/CandidateDetailsView";
 
 const CandidateDetailsPage = () => {
   return <CandidateDetailsView />;

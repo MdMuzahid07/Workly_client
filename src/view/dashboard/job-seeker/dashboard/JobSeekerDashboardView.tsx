@@ -1,0 +1,221 @@
+"use client";
+
+import { JobApplicationsChart } from "@/components/dashboard/charts/JobApplicationsChart";
+import { ProfileViewsChart } from "@/components/dashboard/charts/ProfileViewsChart";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useGetMyApplicationsQuery } from "@/redux/feature/application/applicationApi";
+import {
+  useGetProfileQuery,
+  useGetSavedJobsQuery,
+} from "@/redux/feature/profile/profileApi";
+import { useAppSelector } from "@/redux/hooks";
+import { Bookmark, FileText, Search, TrendingUp, User } from "lucide-react";
+import Link from "next/link";
+import { StatCard } from "@/components/shared/StatCard";
+import DashboardJobSeekerHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobSeekerHeader";
+
+import JobSeekerDashboardSkeleton from "@/skeleton/dashboard/job-seeker/dashboard/JobSeekerDashboardSkeleton";
+
+interface ProfileCompletionData {
+  profile?: {
+    bio?: string | null;
+    location?: string | null;
+    avatarUrl?: string | null;
+    resumeUrl?: string | null;
+  };
+  fullName?: string;
+}
+
+function computeProfileCompletion(
+  data: ProfileCompletionData | undefined,
+): number {
+  if (!data) return 0;
+  const { profile } = data;
+  const fields = [
+    !!data.fullName,
+    !!profile?.bio,
+    !!profile?.location,
+    !!profile?.avatarUrl,
+    !!profile?.resumeUrl,
+  ];
+  const filled = fields.filter(Boolean).length;
+  return Math.min(100, Math.round((filled / fields.length) * 100));
+}
+
+export default function JobSeekerDashboardView() {
+  const { user } = useAppSelector((state) => state.auth) || {};
+  const userId = user?.id;
+
+  const { data: profileData, isLoading: isProfileLoading } = useGetProfileQuery(
+    undefined,
+    {
+      skip: !userId,
+    },
+  );
+  const { data: applicationsData, isLoading: isApplicationsLoading } =
+    useGetMyApplicationsQuery(undefined, {
+      skip: !userId,
+    });
+  const { data: savedJobsData, isLoading: isSavedLoading } =
+    useGetSavedJobsQuery(undefined, {
+      skip: !userId,
+    });
+
+  const isLoading = isProfileLoading || isApplicationsLoading || isSavedLoading;
+
+  const profileCompletion = computeProfileCompletion(profileData?.data);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applications = (applicationsData?.data as any[]) || [];
+  const savedCount = Array.isArray(savedJobsData?.data)
+    ? savedJobsData.data.length
+    : 0;
+  const appliedCount = applications.length;
+
+  return (
+    <div className="mt-16 min-h-screen">
+      <DashboardJobSeekerHeader />
+      {isLoading ? (
+        <JobSeekerDashboardSkeleton />
+      ) : (
+        <div className="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+            <StatCard
+              title="Profile completion"
+              value={`${profileCompletion}%`}
+              description="Complete your profile to get better matches"
+              icon={<User className="h-4 w-4" />}
+              ctaHref="/dashboard/profile"
+              ctaLabel="Edit profile"
+            />
+
+            <StatCard
+              title="Applications"
+              value={appliedCount}
+              description="Total applications submitted"
+              icon={<FileText className="h-4 w-4" />}
+              ctaHref="/dashboard/applied-jobs"
+              ctaLabel="View applied jobs"
+            />
+
+            <StatCard
+              title="Saved jobs"
+              value={savedCount}
+              description="Jobs you've saved for later"
+              icon={<Bookmark className="h-4 w-4" />}
+              ctaHref="/dashboard/saved-jobs"
+              ctaLabel="View saved jobs"
+            />
+
+            <StatCard
+              title="Recommended"
+              value="Jobs for You"
+              description="Jobs matched to your profile and preferences"
+              icon={<TrendingUp className="h-4 w-4" />}
+              ctaHref="/dashboard/recommended-jobs"
+              ctaLabel="See recommendations"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+            <ProfileViewsChart />
+            <JobApplicationsChart />
+          </div>
+
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            <Card className="bg-card border transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Quick actions
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Shortcuts to common tasks
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+                <Link href="/dashboard/find-jobs" className="w-full sm:w-auto">
+                  <Button className="w-full touch-manipulation sm:w-auto">
+                    <Search className="mr-2 h-4 w-4" />
+                    Find jobs
+                  </Button>
+                </Link>
+                <Link href="/dashboard/profile" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    className="w-full touch-manipulation sm:w-auto"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Edit profile
+                  </Button>
+                </Link>
+                <Link href="/dashboard/cv-manager" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    className="w-full touch-manipulation sm:w-auto"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    CV Manager
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Recent activity
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Your latest applications and saves
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {appliedCount === 0 && savedCount === 0 ? (
+                  <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                    You {`haven't`} applied or saved any jobs yet.{" "}
+                    <Link
+                      href="/dashboard/find-jobs"
+                      className="text-primary touch-manipulation hover:underline active:opacity-70"
+                    >
+                      Start exploring
+                    </Link>
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {appliedCount > 0 && (
+                      <p className="text-xs sm:text-sm">
+                        <span className="font-medium">{appliedCount}</span>{" "}
+                        application
+                        {appliedCount !== 1 ? "s" : ""} submitted
+                      </p>
+                    )}
+                    {savedCount > 0 && (
+                      <p className="text-xs sm:text-sm">
+                        <span className="font-medium">{savedCount}</span> job
+                        {savedCount !== 1 ? "s" : ""} saved
+                      </p>
+                    )}
+                    <Link href="/dashboard/applied-jobs">
+                      <Button
+                        variant="link"
+                        className="h-auto touch-manipulation p-0 text-xs active:opacity-70 sm:text-sm"
+                      >
+                        View all activity
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

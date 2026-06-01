@@ -17,7 +17,7 @@ import { useState, type ComponentType, useEffect } from "react";
 import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { globeConfig, globeSampleAreas } from "../../constants";
-import GlobeSkeleton from "../../skeleton/landing/GlobeSkeleton";
+import GlobeSkeleton from "../../skeleton/landing/home/GlobeSkeleton";
 import { useGetSearchSuggestionsQuery } from "../../redux/feature/job/jobApi";
 
 interface WorldProps {

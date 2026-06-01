@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useGetFollowedCompaniesQuery } from "@/redux/feature/follow/followApi";
 import { AnimatePresence } from "framer-motion";
-import { FollowedCompaniesSkeleton } from "@/skeleton/dashboard/overview/JobSeekerDashboardSkeleton";
+import FollowedCompaniesSkeleton from "@/skeleton/followed-company/FollowedCompaniesSkeleton";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";

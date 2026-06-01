@@ -1,4 +1,4 @@
-import MyAppliedJobsView from "../../../view/job/MyAppliedJobsView";
+import MyAppliedJobsView from "../../../view/job/applied/MyAppliedJobsView";
 
 const page = () => {
   return <MyAppliedJobsView />;

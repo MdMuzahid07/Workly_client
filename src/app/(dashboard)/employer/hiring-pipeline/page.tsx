@@ -1,4 +1,4 @@
-import HiringPipelineView from "../../../../view/dashboard/HiringPipelineView";
+import HiringPipelineView from "../../../../view/dashboard/employer/hiring-pipeline/HiringPipelineView";
 
 export default function EmployerHiringPipelinePage() {
   return <HiringPipelineView />;

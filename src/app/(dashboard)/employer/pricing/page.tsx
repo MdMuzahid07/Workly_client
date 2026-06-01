@@ -1,4 +1,4 @@
-import EmployerPricingView from "@/view/dashboard/EmployerPricingView";
+import EmployerPricingView from "@/view/dashboard/employer/pricing/EmployerPricingView";
 
 export default function EmployerPricingPage() {
   return <EmployerPricingView />;

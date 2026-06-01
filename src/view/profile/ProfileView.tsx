@@ -27,7 +27,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
-import ProfileSkeleton from "../../skeleton/profile/ProfileSkeleton";
+import ProfileSkeleton from "../../skeleton/profile/overview/ProfileSkeleton";
 
 import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicInfoForm";
 import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";

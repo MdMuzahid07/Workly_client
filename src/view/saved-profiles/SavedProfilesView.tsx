@@ -18,6 +18,7 @@ import {
   useGetSavedCandidatesQuery,
   useToggleSaveCandidateMutation,
 } from "@/redux/feature/candidate/candidateApi";
+import SavedProfilesSkeleton from "@/skeleton/saved-profiles/SavedProfilesSkeleton";
 import { AnimatePresence } from "framer-motion";
 import { Bookmark, Search } from "lucide-react";
 import Link from "next/link";
@@ -73,10 +74,9 @@ const SavedProfilesView = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-primary animate-pulse text-lg font-bold">
-          Loading saved profiles...
-        </div>
+      <div className="min-h-screen pt-16">
+        <DashboardEmployerSavedProfilesHeader />
+        <SavedProfilesSkeleton />
       </div>
     );
   }
