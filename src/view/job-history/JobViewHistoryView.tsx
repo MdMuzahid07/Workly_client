@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/select";
 import { useGetJobViewHistoryQuery } from "@/redux/feature/jobView/jobViewApi";
 import { AnimatePresence } from "framer-motion";
-import { Briefcase, Loader2, Search } from "lucide-react";
+import JobViewHistorySkeleton from "@/skeleton/job-history/JobViewHistorySkeleton";
+import { Briefcase, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -44,108 +45,109 @@ const JobViewHistoryView = () => {
     });
   }, [response, searchTerm, jobTypeFilter]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center pt-16">
-        <Loader2 className="text-primary h-10 w-10 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen pt-16">
       <DashboardJobViewHistoryHeader />
-      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
-        {/* Filter Bar */}
-        <Card className="bg-card rounded-xl border">
-          <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-center">
-              {/* Search Placeholder */}
-              <div className="group relative max-w-md flex-1">
-                <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
-                <Input
-                  placeholder="Search your history..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
-                />
-              </div>
-
-              {/* Job Type Filter UI */}
-              <div className="flex items-center gap-3">
-                <span className="text-muted-foreground/60 text-[10px] font-black tracking-widest uppercase">
-                  Type:
-                </span>
-                <Select value={jobTypeFilter} onValueChange={setJobTypeFilter}>
-                  <SelectTrigger className="bg-muted/20 border-border h-10 w-48 cursor-pointer rounded-full font-bold">
-                    <SelectValue placeholder="All types" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    {jobTypes.map((type) => (
-                      <SelectItem
-                        key={type}
-                        className="cursor-pointer rounded-lg font-medium"
-                        value={type}
-                      >
-                        {type === "all" ? "All Types" : type.replace("_", " ")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Link href="/dashboard/find-jobs">
-                <Button className="h-11 rounded-full px-6 font-bold shadow-sm">
-                  Find More Jobs
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Jobs Grid */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
-          <AnimatePresence mode="popLayout">
-            {filteredJobs.length > 0 ? (
-              filteredJobs.map((item: any) => {
-                // Map backend logoUrl to frontend logo for JobCard
-                const jobWithMappedLogo = {
-                  ...item.job,
-                  company: {
-                    ...item.job.company,
-                    logo: item.job.company.logoUrl,
-                  },
-                };
-                return (
-                  <JobCard
-                    key={item.id}
-                    job={jobWithMappedLogo}
-                    inDashboard={true}
+      {isLoading ? (
+        <JobViewHistorySkeleton />
+      ) : (
+        <div className="space-y-6 px-4 sm:px-6 sm:py-8">
+          {/* Filter Bar */}
+          <Card className="bg-card rounded-xl border">
+            <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-center">
+                {/* Search Placeholder */}
+                <div className="group relative max-w-md flex-1">
+                  <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
+                  <Input
+                    placeholder="Search your history..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
                   />
-                );
-              })
-            ) : (
-              <div className="bg-card col-span-full flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
-                <div className="bg-muted/20 rounded-full p-6">
-                  <Briefcase className="text-muted-foreground/20 h-10 w-10" />
                 </div>
-                <p className="text-muted-foreground text-sm font-bold italic">
-                  {searchTerm || jobTypeFilter !== "all"
-                    ? "No jobs match your search filters."
-                    : "Your viewing history is currently empty."}
-                </p>
+
+                {/* Job Type Filter UI */}
+                <div className="flex items-center gap-3">
+                  <span className="text-muted-foreground/60 text-[10px] font-black tracking-widest uppercase">
+                    Type:
+                  </span>
+                  <Select
+                    value={jobTypeFilter}
+                    onValueChange={setJobTypeFilter}
+                  >
+                    <SelectTrigger className="bg-muted/20 border-border h-10 w-48 cursor-pointer rounded-full font-bold">
+                      <SelectValue placeholder="All types" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      {jobTypes.map((type) => (
+                        <SelectItem
+                          key={type}
+                          className="cursor-pointer rounded-lg font-medium"
+                          value={type}
+                        >
+                          {type === "all"
+                            ? "All Types"
+                            : type.replace("_", " ")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
                 <Link href="/dashboard/find-jobs">
-                  <Button className="mt-2 rounded-full font-bold">
-                    Start exploring jobs
+                  <Button className="h-11 rounded-full px-6 font-bold shadow-sm">
+                    Find More Jobs
                   </Button>
                 </Link>
               </div>
-            )}
-          </AnimatePresence>
+            </CardContent>
+          </Card>
+
+          {/* Jobs Grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+            <AnimatePresence mode="popLayout">
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map((item: any) => {
+                  // Map backend logoUrl to frontend logo for JobCard
+                  const jobWithMappedLogo = {
+                    ...item.job,
+                    company: {
+                      ...item.job.company,
+                      logo: item.job.company.logoUrl,
+                    },
+                  };
+                  return (
+                    <JobCard
+                      key={item.id}
+                      job={jobWithMappedLogo}
+                      inDashboard={true}
+                    />
+                  );
+                })
+              ) : (
+                <div className="bg-card col-span-full flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
+                  <div className="bg-muted/20 rounded-full p-6">
+                    <Briefcase className="text-muted-foreground/20 h-10 w-10" />
+                  </div>
+                  <p className="text-muted-foreground text-sm font-bold italic">
+                    {searchTerm || jobTypeFilter !== "all"
+                      ? "No jobs match your search filters."
+                      : "Your viewing history is currently empty."}
+                  </p>
+                  <Link href="/dashboard/find-jobs">
+                    <Button className="mt-2 rounded-full font-bold">
+                      Start exploring jobs
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

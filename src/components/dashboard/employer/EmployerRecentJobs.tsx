@@ -12,11 +12,11 @@ import {
   humanizeJobOrApplicationStatus,
   jobStatusToBadgeVariant,
 } from "@/lib/employerDashboardFormat";
+import { EmployerListRowSkeleton } from "@/skeleton/dashboard/employer/dashboard/EmployerDashboardSkeleton";
 import type { EmployerDashboardJobRow } from "@/types/employerDashboard";
 import { formatDistanceToNow } from "date-fns";
 import { FileText } from "lucide-react";
 import Link from "next/link";
-import { EmployerListRowSkeleton } from "./EmployerDashboardSkeleton";
 
 type EmployerRecentJobsProps = {
   jobs: EmployerDashboardJobRow[];

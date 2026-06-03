@@ -34,6 +34,8 @@ export default function GoogleAuthCallbackPage() {
         role: string;
       };
 
+      const isVerified = decodedToken.isVerified ?? userData.isVerified ?? true;
+
       // Map user data to match the structure expected by setCredentials
       // (consistent with SignInView and SignUpView patterns)
       dispatch(
@@ -44,7 +46,7 @@ export default function GoogleAuthCallbackPage() {
             fullName: userData.fullName,
             phone: userData.phone,
             role: (userData.role || decodedToken.role) as UserRole, // Map to UserRole enum
-            isVerified: decodedToken.isVerified ?? userData.isVerified ?? true,
+            isVerified,
             isActive: userData.isActive ?? true,
             profileId: userData.profileId,
             companyId: userData.companyId,
@@ -55,8 +57,15 @@ export default function GoogleAuthCallbackPage() {
         }),
       );
 
-      toast.success("Logged in with Google!");
-      router.replace("/jobs");
+      if (!isVerified) {
+        toast.success(
+          "Please verify your email using the link sent to your inbox!",
+        );
+        router.replace("/verify-email");
+      } else {
+        toast.success("Logged in with Google!");
+        router.replace("/jobs");
+      }
     } catch (error) {
       console.error("Google auth callback error:", error);
       toast.error("Google login failed. Invalid callback data.");

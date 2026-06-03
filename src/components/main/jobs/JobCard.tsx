@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Briefcase, Clock, Heart, MapPin } from "lucide-react";
+import { Bookmark, Briefcase, Clock, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -64,7 +64,7 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
           "group relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 transition-all duration-300",
           inDashboard
             ? "bg-card border-border/50"
-            : "hover:border-primary/50 from-primary/30 via-primary/10 to-primary/20 border-gray-100 bg-white bg-linear-to-r dark:border-slate-800 dark:bg-slate-900/50",
+            : "hover:border-primary/50 bg-card border-gray-100 dark:border-slate-800",
         )}
       >
         <CardContent className="flex flex-1 flex-col p-0">
@@ -82,15 +82,23 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
                 <Briefcase className="text-primary/40 h-6 w-6" />
               )}
             </div>
-            <HoverHint hint="Save job">
+            <HoverHint hint={job.isSaved ? "Unsave job" : "Save job"}>
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-primary/10 hover:text-primary h-8 w-8 rounded-full text-slate-400 transition-colors"
+                className={cn(
+                  "h-8 w-8 rounded-full transition-colors",
+                  job.isSaved
+                    ? "bg-primary/10 text-primary hover:bg-primary/20"
+                    : "hover:bg-primary/10 hover:text-primary text-slate-400",
+                )}
                 onClick={() => handleJobSave(job?.id)}
               >
-                <Heart
-                  className={`h-4.5 w-4.5 ${job.isSaved ? "fill-rose-500 text-rose-500" : "text-slate-400"}`}
+                <Bookmark
+                  className={cn(
+                    "h-4.5 w-4.5 transition-all duration-200",
+                    job.isSaved ? "fill-primary" : "",
+                  )}
                 />
               </Button>
             </HoverHint>
@@ -168,7 +176,7 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
         "group relative overflow-hidden rounded-3xl border transition-all duration-300",
         inDashboard
           ? "bg-card border-border p-6"
-          : "hover:border-primary/50 from-primary/20 via-primary/10 to-primary/20 border-gray-100 bg-linear-to-r px-3 py-5 md:px-12 md:py-14 dark:border-slate-800 dark:bg-slate-900/50",
+          : "hover:border-primary/50 bg-card border-gray-100 px-3 py-5 md:px-12 md:py-14 dark:border-slate-800",
       )}
     >
       <CardContent className="p-0">
@@ -241,15 +249,23 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
           {/* Right: Salary & Actions */}
           <div className="flex flex-col items-end gap-1 sm:gap-3 sm:text-right">
             <div className="flex items-center gap-2">
-              <HoverHint hint="Save job">
+              <HoverHint hint={job.isSaved ? "Unsave job" : "Save job"}>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-primary/10 hover:text-primary h-9 w-9 rounded-full text-slate-400 transition-colors"
+                  className={cn(
+                    "h-9 w-9 rounded-full transition-colors",
+                    job.isSaved
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
+                      : "hover:bg-primary/10 hover:text-primary text-slate-400",
+                  )}
                   onClick={() => handleJobSave(job?.id)}
                 >
-                  <Heart
-                    className={`h-5 w-5 ${job.isSaved ? "fill-rose-500 text-rose-500" : "text-gray-400"}`}
+                  <Bookmark
+                    className={cn(
+                      "h-5 w-5 transition-all duration-200",
+                      job.isSaved ? "fill-primary" : "",
+                    )}
                   />
                 </Button>
               </HoverHint>

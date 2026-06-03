@@ -16,6 +16,7 @@ import { useCreateCategoryMutation } from "@/redux/feature/category/categoryApi"
 import { Loader2, Save } from "lucide-react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/types/api";
 
 interface AddCategoryDialogProps {
   open: boolean;
@@ -36,9 +37,8 @@ const AddCategoryDialog = ({
       toast.success("Category created successfully");
       onSuccess(data);
       onOpenChange(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to create category");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to create category"));
     }
   };
 

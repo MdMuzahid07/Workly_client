@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,12 +23,21 @@ import {
 } from "../../../ui/card";
 import { Input } from "../../../ui/input";
 
+import type { CompanySettings } from "@/types/company-settings";
+
 const BillingSettingTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <
+    K extends keyof CompanySettings,
+    F extends keyof CompanySettings[K],
+  >(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="billing" className="space-y-6">
@@ -110,7 +118,7 @@ const BillingSettingTab = ({
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete
                   your company account and remove all associated data including
-                  jobs, applications, and employee records.
+                  jobs, applications, and team member records.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import JobView from "../../../view/job/JobView";
+import { Suspense } from "react";
+import JobView from "../../../view/job/browse/JobView";
 
 export const metadata: Metadata = {
   title: "Jobs",
@@ -7,9 +8,15 @@ export const metadata: Metadata = {
 
 const page = () => {
   return (
-    <>
+    <Suspense
+      fallback={
+        <div className="text-muted-foreground container mx-auto py-20 text-center">
+          Loading jobs page...
+        </div>
+      }
+    >
       <JobView />
-    </>
+    </Suspense>
   );
 };
 

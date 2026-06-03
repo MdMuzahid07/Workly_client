@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import CompanyView from "../../../view/company/CompanyView";
+import CompanyView from "../../../view/company/browse/CompanyView";
 
 type CompanyListItem = {
   id: string | number;

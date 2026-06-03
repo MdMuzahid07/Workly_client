@@ -23,8 +23,7 @@ export const SocialLinksForm = ({
   return (
     <WkForm<SocialLinksFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
+      defaultValues={defaultValues as unknown as SocialLinksFormData}
       resolver={zodResolver(socialLinksSchema)}
     >
       <div className="space-y-4">

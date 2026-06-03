@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -157,7 +155,9 @@ const SubcategorySelect = ({
   categories,
   categoriesLoading,
 }: {
-  categories: any;
+  categories: {
+    data?: { id: string; name: string; subcategories: string[] }[];
+  };
   categoriesLoading: boolean;
 }) => {
   const { watch } = useFormContext<JobFormData>();
@@ -166,9 +166,7 @@ const SubcategorySelect = ({
   const subcategoryOptions = useMemo(() => {
     if (!categories?.data || !selectedIndustry) return [];
 
-    const category = categories.data.find(
-      (cat: any) => cat.id === selectedIndustry,
-    );
+    const category = categories.data.find((cat) => cat.id === selectedIndustry);
     return (
       category?.subcategories.map((sub: string) => ({
         value: sub,
@@ -245,11 +243,11 @@ const CreateNewJobForm = ({
         if (data.applicationDeadline) {
           isoDeadline = new Date(data.applicationDeadline).toISOString();
         }
-      } catch (err) {
+      } catch {
         console.error("Invalid deadline date:", data.applicationDeadline);
       }
 
-      const apiPayload: any = {
+      const apiPayload: Record<string, unknown> = {
         title: data.title,
         discipline: data.discipline,
         industryId: data.industryId,
@@ -294,11 +292,14 @@ const CreateNewJobForm = ({
 
       // Close modal if provided
       onClose?.();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Job operation error:", error);
+      const err = error as {
+        data?: { error?: { message?: string }; message?: string };
+      };
       toast.error(
-        error?.data?.error?.message ||
-          error?.data?.message ||
+        err?.data?.error?.message ||
+          err?.data?.message ||
           `Failed to ${jobId ? "update" : "create"} job. Please try again.`,
       );
     }
@@ -491,10 +492,12 @@ const CreateNewJobForm = ({
                     }
                     required
                     options={
-                      categories?.data?.map((cat: any) => ({
-                        value: cat.id,
-                        label: cat.name,
-                      })) || []
+                      categories?.data?.map(
+                        (cat: { id: string; name: string }) => ({
+                          value: cat.id,
+                          label: cat.name,
+                        }),
+                      ) || []
                     }
                   />
                   <SubcategorySelect

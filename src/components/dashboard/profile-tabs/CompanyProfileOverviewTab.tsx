@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -7,16 +6,18 @@ import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import WKTextArea from "../../form/WkTextArea";
 
+import type { CompanyProfile } from "@/types/company-profile";
+
 const CompanyProfileOverviewTab = ({
   currentProfile,
   isEditing,
   updateField,
   editedProfile,
 }: {
-  currentProfile: any;
+  currentProfile: CompanyProfile;
   isEditing: boolean;
-  updateField: (field: string, value: any) => void;
-  editedProfile: any;
+  updateField: (field: string, value: unknown) => void;
+  editedProfile: Partial<CompanyProfile>;
 }) => {
   const methods = useForm({
     mode: "onChange",
@@ -43,8 +44,8 @@ const CompanyProfileOverviewTab = ({
         iconColor: "text-emerald-600",
       },
       {
-        label: "Employees",
-        value: currentProfile?.stats?.totalEmployees || 0,
+        label: "Team members",
+        value: currentProfile?.stats?.totalTeamMembers || 0,
         icon: Users,
         color: "",
         iconColor: "text-orange-600",
@@ -61,11 +62,13 @@ const CompanyProfileOverviewTab = ({
   );
 
   useEffect(() => {
-    const subscription = methods.watch((value: any, { name }) => {
-      if (name && value[name] !== undefined) {
-        updateField(name, value[name]);
-      }
-    });
+    const subscription = methods.watch(
+      (value: { description?: string; mission?: string }, { name }) => {
+        if (name && value[name] !== undefined) {
+          updateField(name, value[name]);
+        }
+      },
+    );
     return () => subscription.unsubscribe();
   }, [methods, updateField]);
 

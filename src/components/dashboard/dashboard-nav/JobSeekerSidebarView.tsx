@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -24,11 +23,14 @@ import {
   Briefcase,
   Building2,
   Clock,
+  Crown,
   Eye,
   FileText,
   LogOut,
   Menu,
   MessageCircle,
+  Package,
+  Receipt,
   Search,
   Settings,
   User,
@@ -164,7 +166,18 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   pathname: string;
   user: { fullName?: string; avatar?: string; profilePicture?: string } | null;
   profile: { avatarUrl?: string | null } | undefined;
-  profileData?: any;
+  profileData?: {
+    data?: {
+      fullName?: string;
+      isPremium?: boolean;
+      profile?: {
+        bio?: string | null;
+        location?: string | null;
+        avatarUrl?: string | null;
+        resumeUrl?: string | null;
+      };
+    };
+  };
   profileCompletion: number;
   onSignOut: () => void;
   onItemClick: () => void;
@@ -199,9 +212,18 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="text-foreground truncate text-sm font-semibold">
-              {profileData?.data?.fullName || user?.fullName || "User"}
-            </p>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="text-foreground truncate text-sm font-semibold">
+                {profileData?.data?.fullName || user?.fullName || "User"}
+              </p>
+              {(profileData?.data?.isPremium ||
+                (user as { isPremium?: boolean })?.isPremium) && (
+                <span className="inline-flex shrink-0 animate-pulse items-center gap-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-amber-500 uppercase shadow-xs">
+                  <Crown className="h-2.5 w-2.5 fill-amber-500" />
+                  Pro
+                </span>
+              )}
+            </div>
             <div className="mt-1.5 flex items-center gap-2">
               <Progress value={profileCompletion} className="h-1.5 flex-1" />
               <span className="text-muted-foreground text-[10px] font-medium">
@@ -379,6 +401,17 @@ export default function JobSeekerSidebarView({
           badge: "2",
         },
         { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+      ],
+    },
+    {
+      title: "Billing & Upgrades",
+      items: [
+        {
+          icon: Package,
+          label: "Pricing Packages",
+          href: "/dashboard/pricing",
+        },
+        { icon: Receipt, label: "Billing Details", href: "/dashboard/billing" },
       ],
     },
   ];

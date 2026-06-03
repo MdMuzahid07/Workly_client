@@ -135,7 +135,7 @@ export default function DashboardLayoutClient({
           isOpen={isSidebarOpen}
           onOpenChange={setIsSidebarOpen}
         />
-        <div className="bg-background min-w-0 lg:pl-64">
+        <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
           <main className="min-h-screen w-full min-w-0">{children}</main>
         </div>
       </div>
@@ -146,7 +146,7 @@ export default function DashboardLayoutClient({
     return (
       <div className="bg-background min-h-screen">
         <AdminSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
-        <div className="bg-background min-w-0 lg:pl-64">
+        <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
           <main className="min-h-screen w-full min-w-0">{children}</main>
         </div>
       </div>
@@ -159,7 +159,7 @@ export default function DashboardLayoutClient({
         isOpen={isSidebarOpen}
         onOpenChange={setIsSidebarOpen}
       />
-      <div className="bg-background min-w-0 lg:pl-64">
+      <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
         <main className="min-h-screen w-full min-w-0">{children}</main>
       </div>
     </div>

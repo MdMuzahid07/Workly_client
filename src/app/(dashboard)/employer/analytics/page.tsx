@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AnalyticsView from "../../../../view/dashboard/AnalyticsView";
+import AnalyticsView from "../../../../view/dashboard/employer/analytics/AnalyticsView";
 
 export const metadata: Metadata = {
   title: "Performance Analytics",

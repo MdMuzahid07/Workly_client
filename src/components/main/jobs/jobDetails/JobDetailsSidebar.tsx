@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Calendar, Eye, FileText, Heart, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Bookmark,
+  Building2,
+  Calendar,
+  Eye,
+  FileText,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
@@ -172,12 +180,20 @@ const JobDetailsSidebar = ({
             </Link>
             <Button
               variant="outline"
-              className="hover:bg-primary/5 hover:text-primary border-primary/20 h-12 w-full text-lg font-bold transition-all"
+              className={cn(
+                "h-12 w-full border text-lg font-bold transition-all",
+                job.isSaved
+                  ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary"
+                  : "hover:bg-primary/5 hover:text-primary border-primary/20",
+              )}
               onClick={handleSave}
               disabled={isSaving}
             >
-              <Heart
-                className={`mr-2 h-5 w-5 ${job.isSaved ? "fill-primary text-primary" : ""}`}
+              <Bookmark
+                className={cn(
+                  "mr-2 h-5 w-5 transition-all duration-200",
+                  job.isSaved ? "fill-primary" : "",
+                )}
               />
               {isSaving ? "Saving..." : job.isSaved ? "Saved" : "Save Job"}
             </Button>

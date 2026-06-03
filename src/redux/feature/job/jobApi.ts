@@ -20,6 +20,14 @@ const jobApi = baseApi.injectEndpoints({
       providesTags: ["jobs"],
     }),
 
+    getSearchSuggestions: builder.query({
+      query: (params: { keyword?: string; location?: string }) => ({
+        url: "/job/suggestions",
+        method: "GET",
+        params,
+      }),
+    }),
+
     getMyJobs: builder.query({
       query: (params) => ({
         url: "/job/my-jobs",
@@ -72,5 +80,6 @@ export const {
   useGetJobByIdQuery,
   useUpdateJobMutation,
   useDeleteJobMutation,
+  useGetSearchSuggestionsQuery,
 } = jobApi;
 export default jobApi;

@@ -6,31 +6,31 @@ import { Banknote, CreditCard, Receipt, TrendingUp } from "lucide-react";
 const stats = [
   {
     label: "Total Revenue",
-    value: "$142,500",
+    value: "৳942,500",
     icon: Banknote,
     color: "text-primary",
     trend: "+12.5%",
   },
   {
     label: "Monthly Volume",
-    value: "$12,480",
+    value: "৳82,480",
     icon: TrendingUp,
     color: "text-emerald-500",
     trend: "+4.2%",
   },
   {
     label: "Pending Invoices",
-    value: "$3,240",
+    value: "৳13,240",
     icon: Receipt,
     color: "text-amber-500",
     trend: "6 items",
   },
   {
     label: "Success Rate",
-    value: "98.4%",
+    value: "99.2%",
     icon: CreditCard,
     color: "text-blue-500",
-    trend: "0.2% drop",
+    trend: "+0.8% rise",
   },
 ];
 

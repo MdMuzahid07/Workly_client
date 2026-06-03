@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import WKCheckbox from "@/components/form/WKCheckbox";
@@ -35,8 +36,7 @@ export const JobPreferenceForm = ({
   return (
     <WkForm<JobPreferenceFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      resolver={zodResolver(jobPreferenceSchema as any)}
+      resolver={zodResolver(jobPreferenceSchema) as any}
       defaultValues={{
         jobType: "FULL_TIME",
         expectedSalary: 0,

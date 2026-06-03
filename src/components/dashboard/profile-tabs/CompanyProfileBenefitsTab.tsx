@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { LucideIcon } from "lucide-react";
 
 import WKCheckbox from "@/components/form/WKCheckbox";
 import WkForm from "@/components/form/WkForm";
@@ -49,7 +49,7 @@ const benefitFormSchema = z.object({
 
 type BenefitFormData = z.infer<typeof benefitFormSchema>;
 
-const ICON_MAP: Record<string, any> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   award: Award,
   heart: Heart,
   zap: Zap,
@@ -66,7 +66,19 @@ const CompanyProfileBenefitsTab = ({
   isEditing,
   onBenefitsChange,
 }: {
-  currentProfile: any;
+  currentProfile: {
+    benefits?: (
+      | {
+          id?: string;
+          title?: string;
+          description?: string;
+          category?: string;
+          icon?: string;
+          isActive?: boolean;
+        }
+      | string
+    )[];
+  };
   isEditing: boolean;
   onBenefitsChange: (benefits: CompanyBenefit[]) => void;
 }) => {
@@ -77,7 +89,7 @@ const CompanyProfileBenefitsTab = ({
   const [isFormLoading, setIsFormLoading] = useState(false);
 
   const benefits: CompanyBenefit[] = useMemo(() => {
-    return (currentProfile?.benefits || []).map((b: any) => {
+    return (currentProfile?.benefits || []).map((b) => {
       if (typeof b === "string")
         return { id: Math.random().toString(), title: b, isActive: true };
       return {
@@ -115,7 +127,7 @@ const CompanyProfileBenefitsTab = ({
   return (
     <TabsContent value="benefits" className="space-y-10 focus:outline-none">
       <SectionCard
-        title="Employee Perks & Benefits"
+        title="Company perks & benefits"
         isCompleted={activeBenefits.length > 0}
         onAdd={
           isEditing
@@ -288,7 +300,17 @@ const CompanyProfileBenefitsTab = ({
   );
 };
 
-const BenefitForm = ({ initialValues, onSubmit, onCancel, isLoading }: any) => {
+const BenefitForm = ({
+  initialValues,
+  onSubmit,
+  onCancel,
+  isLoading,
+}: {
+  initialValues?: CompanyBenefit;
+  onSubmit: (data: BenefitFormData) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}) => {
   return (
     <WkForm<BenefitFormData>
       defaultValues={

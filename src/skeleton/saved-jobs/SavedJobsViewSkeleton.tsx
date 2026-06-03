@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const SavedJobsViewSkeleton = () => {
   return (
-    <div className="animate-in fade-in-50 container mx-auto max-w-7xl space-y-8 px-4 py-6 pt-24">
+    <div className="animate-in fade-in-50 container mx-auto space-y-8 px-4 py-6 pt-24">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-3">
           <Skeleton className="h-8 w-48 rounded-md" />

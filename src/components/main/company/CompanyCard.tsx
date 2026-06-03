@@ -68,7 +68,7 @@ export function CompanyCard({
   // Grid View Card
   if (viewType === "grid") {
     return (
-      <Card className="group hover:border-primary/50 from-primary/25 via-primary/8 to-primary/15 relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+      <Card className="group hover:border-primary/50 bg-card relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 p-5 transition-all duration-300 dark:border-slate-800">
         <Link
           href={`/companies/${company.slug}`}
           className="relative flex h-full flex-col"
@@ -125,7 +125,7 @@ export function CompanyCard({
             </Badge>
             <Badge variant="outline" className="gap-1.5">
               <Users className="h-3 w-3" />
-              <span className="text-xs">{company.size ?? "N/A"} employees</span>
+              <span className="text-xs">{company.size ?? "N/A"} staff</span>
             </Badge>
           </div>
 
@@ -164,7 +164,7 @@ export function CompanyCard({
   }
 
   return (
-    <Card className="group hover:border-primary/50 from-primary/15 via-primary/8 to-primary/15 relative overflow-hidden rounded-3xl border border-gray-100 bg-linear-to-r transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+    <Card className="group hover:border-primary/50 bg-card relative overflow-hidden rounded-3xl border border-gray-100 transition-all duration-300 dark:border-slate-800">
       <div className="relative flex items-start justify-between gap-3 p-3 sm:gap-5 sm:p-5">
         {/* Left section */}
         <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-4">

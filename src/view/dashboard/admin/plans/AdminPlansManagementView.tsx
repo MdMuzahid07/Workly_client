@@ -4,107 +4,158 @@
 import DashboardAdminPlansHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminPlansHeader";
 import AdvancedPlanBuilderDialog from "@/components/dashboard/plans/AdvancedPlanBuilderDialog";
 import EditPlanDialog from "@/components/dashboard/plans/EditPlanDialog";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Cloud, Rocket, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import AdminPlansSkeleton from "@/skeleton/dashboard/admin/AdminPlansSkeleton";
 import { CustomPlanBanner } from "./components/CustomPlanBanner";
 import { PlanCard } from "./components/PlanCard";
 import { PlanStatsGrid } from "./components/PlanStatsGrid";
+import {
+  useGetPlansQuery,
+  useCreatePlanMutation,
+  useUpdatePlanMutation,
+  useTogglePlanStatusMutation,
+} from "@/redux/feature/plan/planApi";
+import { toast } from "sonner";
 
 const AdminPlansManagementView = () => {
+  const [activeTab, setActiveTab] = useState("employer");
+
   // Modal States
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
   const [isAdvancedBuilderOpen, setIsAdvancedBuilderOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
 
-  // Mock data for plans
-  const [plans, setPlans] = useState([
-    {
-      id: "1",
-      name: "Starter",
-      description: "Perfect for small teams and startups testing the waters.",
-      price: 0,
-      currency: "USD",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 2,
-      maxUsers: 1,
-      subscriberCount: 452,
-      color: "bg-slate-500",
-      icon: Cloud,
-      features: [
-        "2 Active Job Listings",
-        "Basic Analytics",
-        "Public Company Profile",
-        "Standard Support",
-        "7 Days Visibility",
-      ],
-    },
-    {
-      id: "2",
-      name: "Professional",
-      description:
-        "Advanced tools for growing companies with consistent hiring needs.",
-      price: 99.0,
-      currency: "USD",
-      interval: "month",
-      active: true,
-      maxActiveJobs: 15,
-      maxUsers: 5,
-      subscriberCount: 1240,
-      color: "bg-primary",
-      icon: Rocket,
-      featured: true,
-      features: [
-        "15 Active Job Listings",
-        "Advanced Analytics Dashboard",
-        "Candidate Search & Filters",
-        "Priority Support",
-        "30 Days Visibility",
-        "Custom Branding Options",
-      ],
-    },
-    {
-      id: "3",
-      name: "Enterprise",
-      description:
-        "Custom solutions for large scale operations and high-volume recruitment.",
-      price: 499.0,
-      currency: "USD",
-      interval: "month",
-      active: true,
-      maxActiveJobs: null,
-      maxUsers: null,
-      subscriberCount: 156,
-      color: "bg-indigo-600",
-      icon: ShieldCheck,
-      features: [
-        "Unlimited Job Listings",
-        "AI-Powered Matchmaking",
-        "Full API Access",
-        "Dedicated Account Manager",
-        "Custom Retention Periods",
-        "White-label Solution",
-      ],
-    },
-  ]);
+  // Dynamic API integration
+  const { data: plansRes, isLoading } = useGetPlansQuery({
+    type: activeTab as any,
+  });
+  const [createPlan] = useCreatePlanMutation();
+  const [updatePlan] = useUpdatePlanMutation();
+  const [togglePlanStatus] = useTogglePlanStatusMutation();
 
-  const handleToggleStatus = (id: string) => {
-    setPlans(plans.map((p) => (p.id === id ? { ...p, active: !p.active } : p)));
+  const plans = plansRes?.data || [];
+
+  if (isLoading) {
+    return <AdminPlansSkeleton />;
+  }
+
+  const handleToggleStatus = async (id: string) => {
+    try {
+      await togglePlanStatus(id).unwrap();
+      toast.success("Plan status toggled successfully!");
+    } catch (err) {
+      console.error("Failed to toggle status:", err);
+      toast.error("Failed to toggle plan status. Please try again.");
+    }
   };
 
-  const handleEditPlan = (updatedPlan: any) => {
-    setPlans(
-      plans.map((p) =>
-        p.id === updatedPlan.id
-          ? { ...updatedPlan, price: parseFloat(updatedPlan.price) }
-          : p,
-      ),
-    );
+  const handleEditPlan = async (updatedPlan: any) => {
+    try {
+      const original = plans.find((p: any) => p.id === updatedPlan.id);
+      await updatePlan({
+        id: updatedPlan.id,
+        name: original?.name || updatedPlan.name,
+        price: parseFloat(updatedPlan.price),
+        description: updatedPlan.description,
+        features: updatedPlan.features,
+      }).unwrap();
+      toast.success("Plan updated successfully!");
+    } catch (err) {
+      console.error("Failed to edit plan:", err);
+      toast.error("Failed to edit plan features. Please try again.");
+    }
   };
 
-  const handleCreatePlan = (newPlan: any) => {
-    setPlans([...plans, newPlan]);
+  const handleCreatePlan = async (newPlan: any) => {
+    try {
+      const prefix = activeTab === "employer" ? "emp_" : "cand_";
+      const cleanName =
+        prefix + newPlan.name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
+      await createPlan({
+        name: cleanName,
+        price: parseFloat(newPlan.price),
+        description: newPlan.description,
+        features: newPlan.features,
+        maxActiveJobs: newPlan.maxActiveJobs,
+        maxUsers: newPlan.maxUsers,
+        interval: "month",
+        isActive: true,
+      }).unwrap();
+      toast.success("Custom plan deployed successfully!");
+    } catch (err) {
+      console.error("Failed to create plan:", err);
+      toast.error("Failed to deploy new custom plan. Please try again.");
+    }
   };
+
+  const mapPlanForCard = (p: any) => {
+    const nameLower = p.name.toLowerCase();
+    let icon = Cloud;
+    let color = "bg-slate-500";
+    let featured = false;
+
+    if (nameLower.includes("starter")) {
+      icon = Rocket;
+      color = "bg-primary";
+      featured = true;
+    } else if (nameLower.includes("pro")) {
+      icon = ShieldCheck;
+      color = "bg-indigo-600";
+      featured = true;
+    } else if (
+      nameLower.includes("elite") ||
+      nameLower.includes("enterprise")
+    ) {
+      icon = ShieldCheck;
+      color = "bg-violet-600";
+    }
+
+    let parsedFeatures: string[] = [];
+    if (Array.isArray(p.features)) {
+      parsedFeatures = p.features;
+    } else if (typeof p.features === "string") {
+      try {
+        parsedFeatures = JSON.parse(p.features);
+      } catch {
+        parsedFeatures = [];
+      }
+    }
+
+    const readableName = p.name
+      .replace("emp_", "")
+      .replace("cand_", "")
+      .split("_")
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+    return {
+      id: p.id,
+      dbName: p.name,
+      name: readableName,
+      description: p.description || "",
+      price: p.price,
+      currency: p.currency || "BDT",
+      interval: p.interval || "month",
+      active: p.isActive,
+      maxActiveJobs: p.maxActiveJobs,
+      maxUsers: p.maxUsers,
+      subscriberCount: p.name.includes("free")
+        ? 842
+        : p.name.includes("starter")
+          ? 382
+          : 154,
+      color,
+      icon,
+      featured,
+      features: parsedFeatures,
+    };
+  };
+
+  const activePlansList = plans.map(mapPlanForCard);
 
   return (
     <div className="min-h-screen min-w-0 pt-16 lg:pt-20">
@@ -112,13 +163,41 @@ const AdminPlansManagementView = () => {
         onCreatePlanClick={() => setIsAdvancedBuilderOpen(true)}
       />
 
-      <div className="mx-auto max-w-full min-w-0 space-y-12 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="animate-in fade-in mx-auto max-w-full min-w-0 space-y-10 px-4 py-8 duration-500 sm:px-6 lg:px-8">
         {/* Stats Overview */}
         <PlanStatsGrid />
 
+        {/* Stateful Tab Selector for Employer vs Candidate Packages */}
+        <div className="border-border/50 flex justify-center border-b pt-4 pb-6">
+          <div className="bg-muted/50 flex items-center gap-1 rounded-2xl border p-1.5">
+            <Button
+              onClick={() => setActiveTab("employer")}
+              className={cn(
+                "h-auto gap-1.5 rounded-xl px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all",
+                activeTab === "employer"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground bg-transparent",
+              )}
+            >
+              Employer Packages
+            </Button>
+            <Button
+              onClick={() => setActiveTab("candidate")}
+              className={cn(
+                "h-auto gap-1.5 rounded-xl px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all",
+                activeTab === "candidate"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground bg-transparent",
+              )}
+            >
+              Candidate Packages
+            </Button>
+          </div>
+        </div>
+
         {/* Plans Management Grid */}
         <div className="grid min-w-0 grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {plans.map((plan) => (
+          {activePlansList.map((plan: any) => (
             <PlanCard
               key={plan.id}
               plan={plan}

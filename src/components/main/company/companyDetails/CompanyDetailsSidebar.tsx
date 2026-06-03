@@ -61,7 +61,15 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
             ) : null}
             {isFollowing ? "Unfollow Company" : "Follow Company"}
           </Button>
-          <Button variant="outline" className="w-full bg-transparent">
+          <Button
+            variant="outline"
+            className="border-primary/20 hover:border-primary/45 hover:bg-primary/5 text-foreground hover:text-primary w-full bg-transparent font-semibold transition-all duration-300 active:scale-98"
+            onClick={() => {
+              document
+                .getElementById("open-positions")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
             View All Jobs
           </Button>
         </CardContent>
@@ -73,15 +81,26 @@ const CompanyDetailsSidebar = ({ company }: { company: any }) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-secondary-foreground">Employees</span>
+            <span className="text-secondary-foreground">Team members</span>
             <span className="font-medium">
               {company?._count?.employees || 0}
             </span>
           </div>
           <div className="bg-border/20 h-px w-full" />
-          <div className="flex items-center justify-between">
-            <span className="text-secondary-foreground">Open Jobs</span>
-            <span className="font-medium">{company?._count?.jobs || 0}</span>
+          <div
+            className="group/stat hover:text-primary flex cursor-pointer items-center justify-between transition-colors duration-200"
+            onClick={() => {
+              document
+                .getElementById("open-positions")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <span className="text-secondary-foreground group-hover/stat:text-primary transition-colors">
+              Open Jobs
+            </span>
+            <span className="text-primary decoration-primary/20 group-hover/stat:decoration-primary font-semibold underline underline-offset-4 transition-colors">
+              {company?._count?.jobs || 0}
+            </span>
           </div>
           <div className="bg-border/20 h-px w-full" />
           <div className="flex items-center justify-between">

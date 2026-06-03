@@ -35,7 +35,6 @@ import {
   Send,
   ShieldAlert,
   Smile,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
@@ -54,8 +53,9 @@ import {
   useMarkAsReadMutation,
   useSendMessageMutation,
 } from "../../redux/feature/message/messageApi";
+import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
 import { useAppSelector } from "../../redux/hooks";
-import MessageViewSkeleton from "../../skeleton/message/MessageViewSkeleton";
+import MessageViewSkeleton from "../../skeleton/message/inbox/MessageViewSkeleton";
 
 interface Message {
   id: string;
@@ -77,7 +77,10 @@ interface Message {
 
 const MessageView = () => {
   const { socket } = useSocket();
+  const { data: profileData } = useGetProfileQuery(undefined);
   const currentUser = useAppSelector((state) => state.auth.user);
+  const isPremium =
+    profileData?.data?.isPremium || currentUser?.isPremium || false;
 
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
@@ -394,7 +397,7 @@ const MessageView = () => {
     setSelectedConversation(null);
   };
 
-  if (!currentUser?.isPremium) {
+  if (!isPremium) {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center p-4">
         <Card className="max-w-2xl overflow-hidden border">
@@ -434,7 +437,7 @@ const MessageView = () => {
                 className="bg-primary text-primary-foreground h-14 rounded-2xl px-10 text-lg font-black shadow-xl transition-all hover:scale-105 active:scale-95"
               >
                 Upgrade to Premium
-                <Sparkles className="ml-2 h-5 w-5" />
+                <Crown className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"

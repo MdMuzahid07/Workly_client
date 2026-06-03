@@ -27,8 +27,8 @@ export const GoogleLoginButton = ({
     <Button
       type="button"
       onClick={handleGoogleLogin}
-      variant="ghost"
-      className="text-card-foreground flex h-11 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-white/5 bg-white/3 font-bold transition-all duration-200 hover:scale-105 hover:border hover:bg-white/8 hover:text-white md:h-14"
+      variant="outline"
+      className="text-foreground border-border/80 bg-card hover:bg-muted hover:text-foreground flex h-11 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl font-bold transition-all duration-200 hover:scale-[1.02] md:h-14"
     >
       <svg className="h-5 w-5" viewBox="0 0 24 24">
         <path

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -135,7 +134,14 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
   pathname: string;
   user: { fullName?: string; profilePicture?: string } | null;
   profile: { avatarUrl?: string | null } | undefined;
-  profileData?: any;
+  profileData?: {
+    data?: {
+      fullName?: string;
+      profile?: {
+        avatarUrl?: string | null;
+      };
+    };
+  };
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
@@ -216,6 +222,12 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
   );
 });
 
+import {
+  useGetActiveJobsAdminQuery,
+  useGetJobReportStatsQuery,
+} from "@/redux/feature/admin/adminApi";
+import { useGetUnreadCountQuery } from "@/redux/feature/notification/notificationApi";
+
 export default function AdminSidebarView({
   isOpen: controlledIsOpen,
   onOpenChange,
@@ -238,6 +250,19 @@ export default function AdminSidebarView({
   const profile = profileData?.data?.profile;
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+
+  // Live sidebar counters
+  const { data: pendingJobsData } = useGetActiveJobsAdminQuery({
+    status: "DRAFT",
+    limit: 1,
+  });
+  const { data: reportStatsData } = useGetJobReportStatsQuery();
+  const { data: unreadNotificationsData } = useGetUnreadCountQuery();
+
+  const pendingCount =
+    (pendingJobsData as { meta?: { total?: number } })?.meta?.total ?? 0;
+  const reportedCount = reportStatsData?.data?.openReports ?? 0;
+  const unreadCount = unreadNotificationsData?.data?.unreadCount ?? 0;
 
   const handleSignOutClick = () => {
     setIsSignOutModalOpen(true);
@@ -285,12 +310,13 @@ export default function AdminSidebarView({
           icon: CheckCircle2,
           label: "Pending Approvals",
           href: "/admin/jobs/pending",
-          badge: 5,
+          badge: pendingCount > 0 ? pendingCount : undefined,
         },
         {
           icon: AlertTriangle,
           label: "Reported",
           href: "/admin/jobs/reported",
+          badge: reportedCount > 0 ? reportedCount : undefined,
         },
         { icon: Tags, label: "Categories", href: "/admin/categories" },
       ],
@@ -347,7 +373,7 @@ export default function AdminSidebarView({
       icon: Bell,
       label: "Notifications",
       href: "/admin/notifications",
-      badge: 8,
+      badge: unreadCount > 0 ? unreadCount : undefined,
     },
     { icon: Settings, label: "Settings", href: "/admin/settings" },
     { icon: LogOut, label: "Logout", href: "#", signOut: true },

@@ -19,8 +19,32 @@ import {
 import { useState } from "react";
 import JobDetailsSheet from "./DashboardJobDetails";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const DashboardJobCard = ({ job, onEdit, onDelete, onStatusChange }: any) => {
+export interface JobCardProps {
+  job: {
+    id: string;
+    title: string;
+    company: string;
+    location: string;
+    isRemote: boolean;
+    type: string;
+    experience: string;
+    salary: string;
+    applications: number;
+    postedDate: string;
+    status: string;
+    isFeatured: boolean;
+  };
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onStatusChange?: (id: string, status: string) => void;
+}
+
+const DashboardJobCard = ({
+  job,
+  onEdit,
+  onDelete,
+  onStatusChange,
+}: JobCardProps) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   return (

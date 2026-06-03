@@ -68,14 +68,14 @@ export function useEmployerDashboard() {
   ) as EmployerDashboardJobRow[];
 
   const trends = overview?.trends;
-  const recentEmployees = overview?.recentEmployees ?? [];
+  const recentTeamMembers = overview?.recentTeamMembers ?? [];
 
   const stats = useMemo(
     () => ({
       totalJobs: overview?.totalJobs ?? 0,
       activeJobs: overview?.activeJobs ?? 0,
       totalApplications: overview?.totalApplications ?? 0,
-      totalEmployees: overview?.totalEmployees ?? 0,
+      totalTeamMembers: overview?.totalTeamMembers ?? 0,
       pendingApplications: overview?.pendingApplications ?? 0,
     }),
     [overview],
@@ -96,16 +96,16 @@ export function useEmployerDashboard() {
       trends,
     );
 
-    const employeesTrendLine = trends
+    const teamMembersTrendLine = trends
       ? comparePeriodCopy(
-          trends.employeesJoinedLast90Days,
-          trends.employeesJoinedPrevious90Days,
+          trends.teamMembersJoinedLast90Days,
+          trends.teamMembersJoinedPrevious90Days,
           "new in last 90 days vs prior quarter",
           "No new members in the last 180 days",
         )
       : "—";
 
-    return { jobsTrendLine, applicationsTrendLine, employeesTrendLine };
+    return { jobsTrendLine, applicationsTrendLine, teamMembersTrendLine };
   }, [summary, trends]);
 
   const headerData: EmployerCompanyHeader = useMemo(
@@ -153,7 +153,7 @@ export function useEmployerDashboard() {
     overview,
     summary,
     recentJobs,
-    recentEmployees,
+    recentTeamMembers,
 
     statsBlocking,
     detailBlocking,

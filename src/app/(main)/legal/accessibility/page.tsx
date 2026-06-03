@@ -1,4 +1,4 @@
-import AccessibilityView from "@/view/legal/AccessibilityView";
+import AccessibilityView from "@/view/legal/accessibility/AccessibilityView";
 
 export const metadata = {
   title: "Accessibility | Workly_job",

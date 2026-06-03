@@ -7,7 +7,7 @@ import {
   Building2,
   ChevronDown,
   FileText,
-  Heart,
+  Bookmark,
   LogOut,
   User,
   Settings,
@@ -106,7 +106,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
       ? [
           { icon: Briefcase, label: "Dashboard", href: "/dashboard" },
           {
-            icon: Heart,
+            icon: Bookmark,
             label: "Saved Jobs",
             href: "/dashboard/saved-jobs",
             badge: 12,
@@ -135,6 +135,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
             <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-[10px] font-bold uppercase">
               {user?.fullName
                 ?.split(" ")
+                .filter(Boolean)
                 .map((n) => n[0])
                 .join("")}
             </div>

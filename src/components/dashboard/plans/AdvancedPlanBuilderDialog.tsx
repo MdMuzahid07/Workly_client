@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +19,19 @@ import WkTextArea from "../../form/WkTextArea";
 interface AdvancedPlanBuilderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: (data: any) => void;
+  onSuccess: (data: {
+    id: string;
+    name: string;
+    price: string;
+    description: string;
+    active: boolean;
+    features: string[];
+    subscriberCount: number;
+    color: string;
+    icon: React.ElementType;
+    maxActiveJobs: number | null;
+    maxUsers: number | null;
+  }) => void;
 }
 
 const AdvancedPlanBuilderDialog = ({
@@ -42,7 +53,13 @@ const AdvancedPlanBuilderDialog = ({
     setFeatures(features.filter((_, i) => i !== index));
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: {
+    name: string;
+    price: string;
+    description: string;
+    maxActiveJobs?: string;
+    maxUsers?: string;
+  }) => {
     onSuccess({
       ...data,
       id: Math.random().toString(36).substr(2, 9),

@@ -13,7 +13,7 @@ export interface SocialLink {
  * Company statistics interface
  */
 export interface CompanyStats {
-  totalEmployees: number;
+  totalTeamMembers: number;
   totalJobs: number;
   totalApplications: number;
   profileViews: number;
@@ -102,7 +102,7 @@ export const DEFAULT_PROFILE: CompanyProfile = {
   benefits: [],
   socialLinks: [],
   stats: {
-    totalEmployees: 0,
+    totalTeamMembers: 0,
     totalJobs: 0,
     totalApplications: 0,
     profileViews: 0,

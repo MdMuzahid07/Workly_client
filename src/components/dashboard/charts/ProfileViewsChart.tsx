@@ -24,8 +24,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ProfileViewsChart({ data: initialData }: { data?: any[] }) {
+export function ProfileViewsChart({
+  data: initialData,
+}: {
+  data?: { date: string; count: number }[];
+}) {
   const [period, setPeriod] = useState<TimePeriod>("7days");
   const { data: statsData, isLoading } = useGetProfileViewStatsQuery(
     { period },

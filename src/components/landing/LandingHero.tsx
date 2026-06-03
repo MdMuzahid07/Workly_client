@@ -3,12 +3,22 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { GlobeConfig } from "@/components/ui/globe";
-import { Briefcase, Building2, Compass, TrendingUp, Users } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  Compass,
+  TrendingUp,
+  Users,
+  Search,
+  MapPin,
+} from "lucide-react";
 import { motion } from "motion/react";
-import type { ComponentType } from "react";
+import { useState, type ComponentType, useEffect } from "react";
 import { Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { globeConfig, globeSampleAreas } from "../../constants";
-import GlobeSkeleton from "../../skeleton/landing/GlobeSkeleton";
+import GlobeSkeleton from "../../skeleton/landing/home/GlobeSkeleton";
+import { useGetSearchSuggestionsQuery } from "../../redux/feature/job/jobApi";
 
 interface WorldProps {
   data: typeof globeSampleAreas;
@@ -20,6 +30,120 @@ interface LandingHeroProps {
 }
 
 const LandingHero = ({ World }: LandingHeroProps) => {
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
+  const [location, setLocation] = useState("");
+  const [activeInput, setActiveInput] = useState<"keyword" | "location" | null>(
+    null,
+  );
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  // Debouncing search queries
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+  const [debouncedLocation, setDebouncedLocation] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [keyword]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedLocation(location);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [location]);
+
+  // Fetch suggestions with skip options for efficiency
+  const { data: keywordSuggestionsData } = useGetSearchSuggestionsQuery(
+    { keyword: debouncedKeyword },
+    {
+      skip:
+        !debouncedKeyword ||
+        debouncedKeyword.trim().length < 2 ||
+        activeInput !== "keyword",
+    },
+  );
+
+  const { data: locationSuggestionsData } = useGetSearchSuggestionsQuery(
+    { location: debouncedLocation },
+    {
+      skip:
+        !debouncedLocation ||
+        debouncedLocation.trim().length < 2 ||
+        activeInput !== "location",
+    },
+  );
+
+  const suggestions =
+    activeInput === "keyword"
+      ? keywordSuggestionsData?.data?.keywords || []
+      : activeInput === "location"
+        ? locationSuggestionsData?.data?.locations || []
+        : [];
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    type: "keyword" | "location",
+  ) => {
+    if (activeInput !== type) {
+      setActiveInput(type);
+      setFocusedIndex(-1);
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+    } else if (e.key === "Enter") {
+      if (focusedIndex >= 0 && focusedIndex < suggestions.length) {
+        e.preventDefault();
+        const selectedValue = suggestions[focusedIndex];
+        if (type === "keyword") {
+          setKeyword(selectedValue);
+        } else {
+          setLocation(selectedValue);
+        }
+        setActiveInput(null);
+        setFocusedIndex(-1);
+      }
+    } else if (e.key === "Escape") {
+      setActiveInput(null);
+      setFocusedIndex(-1);
+    }
+  };
+
+  // Close suggestions popover when user clicks outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".search-form-container")) {
+        setActiveInput(null);
+        setFocusedIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const queryParams = new URLSearchParams();
+    if (keyword) queryParams.set("search", keyword);
+    if (location) queryParams.set("location", location);
+    router.push(`/jobs?${queryParams.toString()}`);
+  };
+
+  const handleTrendingClick = (term: string) => {
+    setKeyword(term);
+    router.push(`/jobs?search=${encodeURIComponent(term)}`);
+  };
+
   return (
     <section className="bg-background border-primary/30 relative min-h-screen overflow-hidden border-b">
       {/* Refined Background Pattern */}
@@ -137,11 +261,152 @@ const LandingHero = ({ World }: LandingHeroProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-muted-foreground mb-10 max-w-xl text-base leading-relaxed sm:text-lg"
+              className="text-muted-foreground mb-8 max-w-xl text-base leading-relaxed sm:text-lg"
             >
               Connect with top companies worldwide. Access thousands of job
               opportunities tailored to your skills and ambitions.
             </motion.p>
+
+            {/* Interactive Job Search & Filter Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="search-form-container relative mb-10 max-w-2xl"
+            >
+              <form
+                onSubmit={handleSearchSubmit}
+                className="bg-card/85 border-border/60 shadow-primary/5 hover:border-primary/30 flex flex-col gap-2 rounded-2xl border p-2 shadow-2xl backdrop-blur-xl transition-all sm:flex-row sm:items-center sm:gap-0"
+              >
+                {/* Keyword Search */}
+                <div className="relative flex-1">
+                  <Search className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => {
+                      setKeyword(e.target.value);
+                      setActiveInput("keyword");
+                    }}
+                    onFocus={() => {
+                      setActiveInput("keyword");
+                      setFocusedIndex(-1);
+                    }}
+                    onKeyDown={(e) => handleKeyDown(e, "keyword")}
+                    placeholder="Job title, keywords..."
+                    className="placeholder:text-muted-foreground text-foreground h-12 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
+                  />
+
+                  {/* Suggestions Dropdown */}
+                  {activeInput === "keyword" && suggestions.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="border-border/60 bg-card/95 absolute top-[calc(100%+8px)] right-0 left-0 z-50 max-h-60 overflow-y-auto rounded-xl border p-1.5 shadow-2xl backdrop-blur-xl"
+                    >
+                      {suggestions.map((item: string, idx: number) => (
+                        <div
+                          key={idx}
+                          onMouseDown={() => {
+                            setKeyword(item);
+                            setActiveInput(null);
+                            setFocusedIndex(-1);
+                          }}
+                          className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+                            focusedIndex === idx
+                              ? "bg-primary/10 text-primary"
+                              : "text-foreground hover:bg-muted/60"
+                          }`}
+                        >
+                          <Search className="text-muted-foreground h-4 w-4" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Divider */}
+                <div className="bg-border/60 hidden h-8 w-px sm:block" />
+
+                {/* Location Search */}
+                <div className="relative flex-1">
+                  <MapPin className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => {
+                      setLocation(e.target.value);
+                      setActiveInput("location");
+                    }}
+                    onFocus={() => {
+                      setActiveInput("location");
+                      setFocusedIndex(-1);
+                    }}
+                    onKeyDown={(e) => handleKeyDown(e, "location")}
+                    placeholder="Location or Remote..."
+                    className="placeholder:text-muted-foreground text-foreground h-12 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
+                  />
+
+                  {/* Suggestions Dropdown */}
+                  {activeInput === "location" && suggestions.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="border-border/60 bg-card/95 absolute top-[calc(100%+8px)] right-0 left-0 z-50 max-h-60 overflow-y-auto rounded-xl border p-1.5 shadow-2xl backdrop-blur-xl"
+                    >
+                      {suggestions.map((item: string, idx: number) => (
+                        <div
+                          key={idx}
+                          onMouseDown={() => {
+                            setLocation(item);
+                            setActiveInput(null);
+                            setFocusedIndex(-1);
+                          }}
+                          className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+                            focusedIndex === idx
+                              ? "bg-primary/10 text-primary"
+                              : "text-foreground hover:bg-muted/60"
+                          }`}
+                        >
+                          <MapPin className="text-muted-foreground h-4 w-4" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Action CTA */}
+                <button
+                  type="submit"
+                  className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl sm:w-auto"
+                >
+                  <Search className="h-4 w-4" />
+                  <span>Search Jobs</span>
+                </button>
+              </form>
+
+              {/* Trending Keywords */}
+              <div className="mt-4 flex flex-wrap items-center gap-2 px-1">
+                <span className="text-muted-foreground flex items-center gap-1 text-xs font-semibold">
+                  <TrendingUp className="text-primary h-3 w-3" />
+                  Trending:
+                </span>
+                {["React", "UI/UX", "Python", "Remote", "DevOps"].map(
+                  (term, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleTrendingClick(term)}
+                      className="bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground hover:border-primary/20 cursor-pointer rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium transition-all"
+                    >
+                      {term}
+                    </button>
+                  ),
+                )}
+              </div>
+            </motion.div>
 
             {/* Stats Grid */}
             <motion.div

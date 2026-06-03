@@ -33,8 +33,7 @@ export const EducationForm = ({
   return (
     <WkForm<EducationFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
+      defaultValues={defaultValues as unknown as EducationFormData}
       resolver={zodResolver(educationSchema)}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

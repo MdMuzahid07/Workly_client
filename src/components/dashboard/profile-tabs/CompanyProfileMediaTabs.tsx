@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
@@ -19,6 +18,8 @@ import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { CardDescription } from "../../ui/card";
 
+import type { CompanyProfile } from "@/types/company-profile";
+
 const CompanyProfileMediaTabs = ({
   isEditing,
   currentProfile,
@@ -26,9 +27,9 @@ const CompanyProfileMediaTabs = ({
   editedProfile,
 }: {
   isEditing: boolean;
-  currentProfile: any;
-  updateField: (field: string, value: any) => void;
-  editedProfile: any;
+  currentProfile: CompanyProfile;
+  updateField: (field: string, value: unknown) => void;
+  editedProfile: Partial<CompanyProfile>;
 }) => {
   const [uploadFile, { isLoading: isUploading }] =
     useUploadSingleFileMutation();

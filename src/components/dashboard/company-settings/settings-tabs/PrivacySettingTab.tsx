@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Label } from "@radix-ui/react-label";
 import { Switch } from "@radix-ui/react-switch";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -11,12 +10,21 @@ import {
   CardTitle,
 } from "../../../ui/card";
 
+import type { CompanySettings } from "@/types/company-settings";
+
 const PrivacySettingTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <
+    K extends keyof CompanySettings,
+    F extends keyof CompanySettings[K],
+  >(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="privacy" className="space-y-6">
@@ -44,7 +52,7 @@ const PrivacySettingTab = ({
                     updateSettings(
                       "privacy",
                       "profileVisibility",
-                      e.target.value,
+                      e.target.value as "public" | "private",
                     )
                   }
                   className="text-primary"
@@ -61,7 +69,7 @@ const PrivacySettingTab = ({
                     updateSettings(
                       "privacy",
                       "profileVisibility",
-                      e.target.value,
+                      e.target.value as "public" | "private",
                     )
                   }
                   className="text-primary"
@@ -77,9 +85,9 @@ const PrivacySettingTab = ({
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Show employee count</Label>
+              <Label>Show team member count</Label>
               <p className="text-muted-foreground text-sm">
-                Display the number of employees on your profile
+                Display how many employer accounts are linked to your company
               </p>
             </div>
             <Switch

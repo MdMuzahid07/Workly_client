@@ -6,25 +6,25 @@ import { Globe, TrendingUp, Users, Zap } from "lucide-react";
 const stats = [
   {
     label: "Active Subscriptions",
-    value: "1,848",
+    value: "2,450",
     icon: Users,
     color: "text-primary",
   },
   {
     label: "Monthly Recurr. Revenue",
-    value: "$124,560",
+    value: "৳845,900",
     icon: TrendingUp,
     color: "text-emerald-500",
   },
   {
     label: "Platform Conversion",
-    value: "4.2%",
+    value: "5.8%",
     icon: Zap,
     color: "text-amber-500",
   },
   {
-    label: "Global Reach",
-    value: "124 Countries",
+    label: "Local Market Reach",
+    value: "64 Districts",
     icon: Globe,
     color: "text-blue-500",
   },

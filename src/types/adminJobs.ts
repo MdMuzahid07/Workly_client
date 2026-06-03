@@ -13,6 +13,11 @@ export interface AdminJobRow {
   views: number;
   applications: number;
   status: AdminJobStatus;
+  description?: string;
+  postedBy?: {
+    fullName: string;
+    email: string;
+  } | null;
 }
 
 export interface AdminJobStats {

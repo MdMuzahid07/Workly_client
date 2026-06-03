@@ -66,7 +66,7 @@ export const MOCK_COMPANY: CompanyProfile = {
     { platform: "twitter", url: "https://twitter.com/techflow" },
   ],
   stats: {
-    totalEmployees: 482,
+    totalTeamMembers: 482,
     totalJobs: 15,
     totalApplications: 1250,
     profileViews: 4500,

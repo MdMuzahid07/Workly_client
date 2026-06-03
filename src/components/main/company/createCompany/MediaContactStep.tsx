@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { useUploadMultipleFilesMutation } from "../../../../redux/feature/upload/uploadApi";
-import { CompanyFormData } from "../../../../view/dashboard/CompanyCreationView";
+import { CompanyFormData } from "../../../../view/dashboard/employer/company-creation/CompanyCreationView";
 import WKInput from "../../../form/WkInput";
 import { Button } from "../../../ui/button";
 import {

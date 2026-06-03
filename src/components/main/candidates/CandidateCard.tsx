@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Briefcase, Heart, MapPin, Star, User } from "lucide-react";
+import { BadgeCheck, Bookmark, Briefcase, MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -33,6 +33,38 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
     useToggleSaveCandidateMutation();
   const { user: currentUser } = useAppSelector((state) => state.auth);
 
+  const initials = candidate.fullName
+    ? candidate.fullName
+        .split(" ")
+        .filter(Boolean)
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "C";
+
+  const isPlaceholderAvatar =
+    !candidate.profile?.avatarUrl ||
+    candidate.profile.avatarUrl.includes("placeholder") ||
+    !candidate.profile.avatarUrl.startsWith("http");
+
+  const rawHeadline = candidate.profile?.headline || "";
+  const displayHeadline =
+    !rawHeadline || rawHeadline.toUpperCase() === "JOB_SEEKER"
+      ? candidate.profile?.skills?.length
+        ? `${candidate.profile.skills
+            .map((s) => s.skillName)
+            .slice(0, 2)
+            .join(" & ")} Specialist`
+        : "Verified Talent"
+      : rawHeadline;
+
+  const experienceText =
+    candidate.profile?.totalExperienceYears !== undefined &&
+    candidate.profile.totalExperienceYears > 0
+      ? `${candidate.profile.totalExperienceYears} Yrs Exp`
+      : "Entry-level Talent";
+
   const isEmployer =
     currentUser?.role === "EMPLOYER" ||
     currentUser?.role === "ADMIN" ||
@@ -57,21 +89,21 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
 
   if (viewType === "grid") {
     return (
-      <Card className="group from-primary/30 via-primary/10 to-primary/20 relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+      <Card className="group bg-card relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 p-5 transition-all duration-300 dark:border-slate-800">
         <CardContent className="flex flex-1 flex-col p-0">
           <div className="mb-4 flex items-start justify-between">
             <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-gray-50 p-0 dark:bg-slate-800">
-              {candidate.profile?.avatarUrl ? (
+              {!isPlaceholderAvatar ? (
                 <Image
-                  src={candidate.profile.avatarUrl}
+                  src={candidate.profile.avatarUrl!}
                   alt={candidate.fullName}
                   className="h-full w-full object-cover"
                   width={64}
                   height={64}
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <User className="text-primary/40 h-8 w-8" />
+                <div className="bg-primary/5 text-primary border-primary/10 flex h-full w-full items-center justify-center rounded-2xl border text-lg font-bold">
+                  {initials}
                 </div>
               )}
             </div>
@@ -84,13 +116,13 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
                   size="icon"
                   className={`h-8 w-8 rounded-full transition-colors ${
                     candidate.isSaved
-                      ? "bg-red-50 text-red-500 hover:bg-red-100"
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
                       : "hover:bg-primary/10 hover:text-primary text-slate-400"
                   }`}
                   onClick={handleSave}
                   disabled={isSaving}
                 >
-                  <Heart
+                  <Bookmark
                     className={`h-4.5 w-4.5 ${candidate.isSaved ? "fill-current" : ""}`}
                   />
                 </Button>
@@ -103,25 +135,24 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
               href={`/browse-candidates/${candidate.id}`}
               className="hover:text-primary transition-colors"
             >
-              <h3 className="text-foreground line-clamp-1 text-base font-bold">
+              <h3 className="text-foreground line-clamp-1 flex items-center gap-1 text-base font-bold">
                 {candidate.fullName}
+                <BadgeCheck className="h-4 w-4 shrink-0 fill-emerald-500/10 text-emerald-500" />
               </h3>
             </Link>
           </div>
 
-          <p className="text-muted-foreground mb-3 line-clamp-1 text-xs font-medium">
-            {candidate.profile?.headline || "No headline provided"}
+          <p className="text-muted-foreground mb-3 line-clamp-1 text-xs font-semibold">
+            {displayHeadline}
           </p>
 
           <div className="mb-4 flex flex-wrap gap-1.5">
-            {candidate.profile?.totalExperienceYears !== undefined && (
-              <Badge
-                variant="default"
-                className="bg-primary/10 text-primary rounded-md border-0 py-0 text-[9px] font-bold tracking-wider uppercase"
-              >
-                {candidate.profile.totalExperienceYears} Yrs Exp
-              </Badge>
-            )}
+            <Badge
+              variant="default"
+              className="bg-primary/10 text-primary rounded-md border-0 py-0 text-[9px] font-bold tracking-wider uppercase"
+            >
+              {experienceText}
+            </Badge>
             {candidate.profile?.preference?.jobType && (
               <Badge
                 variant="secondary"
@@ -173,21 +204,21 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
   }
 
   return (
-    <Card className="group hover:border-primary/50 relative overflow-hidden rounded-3xl border bg-white px-3 py-5 transition-all duration-300 md:px-8 md:py-8 dark:border-slate-800 dark:bg-slate-900/50">
+    <Card className="group hover:border-primary/50 bg-card relative overflow-hidden rounded-3xl border border-gray-100 px-3 py-5 transition-all duration-300 md:px-8 md:py-8 dark:border-slate-800">
       <CardContent className="p-0">
         <div className="flex flex-row gap-2 sm:items-center sm:gap-6">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-gray-50 p-0 sm:h-20 sm:w-20 dark:bg-slate-800">
-            {candidate.profile?.avatarUrl ? (
+            {!isPlaceholderAvatar ? (
               <Image
-                src={candidate.profile.avatarUrl}
+                src={candidate.profile.avatarUrl!}
                 alt={candidate.fullName}
                 className="h-full w-full object-cover"
                 width={80}
                 height={80}
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <User className="text-primary/40 h-10 w-10" />
+              <div className="bg-primary/5 text-primary border-primary/10 flex h-full w-full items-center justify-center rounded-2xl border text-xl font-bold">
+                {initials}
               </div>
             )}
           </div>
@@ -198,8 +229,9 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
                 href={`/browse-candidates/${candidate.id}`}
                 className="hover:text-primary transition-colors"
               >
-                <h3 className="text-foreground truncate text-sm font-bold sm:text-xl">
+                <h3 className="text-foreground flex items-center gap-1 truncate text-sm font-bold sm:text-xl">
                   {candidate.fullName}
+                  <BadgeCheck className="h-4 w-4 shrink-0 fill-emerald-500/10 text-emerald-500 sm:h-5 sm:w-5" />
                 </h3>
               </Link>
               {candidate.profile?.totalExperienceYears &&
@@ -208,8 +240,8 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
                 )}
             </div>
 
-            <p className="text-muted-foreground mb-2 line-clamp-1 text-xs sm:text-sm">
-              {candidate.profile?.headline || "No headline provided"}
+            <p className="text-muted-foreground mb-2 line-clamp-1 text-xs font-semibold sm:text-sm">
+              {displayHeadline}
             </p>
 
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm">
@@ -220,8 +252,9 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <Briefcase className="text-primary h-3.5 w-3.5 opacity-70" />
                 <span>
-                  {candidate.profile?.totalExperienceYears || 0} Years
-                  Experience
+                  {experienceText === "Entry-level Talent"
+                    ? "Entry-level Experience"
+                    : `${candidate.profile?.totalExperienceYears} Years Experience`}
                 </span>
               </div>
             </div>
@@ -254,13 +287,13 @@ const CandidateCard = ({ candidate, viewType = "list" }: CandidateProps) => {
                   size="icon"
                   className={`h-10 w-10 rounded-full transition-colors ${
                     candidate.isSaved
-                      ? "bg-red-50 text-red-500 hover:bg-red-100"
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
                       : "hover:bg-primary/10 hover:text-primary text-slate-400"
                   }`}
                   onClick={handleSave}
                   disabled={isSaving}
                 >
-                  <Heart
+                  <Bookmark
                     className={`h-6 w-6 ${candidate.isSaved ? "fill-current" : ""}`}
                   />
                 </Button>

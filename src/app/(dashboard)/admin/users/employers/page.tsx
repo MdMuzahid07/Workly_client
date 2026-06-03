@@ -1,4 +1,4 @@
-import AdminEmployersManagementView from "../../../../../view/dashboard/AdminEmployersManagementView";
+import AdminEmployersManagementView from "../../../../../view/dashboard/admin/users/employers/AdminEmployersManagementView";
 
 export default function AdminEmployersPage() {
   return <AdminEmployersManagementView />;
