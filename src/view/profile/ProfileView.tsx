@@ -376,6 +376,8 @@ const ProfileView = () => {
                 linkedin: localProfile?.linkedInUrl || "",
                 github: localProfile?.githubUrl || "",
                 website: localProfile?.websiteUrl || "",
+                twitter: localProfile?.twitterUrl || "",
+                facebook: localProfile?.facebookUrl || "",
               }}
               onAddVideoResume={() => {
                 if (!user?.isPremium) {
@@ -605,6 +607,8 @@ const ProfileView = () => {
                   linkedin: localProfile?.linkedInUrl || "",
                   github: localProfile?.githubUrl || "",
                   website: localProfile?.websiteUrl || "",
+                  twitter: localProfile?.twitterUrl || "",
+                  facebook: localProfile?.facebookUrl || "",
                 }}
                 onSubmit={async (data) => {
                   setLocalProfile((prev: any) => ({
@@ -612,6 +616,8 @@ const ProfileView = () => {
                     linkedInUrl: data.linkedin,
                     githubUrl: data.github,
                     websiteUrl: data.website,
+                    twitterUrl: data.twitter,
+                    facebookUrl: data.facebook,
                   }));
                   setActiveModal(null);
                   toast.success(

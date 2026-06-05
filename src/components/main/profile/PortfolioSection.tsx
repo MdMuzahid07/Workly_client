@@ -1,6 +1,14 @@
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
-import { Github, Globe, Linkedin, Upload, Video } from "lucide-react";
+import {
+  Facebook,
+  Github,
+  Globe,
+  Linkedin,
+  Twitter,
+  Upload,
+  Video,
+} from "lucide-react";
 
 export const PortfolioSection = ({
   videoResumeUrl,
@@ -74,45 +82,84 @@ export const PortfolioSection = ({
       {/* Social Profiles */}
       <SectionCard
         title="Online Presence"
-        isCompleted={Object.keys(socialLinks).length > 0}
+        isCompleted={Object.values(socialLinks).some((val) => !!val)}
         completionPercentage={10}
         onEdit={onEditSocials}
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex items-center gap-3 rounded-md border p-3">
-            <Linkedin className="h-5 w-5 text-blue-600" />
-            <div className="flex-1 overflow-hidden">
-              <div className="text-muted-foreground text-xs font-medium">
-                LinkedIn
-              </div>
-              <div className="truncate text-sm font-medium">
-                {socialLinks?.linkedin || "Not connected"}
-              </div>
-            </div>
+        {!Object.values(socialLinks).some((val) => !!val) ? (
+          <div className="text-muted-foreground p-2 text-sm">
+            No professional links added yet. Click edit to add your social
+            profiles.
           </div>
-          <div className="flex items-center gap-3 rounded-md border p-3">
-            <Github className="text-foreground h-5 w-5" />
-            <div className="flex-1 overflow-hidden">
-              <div className="text-muted-foreground text-xs font-medium">
-                GitHub
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {socialLinks?.linkedin && (
+              <div className="flex items-center gap-3 rounded-md border p-3">
+                <Linkedin className="h-5 w-5 text-blue-600" />
+                <div className="flex-1 overflow-hidden">
+                  <div className="text-muted-foreground text-xs font-medium">
+                    LinkedIn
+                  </div>
+                  <div className="truncate text-sm font-medium">
+                    {socialLinks.linkedin}
+                  </div>
+                </div>
               </div>
-              <div className="truncate text-sm font-medium">
-                {socialLinks?.github || "Not connected"}
+            )}
+            {socialLinks?.github && (
+              <div className="flex items-center gap-3 rounded-md border p-3">
+                <Github className="text-foreground h-5 w-5" />
+                <div className="flex-1 overflow-hidden">
+                  <div className="text-muted-foreground text-xs font-medium">
+                    GitHub
+                  </div>
+                  <div className="truncate text-sm font-medium">
+                    {socialLinks.github}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+            {socialLinks?.website && (
+              <div className="flex items-center gap-3 rounded-md border p-3">
+                <Globe className="h-5 w-5 text-emerald-600" />
+                <div className="flex-1 overflow-hidden">
+                  <div className="text-muted-foreground text-xs font-medium">
+                    Portfolio Website
+                  </div>
+                  <div className="truncate text-sm font-medium">
+                    {socialLinks.website}
+                  </div>
+                </div>
+              </div>
+            )}
+            {socialLinks?.twitter && (
+              <div className="flex items-center gap-3 rounded-md border p-3">
+                <Twitter className="h-5 w-5 text-sky-500" />
+                <div className="flex-1 overflow-hidden">
+                  <div className="text-muted-foreground text-xs font-medium">
+                    Twitter / X
+                  </div>
+                  <div className="truncate text-sm font-medium">
+                    {socialLinks.twitter}
+                  </div>
+                </div>
+              </div>
+            )}
+            {socialLinks?.facebook && (
+              <div className="flex items-center gap-3 rounded-md border p-3">
+                <Facebook className="h-5 w-5 text-blue-700" />
+                <div className="flex-1 overflow-hidden">
+                  <div className="text-muted-foreground text-xs font-medium">
+                    Facebook
+                  </div>
+                  <div className="truncate text-sm font-medium">
+                    {socialLinks.facebook}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-3 rounded-md border p-3">
-            <Globe className="h-5 w-5 text-emerald-600" />
-            <div className="flex-1 overflow-hidden">
-              <div className="text-muted-foreground text-xs font-medium">
-                Portfolio Website
-              </div>
-              <div className="truncate text-sm font-medium">
-                {socialLinks?.website || "Not connected"}
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </SectionCard>
     </div>
   );
