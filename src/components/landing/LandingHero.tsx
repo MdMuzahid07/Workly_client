@@ -7,18 +7,17 @@ import {
   Briefcase,
   Building2,
   Compass,
+  MapPin,
+  Search,
   TrendingUp,
   Users,
-  Search,
-  MapPin,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState, type ComponentType, useEffect } from "react";
-import { Suspense } from "react";
 import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState, type ComponentType } from "react";
 import { globeConfig, globeSampleAreas } from "../../constants";
-import GlobeSkeleton from "../../skeleton/landing/home/GlobeSkeleton";
 import { useGetSearchSuggestionsQuery } from "../../redux/feature/job/jobApi";
+import GlobeSkeleton from "../../skeleton/landing/home/GlobeSkeleton";
 
 interface WorldProps {
   data: typeof globeSampleAreas;

@@ -39,7 +39,45 @@ export function ProfileViewsChart({
     const rawData = initialData || statsData?.data?.chartData || [];
     if (rawData.length === 0) return [];
 
-    return rawData.map((item: { date: string; count: number }) => {
+    let processedData = [...rawData];
+
+    // Pad missing days for daily views
+    if (period === "7days" || period === "14days" || period === "lastMonth") {
+      const daysToPad = period === "7days" ? 7 : period === "14days" ? 14 : 30;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const dataMap = new Map();
+      rawData.forEach((item: { date: string; count: number }) => {
+        const d = new Date(item.date);
+        d.setHours(0, 0, 0, 0);
+        dataMap.set(d.getTime(), item.count);
+      });
+
+      const padded = [];
+      for (let i = daysToPad - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        padded.push({
+          date: d.toISOString(),
+          count: dataMap.get(d.getTime()) || 0,
+        });
+      }
+      processedData = padded;
+    } else if (processedData.length === 1) {
+      // For overall or 3months if only 1 data point exists, add a 0 point before it to draw a line
+      const singleDate = new Date(processedData[0].date);
+      const prevDate = new Date(singleDate);
+      if (period === "3months") prevDate.setDate(prevDate.getDate() - 7);
+      else prevDate.setMonth(prevDate.getMonth() - 1);
+
+      processedData = [
+        { date: prevDate.toISOString(), count: 0 },
+        processedData[0],
+      ];
+    }
+
+    return processedData.map((item: { date: string; count: number }) => {
       const dateObj = new Date(item.date);
       let label = "";
 
@@ -150,6 +188,8 @@ export function ProfileViewsChart({
                 fillOpacity={0.4}
                 stroke="var(--color-views)"
                 stackId="a"
+                dot={{ r: 4, fill: "var(--color-views)", strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: "var(--color-views)", strokeWidth: 0 }}
               />
             </AreaChart>
           </ChartContainer>

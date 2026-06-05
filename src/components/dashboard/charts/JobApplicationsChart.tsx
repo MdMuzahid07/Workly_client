@@ -34,7 +34,44 @@ export function JobApplicationsChart() {
   const chartData = useMemo(() => {
     if (!statsData?.data) return [];
 
-    return statsData.data.map((item: { date: string; count: number }) => {
+    let processedData = [...statsData.data];
+
+    // Pad missing days for daily views
+    if (period === "7days" || period === "14days" || period === "lastMonth") {
+      const daysToPad = period === "7days" ? 7 : period === "14days" ? 14 : 30;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const dataMap = new Map();
+      statsData.data.forEach((item: { date: string; count: number }) => {
+        const d = new Date(item.date);
+        d.setHours(0, 0, 0, 0);
+        dataMap.set(d.getTime(), item.count);
+      });
+
+      const padded = [];
+      for (let i = daysToPad - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        padded.push({
+          date: d.toISOString(),
+          count: dataMap.get(d.getTime()) || 0,
+        });
+      }
+      processedData = padded;
+    } else if (processedData.length === 1) {
+      const singleDate = new Date(processedData[0].date);
+      const prevDate = new Date(singleDate);
+      if (period === "3months") prevDate.setDate(prevDate.getDate() - 7);
+      else prevDate.setMonth(prevDate.getMonth() - 1);
+
+      processedData = [
+        { date: prevDate.toISOString(), count: 0 },
+        processedData[0],
+      ];
+    }
+
+    return processedData.map((item: { date: string; count: number }) => {
       const dateObj = new Date(item.date);
       let label = "";
 
