@@ -13,6 +13,9 @@ import {
   Share2,
   Star,
   User,
+  Github,
+  Twitter,
+  Facebook,
 } from "lucide-react";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
@@ -141,6 +144,39 @@ const ProfileSidebar = ({
             >
               <Linkedin className="text-primary mr-3 h-5 w-5" />
               <span className="font-medium">LinkedIn Profile</span>
+            </a>
+          )}
+          {user?.profile?.githubUrl && (
+            <a
+              href={user?.profile?.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
+            >
+              <Github className="text-primary mr-3 h-5 w-5" />
+              <span className="font-medium">GitHub Profile</span>
+            </a>
+          )}
+          {user?.profile?.twitterUrl && (
+            <a
+              href={user?.profile?.twitterUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
+            >
+              <Twitter className="text-primary mr-3 h-5 w-5" />
+              <span className="font-medium">Twitter / X Profile</span>
+            </a>
+          )}
+          {user?.profile?.facebookUrl && (
+            <a
+              href={user?.profile?.facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-muted/50 hover:bg-muted text-foreground hover:text-primary flex items-center rounded-full p-3 transition-colors"
+            >
+              <Facebook className="text-primary mr-3 h-5 w-5" />
+              <span className="font-medium">Facebook Profile</span>
             </a>
           )}
         </CardContent>

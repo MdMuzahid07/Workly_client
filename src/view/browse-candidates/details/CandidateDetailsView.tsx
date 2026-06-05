@@ -18,6 +18,10 @@ import {
   Shield,
   User,
   Video,
+  Linkedin,
+  Github,
+  Twitter,
+  Facebook,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -464,10 +468,20 @@ const CandidateDetailsView = () => {
                     target="_blank"
                     className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
                   >
-                    <Globe className="text-primary h-5 w-5" />
+                    <Linkedin className="text-primary h-5 w-5" />
                     <span className="text-sm font-medium">
                       LinkedIn Profile
                     </span>
+                  </a>
+                )}
+                {profile.githubUrl && (
+                  <a
+                    href={profile.githubUrl}
+                    target="_blank"
+                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                  >
+                    <Github className="text-primary h-5 w-5" />
+                    <span className="text-sm font-medium">GitHub Profile</span>
                   </a>
                 )}
                 {profile.websiteUrl && (
@@ -479,6 +493,30 @@ const CandidateDetailsView = () => {
                     <Globe className="text-primary h-5 w-5" />
                     <span className="text-sm font-medium">
                       Personal Website
+                    </span>
+                  </a>
+                )}
+                {profile.twitterUrl && (
+                  <a
+                    href={profile.twitterUrl}
+                    target="_blank"
+                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                  >
+                    <Twitter className="text-primary h-5 w-5" />
+                    <span className="text-sm font-medium">
+                      Twitter / X Profile
+                    </span>
+                  </a>
+                )}
+                {profile.facebookUrl && (
+                  <a
+                    href={profile.facebookUrl}
+                    target="_blank"
+                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                  >
+                    <Facebook className="text-primary h-5 w-5" />
+                    <span className="text-sm font-medium">
+                      Facebook Profile
                     </span>
                   </a>
                 )}

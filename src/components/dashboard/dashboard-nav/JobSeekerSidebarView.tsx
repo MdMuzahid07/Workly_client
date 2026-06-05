@@ -16,6 +16,7 @@ import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
 import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import {
   BarChart3,
   Bell,
@@ -53,32 +54,6 @@ interface SidebarItemProps {
 interface SidebarGroupProps {
   title?: string;
   items: SidebarItemProps[];
-}
-
-function computeProfileCompletion(
-  data:
-    | {
-        profile?: {
-          bio?: string | null;
-          location?: string | null;
-          avatarUrl?: string | null;
-          resumeUrl?: string | null;
-        };
-        fullName?: string;
-      }
-    | undefined,
-): number {
-  if (!data) return 0;
-  const { profile } = data;
-  const fields = [
-    !!data.fullName,
-    !!profile?.bio,
-    !!profile?.location,
-    !!profile?.avatarUrl,
-    !!profile?.resumeUrl,
-  ];
-  const filled = fields.filter(Boolean).length;
-  return Math.min(100, Math.round((filled / fields.length) * 100));
 }
 
 const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
@@ -320,7 +295,9 @@ export default function JobSeekerSidebarView({
     skip: !user?.id,
   });
   const profile = profileData?.data?.profile;
-  const profileCompletion = computeProfileCompletion(profileData?.data);
+  const profileCompletion = calculateJobSeekerProfileCompletion(
+    profileData?.data,
+  );
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
 

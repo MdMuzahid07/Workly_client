@@ -20,34 +20,9 @@ import { Bookmark, FileText, Search, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import { StatCard } from "@/components/shared/StatCard";
 import DashboardJobSeekerHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobSeekerHeader";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 
 import JobSeekerDashboardSkeleton from "@/skeleton/dashboard/job-seeker/dashboard/JobSeekerDashboardSkeleton";
-
-interface ProfileCompletionData {
-  profile?: {
-    bio?: string | null;
-    location?: string | null;
-    avatarUrl?: string | null;
-    resumeUrl?: string | null;
-  };
-  fullName?: string;
-}
-
-function computeProfileCompletion(
-  data: ProfileCompletionData | undefined,
-): number {
-  if (!data) return 0;
-  const { profile } = data;
-  const fields = [
-    !!data.fullName,
-    !!profile?.bio,
-    !!profile?.location,
-    !!profile?.avatarUrl,
-    !!profile?.resumeUrl,
-  ];
-  const filled = fields.filter(Boolean).length;
-  return Math.min(100, Math.round((filled / fields.length) * 100));
-}
 
 export default function JobSeekerDashboardView() {
   const { user } = useAppSelector((state) => state.auth) || {};
@@ -70,7 +45,9 @@ export default function JobSeekerDashboardView() {
 
   const isLoading = isProfileLoading || isApplicationsLoading || isSavedLoading;
 
-  const profileCompletion = computeProfileCompletion(profileData?.data);
+  const profileCompletion = calculateJobSeekerProfileCompletion(
+    profileData?.data,
+  );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const applications = (applicationsData?.data as any[]) || [];
   const savedCount = Array.isArray(savedJobsData?.data)

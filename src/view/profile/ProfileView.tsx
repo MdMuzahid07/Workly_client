@@ -28,6 +28,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/overview/ProfileSkeleton";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 
 import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicInfoForm";
 import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
@@ -54,12 +55,21 @@ import { VolunteerForm } from "../../components/dashboard/profile-tabs/forms/Vol
 import { Button } from "../../components/ui/button";
 import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
-const createLocalProfile = (userData: any) => ({
-  ...userData.profile,
-  fullName: userData.fullName,
-  email: userData.email,
-  phone: userData.phone,
-});
+const createLocalProfile = (userData: any) => {
+  const profile = userData.profile || {};
+  const education = (profile.education || []).map((edu: any) => ({
+    ...edu,
+    institute: edu.institute || edu.institution || "",
+    result: edu.result || edu.grade || "",
+  }));
+  return {
+    ...profile,
+    education,
+    fullName: userData.fullName,
+    email: userData.email,
+    phone: userData.phone,
+  };
+};
 
 const stableStringify = (value: any): string => {
   if (Array.isArray(value)) {
@@ -251,27 +261,7 @@ const ProfileView = () => {
     });
   };
 
-  const calculateProgress = () => {
-    let progress = 20; // Base: Account Created
-    if (localProfile?.avatarUrl) progress += 5;
-    if (localProfile?.bio) progress += 5;
-    if (localProfile?.location) progress += 5;
-    if (localProfile?.headline) progress += 5;
-    if (localProfile?.skills?.length > 0) progress += 10;
-    if (localProfile?.education?.length > 0) progress += 10;
-    if (localProfile?.workExperiences?.length > 0) progress += 10;
-    if (localProfile?.projects?.length > 0) progress += 5;
-    if (localProfile?.volunteers?.length > 0) progress += 5;
-    if (localProfile?.awards?.length > 0) progress += 5;
-    if (localProfile?.publications?.length > 0) progress += 5;
-    if (localProfile?.references?.length > 0) progress += 5;
-    if (localProfile?.languages?.length > 0) progress += 5;
-    if (localProfile?.address) progress += 5;
-    if (localProfile?.preference) progress += 5;
-    return Math.min(progress, 100);
-  };
-
-  const progress = calculateProgress();
+  const progress = calculateJobSeekerProfileCompletion(localProfile);
 
   if (isLoading && !data) {
     return <ProfileSkeleton />;
