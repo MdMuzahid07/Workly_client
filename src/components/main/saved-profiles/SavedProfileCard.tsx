@@ -70,6 +70,7 @@ const SavedProfileCard = ({
       : "Not Specified",
     summary: rawProfile.profile?.bio || "No biography provided.",
     resumeUrl: rawProfile.profile?.resumeUrl,
+    videoResumeUrl: rawProfile.profile?.videoResumeUrl,
     linkedinUrl: rawProfile.profile?.linkedInUrl,
     portfolioUrl: rawProfile.profile?.websiteUrl,
     availability:

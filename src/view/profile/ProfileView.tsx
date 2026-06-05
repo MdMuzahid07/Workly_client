@@ -371,13 +371,21 @@ const ProfileView = () => {
 
             {/* Portfolio Section */}
             <PortfolioSection
-              videoResumeUrl={localProfile?.resumeUrl || ""}
+              videoResumeUrl={localProfile?.videoResumeUrl || ""}
               socialLinks={{
                 linkedin: localProfile?.linkedInUrl || "",
                 github: localProfile?.githubUrl || "",
                 website: localProfile?.websiteUrl || "",
               }}
-              onAddVideoResume={() => setActiveModal("video")}
+              onAddVideoResume={() => {
+                if (!user?.isPremium) {
+                  toast.error(
+                    "Video Resume is a premium feature. Please upgrade your account.",
+                  );
+                  return;
+                }
+                setActiveModal("video");
+              }}
               onEditSocials={() => setActiveModal("social")}
             />
 
@@ -616,12 +624,12 @@ const ProfileView = () => {
             {activeModal === "video" && (
               <VideoResumeForm
                 defaultValues={{
-                  videoUrl: localProfile?.resumeUrl || "",
+                  videoUrl: localProfile?.videoResumeUrl || "",
                 }}
                 onSubmit={async (data) => {
                   setLocalProfile((prev: any) => ({
                     ...prev,
-                    resumeUrl: data.videoUrl,
+                    videoResumeUrl: data.videoUrl,
                   }));
                   setActiveModal(null);
                   toast.success(

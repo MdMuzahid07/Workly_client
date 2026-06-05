@@ -5,21 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Award,
+  BadgeCheck,
+  Bookmark,
   Briefcase,
   Calendar,
   Globe,
   GraduationCap,
-  Bookmark,
   Mail,
   MapPin,
   MessageSquare,
   Share2,
   Shield,
   User,
-  BadgeCheck,
+  Video,
 } from "lucide-react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import {
   useGetCandidateByIdQuery,
@@ -29,8 +31,6 @@ import { useCreateConversationMutation } from "../../../redux/feature/message/me
 import { useLogProfileViewMutation } from "../../../redux/feature/profileView/profileViewApi";
 import { useAppSelector } from "../../../redux/hooks";
 import CandidateDetailsSkeleton from "../../../skeleton/browse-candidates/details/CandidateDetailsSkeleton";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 const CandidateDetailsView = () => {
   const params = useParams();
@@ -283,6 +283,30 @@ const CandidateDetailsView = () => {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Video Resume */}
+            {profile.videoResumeUrl && (
+              <Card className="bg-background/50 overflow-hidden border backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Video className="text-primary h-5 w-5" />
+                    Video Resume / Introduction
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-center bg-black/5 p-6">
+                  <div className="relative aspect-video w-full max-w-3xl overflow-hidden rounded-xl border bg-black shadow-md">
+                    <video
+                      src={profile.videoResumeUrl}
+                      controls
+                      className="h-full w-full object-contain"
+                      preload="metadata"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
