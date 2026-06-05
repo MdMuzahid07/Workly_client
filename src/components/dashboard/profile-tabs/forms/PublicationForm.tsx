@@ -12,16 +12,19 @@ interface PublicationFormProps {
   onSubmit: (data: PublicationFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<PublicationFormData>;
 }
 
 export const PublicationForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: PublicationFormProps) => {
   return (
     <WkForm<PublicationFormData>
       onSubmit={onSubmit}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(publicationSchema)}
     >
       <div className="space-y-4">
