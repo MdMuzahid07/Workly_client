@@ -41,7 +41,14 @@ export default function AnalyticsDepartmentDistribution({
         percentage: d.percentage,
         color: d.color,
       }))
-    : [{ name: "Other", applicants: 1, percentage: 100, color: "#64748b" }];
+    : [
+        {
+          name: "No data",
+          applicants: 1,
+          percentage: 0,
+          color: "var(--muted)",
+        },
+      ];
 
   const totalApplicants = departments.reduce((sum, d) => sum + d.count, 0);
 
@@ -55,21 +62,24 @@ export default function AnalyticsDepartmentDistribution({
           </p>
         </div>
 
-        <div className="h-80 w-full">
+        <div className="relative flex h-80 w-full items-center justify-center">
+          <div className="pointer-events-none absolute flex flex-col items-center justify-center text-center">
+            <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase opacity-60">
+              Total
+            </span>
+            <span className="text-3xl font-extrabold tracking-tight tabular-nums">
+              {totalApplicants}
+            </span>
+          </div>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={({ name, percentage }) =>
-                  typeof percentage === "number"
-                    ? `${name} ${percentage}%`
-                    : `${name}`
-                }
-                outerRadius={100}
-                fill="#8884d8"
+                innerRadius={65}
+                outerRadius={90}
+                paddingAngle={departments.length > 1 ? 2 : 0}
                 dataKey="applicants"
               >
                 {chartData.map((entry, index) => (
@@ -78,11 +88,16 @@ export default function AnalyticsDepartmentDistribution({
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--background)",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
                 }}
-                formatter={(value) => [`${value} applications`, "Applicants"]}
+                formatter={(value, name) => [
+                  departments.length
+                    ? `${value} applications`
+                    : "0 applications",
+                  departments.length ? name : "No data",
+                ]}
               />
             </PieChart>
           </ResponsiveContainer>

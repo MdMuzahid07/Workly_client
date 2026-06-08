@@ -56,27 +56,26 @@ export default function AnalyticsApplicationTrendsChart({
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="hsl(var(--border))"
+              stroke="var(--border)"
               vertical={false}
             />
             <XAxis
               dataKey="periodLabel"
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--muted-foreground)"
               style={{ fontSize: "12px" }}
             />
             <YAxis
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--muted-foreground)"
               style={{ fontSize: "12px" }}
               allowDecimals={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(var(--background))",
-                border: "1px solid hsl(var(--border))",
+                backgroundColor: "var(--background)",
+                border: "1px solid var(--border)",
                 borderRadius: "8px",
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
               }}
-              cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
+              cursor={{ fill: "var(--muted)" }}
             />
             <Legend wrapperStyle={{ paddingTop: "20px" }} />
             <Bar dataKey="applications" fill="#F87171" radius={[8, 8, 0, 0]} />

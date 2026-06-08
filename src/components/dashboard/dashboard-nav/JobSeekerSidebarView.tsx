@@ -160,7 +160,7 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   return (
     <div className="bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex h-14 shrink-0 items-center justify-between px-4 sm:h-16">
+      <div className="flex h-12 shrink-0 items-center justify-between px-4 sm:h-14">
         <WJLogo />
         <span className="pr-10 lg:pr-0">
           <ThemeToggleButtonCompact />
@@ -243,7 +243,6 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
 
       {/* Footer / Bottom Items */}
       <div className="bg-sidebar border-border/40 mt-auto shrink-0 border-t p-3">
-        <Separator className="mb-3 opacity-50" />
         <nav className="space-y-1">
           {bottomItems.map((item) => (
             <JobSeekerSidebarItem
@@ -255,21 +254,6 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
             />
           ))}
         </nav>
-        <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10px]">
-          <Link
-            href="/privacy"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Privacy
-          </Link>
-          <Link
-            href="/terms"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Terms
-          </Link>
-          <span className="text-muted-foreground/50">© 2024 WorklyJob</span>
-        </div>
       </div>
     </div>
   );

@@ -20,13 +20,13 @@ import {
   Bell,
   Briefcase,
   Building2,
+  Crown,
   Heart,
   LayoutDashboard,
   LogOut,
   Menu,
   MessageCircle,
   Package,
-  Pencil,
   Plus,
   Receipt,
   Settings,
@@ -139,6 +139,7 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
   profileData?: {
     data?: {
       fullName?: string;
+      isPremium?: boolean;
       profile?: {
         avatarUrl?: string | null;
       };
@@ -150,7 +151,7 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
   return (
     <div className="bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex h-14 shrink-0 items-center justify-between px-4 sm:h-16">
+      <div className="flex h-12 shrink-0 items-center justify-between px-4 sm:h-14">
         <WJLogo />
         <span className="pr-10 lg:pr-0">
           <ThemeToggleButtonCompact />
@@ -160,10 +161,10 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
       <Separator className="shrink-0 opacity-50" />
 
       {/* Company Profile Section */}
-      <div className="shrink-0 px-4 py-4">
+      <div className="shrink-0 px-4 py-3">
         <Link
           href="/employer/company-profile"
-          className="group border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 flex items-center gap-3 rounded-lg border p-3 transition-all hover:shadow-sm"
+          className="flex items-center gap-3 px-1 py-1"
         >
           <Avatar className="h-10 w-10 shrink-0 sm:h-11 sm:w-11">
             <AvatarImage
@@ -180,14 +181,24 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="text-foreground truncate text-sm font-semibold">
-              {profileData?.data?.fullName || user?.fullName || "Company Name"}
-            </p>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="text-foreground truncate text-sm font-semibold">
+                {profileData?.data?.fullName ||
+                  user?.fullName ||
+                  "Company Name"}
+              </p>
+              {(profileData?.data?.isPremium ||
+                (user as { isPremium?: boolean })?.isPremium) && (
+                <span className="inline-flex shrink-0 animate-pulse items-center gap-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-amber-500 uppercase shadow-xs">
+                  <Crown className="h-2.5 w-2.5 fill-amber-500" />
+                  Pro
+                </span>
+              )}
+            </div>
             <p className="text-muted-foreground truncate text-xs">
               Employer Account
             </p>
           </div>
-          <Pencil className="text-muted-foreground h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
         </Link>
       </div>
 
@@ -219,7 +230,6 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
 
       {/* Footer / Bottom Items */}
       <div className="bg-sidebar border-border/40 mt-auto shrink-0 border-t p-3">
-        <Separator className="mb-3 opacity-50" />
         <nav className="space-y-1">
           {bottomItems.map((item) => (
             <EmployerSidebarItem
@@ -231,21 +241,6 @@ const EmployerSidebarContent = memo(function EmployerSidebarContent({
             />
           ))}
         </nav>
-        <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10px]">
-          <Link
-            href="/privacy"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Privacy
-          </Link>
-          <Link
-            href="/terms"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Terms
-          </Link>
-          <span className="text-muted-foreground/50">© 2024 WorklyJob</span>
-        </div>
       </div>
     </div>
   );

@@ -77,28 +77,29 @@ export default function AnalyticsHiringFunnelChart({
             >
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
+                stroke="var(--border)"
                 vertical={false}
               />
               <XAxis
                 type="number"
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 style={{ fontSize: "12px" }}
                 allowDecimals={false}
               />
               <YAxis
                 dataKey="name"
                 type="category"
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 style={{ fontSize: "12px" }}
                 width={110}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--background)",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
                 }}
+                cursor={{ fill: "var(--muted)" }}
                 formatter={(value) => [`${value} applications`, "Count"]}
               />
               <Bar dataKey="count" radius={[0, 8, 8, 0]} fill="#8884d8">

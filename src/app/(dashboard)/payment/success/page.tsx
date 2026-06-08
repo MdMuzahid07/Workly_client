@@ -28,7 +28,7 @@ export default function PaymentSuccessPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-tr from-slate-50 via-slate-100 to-indigo-50/50 p-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950/40">
-      <Card className="bg-background/60 dark:bg-background/40 relative w-full max-w-lg overflow-hidden border border-emerald-500/20 p-8 text-center shadow-2xl backdrop-blur-xl">
+      <Card className="bg-background/60 dark:bg-background/40 relative w-full max-w-lg overflow-hidden border border-emerald-500/30 p-8 text-center backdrop-blur-xl">
         {/* Glow Effects */}
         <div className="absolute -top-12 -left-12 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl"></div>
         <div className="absolute -right-12 -bottom-12 h-24 w-24 rounded-full bg-indigo-500/10 blur-xl"></div>
@@ -77,7 +77,7 @@ export default function PaymentSuccessPage() {
         {/* Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link href="/dashboard" className="w-full">
-            <button className="bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold transition-all hover:shadow-lg">
+            <button className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold transition-all">
               Go to Dashboard
               <ArrowRight className="h-4 w-4" />
             </button>

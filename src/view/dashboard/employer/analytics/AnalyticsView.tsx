@@ -11,7 +11,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { downloadEmployerAnalyticsCsv } from "@/lib/exportEmployerAnalyticsCsv";
-import { useGetEmployerAnalyticsQuery } from "@/redux/feature/company/companyApi";
+import {
+  useGetEmployerAnalyticsQuery,
+  useLazyGetEmployerAnalyticsQuery,
+} from "@/redux/feature/company/companyApi";
 import { useAppSelector } from "@/redux/hooks";
 import type {
   EmployerAnalyticsPayload,
@@ -27,11 +30,43 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import debounce from "debounce";
 
 export default function AnalyticsView() {
   const { user } = useAppSelector((s) => s.auth);
   const [timeRange, setTimeRange] = useState<EmployerAnalyticsPeriod>("30d");
+  const [triggerExportQuery, { isFetching: isExporting }] =
+    useLazyGetEmployerAnalyticsQuery();
+
+  // Job Performance sorting/filtering states (handled on backend)
+  const [sortBy, setSortBy] = useState<"views" | "applications" | "conversion">(
+    "applications",
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchValue, setSearchValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+
+  // Reset page when timeRange changes
+  useEffect(() => {
+    setPage(1);
+  }, [timeRange]);
+
+  // Debounced search logic
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchQuery(value);
+        setPage(1);
+      }, 500),
+    [],
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchValue);
+    return () => debouncedSearch.clear();
+  }, [debouncedSearch, searchValue]);
 
   const skip = !user?.id;
 
@@ -41,23 +76,49 @@ export default function AnalyticsView() {
     isFetching,
     isError,
     refetch,
-  } = useGetEmployerAnalyticsQuery(timeRange, {
-    skip,
-    refetchOnMountOrArgChange: true,
-  });
+  } = useGetEmployerAnalyticsQuery(
+    {
+      period: timeRange,
+      jobSortBy: sortBy,
+      jobSortOrder: sortOrder,
+      jobSearch: searchQuery || undefined,
+      jobPage: page,
+      jobLimit: 10,
+    },
+    {
+      skip,
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   const analytics = useMemo(
     () => envelope?.data as EmployerAnalyticsPayload | undefined,
     [envelope],
   );
 
-  const handleExport = useCallback(() => {
-    if (!analytics) return;
-    downloadEmployerAnalyticsCsv(
-      analytics,
-      `employer-analytics-${analytics.period}.csv`,
-    );
-  }, [analytics]);
+  const handleExport = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const result = await triggerExportQuery({
+        period: timeRange,
+        jobSortBy: sortBy,
+        jobSortOrder: sortOrder,
+        jobSearch: searchQuery || undefined,
+        jobPage: 1,
+        jobLimit: 5000,
+      }).unwrap();
+
+      const payload = result?.data as EmployerAnalyticsPayload | undefined;
+      if (!payload) return;
+
+      downloadEmployerAnalyticsCsv(
+        payload,
+        `employer-analytics-${payload.period}.csv`,
+      );
+    } catch (error) {
+      console.error("Failed to export analytics report:", error);
+    }
+  }, [triggerExportQuery, timeRange, sortBy, sortOrder, searchQuery, user]);
 
   const chartLoading = isLoading || isFetching;
 
@@ -143,7 +204,8 @@ export default function AnalyticsView() {
         timeRange={timeRange}
         setTimeRange={setTimeRange}
         onExportReport={handleExport}
-        exportDisabled={!analytics || chartLoading}
+        exportDisabled={!analytics || chartLoading || isExporting}
+        isExporting={isExporting}
       />
       <div className="space-y-6 px-4 pb-10 sm:px-6 sm:py-8">
         {skip && (
@@ -232,7 +294,20 @@ export default function AnalyticsView() {
 
           <TabsContent value="jobs">
             <AnalyticsJobPerformanceChart
-              rows={analytics?.jobPerformance ?? []}
+              rows={analytics?.jobPerformance?.data ?? []}
+              totalJobs={analytics?.jobPerformance?.meta?.total ?? 0}
+              page={page}
+              limit={10}
+              onPageChange={setPage}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortChange={(by, order) => {
+                setSortBy(by);
+                setSortOrder(order);
+                setPage(1);
+              }}
+              search={searchValue}
+              onSearchChange={setSearchValue}
               isLoading={chartLoading && !analytics}
             />
           </TabsContent>

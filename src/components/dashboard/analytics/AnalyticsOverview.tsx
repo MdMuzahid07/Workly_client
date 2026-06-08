@@ -36,7 +36,7 @@ function MetricCard({ title, value, changePct, icon }: MetricCardProps) {
           <p className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase opacity-60">
             {title}
           </p>
-          <div className="bg-primary/10 group-hover:bg-primary group-hover:shadow-primary/20 rounded-xl p-2.5 transition-all group-hover:shadow-lg">
+          <div className="bg-primary/10 group-hover:bg-primary group-hover:border-primary/20 rounded-xl border border-transparent p-2.5 transition-all">
             {React.cloneElement(
               icon as React.ReactElement<{ className?: string }>,
               {

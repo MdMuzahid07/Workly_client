@@ -1,4 +1,5 @@
 import baseApi from "../../api/baseApi";
+import { updateUser } from "../auth/authSlice";
 
 export interface CompanyInfo {
   name: string;
@@ -63,6 +64,16 @@ const profileApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["profile"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.data) {
+            dispatch(updateUser(data.data));
+          }
+        } catch (err) {
+          console.error("Failed to fetch profile", err);
+        }
+      },
     }),
 
     updateProfile: builder.mutation({
