@@ -326,10 +326,6 @@ const AdminEmployersManagementView = () => {
                               View Profile
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <Briefcase className="mr-2 h-4 w-4" />
-                            Manage Jobs
-                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {emp.status !== "Verified" && (
                             <DropdownMenuItem
