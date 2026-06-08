@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
-import { HeartHandshake } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Edit2, HeartHandshake, Trash2 } from "lucide-react";
 
 export const VolunteerSection = ({
   volunteer = [],
   onAdd,
+  onEdit,
+  onDelete,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   volunteer: any[];
   onAdd?: () => void;
+  onEdit?: (vol: any, index: number) => void;
+  onDelete?: (index: number) => void;
 }) => {
   return (
     <SectionCard
@@ -75,6 +80,25 @@ export const VolunteerSection = ({
                   </p>
                 </div>
               )}
+
+              <div className="absolute top-4 right-4 flex flex-col gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary h-8 w-8"
+                  onClick={() => onEdit?.(vol, index)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-destructive h-8 w-8"
+                  onClick={() => onDelete?.(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>

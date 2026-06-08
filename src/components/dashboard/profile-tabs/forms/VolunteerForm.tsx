@@ -14,6 +14,7 @@ interface VolunteerFormProps {
   onSubmit: (data: VolunteerFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<VolunteerFormData>;
 }
 
 const DateFields = () => {
@@ -42,11 +43,12 @@ export const VolunteerForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: VolunteerFormProps) => {
   return (
     <WkForm<VolunteerFormData>
       onSubmit={onSubmit}
-      defaultValues={{ currentlyVolunteering: false }}
+      defaultValues={defaultValues || { currentlyVolunteering: false }}
       resolver={zodResolver(volunteerSchema)}
     >
       <div className="space-y-4">

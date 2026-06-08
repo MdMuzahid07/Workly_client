@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardSavedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardSavedJobsHeader";
@@ -18,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetSavedJobsQuery } from "@/redux/feature/profile/profileApi";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bookmark, FilterX, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import JobCard from "../../components/main/jobs/JobCard";
 import StatsCards from "../../components/main/saved-jobs/StatsCards";
 
@@ -28,42 +27,55 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SavedJobsView = () => {
   // Query States
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState("10");
 
   const [activeTab, setActiveTab] = useState("ACTIVE");
 
+  // Debounce search term to optimize backend query performance
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   // RTK Query
   const { data: savedJobsRes, isLoading } = useGetSavedJobsQuery({
     page: currentPage,
     limit: parseInt(limit),
-    searchTerm: searchTerm || undefined,
+    searchTerm: debouncedSearch || undefined,
     company: selectedCompany !== "all" ? selectedCompany : undefined,
     status: activeTab,
   });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const rawSavedJobs = savedJobsRes?.data || [];
   const meta = savedJobsRes?.meta || {
     page: 1,
     limit: parseInt(limit),
     total: 0,
     totalPages: 1,
+    companies: [],
+    expiringSoonCount: 0,
   };
 
   const jobs = useMemo(() => {
-    return rawSavedJobs.map((sj: any) => sj.job);
-  }, [rawSavedJobs]);
+    const rawSavedJobs = savedJobsRes?.data || [];
+    return rawSavedJobs.map((sj) => ({
+      ...sj.job,
+      company: {
+        name: sj.job.company.name,
+        logo: sj.job.company.logo || sj.job.company.logoUrl,
+      },
+    }));
+  }, [savedJobsRes?.data]);
 
   const companies = useMemo(() => {
-    return [
-      "all",
-      ...Array.from(
-        new Set<string>(jobs.map((j: any) => j.company?.name || "")),
-      ),
-    ];
-  }, [jobs]);
+    return ["all", ...(meta.companies || [])];
+  }, [meta.companies]);
 
   const paginationMeta = {
     page: meta.page,
@@ -74,14 +86,10 @@ const SavedJobsView = () => {
 
   const stats = useMemo(() => {
     return {
-      total: meta.total, // For demo, use total from the current query
-      expiring: jobs.filter((job: any) => {
-        const deadline = new Date(job.applicationDeadline);
-        const diff = deadline.getTime() - Date.now();
-        return diff > 0 && diff < 7 * 86400000;
-      }).length,
+      total: meta.total,
+      expiring: meta.expiringSoonCount || 0,
     };
-  }, [jobs, meta.total]);
+  }, [meta.total, meta.expiringSoonCount]);
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -116,7 +124,10 @@ const SavedJobsView = () => {
             <div className="flex flex-wrap items-center gap-3">
               <Select
                 value={selectedCompany}
-                onValueChange={setSelectedCompany}
+                onValueChange={(val) => {
+                  setSelectedCompany(val);
+                  setCurrentPage(1);
+                }}
               >
                 <SelectTrigger className="border-border h-10 w-[180px] cursor-pointer rounded-full font-semibold">
                   <SelectValue placeholder="All Companies" />
@@ -151,7 +162,10 @@ const SavedJobsView = () => {
         <Tabs
           defaultValue="ACTIVE"
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={(val) => {
+            setActiveTab(val);
+            setCurrentPage(1);
+          }}
           className="w-full space-y-6"
         >
           <div className="flex items-center justify-between">
@@ -186,7 +200,13 @@ const SavedJobsView = () => {
               <span className="text-muted-foreground mt-1 text-xs leading-relaxed">
                 Limit:
               </span>
-              <Select value={limit} onValueChange={setLimit}>
+              <Select
+                value={limit}
+                onValueChange={(val) => {
+                  setLimit(val);
+                  setCurrentPage(1);
+                }}
+              >
                 <SelectTrigger className="border-border h-8 w-[70px] cursor-pointer rounded-full text-xs font-bold">
                   <SelectValue />
                 </SelectTrigger>
@@ -229,7 +249,7 @@ const SavedJobsView = () => {
                   exit={{ opacity: 0 }}
                   className="grid grid-cols-1 gap-4"
                 >
-                  {jobs.map((job: any) => (
+                  {jobs.map((job) => (
                     <JobCard
                       inDashboard={true}
                       key={job.id}
@@ -299,7 +319,7 @@ const SavedJobsView = () => {
               </div>
             ) : jobs.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 opacity-75">
-                {jobs.map((job: any) => (
+                {jobs.map((job) => (
                   <JobCard
                     inDashboard={true}
                     key={job.id}

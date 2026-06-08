@@ -17,19 +17,21 @@ interface CertificationFormProps {
   onSubmit: (data: CertificationFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<CertificationFormData>;
 }
 
 export const CertificationForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: CertificationFormProps) => {
   const [activeTab, setActiveTab] = useState("link");
 
   return (
     <WkForm<CertificationFormData>
       onSubmit={onSubmit}
-      defaultValues={{}}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(certificationSchema)}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

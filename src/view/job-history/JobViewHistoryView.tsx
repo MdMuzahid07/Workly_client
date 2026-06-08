@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardJobViewHistoryHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobViewHistoryHeader";
@@ -18,32 +17,44 @@ import { AnimatePresence } from "framer-motion";
 import JobViewHistorySkeleton from "@/skeleton/job-history/JobViewHistorySkeleton";
 import { Briefcase, Search } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const JobViewHistoryView = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("all");
 
-  const { data: response, isLoading } = useGetJobViewHistoryQuery(undefined);
+  // Debounce search term to optimize backend query performance
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const { data: response, isLoading } = useGetJobViewHistoryQuery({
+    searchTerm: debouncedSearch || undefined,
+    jobType: jobTypeFilter !== "all" ? jobTypeFilter : undefined,
+  });
 
   console.log("[JobViewHistory] Response from server:", response);
 
   const jobTypes = ["all", "FULL_TIME", "PART_TIME", "CONTRACT", "INTERNSHIP"];
 
   const filteredJobs = useMemo(() => {
-    if (!response?.data) return [];
-
-    return response.data.filter((item: any) => {
-      const job = item.job;
-      const matchesSearch =
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company?.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType =
-        jobTypeFilter === "all" || job.jobType === jobTypeFilter;
-
-      return matchesSearch && matchesType;
-    });
-  }, [response, searchTerm, jobTypeFilter]);
+    const rawHistory = response?.data || [];
+    return rawHistory.map((item) => ({
+      ...item,
+      job: {
+        ...item.job,
+        company: {
+          name: item.job.company?.name || "",
+          logo: item.job.company?.logoUrl || undefined,
+        },
+      },
+    }));
+  }, [response?.data]);
 
   return (
     <div className="min-h-screen pt-16">
@@ -110,23 +121,9 @@ const JobViewHistoryView = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
             <AnimatePresence mode="popLayout">
               {filteredJobs.length > 0 ? (
-                filteredJobs.map((item: any) => {
-                  // Map backend logoUrl to frontend logo for JobCard
-                  const jobWithMappedLogo = {
-                    ...item.job,
-                    company: {
-                      ...item.job.company,
-                      logo: item.job.company.logoUrl,
-                    },
-                  };
-                  return (
-                    <JobCard
-                      key={item.id}
-                      job={jobWithMappedLogo}
-                      inDashboard={true}
-                    />
-                  );
-                })
+                filteredJobs.map((item) => (
+                  <JobCard key={item.id} job={item.job} inDashboard={true} />
+                ))
               ) : (
                 <div className="bg-card col-span-full flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
                   <div className="bg-muted/20 rounded-full p-6">

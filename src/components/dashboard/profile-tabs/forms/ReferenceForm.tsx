@@ -11,16 +11,19 @@ interface ReferenceFormProps {
   onSubmit: (data: ReferenceFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<ReferenceFormData>;
 }
 
 export const ReferenceForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: ReferenceFormProps) => {
   return (
     <WkForm<ReferenceFormData>
       onSubmit={onSubmit}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(referenceSchema)}
     >
       <div className="space-y-4">

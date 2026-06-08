@@ -66,10 +66,17 @@ const companyApi = baseApi.injectEndpoints({
     }),
 
     getEmployerAnalytics: builder.query({
-      query: (period: string) => ({
+      query: (params: {
+        period: string;
+        jobSortBy?: string;
+        jobSortOrder?: string;
+        jobSearch?: string;
+        jobPage?: number;
+        jobLimit?: number;
+      }) => ({
         url: "/company/employer-analytics",
         method: "GET",
-        params: { period },
+        params,
       }),
       providesTags: ["company"],
     }),
@@ -94,6 +101,7 @@ export const {
   useGetMyCompanyQuery,
   useGetCompanyOverviewStatisticsQuery,
   useGetEmployerAnalyticsQuery,
+  useLazyGetEmployerAnalyticsQuery,
   useUpdateCompanySettingsMutation,
   useUpdateCompanyByIdMutation,
 } = companyApi;

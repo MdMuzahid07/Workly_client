@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardFollowedCompaniesHeader from "@/components/dashboard/dashboard-nav/header/DashboardFollowedCompaniesHeader";
@@ -18,46 +17,83 @@ import { AnimatePresence } from "framer-motion";
 import FollowedCompaniesSkeleton from "@/skeleton/followed-company/FollowedCompaniesSkeleton";
 import { Search } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+export interface DisplayFollowedCompany {
+  id: string;
+  slug: string;
+  name: string;
+  logo: string;
+  industry: string;
+  description?: string;
+  location: string;
+  followedSince: string;
+  openPositions: number;
+}
+
+interface CompanyIndustry {
+  id: string;
+  name: string;
+}
+
+interface FollowedCompanyInfo {
+  id: string;
+  slug: string;
+  name: string;
+  logoUrl?: string;
+  description?: string;
+  location?: string;
+  industry?: CompanyIndustry;
+  _count?: {
+    jobs: number;
+  };
+}
+
+interface FollowedCompanyItem {
+  id: string;
+  userId: string;
+  companyId: string;
+  followedAt: string;
+  company: FollowedCompanyInfo;
+}
 
 const FollowedCompaniesView = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  const { data: followedData, isLoading } =
-    useGetFollowedCompaniesQuery(undefined);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const { data: followedData, isLoading } = useGetFollowedCompaniesQuery({
+    search: debouncedSearch || undefined,
+    industry: categoryFilter !== "all" ? categoryFilter : undefined,
+  });
 
   const followedCompanies = useMemo(() => {
     if (!followedData?.data) return [];
 
-    return followedData.data.map((follow: any) => ({
+    return (followedData.data as FollowedCompanyItem[]).map((follow) => ({
       id: follow.company.id,
       slug: follow.company.slug,
       name: follow.company.name,
       logo: follow.company.logoUrl || "/placeholder-logo.png",
       industry: follow.company.industry?.name || "Other",
-      description: follow.company.description,
+      description: follow.company.description || "",
       location: follow.company.location || "Remote",
       followedSince: follow.followedAt,
       openPositions: follow.company._count?.jobs || 0,
     }));
   }, [followedData]);
 
-  const filteredCompanies = useMemo(() => {
-    return followedCompanies.filter((company: any) => {
-      const matchesSearch = company.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesCategory =
-        categoryFilter === "all" || company.industry === categoryFilter;
-      return matchesSearch && matchesCategory;
-    });
-  }, [followedCompanies, searchTerm, categoryFilter]);
-
   const industries = useMemo(() => {
-    const allIndustries = followedCompanies.map((c: any) => c.industry);
-    return ["all", ...Array.from(new Set(allIndustries))];
-  }, [followedCompanies]);
+    return ["all", ...(followedData?.meta?.industries || [])];
+  }, [followedData?.meta?.industries]);
 
   return (
     <div className="min-h-screen pt-16">
@@ -95,7 +131,7 @@ const FollowedCompaniesView = () => {
                       <SelectValue placeholder="All industries" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                      {industries.map((ind: any) => (
+                      {industries.map((ind: string) => (
                         <SelectItem
                           key={ind}
                           className="cursor-pointer rounded-lg font-medium"
@@ -122,14 +158,16 @@ const FollowedCompaniesView = () => {
           {/* Companies Grid */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
-              {filteredCompanies.length > 0 ? (
-                filteredCompanies.map((company: any, index: number) => (
-                  <FollowedCompanyCard
-                    key={company.id}
-                    company={company}
-                    index={index}
-                  />
-                ))
+              {followedCompanies.length > 0 ? (
+                followedCompanies.map(
+                  (company: DisplayFollowedCompany, index: number) => (
+                    <FollowedCompanyCard
+                      key={company.id}
+                      company={company}
+                      index={index}
+                    />
+                  ),
+                )
               ) : (
                 <div className="bg-card col-span-full flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
                   <div className="bg-muted/20 rounded-full p-6">

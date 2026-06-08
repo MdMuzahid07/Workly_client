@@ -1,5 +1,8 @@
-import { ChevronDown, Download, LayoutDashboard } from "lucide-react";
+import { useEffect } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { Download, LayoutDashboard } from "lucide-react";
 import type { EmployerAnalyticsPeriod } from "@/types/employerAnalytics";
+import WKSelect from "@/components/form/WkSelect";
 import { Button } from "../../../ui/button";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
@@ -8,6 +11,7 @@ type DashboardAnalyticsHeaderProps = {
   setTimeRange: (range: EmployerAnalyticsPeriod) => void;
   onExportReport?: () => void;
   exportDisabled?: boolean;
+  isExporting?: boolean;
 };
 
 const DashboardAnalyticsHeader = ({
@@ -15,7 +19,27 @@ const DashboardAnalyticsHeader = ({
   setTimeRange,
   onExportReport,
   exportDisabled,
+  isExporting = false,
 }: DashboardAnalyticsHeaderProps) => {
+  const methods = useForm({
+    defaultValues: {
+      period: timeRange,
+    },
+  });
+
+  const periodValue = methods.watch("period");
+
+  useEffect(() => {
+    if (timeRange && methods.getValues("period") !== timeRange) {
+      methods.setValue("period", timeRange);
+    }
+  }, [timeRange, methods]);
+
+  useEffect(() => {
+    if (periodValue && periodValue !== timeRange) {
+      setTimeRange(periodValue as EmployerAnalyticsPeriod);
+    }
+  }, [periodValue, timeRange, setTimeRange]);
   return (
     <DashboardHeaderContainer>
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -33,35 +57,36 @@ const DashboardAnalyticsHeader = ({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <div className="relative">
-            <label htmlFor="analytics-period" className="sr-only">
-              Reporting period
-            </label>
-            <select
-              id="analytics-period"
-              value={timeRange}
-              onChange={(e) =>
-                setTimeRange(e.target.value as EmployerAnalyticsPeriod)
-              }
-              className="bg-muted/50 border-input text-foreground focus:ring-primary/20 h-9 w-full appearance-none rounded-full border-none px-4 pr-10 text-xs font-bold transition-all focus:ring-2 focus:outline-none sm:h-10 sm:w-auto sm:text-sm"
-            >
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="90d">Last 90 days</option>
-              <option value="1y">Last year</option>
-            </select>
-            <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 opacity-50" />
-          </div>
+          <FormProvider {...methods}>
+            <WKSelect
+              name="period"
+              label="Reporting period"
+              hideLabel
+              options={[
+                { value: "7d", label: "Last 7 days" },
+                { value: "30d", label: "Last 30 days" },
+                { value: "90d", label: "Last 90 days" },
+                { value: "1y", label: "Last year" },
+              ]}
+              className="bg-muted/50 h-9 w-full cursor-pointer rounded-full border-none px-4 text-xs font-bold shadow-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-10 sm:w-[160px] sm:text-sm"
+            />
+          </FormProvider>
 
           <Button
             type="button"
             variant="outline"
-            disabled={exportDisabled}
+            disabled={exportDisabled || isExporting}
             className="hover:bg-primary/5 hover:text-primary bg-muted/50 h-9 gap-2 rounded-full border-none px-5 font-bold transition-all sm:h-10 sm:px-6"
             onClick={onExportReport}
           >
-            <Download className="h-4 w-4" aria-hidden />
-            <span className="hidden sm:inline">Export Report</span>
+            {isExporting ? (
+              <span className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+            ) : (
+              <Download className="h-4 w-4" aria-hidden />
+            )}
+            <span className="hidden sm:inline">
+              {isExporting ? "Exporting..." : "Export Report"}
+            </span>
           </Button>
         </div>
       </div>

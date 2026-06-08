@@ -15,36 +15,43 @@ export type TimePeriod =
   | "3months"
   | "overall";
 
+export const TIME_PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
+  { value: "7days", label: "Last 7 days" },
+  { value: "14days", label: "Last 14 days" },
+  { value: "lastMonth", label: "Last month" },
+  { value: "3months", label: "Last 3 months" },
+  { value: "overall", label: "All time" },
+];
+
 interface TimePeriodFilterProps {
   value: TimePeriod;
   onChange: (value: TimePeriod) => void;
+  className?: string;
 }
 
-export function TimePeriodFilter({ value, onChange }: TimePeriodFilterProps) {
+export function TimePeriodFilter({
+  value,
+  onChange,
+  className,
+}: TimePeriodFilterProps) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as TimePeriod)}>
       <SelectTrigger
-        className="border-border h-7 w-[130px] cursor-pointer rounded-full text-xs"
+        className={`border-border h-8 w-[140px] cursor-pointer rounded-full text-xs font-medium ${className ?? ""}`}
         aria-label="Select time period"
       >
         <SelectValue placeholder="Select period" />
       </SelectTrigger>
       <SelectContent className="rounded-xl">
-        <SelectItem className="cursor-pointer rounded-lg" value="7days">
-          Last 7 days
-        </SelectItem>
-        <SelectItem className="cursor-pointer rounded-lg" value="14days">
-          Last 14 days
-        </SelectItem>
-        <SelectItem className="cursor-pointer rounded-lg" value="lastMonth">
-          Last month
-        </SelectItem>
-        <SelectItem className="cursor-pointer rounded-lg" value="3months">
-          Last 3 months
-        </SelectItem>
-        <SelectItem className="cursor-pointer rounded-lg" value="overall">
-          Overall
-        </SelectItem>
+        {TIME_PERIOD_OPTIONS.map((opt) => (
+          <SelectItem
+            key={opt.value}
+            className="cursor-pointer rounded-lg text-xs font-medium"
+            value={opt.value}
+          >
+            {opt.label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

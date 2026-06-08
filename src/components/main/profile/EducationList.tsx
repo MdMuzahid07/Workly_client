@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Edit2, GraduationCap, Trash2 } from "lucide-react";
@@ -7,13 +8,20 @@ const EducationList = ({
   certifications = [],
   onAdd,
   onAddCertificate,
+  onEditEdu,
+  onDeleteEdu,
+  onEditCert,
+  onDeleteCert,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   education: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   certifications?: any[];
   onAdd?: () => void;
   onAddCertificate?: () => void;
+  onEditEdu?: (edu: any, index: number) => void;
+  onDeleteEdu?: (index: number) => void;
+  onEditCert?: (cert: any, index: number) => void;
+  onDeleteCert?: (index: number) => void;
 }) => {
   return (
     <div className="space-y-6">
@@ -73,6 +81,7 @@ const EducationList = ({
                     size="icon"
                     variant="ghost"
                     className="text-muted-foreground hover:text-primary h-8 w-8"
+                    onClick={() => onEditEdu?.(edu, index)}
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
@@ -80,6 +89,7 @@ const EducationList = ({
                     size="icon"
                     variant="ghost"
                     className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    onClick={() => onDeleteEdu?.(index)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -132,6 +142,7 @@ const EducationList = ({
                     size="icon"
                     variant="ghost"
                     className="text-muted-foreground hover:text-primary h-8 w-8"
+                    onClick={() => onEditCert?.(cert, index)}
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
@@ -139,6 +150,7 @@ const EducationList = ({
                     size="icon"
                     variant="ghost"
                     className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    onClick={() => onDeleteCert?.(index)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

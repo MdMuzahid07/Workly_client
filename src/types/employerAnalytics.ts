@@ -51,7 +51,15 @@ export interface EmployerAnalyticsPayload {
   hasCompany?: boolean;
   summary: EmployerAnalyticsSummary;
   applicationTrends: EmployerApplicationTrendBucket[];
-  jobPerformance: EmployerJobPerformanceRow[];
+  jobPerformance: {
+    data: EmployerJobPerformanceRow[];
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  };
   departments: EmployerDepartmentSlice[];
   funnelStages: EmployerFunnelStage[];
   conversionMetrics: EmployerConversionMetric[];

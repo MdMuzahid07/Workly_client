@@ -12,16 +12,19 @@ interface AwardFormProps {
   onSubmit: (data: AwardFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<AwardFormData>;
 }
 
 export const AwardForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: AwardFormProps) => {
   return (
     <WkForm<AwardFormData>
       onSubmit={onSubmit}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(awardSchema)}
     >
       <div className="space-y-4">

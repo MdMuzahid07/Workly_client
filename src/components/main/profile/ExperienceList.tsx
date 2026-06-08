@@ -5,10 +5,15 @@ import { Edit2, Trash2 } from "lucide-react";
 const ExperienceList = ({
   experience = [],
   onAdd,
+  onEdit,
+  onDelete,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   experience: any[];
   onAdd?: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onEdit?: (exp: any, index: number) => void;
+  onDelete?: (index: number) => void;
 }) => {
   return (
     <SectionCard
@@ -34,7 +39,9 @@ const ExperienceList = ({
                   <div className="text-muted-foreground mb-1 text-xs tracking-wider uppercase">
                     Designation
                   </div>
-                  <div className="font-medium">{exp.designation}</div>
+                  <div className="font-medium">
+                    {exp.jobTitle || exp.designation}
+                  </div>
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1 text-xs tracking-wider uppercase">
@@ -47,8 +54,21 @@ const ExperienceList = ({
                     Duration
                   </div>
                   <div className="font-medium">
-                    {exp.startDate} -{" "}
-                    {exp.currentlyWorking ? "Present" : exp.endDate}
+                    {exp.startDate
+                      ? new Date(exp.startDate).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                        })
+                      : "N/A"}{" "}
+                    -{" "}
+                    {exp.currentlyWorking || exp.current
+                      ? "Present"
+                      : exp.endDate
+                        ? new Date(exp.endDate).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                          })
+                        : "N/A"}
                   </div>
                 </div>
                 <div>
@@ -77,6 +97,7 @@ const ExperienceList = ({
                   size="icon"
                   variant="ghost"
                   className="text-muted-foreground hover:text-primary h-8 w-8"
+                  onClick={() => onEdit?.(exp, index)}
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
@@ -84,6 +105,7 @@ const ExperienceList = ({
                   size="icon"
                   variant="ghost"
                   className="text-muted-foreground hover:text-destructive h-8 w-8"
+                  onClick={() => onDelete?.(index)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

@@ -28,6 +28,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/overview/ProfileSkeleton";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 
 import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicInfoForm";
 import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
@@ -52,13 +53,23 @@ import { ReferenceForm } from "../../components/dashboard/profile-tabs/forms/Ref
 import { SoftSkillsForm } from "../../components/dashboard/profile-tabs/forms/SoftSkillsForm";
 import { VolunteerForm } from "../../components/dashboard/profile-tabs/forms/VolunteerForm";
 import { Button } from "../../components/ui/button";
+import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
-const createLocalProfile = (userData: any) => ({
-  ...userData.profile,
-  fullName: userData.fullName,
-  email: userData.email,
-  phone: userData.phone,
-});
+const createLocalProfile = (userData: any) => {
+  const profile = userData.profile || {};
+  const education = (profile.education || []).map((edu: any) => ({
+    ...edu,
+    institute: edu.institute || edu.institution || "",
+    result: edu.result || edu.grade || "",
+  }));
+  return {
+    ...profile,
+    education,
+    fullName: userData.fullName,
+    email: userData.email,
+    phone: userData.phone,
+  };
+};
 
 const stableStringify = (value: any): string => {
   if (Array.isArray(value)) {
@@ -74,6 +85,17 @@ const stableStringify = (value: any): string => {
   }
 
   return JSON.stringify(value);
+};
+
+const formatDateForInput = (dateString?: string | Date) => {
+  if (!dateString) return "";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split("T")[0];
+  } catch {
+    return "";
+  }
 };
 
 const ProfileView = () => {
@@ -104,6 +126,56 @@ const ProfileView = () => {
   // Local state to track all changes before global save
   const [localProfile, setLocalProfile] = useState<any>(null);
   const [savedProfile, setSavedProfile] = useState<any>(null);
+
+  const [editingExperience, setEditingExperience] = useState<any>(null);
+  const [editingExperienceIndex, setEditingExperienceIndex] = useState<
+    number | null
+  >(null);
+  const [experienceToDeleteIndex, setExperienceToDeleteIndex] = useState<
+    number | null
+  >(null);
+
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [editingProjectIndex, setEditingProjectIndex] = useState<number | null>(
+    null,
+  );
+  const [projectToDeleteIndex, setProjectToDeleteIndex] = useState<
+    number | null
+  >(null);
+
+  const [editingVolunteer, setEditingVolunteer] = useState<any>(null);
+  const [editingVolunteerIndex, setEditingVolunteerIndex] = useState<
+    number | null
+  >(null);
+  const [volunteerToDeleteIndex, setVolunteerToDeleteIndex] = useState<
+    number | null
+  >(null);
+
+  const [editingEdu, setEditingEdu] = useState<any>(null);
+  const [editingEduIndex, setEditingEduIndex] = useState<number | null>(null);
+  const [eduToDeleteIndex, setEduToDeleteIndex] = useState<number | null>(null);
+
+  const [editingCert, setEditingCert] = useState<any>(null);
+  const [editingCertIndex, setEditingCertIndex] = useState<number | null>(null);
+  const [certToDeleteIndex, setCertToDeleteIndex] = useState<number | null>(
+    null,
+  );
+
+  const [editingAward, setEditingAward] = useState<any>(null);
+  const [editingAwardIndex, setEditingAwardIndex] = useState<number | null>(
+    null,
+  );
+  const [awardToDeleteIndex, setAwardToDeleteIndex] = useState<number | null>(
+    null,
+  );
+
+  const [editingPub, setEditingPub] = useState<any>(null);
+  const [editingPubIndex, setEditingPubIndex] = useState<number | null>(null);
+  const [pubToDeleteIndex, setPubToDeleteIndex] = useState<number | null>(null);
+
+  const [editingRef, setEditingRef] = useState<any>(null);
+  const [editingRefIndex, setEditingRefIndex] = useState<number | null>(null);
+  const [refToDeleteIndex, setRefToDeleteIndex] = useState<number | null>(null);
 
   // Initialize local state when data loads
   useEffect(() => {
@@ -189,27 +261,7 @@ const ProfileView = () => {
     });
   };
 
-  const calculateProgress = () => {
-    let progress = 20; // Base: Account Created
-    if (localProfile?.avatarUrl) progress += 5;
-    if (localProfile?.bio) progress += 5;
-    if (localProfile?.location) progress += 5;
-    if (localProfile?.headline) progress += 5;
-    if (localProfile?.skills?.length > 0) progress += 10;
-    if (localProfile?.education?.length > 0) progress += 10;
-    if (localProfile?.workExperiences?.length > 0) progress += 10;
-    if (localProfile?.projects?.length > 0) progress += 5;
-    if (localProfile?.volunteers?.length > 0) progress += 5;
-    if (localProfile?.awards?.length > 0) progress += 5;
-    if (localProfile?.publications?.length > 0) progress += 5;
-    if (localProfile?.references?.length > 0) progress += 5;
-    if (localProfile?.languages?.length > 0) progress += 5;
-    if (localProfile?.address) progress += 5;
-    if (localProfile?.preference) progress += 5;
-    return Math.min(progress, 100);
-  };
-
-  const progress = calculateProgress();
+  const progress = calculateJobSeekerProfileCompletion(localProfile);
 
   if (isLoading && !data) {
     return <ProfileSkeleton />;
@@ -371,13 +423,23 @@ const ProfileView = () => {
 
             {/* Portfolio Section */}
             <PortfolioSection
-              videoResumeUrl={localProfile?.resumeUrl || ""}
+              videoResumeUrl={localProfile?.videoResumeUrl || ""}
               socialLinks={{
                 linkedin: localProfile?.linkedInUrl || "",
                 github: localProfile?.githubUrl || "",
                 website: localProfile?.websiteUrl || "",
+                twitter: localProfile?.twitterUrl || "",
+                facebook: localProfile?.facebookUrl || "",
               }}
-              onAddVideoResume={() => setActiveModal("video")}
+              onAddVideoResume={() => {
+                if (!user?.isPremium) {
+                  toast.error(
+                    "Video Resume is a premium feature. Please upgrade your account.",
+                  );
+                  return;
+                }
+                setActiveModal("video");
+              }}
               onEditSocials={() => setActiveModal("social")}
             />
 
@@ -443,15 +505,51 @@ const ProfileView = () => {
           >
             <ExperienceList
               experience={localProfile?.workExperiences || []}
-              onAdd={() => setActiveModal("experience")}
+              onAdd={() => {
+                setEditingExperience(null);
+                setEditingExperienceIndex(null);
+                setActiveModal("experience");
+              }}
+              onEdit={(exp, index) => {
+                setEditingExperience(exp);
+                setEditingExperienceIndex(index);
+                setActiveModal("experience");
+              }}
+              onDelete={(index) => {
+                setExperienceToDeleteIndex(index);
+              }}
             />
             <ProjectList
               projects={localProfile?.projects || []}
-              onAdd={() => setActiveModal("project")}
+              onAdd={() => {
+                setEditingProject(null);
+                setEditingProjectIndex(null);
+                setActiveModal("project");
+              }}
+              onEdit={(project, index) => {
+                setEditingProject(project);
+                setEditingProjectIndex(index);
+                setActiveModal("project");
+              }}
+              onDelete={(index) => {
+                setProjectToDeleteIndex(index);
+              }}
             />
             <VolunteerSection
               volunteer={localProfile?.volunteers || []}
-              onAdd={() => setActiveModal("volunteer")}
+              onAdd={() => {
+                setEditingVolunteer(null);
+                setEditingVolunteerIndex(null);
+                setActiveModal("volunteer");
+              }}
+              onEdit={(vol, index) => {
+                setEditingVolunteer(vol);
+                setEditingVolunteerIndex(index);
+                setActiveModal("volunteer");
+              }}
+              onDelete={(index) => {
+                setVolunteerToDeleteIndex(index);
+              }}
             />
           </TabsContent>
 
@@ -463,16 +561,76 @@ const ProfileView = () => {
             <EducationList
               education={localProfile?.education || []}
               certifications={localProfile?.certifications || []}
-              onAdd={() => setActiveModal("education")}
-              onAddCertificate={() => setActiveModal("certification")}
+              onAdd={() => {
+                setEditingEdu(null);
+                setEditingEduIndex(null);
+                setActiveModal("education");
+              }}
+              onAddCertificate={() => {
+                setEditingCert(null);
+                setEditingCertIndex(null);
+                setActiveModal("certification");
+              }}
+              onEditEdu={(edu, index) => {
+                setEditingEdu(edu);
+                setEditingEduIndex(index);
+                setActiveModal("education");
+              }}
+              onDeleteEdu={(index) => {
+                setEduToDeleteIndex(index);
+              }}
+              onEditCert={(cert, index) => {
+                setEditingCert(cert);
+                setEditingCertIndex(index);
+                setActiveModal("certification");
+              }}
+              onDeleteCert={(index) => {
+                setCertToDeleteIndex(index);
+              }}
             />
             <AdditionalInfo
               awards={localProfile?.awards || []}
               publications={localProfile?.publications || []}
               references={localProfile?.references || []}
-              onAddAward={() => setActiveModal("award")}
-              onAddPublication={() => setActiveModal("publication")}
-              onAddReference={() => setActiveModal("reference")}
+              onAddAward={() => {
+                setEditingAward(null);
+                setEditingAwardIndex(null);
+                setActiveModal("award");
+              }}
+              onAddPublication={() => {
+                setEditingPub(null);
+                setEditingPubIndex(null);
+                setActiveModal("publication");
+              }}
+              onAddReference={() => {
+                setEditingRef(null);
+                setEditingRefIndex(null);
+                setActiveModal("reference");
+              }}
+              onEditAward={(award, index) => {
+                setEditingAward(award);
+                setEditingAwardIndex(index);
+                setActiveModal("award");
+              }}
+              onDeleteAward={(index) => {
+                setAwardToDeleteIndex(index);
+              }}
+              onEditPublication={(pub, index) => {
+                setEditingPub(pub);
+                setEditingPubIndex(index);
+                setActiveModal("publication");
+              }}
+              onDeletePublication={(index) => {
+                setPubToDeleteIndex(index);
+              }}
+              onEditReference={(ref, index) => {
+                setEditingRef(ref);
+                setEditingRefIndex(index);
+                setActiveModal("reference");
+              }}
+              onDeleteReference={(index) => {
+                setRefToDeleteIndex(index);
+              }}
             />
           </TabsContent>
 
@@ -505,23 +663,61 @@ const ProfileView = () => {
 
       <Dialog
         open={!!activeModal}
-        onOpenChange={(open) => !open && setActiveModal(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveModal(null);
+            setEditingExperience(null);
+            setEditingExperienceIndex(null);
+            setEditingProject(null);
+            setEditingProjectIndex(null);
+            setEditingVolunteer(null);
+            setEditingVolunteerIndex(null);
+            setEditingEdu(null);
+            setEditingEduIndex(null);
+            setEditingCert(null);
+            setEditingCertIndex(null);
+            setEditingAward(null);
+            setEditingAwardIndex(null);
+            setEditingPub(null);
+            setEditingPubIndex(null);
+            setEditingRef(null);
+            setEditingRefIndex(null);
+          }
+        }}
       >
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
               {activeModal === "basic" && "Edit Basic Information"}
-              {activeModal === "education" && "Add Education"}
-              {activeModal === "experience" && "Add Experience"}
-              {activeModal === "project" && "Add Project"}
-              {activeModal === "certification" && "Add Certification"}
+              {activeModal === "education" &&
+                (editingEduIndex !== null ? "Edit Education" : "Add Education")}
+              {activeModal === "experience" &&
+                (editingExperienceIndex !== null
+                  ? "Edit Experience"
+                  : "Add Experience")}
+              {activeModal === "project" &&
+                (editingProjectIndex !== null ? "Edit Project" : "Add Project")}
+              {activeModal === "certification" &&
+                (editingCertIndex !== null
+                  ? "Edit Certification"
+                  : "Add Certification")}
               {activeModal === "social" && "Edit Online Presence"}
               {activeModal === "video" && "Add Video Resume"}
               {activeModal === "address" && "Edit Address Details"}
-              {activeModal === "volunteer" && "Add Volunteer Work"}
-              {activeModal === "award" && "Add Honor / Award"}
-              {activeModal === "publication" && "Add Publication"}
-              {activeModal === "reference" && "Add Reference"}
+              {activeModal === "volunteer" &&
+                (editingVolunteerIndex !== null
+                  ? "Edit Volunteer Work"
+                  : "Add Volunteer Work")}
+              {activeModal === "award" &&
+                (editingAwardIndex !== null
+                  ? "Edit Honor / Award"
+                  : "Add Honor / Award")}
+              {activeModal === "publication" &&
+                (editingPubIndex !== null
+                  ? "Edit Publication"
+                  : "Add Publication")}
+              {activeModal === "reference" &&
+                (editingRefIndex !== null ? "Edit Reference" : "Add Reference")}
               {activeModal === "softSkill" && "Add Soft Skill"}
               {activeModal === "language" && "Add Language"}
               {activeModal === "jobPreference" && "Edit Job Preferences"}
@@ -551,44 +747,232 @@ const ProfileView = () => {
             )}
             {activeModal === "education" && (
               <EducationForm
+                defaultValues={
+                  editingEdu
+                    ? {
+                        level: editingEdu.level || "",
+                        degree: editingEdu.degree || "",
+                        institute: editingEdu.institute || "",
+                        year: editingEdu.year ? String(editingEdu.year) : "",
+                        result: editingEdu.result || "",
+                        currentlyStudying:
+                          editingEdu.currentlyStudying ||
+                          editingEdu.current ||
+                          false,
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newEdu = [...(localProfile?.education || []), data];
+                  let newEdu;
+                  if (
+                    editingEduIndex !== null &&
+                    editingEduIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.education || [])[
+                      editingEduIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                    };
+                    newEdu = [...(localProfile?.education || [])];
+                    newEdu[editingEduIndex] = updatedItem;
+                  } else {
+                    newEdu = [...(localProfile?.education || []), data];
+                  }
                   updateLocalSection("education", newEdu);
+                  setEditingEdu(null);
+                  setEditingEduIndex(null);
+                  toast.success(
+                    editingEduIndex !== null
+                      ? "Education updated locally. Click 'Save Changes' to persist."
+                      : "Education added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingEdu(null);
+                  setEditingEduIndex(null);
+                }}
               />
             )}
             {activeModal === "experience" && (
               <ExperienceForm
+                defaultValues={
+                  editingExperience
+                    ? {
+                        designation:
+                          editingExperience.jobTitle ||
+                          editingExperience.designation ||
+                          "",
+                        company: editingExperience.company || "",
+                        employmentType:
+                          editingExperience.employmentType || "Full-time",
+                        location: editingExperience.location || "",
+                        startDate: formatDateForInput(
+                          editingExperience.startDate,
+                        ),
+                        endDate: formatDateForInput(editingExperience.endDate),
+                        currentlyWorking:
+                          editingExperience.currentlyWorking ||
+                          editingExperience.current ||
+                          false,
+                        description: editingExperience.description || "",
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newExp = [
-                    ...(localProfile?.workExperiences || []),
-                    data,
-                  ];
+                  let newExp;
+                  if (
+                    editingExperienceIndex !== null &&
+                    editingExperienceIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.workExperiences || [])[
+                      editingExperienceIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                      jobTitle: data.designation,
+                      current: data.currentlyWorking || false,
+                    };
+                    newExp = [...(localProfile?.workExperiences || [])];
+                    newExp[editingExperienceIndex] = updatedItem;
+                  } else {
+                    newExp = [
+                      ...(localProfile?.workExperiences || []),
+                      {
+                        ...data,
+                        jobTitle: data.designation,
+                        current: data.currentlyWorking || false,
+                      },
+                    ];
+                  }
                   updateLocalSection("workExperiences", newExp);
+                  setEditingExperience(null);
+                  setEditingExperienceIndex(null);
+                  toast.success(
+                    editingExperienceIndex !== null
+                      ? "Experience updated locally. Click 'Save Changes' to persist."
+                      : "Experience added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingExperience(null);
+                  setEditingExperienceIndex(null);
+                }}
               />
             )}
             {activeModal === "project" && (
               <ProjectForm
+                defaultValues={
+                  editingProject
+                    ? {
+                        title: editingProject.title || "",
+                        description: editingProject.description || "",
+                        technologies: editingProject.technologies || [],
+                        projectUrl: editingProject.projectUrl || "",
+                        repoUrl: editingProject.repoUrl || "",
+                        startDate: formatDateForInput(editingProject.startDate),
+                        endDate: formatDateForInput(editingProject.endDate),
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newProj = [...(localProfile?.projects || []), data];
+                  let newProj;
+                  if (
+                    editingProjectIndex !== null &&
+                    editingProjectIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.projects || [])[
+                      editingProjectIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                    };
+                    newProj = [...(localProfile?.projects || [])];
+                    newProj[editingProjectIndex] = updatedItem;
+                  } else {
+                    newProj = [...(localProfile?.projects || []), data];
+                  }
                   updateLocalSection("projects", newProj);
+                  setEditingProject(null);
+                  setEditingProjectIndex(null);
+                  toast.success(
+                    editingProjectIndex !== null
+                      ? "Project updated locally. Click 'Save Changes' to persist."
+                      : "Project added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingProject(null);
+                  setEditingProjectIndex(null);
+                }}
               />
             )}
             {activeModal === "certification" && (
               <CertificationForm
+                defaultValues={
+                  editingCert
+                    ? {
+                        name: editingCert.name || "",
+                        organization:
+                          editingCert.issuingOrg ||
+                          editingCert.organization ||
+                          "",
+                        credentialId: editingCert.credentialId || "",
+                        issueDate: formatDateForInput(editingCert.issueDate),
+                        expirationDate: formatDateForInput(
+                          editingCert.expiryDate || editingCert.expirationDate,
+                        ),
+                        credentialUrl: editingCert.credentialUrl || "",
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newCert = [
-                    ...(localProfile?.certifications || []),
-                    data,
-                  ];
+                  let newCert;
+                  if (
+                    editingCertIndex !== null &&
+                    editingCertIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.certifications || [])[
+                      editingCertIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                      issuingOrg: data.organization,
+                      expiryDate: data.expirationDate,
+                    };
+                    newCert = [...(localProfile?.certifications || [])];
+                    newCert[editingCertIndex] = updatedItem;
+                  } else {
+                    newCert = [
+                      ...(localProfile?.certifications || []),
+                      {
+                        ...data,
+                        issuingOrg: data.organization,
+                        expiryDate: data.expirationDate,
+                      },
+                    ];
+                  }
                   updateLocalSection("certifications", newCert);
+                  setEditingCert(null);
+                  setEditingCertIndex(null);
+                  toast.success(
+                    editingCertIndex !== null
+                      ? "Certification updated locally. Click 'Save Changes' to persist."
+                      : "Certification added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingCert(null);
+                  setEditingCertIndex(null);
+                }}
               />
             )}
             {activeModal === "social" && (
@@ -597,6 +981,8 @@ const ProfileView = () => {
                   linkedin: localProfile?.linkedInUrl || "",
                   github: localProfile?.githubUrl || "",
                   website: localProfile?.websiteUrl || "",
+                  twitter: localProfile?.twitterUrl || "",
+                  facebook: localProfile?.facebookUrl || "",
                 }}
                 onSubmit={async (data) => {
                   setLocalProfile((prev: any) => ({
@@ -604,6 +990,8 @@ const ProfileView = () => {
                     linkedInUrl: data.linkedin,
                     githubUrl: data.github,
                     websiteUrl: data.website,
+                    twitterUrl: data.twitter,
+                    facebookUrl: data.facebook,
                   }));
                   setActiveModal(null);
                   toast.success(
@@ -616,12 +1004,12 @@ const ProfileView = () => {
             {activeModal === "video" && (
               <VideoResumeForm
                 defaultValues={{
-                  videoUrl: localProfile?.resumeUrl || "",
+                  videoUrl: localProfile?.videoResumeUrl || "",
                 }}
                 onSubmit={async (data) => {
                   setLocalProfile((prev: any) => ({
                     ...prev,
-                    resumeUrl: data.videoUrl,
+                    videoResumeUrl: data.videoUrl,
                   }));
                   setActiveModal(null);
                   toast.success(
@@ -681,38 +1069,228 @@ const ProfileView = () => {
             )}
             {activeModal === "volunteer" && (
               <VolunteerForm
+                defaultValues={
+                  editingVolunteer
+                    ? {
+                        organization: editingVolunteer.organization || "",
+                        role: editingVolunteer.role || "",
+                        startDate: formatDateForInput(
+                          editingVolunteer.startDate,
+                        ),
+                        endDate: formatDateForInput(editingVolunteer.endDate),
+                        currentlyVolunteering:
+                          editingVolunteer.currentlyVolunteering ||
+                          editingVolunteer.current ||
+                          false,
+                        description: editingVolunteer.description || "",
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newVol = [...(localProfile?.volunteers || []), data];
+                  let newVol;
+                  if (
+                    editingVolunteerIndex !== null &&
+                    editingVolunteerIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.volunteers || [])[
+                      editingVolunteerIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                      current: data.currentlyVolunteering || false,
+                    };
+                    newVol = [...(localProfile?.volunteers || [])];
+                    newVol[editingVolunteerIndex] = updatedItem;
+                  } else {
+                    newVol = [
+                      ...(localProfile?.volunteers || []),
+                      {
+                        ...data,
+                        current: data.currentlyVolunteering || false,
+                      },
+                    ];
+                  }
                   updateLocalSection("volunteers", newVol);
+                  setEditingVolunteer(null);
+                  setEditingVolunteerIndex(null);
+                  toast.success(
+                    editingVolunteerIndex !== null
+                      ? "Volunteer work updated locally. Click 'Save Changes' to persist."
+                      : "Volunteer work added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingVolunteer(null);
+                  setEditingVolunteerIndex(null);
+                }}
               />
             )}
             {activeModal === "award" && (
               <AwardForm
+                defaultValues={
+                  editingAward
+                    ? {
+                        title: editingAward.title || "",
+                        organization:
+                          editingAward.issuer ||
+                          editingAward.organization ||
+                          "",
+                        date: formatDateForInput(
+                          editingAward.issueDate || editingAward.date,
+                        ),
+                        description: editingAward.description || "",
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newAward = [...(localProfile?.awards || []), data];
+                  let newAward;
+                  if (
+                    editingAwardIndex !== null &&
+                    editingAwardIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.awards || [])[
+                      editingAwardIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                      issuer: data.organization,
+                      issueDate: data.date,
+                    };
+                    newAward = [...(localProfile?.awards || [])];
+                    newAward[editingAwardIndex] = updatedItem;
+                  } else {
+                    newAward = [
+                      ...(localProfile?.awards || []),
+                      {
+                        ...data,
+                        issuer: data.organization,
+                        issueDate: data.date,
+                      },
+                    ];
+                  }
                   updateLocalSection("awards", newAward);
+                  setEditingAward(null);
+                  setEditingAwardIndex(null);
+                  toast.success(
+                    editingAwardIndex !== null
+                      ? "Award updated locally. Click 'Save Changes' to persist."
+                      : "Award added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingAward(null);
+                  setEditingAwardIndex(null);
+                }}
               />
             )}
             {activeModal === "publication" && (
               <PublicationForm
+                defaultValues={
+                  editingPub
+                    ? {
+                        title: editingPub.title || "",
+                        publisher: editingPub.publisher || "",
+                        date: formatDateForInput(
+                          editingPub.publishDate || editingPub.date,
+                        ),
+                        url: editingPub.link || editingPub.url || "",
+                        description: editingPub.description || "",
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newPub = [...(localProfile?.publications || []), data];
+                  let newPub;
+                  if (
+                    editingPubIndex !== null &&
+                    editingPubIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.publications || [])[
+                      editingPubIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                      link: data.url,
+                      publishDate: data.date,
+                    };
+                    newPub = [...(localProfile?.publications || [])];
+                    newPub[editingPubIndex] = updatedItem;
+                  } else {
+                    newPub = [
+                      ...(localProfile?.publications || []),
+                      {
+                        ...data,
+                        link: data.url,
+                        publishDate: data.date,
+                      },
+                    ];
+                  }
                   updateLocalSection("publications", newPub);
+                  setEditingPub(null);
+                  setEditingPubIndex(null);
+                  toast.success(
+                    editingPubIndex !== null
+                      ? "Publication updated locally. Click 'Save Changes' to persist."
+                      : "Publication added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingPub(null);
+                  setEditingPubIndex(null);
+                }}
               />
             )}
             {activeModal === "reference" && (
               <ReferenceForm
+                defaultValues={
+                  editingRef
+                    ? {
+                        name: editingRef.name || "",
+                        relationship: editingRef.relationship || "",
+                        company: editingRef.company || "",
+                        position: editingRef.position || "",
+                        email: editingRef.email || "",
+                        phone: editingRef.phone || "",
+                      }
+                    : undefined
+                }
                 onSubmit={async (data) => {
-                  const newRef = [...(localProfile?.references || []), data];
+                  let newRef;
+                  if (
+                    editingRefIndex !== null &&
+                    editingRefIndex !== undefined
+                  ) {
+                    const existing = (localProfile?.references || [])[
+                      editingRefIndex
+                    ];
+                    const updatedItem = {
+                      ...existing,
+                      ...data,
+                    };
+                    newRef = [...(localProfile?.references || [])];
+                    newRef[editingRefIndex] = updatedItem;
+                  } else {
+                    newRef = [...(localProfile?.references || []), data];
+                  }
                   updateLocalSection("references", newRef);
+                  setEditingRef(null);
+                  setEditingRefIndex(null);
+                  toast.success(
+                    editingRefIndex !== null
+                      ? "Reference updated locally. Click 'Save Changes' to persist."
+                      : "Reference added locally. Click 'Save Changes' to persist.",
+                  );
                 }}
-                onCancel={() => setActiveModal(null)}
+                onCancel={() => {
+                  setActiveModal(null);
+                  setEditingRef(null);
+                  setEditingRefIndex(null);
+                }}
               />
             )}
             {activeModal === "jobPreference" && (
@@ -731,6 +1309,206 @@ const ProfileView = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmationModal
+        open={experienceToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setExperienceToDeleteIndex(null);
+          }
+        }}
+        title="Delete Work Experience"
+        description="Are you sure you want to delete this work experience?"
+        onConfirm={async () => {
+          if (experienceToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevExp = prev?.workExperiences || [];
+              const nextExp = prevExp.filter(
+                (_: any, i: number) => i !== experienceToDeleteIndex,
+              );
+              return { ...prev, workExperiences: nextExp };
+            });
+            toast.success(
+              "Experience deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={projectToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setProjectToDeleteIndex(null);
+          }
+        }}
+        title="Delete Project"
+        description="Are you sure you want to delete this project?"
+        onConfirm={async () => {
+          if (projectToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevProj = prev?.projects || [];
+              const nextProj = prevProj.filter(
+                (_: any, i: number) => i !== projectToDeleteIndex,
+              );
+              return { ...prev, projects: nextProj };
+            });
+            toast.success(
+              "Project deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={volunteerToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setVolunteerToDeleteIndex(null);
+          }
+        }}
+        title="Delete Volunteer Work"
+        description="Are you sure you want to delete this volunteer work?"
+        onConfirm={async () => {
+          if (volunteerToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevVol = prev?.volunteers || [];
+              const nextVol = prevVol.filter(
+                (_: any, i: number) => i !== volunteerToDeleteIndex,
+              );
+              return { ...prev, volunteers: nextVol };
+            });
+            toast.success(
+              "Volunteer work deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={eduToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEduToDeleteIndex(null);
+          }
+        }}
+        title="Delete Education"
+        description="Are you sure you want to delete this education record?"
+        onConfirm={async () => {
+          if (eduToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevEdu = prev?.education || [];
+              const nextEdu = prevEdu.filter(
+                (_: any, i: number) => i !== eduToDeleteIndex,
+              );
+              return { ...prev, education: nextEdu };
+            });
+            toast.success(
+              "Education record deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={certToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCertToDeleteIndex(null);
+          }
+        }}
+        title="Delete Certification"
+        description="Are you sure you want to delete this certification?"
+        onConfirm={async () => {
+          if (certToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevCert = prev?.certifications || [];
+              const nextCert = prevCert.filter(
+                (_: any, i: number) => i !== certToDeleteIndex,
+              );
+              return { ...prev, certifications: nextCert };
+            });
+            toast.success(
+              "Certification deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={awardToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setAwardToDeleteIndex(null);
+          }
+        }}
+        title="Delete Honor / Award"
+        description="Are you sure you want to delete this honor/award?"
+        onConfirm={async () => {
+          if (awardToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevAward = prev?.awards || [];
+              const nextAward = prevAward.filter(
+                (_: any, i: number) => i !== awardToDeleteIndex,
+              );
+              return { ...prev, awards: nextAward };
+            });
+            toast.success(
+              "Award deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={pubToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPubToDeleteIndex(null);
+          }
+        }}
+        title="Delete Publication"
+        description="Are you sure you want to delete this publication?"
+        onConfirm={async () => {
+          if (pubToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevPub = prev?.publications || [];
+              const nextPub = prevPub.filter(
+                (_: any, i: number) => i !== pubToDeleteIndex,
+              );
+              return { ...prev, publications: nextPub };
+            });
+            toast.success(
+              "Publication deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
+
+      <DeleteConfirmationModal
+        open={refToDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRefToDeleteIndex(null);
+          }
+        }}
+        title="Delete Reference"
+        description="Are you sure you want to delete this reference?"
+        onConfirm={async () => {
+          if (refToDeleteIndex !== null) {
+            setLocalProfile((prev: any) => {
+              const prevRef = prev?.references || [];
+              const nextRef = prevRef.filter(
+                (_: any, i: number) => i !== refToDeleteIndex,
+              );
+              return { ...prev, references: nextRef };
+            });
+            toast.success(
+              "Reference deleted locally. Click 'Save Changes' to persist.",
+            );
+          }
+        }}
+      />
     </div>
   );
 };

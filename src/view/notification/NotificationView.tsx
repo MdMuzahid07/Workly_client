@@ -10,6 +10,7 @@ import {
   useMarkNotificationReadMutation,
 } from "@/redux/feature/notification/notificationApi";
 import { useAppSelector } from "@/redux/hooks";
+import NotificationsSkeleton from "@/skeleton/notification/NotificationsSkeleton";
 import type { NotificationType } from "@/types/notification";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -21,7 +22,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import NotificationCard from "../../components/main/notification/NotificationCard";
-import NotificationsSkeleton from "@/skeleton/notification/NotificationsSkeleton";
 
 interface Notification {
   id: string;
@@ -159,28 +159,28 @@ const NotificationView = () => {
               className="mb-8"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <TabsList className="bg-muted/10 h-10 w-full max-w-lg rounded-full border p-1 sm:w-auto">
+                <TabsList className="bg-muted/10 h-10 w-full rounded-full border">
                   <TabsTrigger
                     value="all"
-                    className="cursor-pointer rounded-full font-bold"
+                    className="w-full cursor-pointer rounded-full font-bold"
                   >
                     All
                   </TabsTrigger>
                   <TabsTrigger
                     value="unread"
-                    className="cursor-pointer rounded-full font-bold"
+                    className="w-full cursor-pointer rounded-full font-bold"
                   >
                     Unread {unreadCount > 0 && `(${unreadCount})`}
                   </TabsTrigger>
                   <TabsTrigger
                     value="applications"
-                    className="cursor-pointer rounded-full font-bold"
+                    className="w-full cursor-pointer rounded-full font-bold"
                   >
                     Applications
                   </TabsTrigger>
                   <TabsTrigger
                     value="messages"
-                    className="cursor-pointer rounded-full font-bold"
+                    className="w-full cursor-pointer rounded-full font-bold"
                   >
                     Messages
                   </TabsTrigger>

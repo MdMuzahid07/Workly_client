@@ -28,6 +28,8 @@ interface JobManagementTabsProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   onStatusChange?: (id: string, status: string) => void;
+  allJobs?: Array<Pick<Job, "id" | "status" | "applications">>;
+  isLoading?: boolean;
 }
 
 const JobManagementTabs = ({
@@ -38,15 +40,23 @@ const JobManagementTabs = ({
   onEdit,
   onDelete,
   onStatusChange,
+  allJobs,
+  isLoading,
 }: JobManagementTabsProps) => {
   const getJobsByStatus = (status: string) => {
     if (status === "all") return filteredJobs;
     return filteredJobs.filter((job) => job.status === status);
   };
 
-  const activeCount = jobs.filter((job) => job.status === "active").length;
-  const closedCount = jobs.filter((job) => job.status === "closed").length;
-  const draftCount = jobs.filter((job) => job.status === "draft").length;
+  const jobsToCount = allJobs || jobs;
+  const activeCount = jobsToCount.filter(
+    (job) => job.status === "active",
+  ).length;
+  const closedCount = jobsToCount.filter(
+    (job) => job.status === "closed",
+  ).length;
+  const draftCount = jobsToCount.filter((job) => job.status === "draft").length;
+  const totalCount = jobsToCount.length;
 
   const renderJobCard = (job: Job) => (
     <DashboardJobCard
@@ -58,13 +68,21 @@ const JobManagementTabs = ({
     />
   );
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
+      </div>
+    );
+  }
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="mb-6 grid w-full grid-cols-4 border p-0 lg:w-auto">
         <TabsTrigger value="all" className="gap-2">
           All Jobs
           <Badge variant="secondary" className="ml-1">
-            {jobs.length}
+            {totalCount}
           </Badge>
         </TabsTrigger>
         <TabsTrigger value="active" className="gap-2">

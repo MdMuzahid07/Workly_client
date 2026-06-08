@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Briefcase, Plus } from "lucide-react";
 import { useState } from "react";
-import CreateNewJobForm from "../../job/CreateNewJobForm";
+import CreateNewJobForm from "@/components/dashboard/job/create-job-form";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
 interface DashboardCompanyJobsHeaderProps {

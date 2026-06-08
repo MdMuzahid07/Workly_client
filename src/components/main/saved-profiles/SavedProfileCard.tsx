@@ -24,6 +24,9 @@ import {
   Phone,
   Trash2,
   User,
+  Github,
+  Twitter,
+  Facebook,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -70,8 +73,12 @@ const SavedProfileCard = ({
       : "Not Specified",
     summary: rawProfile.profile?.bio || "No biography provided.",
     resumeUrl: rawProfile.profile?.resumeUrl,
+    videoResumeUrl: rawProfile.profile?.videoResumeUrl,
     linkedinUrl: rawProfile.profile?.linkedInUrl,
     portfolioUrl: rawProfile.profile?.websiteUrl,
+    githubUrl: rawProfile.profile?.githubUrl,
+    twitterUrl: rawProfile.profile?.twitterUrl,
+    facebookUrl: rawProfile.profile?.facebookUrl,
     availability:
       (rawProfile.profile?.preference?.availability?.toLowerCase() as any) ||
       "immediate",
@@ -284,6 +291,19 @@ const SavedProfileCard = ({
                 </a>
               )}
 
+              {/* GitHub */}
+              {profile.githubUrl && (
+                <a
+                  href={profile.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
+                >
+                  <Github className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">GitHub</span>
+                </a>
+              )}
+
               {/* Portfolio */}
               {profile.portfolioUrl && (
                 <a
@@ -294,6 +314,32 @@ const SavedProfileCard = ({
                 >
                   <Globe className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Portfolio</span>
+                </a>
+              )}
+
+              {/* Twitter */}
+              {profile.twitterUrl && (
+                <a
+                  href={profile.twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
+                >
+                  <Twitter className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Twitter</span>
+                </a>
+              )}
+
+              {/* Facebook */}
+              {profile.facebookUrl && (
+                <a
+                  href={profile.facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
+                >
+                  <Facebook className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Facebook</span>
                 </a>
               )}
             </div>

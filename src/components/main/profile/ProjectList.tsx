@@ -6,10 +6,15 @@ import { Edit2, ExternalLink, Trash2 } from "lucide-react";
 export const ProjectList = ({
   projects = [],
   onAdd,
+  onEdit,
+  onDelete,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   projects: any[];
   onAdd?: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onEdit?: (project: any, index: number) => void;
+  onDelete?: (index: number) => void;
 }) => {
   return (
     <SectionCard
@@ -27,7 +32,7 @@ export const ProjectList = ({
           {projects.map((project, index) => (
             <div
               key={index}
-              className="group bg-card relative rounded-xl border p-5 transition-shadow hover:shadow-md"
+              className="group bg-card relative rounded-xl border p-5"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-2">
@@ -52,14 +57,20 @@ export const ProjectList = ({
                     ))}
                   </div>
                 </div>
-                <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button size="icon" variant="ghost" className="h-8 w-8">
+                <div className="flex gap-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8"
+                    onClick={() => onEdit?.(project, index)}
+                  >
                     <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button
                     size="icon"
                     variant="ghost"
                     className="text-destructive h-8 w-8"
+                    onClick={() => onDelete?.(index)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

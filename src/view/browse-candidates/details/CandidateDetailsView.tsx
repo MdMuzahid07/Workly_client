@@ -5,21 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Award,
+  BadgeCheck,
+  Bookmark,
   Briefcase,
   Calendar,
   Globe,
   GraduationCap,
-  Bookmark,
   Mail,
   MapPin,
   MessageSquare,
   Share2,
   Shield,
   User,
-  BadgeCheck,
+  Video,
+  Linkedin,
+  Github,
+  Twitter,
+  Facebook,
 } from "lucide-react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import {
   useGetCandidateByIdQuery,
@@ -29,8 +35,6 @@ import { useCreateConversationMutation } from "../../../redux/feature/message/me
 import { useLogProfileViewMutation } from "../../../redux/feature/profileView/profileViewApi";
 import { useAppSelector } from "../../../redux/hooks";
 import CandidateDetailsSkeleton from "../../../skeleton/browse-candidates/details/CandidateDetailsSkeleton";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 const CandidateDetailsView = () => {
   const params = useParams();
@@ -284,6 +288,30 @@ const CandidateDetailsView = () => {
               </CardContent>
             </Card>
 
+            {/* Video Resume */}
+            {profile.videoResumeUrl && (
+              <Card className="bg-background/50 overflow-hidden border backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Video className="text-primary h-5 w-5" />
+                    Video Resume / Introduction
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-center bg-black/5 p-6">
+                  <div className="relative aspect-video w-full max-w-3xl overflow-hidden rounded-xl border bg-black shadow-md">
+                    <video
+                      src={profile.videoResumeUrl}
+                      controls
+                      className="h-full w-full object-contain"
+                      preload="metadata"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
               <Card className="bg-background/50 border backdrop-blur-sm">
@@ -440,10 +468,20 @@ const CandidateDetailsView = () => {
                     target="_blank"
                     className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
                   >
-                    <Globe className="text-primary h-5 w-5" />
+                    <Linkedin className="text-primary h-5 w-5" />
                     <span className="text-sm font-medium">
                       LinkedIn Profile
                     </span>
+                  </a>
+                )}
+                {profile.githubUrl && (
+                  <a
+                    href={profile.githubUrl}
+                    target="_blank"
+                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                  >
+                    <Github className="text-primary h-5 w-5" />
+                    <span className="text-sm font-medium">GitHub Profile</span>
                   </a>
                 )}
                 {profile.websiteUrl && (
@@ -455,6 +493,30 @@ const CandidateDetailsView = () => {
                     <Globe className="text-primary h-5 w-5" />
                     <span className="text-sm font-medium">
                       Personal Website
+                    </span>
+                  </a>
+                )}
+                {profile.twitterUrl && (
+                  <a
+                    href={profile.twitterUrl}
+                    target="_blank"
+                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                  >
+                    <Twitter className="text-primary h-5 w-5" />
+                    <span className="text-sm font-medium">
+                      Twitter / X Profile
+                    </span>
+                  </a>
+                )}
+                {profile.facebookUrl && (
+                  <a
+                    href={profile.facebookUrl}
+                    target="_blank"
+                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                  >
+                    <Facebook className="text-primary h-5 w-5" />
+                    <span className="text-sm font-medium">
+                      Facebook Profile
                     </span>
                   </a>
                 )}

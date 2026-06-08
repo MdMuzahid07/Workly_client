@@ -147,7 +147,7 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
 }) {
   return (
     <div className="bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
-      <div className="flex h-14 shrink-0 items-center justify-between px-4 sm:h-16">
+      <div className="flex h-12 shrink-0 items-center justify-between px-4 sm:h-14">
         <WJLogo />
         <span className="pr-10 lg:pr-0">
           <ThemeToggleButtonCompact />
@@ -156,8 +156,8 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
 
       <Separator className="shrink-0 opacity-50" />
 
-      <div className="shrink-0 px-4 py-4">
-        <div className="group border-border/50 bg-card/30 flex items-center gap-3 rounded-lg border p-3">
+      <div className="shrink-0 px-4 py-3">
+        <div className="flex items-center gap-3 px-1 py-1">
           <Avatar className="h-10 w-10 shrink-0">
             <AvatarImage
               src={profile?.avatarUrl || user?.profilePicture}
@@ -205,7 +205,6 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
       </div>
 
       <div className="bg-sidebar border-border/40 mt-auto shrink-0 border-t p-3">
-        <Separator className="mb-3 opacity-50" />
         <nav className="space-y-1">
           {bottomItems.map((item) => (
             <AdminSidebarItem

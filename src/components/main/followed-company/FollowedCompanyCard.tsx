@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useUnfollowCompanyMutation } from "@/redux/feature/follow/followApi";
+import { DisplayFollowedCompany } from "@/view/followed-company/FollowedCompaniesView";
 import { motion } from "framer-motion";
 import { Building2, ExternalLink, Loader2, MapPin, Users2 } from "lucide-react";
 import Image from "next/image";
@@ -11,7 +11,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 interface FollowedCompanyCardProps {
-  company: any;
+  company: DisplayFollowedCompany;
   index: number;
 }
 
@@ -23,6 +23,7 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
     try {
       await unfollowCompany(company.id).unwrap();
       toast.success(`Unfollowed ${company.name}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to unfollow company");
     }

@@ -13,24 +13,26 @@ import { Controller, useFormContext } from "react-hook-form";
 
 interface WKSelectProps {
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   options: { value: string; label: string }[];
   required?: boolean;
   className?: string;
   disabled?: boolean;
   size?: "sm" | "md" | "lg";
+  hideLabel?: boolean;
 }
 
 const WKSelect = ({
   name,
-  label,
+  label = "",
   placeholder,
   options,
   required = false,
   className,
   size = "lg",
   disabled = false,
+  hideLabel = false,
 }: WKSelectProps) => {
   const {
     control,
@@ -47,14 +49,16 @@ const WKSelect = ({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+      {label && !hideLabel && (
+        <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
       <Controller
         name={name}
         control={control}
-        rules={{ required: required ? `${label} is required` : false }}
+        rules={{ required: required ? `${label || name} is required` : false }}
         render={({ field }) => (
           <Select
             onValueChange={field.onChange}

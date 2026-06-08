@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardRecommendedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardRecommendedJobsHeader";
@@ -30,20 +29,62 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+interface JobSkill {
+  id: string;
+  skillName: string;
+}
+
+interface Company {
+  id: string;
+  name: string;
+  logo?: string;
+}
+
+interface RecommendedJob {
+  id: string;
+  title: string;
+  slug: string;
+  discipline: string;
+  description: string;
+  requirements: string[];
+  jobType: string;
+  location: string;
+  experienceLevel: string;
+  isRemote: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+  currency?: string;
+  isFeatured: boolean;
+  matchScore: number;
+  matchReason: string;
+  company: Company;
+  JobSkill: JobSkill[];
+}
 
 const RecommendedJobsView = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState("10");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   const { data: recommendedData } = useGetRecommendedJobsQuery({
     page: currentPage,
     limit: parseInt(limit),
-    search: searchTerm,
+    search: debouncedSearch,
   });
 
-  const jobs = recommendedData?.data || [];
+  const jobs = (recommendedData?.data as RecommendedJob[]) || [];
   const meta = recommendedData?.meta || {
     page: 1,
     limit: 10,
@@ -227,7 +268,7 @@ const RecommendedJobsView = () => {
         <div className="grid grid-cols-1 gap-4 sm:gap-6">
           <AnimatePresence mode="popLayout">
             {jobs.length > 0 ? (
-              jobs.map((job: any, idx: number) => (
+              jobs.map((job: RecommendedJob, idx: number) => (
                 <motion.div
                   key={job.id}
                   initial={{ opacity: 0, y: 15 }}
@@ -260,7 +301,7 @@ const RecommendedJobsView = () => {
   );
 };
 
-const RecommendedJobCard = ({ job }: { job: any }) => (
+const RecommendedJobCard = ({ job }: { job: RecommendedJob }) => (
   <Card className="group bg-card relative overflow-hidden rounded-xl border transition-all">
     <CardContent className="p-5 sm:p-6 md:p-8">
       <div className="flex flex-col gap-6 md:flex-row md:items-center">
@@ -311,7 +352,7 @@ const RecommendedJobCard = ({ job }: { job: any }) => (
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {job.JobSkill.map((skill: any) => (
+            {job.JobSkill.map((skill: JobSkill) => (
               <Badge
                 key={skill.id}
                 variant="secondary"
