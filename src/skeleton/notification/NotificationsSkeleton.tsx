@@ -7,7 +7,7 @@ export default function NotificationsSkeleton() {
   return (
     <div className="animate-pulse space-y-6 px-4 py-8 sm:px-6">
       {/* Filter Tabs */}
-      <div className="bg-muted/10 flex h-10 w-full max-w-lg gap-1 rounded-full border p-1">
+      <div className="bg-muted/10 flex h-10 w-full gap-1 rounded-full border p-1">
         {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton key={i} className="h-8 flex-1 rounded-full" />
         ))}
