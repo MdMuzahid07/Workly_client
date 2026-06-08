@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import {
+  AlertCircle,
   Award,
   Bookmark,
   Building,
@@ -96,10 +97,89 @@ const JobDetailsView = () => {
   }
 
   if (error) {
+    const fetchError = error as any;
+    const errorMessage = fetchError?.data?.message || "";
+
+    let title = "Error Loading Job";
+    let description =
+      "We encountered an issue loading this job listing. Please check your connection and try again.";
+    let icon = (
+      <AlertCircle className="mx-auto h-16 w-16 animate-pulse text-rose-500" />
+    );
+
+    if (
+      errorMessage.toLowerCase().includes("no longer accepting applications") ||
+      errorMessage.toLowerCase().includes("closed")
+    ) {
+      title = "Job Application Closed";
+      description =
+        "This job listing is no longer accepting applications. The employer has closed this position.";
+      icon = (
+        <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+          <Clock className="h-10 w-10 animate-pulse" />
+          <div className="bg-background absolute -right-1 -bottom-1 rounded-full p-1">
+            <div className="text-background rounded-full bg-amber-500 p-0.5">
+              <AlertCircle className="h-3 w-3" />
+            </div>
+          </div>
+        </div>
+      );
+    } else if (errorMessage.toLowerCase().includes("expired")) {
+      title = "Job Posting Expired";
+      description =
+        "This job posting has reached its expiration date and is no longer active.";
+      icon = (
+        <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
+          <Clock className="h-10 w-10" />
+          <div className="bg-background absolute -right-1 -bottom-1 rounded-full p-1">
+            <div className="text-background rounded-full bg-rose-500 p-0.5">
+              <AlertCircle className="h-3 w-3" />
+            </div>
+          </div>
+        </div>
+      );
+    } else if (errorMessage.toLowerCase().includes("not found")) {
+      title = "Job Not Found";
+      description =
+        "The job listing you are trying to view does not exist, has been deleted, or is currently inactive.";
+      icon = (
+        <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-500/10 text-slate-500">
+          <FileText className="h-10 w-10 text-slate-400" />
+          <div className="bg-background absolute -right-1 -bottom-1 rounded-full p-1">
+            <div className="text-background rounded-full bg-rose-500 p-0.5">
+              <AlertCircle className="h-3 w-3" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-destructive text-lg">
-          Error loading job details. Please try again.
+      <div className="flex min-h-[85vh] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <div className="mb-6">{icon}</div>
+          <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
+            {title}
+          </h2>
+          <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+            {description}
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              variant="default"
+              className="rounded-xl px-6 font-bold"
+              onClick={() => (window.location.href = "/jobs")}
+            >
+              Browse Active Jobs
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-xl px-6 font-bold"
+              onClick={() => window.history.back()}
+            >
+              Go Back
+            </Button>
+          </div>
         </div>
       </div>
     );

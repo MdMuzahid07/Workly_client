@@ -1,5 +1,51 @@
 import baseApi from "../../api/baseApi";
 
+export interface CompanyInfo {
+  name: string;
+  logo?: string;
+  logoUrl?: string;
+}
+
+export interface JobSkillInfo {
+  id: string;
+  skillName: string;
+}
+
+export interface SavedJobNestedJob {
+  id: string;
+  title: string;
+  company: CompanyInfo;
+  location: string;
+  salaryMin: number;
+  salaryMax: number;
+  currency: string;
+  jobType: string;
+  createdAt: string;
+  requirements: string;
+  JobSkill: JobSkillInfo[];
+  isFeatured: boolean;
+  isRemote: boolean;
+  isSaved?: boolean;
+}
+
+export interface SavedJobItem {
+  id: string;
+  userId: string;
+  jobId: string;
+  createdAt: string;
+  updatedAt: string;
+  job: SavedJobNestedJob;
+}
+
+export interface SavedJobsResponseMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  companies: string[];
+  expiringSoonCount: number;
+}
+
 const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createProfile: builder.mutation({
@@ -37,11 +83,20 @@ const profileApi = baseApi.injectEndpoints({
       invalidatesTags: ["profile"],
     }),
 
-    getSavedJobs: builder.query({
+    getSavedJobs: builder.query<
+      { data: SavedJobItem[]; meta: SavedJobsResponseMeta },
+      {
+        page?: number;
+        limit?: number;
+        searchTerm?: string;
+        company?: string;
+        status?: string;
+      } | void
+    >({
       query: (params) => ({
         url: "/profile/saved-jobs",
         method: "GET",
-        params,
+        params: params || {},
       }),
       providesTags: ["profile"],
     }),
