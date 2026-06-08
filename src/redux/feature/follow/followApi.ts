@@ -17,9 +17,10 @@ export const followApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.follow, tagTypes.company],
     }),
     getFollowedCompanies: builder.query({
-      query: () => ({
+      query: (params: { search?: string; industry?: string } | undefined) => ({
         url: "/follow/my-follows",
         method: "GET",
+        params,
       }),
       providesTags: [tagTypes.follow],
     }),
