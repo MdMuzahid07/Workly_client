@@ -16,8 +16,7 @@ import {
   MoreHorizontal,
   Users,
 } from "lucide-react";
-import { useState } from "react";
-import JobDetailsSheet from "./DashboardJobDetails";
+import { useRouter } from "next/navigation";
 
 export interface JobCardProps {
   job: {
@@ -45,7 +44,7 @@ const DashboardJobCard = ({
   onDelete,
   onStatusChange,
 }: JobCardProps) => {
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <>
@@ -126,6 +125,9 @@ const DashboardJobCard = ({
                   variant="outline"
                   size="sm"
                   className="border-border bg-transparent"
+                  onClick={() =>
+                    router.push(`/employer/applications?jobId=${job.id}`)
+                  }
                 >
                   View Applications
                 </Button>
@@ -141,10 +143,7 @@ const DashboardJobCard = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        setDetailsOpen(true);
-                      }}
+                      onClick={() => router.push(`/jobs/${job.id}`)}
                     >
                       View Details
                     </DropdownMenuItem>
@@ -185,20 +184,6 @@ const DashboardJobCard = ({
           </div>
         </div>
       </div>
-
-      <JobDetailsSheet
-        jobId={job.id}
-        initialData={{
-          title: job.title,
-          company: job.company,
-          location: job.location,
-          status: job.status,
-          isFeatured: job.isFeatured,
-          isRemote: job.isRemote,
-        }}
-        open={detailsOpen}
-        onOpenChange={setDetailsOpen}
-      />
     </>
   );
 };

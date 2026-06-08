@@ -66,7 +66,7 @@ import {
   XCircle,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import ApplicationFiltersAndSearch from "../../../../components/dashboard/applications/ApplicationFiltersAndSearch";
@@ -159,9 +159,19 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 };
 
 const DashboardJobApplicationView = () => {
+  const searchParams = useSearchParams();
+  const jobIdParam = searchParams.get("jobId");
+
   const [searchValue, setSearchValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedJob, setSelectedJob] = useState("all");
+  const [selectedJob, setSelectedJob] = useState(jobIdParam || "all");
+
+  useEffect(() => {
+    if (jobIdParam) {
+      setSelectedJob(jobIdParam);
+    }
+  }, [jobIdParam]);
+
   const [selectedStatus, setSelectedStatus] = useState<
     ApplicationStatus | "all"
   >("all");

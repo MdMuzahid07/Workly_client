@@ -28,8 +28,10 @@ import {
   useGetMyJobsQuery,
   useUpdateJobMutation,
 } from "@/redux/feature/job/jobApi";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import debounce from "debounce";
+import PaginationBar from "@/components/shared/PaginationBar";
 import CreateNewJobForm from "@/components/dashboard/job/create-job-form";
 import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
@@ -111,13 +113,15 @@ const formatPostedDate = (
 
 const DashboardJobManagementView = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedExperience, setSelectedExperience] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [editingJobId, setEditingJobId] = useState<string | null>(null);
   const [currentEditStep, setCurrentEditStep] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [deleteJob] = useDeleteJobMutation();
   const [updateJob] = useUpdateJobMutation();
@@ -125,6 +129,32 @@ const DashboardJobManagementView = () => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [actionJobId, setActionJobId] = useState<string | null>(null);
+
+  // Debounced search logic
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchQuery(value);
+        setCurrentPage(1);
+      }, 500),
+    [],
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchValue);
+    return () => debouncedSearch.clear();
+  }, [debouncedSearch, searchValue]);
+
+  // Reset page when any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    selectedType,
+    selectedExperience,
+    selectedLocation,
+    activeTab,
+  ]);
 
   const handleStatusChange = async (id: string, status: string) => {
     if (status === "CLOSED") {
@@ -139,7 +169,11 @@ const DashboardJobManagementView = () => {
         `Job ${status === "ACTIVE" ? "published" : "moved to draft"} successfully`,
       );
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to update job status");
+      toast.error(
+        error?.data?.errorSources?.message ||
+          error?.data?.message ||
+          "Failed to update job status",
+      );
     }
   };
 
@@ -160,7 +194,11 @@ const DashboardJobManagementView = () => {
       await updateJob({ id: actionJobId, status: "CLOSED" }).unwrap();
       toast.success("Job closed successfully");
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to close job");
+      toast.error(
+        error?.data?.errorSources?.message ||
+          error?.data?.message ||
+          "Failed to close job",
+      );
     }
     setAlertOpen(false);
     setActionJobId(null);
@@ -171,11 +209,15 @@ const DashboardJobManagementView = () => {
     await deleteJob(actionJobId).unwrap();
     setActionJobId(null);
   };
-  const queryParams = useMemo(() => {
-    const params: Record<string, string> = {};
 
-    if (searchTerm) {
-      params.search = searchTerm;
+  const queryParams = useMemo(() => {
+    const params: Record<string, string> = {
+      page: String(currentPage),
+      limit: "10",
+    };
+
+    if (searchQuery) {
+      params.search = searchQuery;
     }
 
     if (selectedType !== "all") {
@@ -192,13 +234,21 @@ const DashboardJobManagementView = () => {
     }
 
     if (selectedExperience !== "all") {
-      params.experienceLevel = selectedExperience;
+      const expMap: Record<string, string> = {
+        "Entry-level": "Entry",
+        "Mid-level": "Mid",
+        Senior: "Senior",
+        Lead: "Lead",
+      };
+      params.experienceLevel = expMap[selectedExperience] || selectedExperience;
     }
 
     if (selectedLocation === "remote") {
       params.isRemote = "true";
     } else if (selectedLocation === "onsite") {
       params.isRemote = "false";
+    } else if (selectedLocation === "hybrid") {
+      params.location = "hybrid";
     }
 
     if (activeTab === "active") {
@@ -211,14 +261,17 @@ const DashboardJobManagementView = () => {
 
     return params;
   }, [
-    searchTerm,
+    currentPage,
+    searchQuery,
     selectedType,
     selectedExperience,
     selectedLocation,
     activeTab,
   ]);
 
-  const { data: myJobsData } = useGetMyJobsQuery(queryParams);
+  const { data: myJobsData, isLoading: jobsLoading } =
+    useGetMyJobsQuery(queryParams);
+  const { data: allJobsData } = useGetMyJobsQuery({ limit: "1000" });
 
   const jobs: Job[] = useMemo(() => {
     const apiJobs = (myJobsData?.data || []) as {
@@ -253,6 +306,16 @@ const DashboardJobManagementView = () => {
       isFeatured: job.isFeatured,
     }));
   }, [myJobsData]);
+
+  const allJobs = useMemo(() => {
+    const apiJobs = (allJobsData?.data || []) as any[];
+    return apiJobs.map((job) => ({
+      id: job.id,
+      status: mapStatusToDashboardStatus(job.status),
+      applications: job._count?.applications ?? 0,
+    }));
+  }, [allJobsData]);
+
   const filteredJobs = jobs;
 
   return (
@@ -263,7 +326,7 @@ const DashboardJobManagementView = () => {
         setIsCreateModalOpen={setIsCreateModalOpen}
       />
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">
-        <JobStatusCards jobs={jobs} />
+        <JobStatusCards jobs={allJobs} />
 
         <Card className="bg-card rounded-xl border">
           <div className="border-border border-b p-6">
@@ -279,8 +342,8 @@ const DashboardJobManagementView = () => {
 
           <div className="p-6">
             <JobFiltersAndSearch
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
+              searchTerm={searchValue}
+              setSearchTerm={setSearchValue}
               selectedType={selectedType}
               setSelectedType={setSelectedType}
               selectedExperience={selectedExperience}
@@ -297,6 +360,19 @@ const DashboardJobManagementView = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onStatusChange={handleStatusChange}
+              allJobs={allJobs}
+              isLoading={jobsLoading}
+            />
+
+            <PaginationBar
+              meta={{
+                page: myJobsData?.meta?.page || currentPage,
+                limit: myJobsData?.meta?.limit || 10,
+                total: myJobsData?.meta?.total || 0,
+                pages: myJobsData?.meta?.pages || 0,
+              }}
+              onPageChange={setCurrentPage}
+              className="mt-6 border-t pt-6"
             />
           </div>
         </Card>

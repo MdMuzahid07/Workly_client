@@ -15,6 +15,47 @@ import WkForm from "@/components/form/WkForm";
 import { JobFormData, jobSchema, CreateNewJobFormProps } from "./schema";
 import CreateNewJobFormContent from "./CreateNewJobFormContent";
 
+interface ExistingJobSkill {
+  id?: string;
+  skillName: string;
+  experienceYears: number;
+  priority: "HIGH" | "MEDIUM" | "LOW" | "GOOD_TO_HAVE";
+  isRequired: boolean;
+  description?: string;
+}
+
+interface ExistingJob {
+  id: string;
+  title: string;
+  discipline: string;
+  jobType:
+    | "FULL_TIME"
+    | "PART_TIME"
+    | "CONTRACT"
+    | "INTERNSHIP"
+    | "FREELANCE"
+    | "REMOTE";
+  experienceLevel: string;
+  industryId: string;
+  industry?: { id: string; name: string };
+  location: string;
+  companyId: string;
+  isRemote: boolean;
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+  currency?: string | null;
+  description: string;
+  requirements: string[];
+  benefits?: string[] | null;
+  contactEmail?: string | null;
+  applicationDeadline?: string | Date | null;
+  maxApplications?: number | null;
+  isFeatured: boolean;
+  autoCloseApplications: boolean;
+  status: "DRAFT" | "ACTIVE" | "CLOSED" | "EXPIRED";
+  JobSkill?: ExistingJobSkill[];
+}
+
 export default function CreateNewJobForm({
   onClose,
   currentStep,
@@ -37,7 +78,7 @@ export default function CreateNewJobForm({
     },
   );
 
-  const existingJob = existingJobData?.data;
+  const existingJob = existingJobData?.data as ExistingJob | undefined;
 
   const handleSubmit = async (data: JobFormData) => {
     try {
@@ -128,9 +169,9 @@ export default function CreateNewJobForm({
         industryId: existingJob.industryId || existingJob.industry?.id || "",
         location: existingJob.location || "",
         companyId: existingJob.companyId || companyId || "",
-        isRemote: existingJob.isRemote || false,
-        salaryMin: existingJob.salaryMin || null,
-        salaryMax: existingJob.salaryMax || null,
+        isRemote: existingJob.isRemote ?? false,
+        salaryMin: existingJob.salaryMin ?? undefined,
+        salaryMax: existingJob.salaryMax ?? undefined,
         currency: existingJob.currency || "BDT",
         description: existingJob.description || "",
         requirements: existingJob.requirements || [],
@@ -141,11 +182,18 @@ export default function CreateNewJobForm({
               .toISOString()
               .split("T")[0]
           : "",
-        maxApplications: existingJob.maxApplications || 100,
-        isFeatured: existingJob.isFeatured || false,
-        autoCloseApplications: existingJob.autoCloseApplications || true,
+        maxApplications: existingJob.maxApplications ?? undefined,
+        isFeatured: existingJob.isFeatured ?? false,
+        autoCloseApplications: existingJob.autoCloseApplications ?? true,
         status: existingJob.status || "DRAFT",
-        skillsRequired: existingJob.JobSkill || [],
+        skillsRequired:
+          existingJob.JobSkill?.map((skill: ExistingJobSkill) => ({
+            skillName: skill.skillName || "",
+            experienceYears: skill.experienceYears ?? 1,
+            priority: skill.priority || "MEDIUM",
+            isRequired: skill.isRequired ?? true,
+            description: skill.description || "",
+          })) || [],
       };
     }
 
