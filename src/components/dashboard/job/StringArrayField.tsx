@@ -1,9 +1,9 @@
 "use client";
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import { Button } from "../../ui/button";
-import { Input } from "../../ui/input";
-import { JobFormData } from "./CreateNewJobForm";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { JobFormData } from "./create-job-form";
 
 interface StringArrayFieldProps {
   fieldName: "benefits" | "requirements";

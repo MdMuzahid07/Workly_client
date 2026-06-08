@@ -1,12 +1,12 @@
 "use client";
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import WKCheckbox from "../../form/WKCheckbox";
-import WKInput from "../../form/WkInput";
-import WKSelect from "../../form/WkSelect";
-import WKTextArea from "../../form/WkTextArea";
-import { Button } from "../../ui/button";
-import { JobFormData } from "./CreateNewJobForm";
+import WKCheckbox from "@/components/form/WKCheckbox";
+import WKInput from "@/components/form/WkInput";
+import WKSelect from "@/components/form/WkSelect";
+import WKTextArea from "@/components/form/WkTextArea";
+import { Button } from "@/components/ui/button";
+import { JobFormData } from "./create-job-form";
 
 export interface SkillRequired {
   skillName: string;

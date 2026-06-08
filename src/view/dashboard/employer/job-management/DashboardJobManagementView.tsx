@@ -30,7 +30,7 @@ import {
 } from "@/redux/feature/job/jobApi";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import CreateNewJobForm from "../../../../components/dashboard/job/CreateNewJobForm";
+import CreateNewJobForm from "@/components/dashboard/job/create-job-form";
 import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
 interface Job {
