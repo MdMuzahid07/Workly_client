@@ -24,7 +24,8 @@ export default function DashboardLayoutClient({
   }, []);
 
   const isEmployer = user?.role === UserRole.EMPLOYER;
-  const isAdmin = user?.role === UserRole.ADMIN;
+  const isAdmin =
+    user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isJobSeeker =
     user?.role === UserRole.JOB_SEEKER || (!isEmployer && !isAdmin);
@@ -143,6 +144,14 @@ export default function DashboardLayoutClient({
   }
 
   if (isAdminPath) {
+    if (!isAdmin) {
+      return (
+        <div className="bg-primary/2 flex min-h-screen items-center justify-center">
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="bg-background min-h-screen">
         <AdminSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
