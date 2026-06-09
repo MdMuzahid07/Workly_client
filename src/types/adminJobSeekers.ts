@@ -10,6 +10,7 @@ export interface AdminJobSeekerRow {
   experience: string;
   primarySkill: string;
   joinedDate: string;
+  hasResume: boolean;
   socials: {
     github?: string;
     linkedin?: string;
