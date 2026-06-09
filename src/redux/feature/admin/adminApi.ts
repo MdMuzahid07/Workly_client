@@ -257,6 +257,17 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["admin"],
     }),
+    updateStaffRole: builder.mutation<
+      Envelope<unknown>,
+      { userId: string; role: AdminStaffRole }
+    >({
+      query: ({ userId, role }) => ({
+        url: `/admin/staff/${userId}/role`,
+        method: "PATCH",
+        body: { role },
+      }),
+      invalidatesTags: ["admin"],
+    }),
     getJobReports: builder.query<any, any>({
       query: (params) => ({
         url: "/admin/job-reports",
@@ -334,6 +345,7 @@ export const {
   useGetStaffStatsQuery,
   useCreateStaffMutation,
   useSetStaffStatusMutation,
+  useUpdateStaffRoleMutation,
   useGetAuditLogsQuery,
   useLazyGetAuditLogsQuery,
   useGetDashboardOverviewStatsQuery,

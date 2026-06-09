@@ -1,5 +1,6 @@
 "use client";
 
+import AdminStaffPermissionsDialog from "@/components/dashboard/admin/AdminStaffPermissionsDialog";
 import DashboardAdminAdministratorsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminAdministratorsHeader";
 import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
@@ -48,6 +49,7 @@ import {
   useGetStaffStatsQuery,
   useLazyGetAuditLogsQuery,
   useSetStaffStatusMutation,
+  useUpdateStaffRoleMutation,
 } from "@/redux/feature/admin/adminApi";
 import { useAppSelector } from "@/redux/hooks";
 import AdminUsersSkeleton from "@/skeleton/dashboard/admin/AdminUsersSkeleton";
@@ -62,7 +64,6 @@ import debounce from "debounce";
 import {
   Activity,
   AlertTriangle,
-  CheckCircle2,
   ChevronDown,
   Eye,
   Filter,
@@ -95,23 +96,6 @@ const unwrapApiData = <T,>(
     return (payload as ApiEnvelope<T>).data;
   }
   return payload as T;
-};
-
-const ROLE_PERMISSIONS: Record<AdminStaffRole, string[]> = {
-  ADMIN: [
-    "Manage employers, job seekers, jobs, and categories",
-    "Review moderation queues and reported content",
-    "View system audit logs and update portal settings",
-    "Create other Admin accounts",
-    "Cannot create or manage Super Administrators",
-  ],
-  SUPER_ADMIN: [
-    "Full platform administration access",
-    "Create and manage Admin and Super Admin accounts",
-    "Activate or deactivate any staff member",
-    "Access financial, legal, and system configuration areas",
-    "View and export complete audit history",
-  ],
 };
 
 const downloadCsv = (
@@ -227,6 +211,8 @@ const AdminAdministratorsManagementView = () => {
   const [createStaff, { isLoading: isCreating }] = useCreateStaffMutation();
   const [setStaffStatus, { isLoading: isUpdatingStatus }] =
     useSetStaffStatusMutation();
+  const [updateStaffRole, { isLoading: isUpdatingRole }] =
+    useUpdateStaffRoleMutation();
 
   const roleOptions = useMemo(() => {
     const options = [
@@ -337,6 +323,20 @@ const AdminAdministratorsManagementView = () => {
         (error as { data?: { message?: string } })?.data?.message ||
           "Failed to update status",
       );
+    }
+  };
+
+  const handleSaveStaffRole = async (userId: string, role: AdminStaffRole) => {
+    try {
+      await updateStaffRole({ userId, role }).unwrap();
+      toast.success("Staff role updated successfully");
+      setPermissionsTarget(null);
+    } catch (error: unknown) {
+      toast.error(
+        (error as { data?: { message?: string } })?.data?.message ||
+          "Failed to update staff role",
+      );
+      throw error;
     }
   };
 
@@ -817,41 +817,17 @@ const AdminAdministratorsManagementView = () => {
         </div>
       </div>
 
-      <Dialog
+      <AdminStaffPermissionsDialog
         open={Boolean(permissionsTarget)}
         onOpenChange={(open) => {
           if (!open) setPermissionsTarget(null);
         }}
-      >
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Key className="text-primary h-5 w-5" />
-              Role Permissions
-            </DialogTitle>
-            <DialogDescription>
-              Access scope for{" "}
-              <span className="text-foreground font-semibold">
-                {permissionsTarget?.name}
-              </span>{" "}
-              as{" "}
-              <span className="text-foreground font-semibold">
-                {permissionsTarget?.role.replace("_", " ")}
-              </span>
-              .
-            </DialogDescription>
-          </DialogHeader>
-          <ul className="space-y-3 py-2">
-            {permissionsTarget &&
-              ROLE_PERMISSIONS[permissionsTarget.role].map((permission) => (
-                <li key={permission} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{permission}</span>
-                </li>
-              ))}
-          </ul>
-        </DialogContent>
-      </Dialog>
+        staff={permissionsTarget}
+        currentUserId={currentUser?.id}
+        currentUserRole={currentUser?.role}
+        onSaveRole={handleSaveStaffRole}
+        isSaving={isUpdatingRole}
+      />
 
       <AlertDialog
         open={Boolean(statusTarget)}
