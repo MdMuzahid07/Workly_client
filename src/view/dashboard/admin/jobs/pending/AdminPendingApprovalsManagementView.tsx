@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import PaginationBar from "@/components/shared/PaginationBar";
 import {
   useApproveJobAdminMutation,
   useDeleteJobListingMutation,
@@ -43,27 +44,91 @@ import {
   Search,
   ShieldAlert,
   ShieldCheck,
+  X,
   XCircle,
 } from "lucide-react";
-import { Fragment, useState } from "react";
+import debounce from "debounce";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import DashboardAdminPendingApprovalsHeader from "../../../../../components/dashboard/dashboard-nav/header/DashboardAdminPendingApprovalsHeader";
 
 export default function AdminPendingApprovalsManagementView() {
+  const [searchValue, setSearchValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [reviewedTodayCount, setReviewedTodayCount] = useState(18);
 
+  // 300ms debounce — prevents API call on every keystroke
+  const applyDebouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchTerm(value);
+        setPage(1); // Reset to first page on new search
+      }, 300),
+    [],
+  );
+
+  useEffect(() => {
+    applyDebouncedSearch(searchValue);
+    return () => applyDebouncedSearch.clear();
+  }, [searchValue, applyDebouncedSearch]);
+
+  // Reset page when type filter changes
+  const handleTypeChange = (type: string | null) => {
+    setSelectedType(type);
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSearchValue("");
+    setSearchTerm("");
+    setSelectedType(null);
+    setPage(1);
+  };
+
+  const hasActiveFilters = searchValue !== "" || selectedType !== null;
+
   // Live Query from Server (fetching DRAFT jobs for moderation)
-  const { data: jobsResponse, isLoading } = useGetActiveJobsAdminQuery({
+  const {
+    data: jobsResponse,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useGetActiveJobsAdminQuery({
+    page,
+    limit: 10,
     status: "DRAFT",
-    limit: 100,
+    q: searchTerm || undefined,
+    type: selectedType || undefined,
   });
 
   // Live mutations
   const [approveJob] = useApproveJobAdminMutation();
   const [deleteJob] = useDeleteJobListingMutation();
+
+  if (error) {
+    const errorMessage =
+      (error as any)?.data?.message ||
+      (error as any)?.message ||
+      "An unexpected error occurred";
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="text-destructive mx-auto h-12 w-12" />
+          <h2 className="mt-4 text-xl font-bold">
+            Failed to load pending approvals
+          </h2>
+          <p className="text-muted-foreground mt-2">{errorMessage}</p>
+          <Button onClick={() => refetch()} className="mt-6">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <AdminJobsSkeleton />;
@@ -95,6 +160,17 @@ export default function AdminPendingApprovalsManagementView() {
   };
 
   const rawJobs = jobsResponse?.data || [];
+  const rawMeta = jobsResponse?.meta as any;
+
+  // PaginationBar expects { page, limit, total, pages }
+  const paginationMeta = rawMeta
+    ? {
+        page: rawMeta.page ?? page,
+        limit: rawMeta.limit ?? 10,
+        total: rawMeta.total ?? 0,
+        pages: rawMeta.totalPage ?? rawMeta.pages ?? 1,
+      }
+    : null;
 
   // Map and enrich database jobs dynamically with spam filter logic
   const pendingJobs = rawJobs.map((job: any) => {
@@ -117,13 +193,6 @@ export default function AdminPendingApprovalsManagementView() {
     };
   });
 
-  const filteredJobs = pendingJobs.filter(
-    (job) =>
-      (job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedType || job.type === selectedType),
-  );
-
   const typeOptions = [
     { label: "Full Time", value: "FULL_TIME" },
     { label: "Part Time", value: "PART_TIME" },
@@ -134,7 +203,7 @@ export default function AdminPendingApprovalsManagementView() {
   const stats = [
     {
       label: "Total Suspicious",
-      value: isLoading ? "..." : pendingJobs.length,
+      value: isLoading ? "..." : (paginationMeta?.total ?? pendingJobs.length),
       icon: Clock,
       color: "text-amber-500",
     },
@@ -149,7 +218,7 @@ export default function AdminPendingApprovalsManagementView() {
       color: "text-destructive",
     },
     {
-      label: "AI Filter Precision",
+      label: "Filter Accuracy",
       value: "99.4%",
       icon: ShieldAlert,
       color: "text-emerald-500",
@@ -191,11 +260,26 @@ export default function AdminPendingApprovalsManagementView() {
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
+              id="admin-pending-jobs-search"
               placeholder="Search by title, company, or warning..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-muted/50 ring-offset-background focus-visible:ring-primary rounded-full border-none pl-10 focus-visible:ring-1"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="bg-muted/50 ring-offset-background focus-visible:ring-primary rounded-full border-none pr-10 pl-10 focus-visible:ring-1"
             />
+            {/* Clear search button */}
+            {searchValue && (
+              <button
+                onClick={() => {
+                  setSearchValue("");
+                  setSearchTerm("");
+                  setPage(1);
+                }}
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <DropdownMenu>
@@ -213,7 +297,7 @@ export default function AdminPendingApprovalsManagementView() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
-                  onClick={() => setSelectedType(null)}
+                  onClick={() => handleTypeChange(null)}
                   className="cursor-pointer"
                 >
                   All Types
@@ -222,7 +306,7 @@ export default function AdminPendingApprovalsManagementView() {
                 {typeOptions.map((type) => (
                   <DropdownMenuItem
                     key={type.value}
-                    onClick={() => setSelectedType(type.value)}
+                    onClick={() => handleTypeChange(type.value)}
                     className="cursor-pointer"
                   >
                     {type.label}
@@ -231,13 +315,10 @@ export default function AdminPendingApprovalsManagementView() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {(searchTerm || selectedType) && (
+            {hasActiveFilters && (
               <Button
                 variant="ghost"
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedType(null);
-                }}
+                onClick={handleClearFilters}
                 className="text-muted-foreground hover:text-primary rounded-full font-bold"
               >
                 Reset
@@ -248,6 +329,43 @@ export default function AdminPendingApprovalsManagementView() {
 
         {/* Moderation Table */}
         <Card className="bg-card overflow-hidden rounded-xl border">
+          {paginationMeta && (
+            <div className="border-b px-6 py-3">
+              <p className="text-muted-foreground text-xs font-medium">
+                {isFetching ? (
+                  "Loading..."
+                ) : (
+                  <>
+                    Showing{" "}
+                    <span className="text-foreground font-bold">
+                      {Math.min(
+                        (paginationMeta.page - 1) * paginationMeta.limit + 1,
+                        paginationMeta.total,
+                      )}
+                    </span>{" "}
+                    –{" "}
+                    <span className="text-foreground font-bold">
+                      {Math.min(
+                        paginationMeta.page * paginationMeta.limit,
+                        paginationMeta.total,
+                      )}
+                    </span>{" "}
+                    of{" "}
+                    <span className="text-foreground font-bold">
+                      {paginationMeta.total}
+                    </span>{" "}
+                    jobs
+                    {hasActiveFilters && (
+                      <span className="text-primary ml-1 font-semibold">
+                        (filtered)
+                      </span>
+                    )}
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-muted/30">
@@ -262,7 +380,7 @@ export default function AdminPendingApprovalsManagementView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredJobs.map((job) => (
+                {pendingJobs.map((job) => (
                   <Fragment key={job.id}>
                     <TableRow
                       key={job.id}
@@ -518,15 +636,30 @@ export default function AdminPendingApprovalsManagementView() {
             </Table>
           </div>
 
-          {filteredJobs.length === 0 && (
+          {pendingJobs.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="bg-muted mb-4 rounded-full p-4">
-                <ShieldCheck className="text-muted-foreground h-8 w-8" />
+                {hasActiveFilters ? (
+                  <Search className="text-muted-foreground h-8 w-8" />
+                ) : (
+                  <ShieldCheck className="text-muted-foreground h-8 w-8" />
+                )}
               </div>
-              <h3 className="text-lg font-bold">Queue is empty</h3>
+              <h3 className="text-lg font-bold">
+                {hasActiveFilters ? "No matches found" : "Queue is empty"}
+              </h3>
               <p className="text-muted-foreground mx-auto mt-2 max-w-xs">
-                Great job! All submitted postings have been reviewed.
+                {hasActiveFilters
+                  ? "Try adjusting your keywords or clearing the filters to find what you are looking for."
+                  : "Great job! All submitted postings have been reviewed."}
               </p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {paginationMeta && paginationMeta.pages > 1 && (
+            <div className="border-t px-6 py-4">
+              <PaginationBar meta={paginationMeta} onPageChange={setPage} />
             </div>
           )}
         </Card>

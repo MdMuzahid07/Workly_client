@@ -5,7 +5,8 @@ import AddCategoryDialog from "@/components/dashboard/categories/AddCategoryDial
 import AddSubcategoryDialog from "@/components/dashboard/categories/AddSubcategoryDialog";
 import DashboardAdminCategoriesHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminCategoriesHeader";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import debounce from "debounce";
+import { useEffect, useMemo, useState } from "react";
 import AdminCategoriesSkeleton from "@/skeleton/dashboard/admin/AdminCategoriesSkeleton";
 import { CategoryFilterBar } from "./components/CategoryFilterBar";
 import { CategoryStatsGrid } from "./components/CategoryStatsGrid";
@@ -14,6 +15,7 @@ import { CategoryTable } from "./components/CategoryTable";
 import { useGetCategoryStatisticsQuery } from "@/redux/feature/category/categoryApi";
 
 const AdminCategoriesManagementView = () => {
+  const [searchValue, setSearchValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "ACTIVE" | "INACTIVE" | null
@@ -23,6 +25,20 @@ const AdminCategoriesManagementView = () => {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddSubcategoryOpen, setIsAddSubcategoryOpen] = useState(false);
   const [selectedParent, setSelectedParent] = useState<any>(null);
+
+  // 300ms debounce — prevents API call on every keystroke
+  const applyDebouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchTerm(value);
+      }, 300),
+    [],
+  );
+
+  useEffect(() => {
+    applyDebouncedSearch(searchValue);
+    return () => applyDebouncedSearch.clear();
+  }, [searchValue, applyDebouncedSearch]);
 
   const queryParams = {
     search: searchTerm || undefined,
@@ -34,10 +50,13 @@ const AdminCategoriesManagementView = () => {
           : undefined,
   };
 
-  const { data, isLoading, error } = useGetCategoryStatisticsQuery(queryParams);
+  const { data, isLoading, error, refetch } =
+    useGetCategoryStatisticsQuery(queryParams);
 
   const categories = data?.data?.categories || [];
   const summary = data?.data?.summary;
+
+  const hasActiveFilters = searchValue !== "" || statusFilter !== null;
 
   if (isLoading) {
     return <AdminCategoriesSkeleton />;
@@ -56,7 +75,7 @@ const AdminCategoriesManagementView = () => {
               err?.message ||
               "An unexpected error occurred"}
           </p>
-          <Button onClick={() => window.location.reload()} className="mt-6">
+          <Button onClick={() => refetch()} className="mt-6">
             Retry
           </Button>
         </div>
@@ -76,8 +95,8 @@ const AdminCategoriesManagementView = () => {
 
         {/* Filter Bar */}
         <CategoryFilterBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          searchTerm={searchValue}
+          onSearchChange={setSearchValue}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
         />
@@ -86,6 +105,7 @@ const AdminCategoriesManagementView = () => {
         <CategoryTable
           categories={categories}
           isLoading={isLoading}
+          hasActiveFilters={hasActiveFilters}
           onAddSubcategory={(cat) => {
             setSelectedParent(cat);
             setIsAddSubcategoryOpen(true);
