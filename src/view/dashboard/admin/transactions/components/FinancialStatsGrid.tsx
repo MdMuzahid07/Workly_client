@@ -3,38 +3,60 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Banknote, CreditCard, Receipt, TrendingUp } from "lucide-react";
 
-const stats = [
-  {
-    label: "Total Revenue",
-    value: "৳942,500",
-    icon: Banknote,
-    color: "text-primary",
-    trend: "+12.5%",
-  },
-  {
-    label: "Monthly Volume",
-    value: "৳82,480",
-    icon: TrendingUp,
-    color: "text-emerald-500",
-    trend: "+4.2%",
-  },
-  {
-    label: "Pending Invoices",
-    value: "৳13,240",
-    icon: Receipt,
-    color: "text-amber-500",
-    trend: "6 items",
-  },
-  {
-    label: "Success Rate",
-    value: "99.2%",
-    icon: CreditCard,
-    color: "text-blue-500",
-    trend: "+0.8% rise",
-  },
-];
+interface FinancialStatsGridProps {
+  totalRevenue: number;
+  monthlyVolume: number;
+  pendingAmount: number;
+  pendingCount: number;
+  successRate: number;
+  currency?: string;
+  isLoading?: boolean;
+}
 
-export function FinancialStatsGrid() {
+const formatBDT = (amount: number) =>
+  "৳" + amount.toLocaleString("en-BD", { maximumFractionDigits: 0 });
+
+export function FinancialStatsGrid({
+  totalRevenue,
+  monthlyVolume,
+  pendingAmount,
+  pendingCount,
+  successRate,
+  isLoading = false,
+}: FinancialStatsGridProps) {
+  const stats = [
+    {
+      label: "Total Revenue",
+      value: isLoading ? "—" : formatBDT(totalRevenue),
+      icon: Banknote,
+      color: "text-primary",
+      trend: null,
+    },
+    {
+      label: "Monthly Volume",
+      value: isLoading ? "—" : formatBDT(monthlyVolume),
+      icon: TrendingUp,
+      color: "text-emerald-500",
+      trend: null,
+    },
+    {
+      label: "Pending Invoices",
+      value: isLoading ? "—" : formatBDT(pendingAmount),
+      icon: Receipt,
+      color: "text-amber-500",
+      trend: isLoading
+        ? null
+        : `${pendingCount} item${pendingCount !== 1 ? "s" : ""}`,
+    },
+    {
+      label: "Success Rate",
+      value: isLoading ? "—" : `${successRate}%`,
+      icon: CreditCard,
+      color: "text-blue-500",
+      trend: null,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {stats.map((stat, idx) => (
@@ -47,14 +69,16 @@ export function FinancialStatsGrid() {
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
-              <div className="text-2xl font-bold tracking-tight sm:text-3xl">
+              <div
+                className={`text-2xl font-bold tracking-tight sm:text-3xl ${isLoading ? "text-muted-foreground animate-pulse" : ""}`}
+              >
                 {stat.value}
               </div>
-              <span
-                className={`text-[9px] font-bold tracking-widest uppercase ${stat.trend.startsWith("+") ? "text-emerald-500" : "text-muted-foreground opacity-60"}`}
-              >
-                {stat.trend}
-              </span>
+              {stat.trend && (
+                <span className="text-muted-foreground text-[9px] font-bold tracking-widest uppercase opacity-60">
+                  {stat.trend}
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>
