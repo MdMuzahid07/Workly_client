@@ -138,3 +138,38 @@ export const fetchPdfData = async (options: {
 
   return response.arrayBuffer();
 };
+
+/** Download a job seeker resume via the admin proxy endpoint. */
+export const downloadAdminJobSeekerResume = async (
+  userId: string,
+  fileName: string,
+): Promise<void> => {
+  const url = `${API_BASE}/admin/job-seekers/${userId}/resume`;
+  const response = await fetchWithAuth(url);
+
+  if (!response.ok) {
+    let message = "No resume available for this candidate.";
+    try {
+      const payload = await response.json();
+      message = payload?.message || message;
+    } catch {
+      // response body may not be JSON when streaming fails
+    }
+    throw new Error(message);
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    throw new Error("Server returned an error instead of a resume file.");
+  }
+
+  const blob = await response.blob();
+  const objectUrl = window.URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = fileName.endsWith(".pdf") ? fileName : `${fileName}.pdf`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.URL.revokeObjectURL(objectUrl);
+};

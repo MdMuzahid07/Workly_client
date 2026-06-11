@@ -31,6 +31,7 @@ import {
   Plus,
   Power,
   PowerOff,
+  Search,
   Tag,
   Trash2,
   TrendingUp,
@@ -51,6 +52,7 @@ interface CategoryTableProps {
   categories: Category[];
   isLoading?: boolean;
   onAddSubcategory: (cat: Category) => void;
+  hasActiveFilters?: boolean;
 }
 
 const getIcon = (iconName: string) => {
@@ -81,6 +83,7 @@ export function CategoryTable({
   categories,
   isLoading,
   onAddSubcategory,
+  hasActiveFilters,
 }: CategoryTableProps) {
   const [toggleStatus] = useToggleCategoryStatusMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
@@ -262,14 +265,19 @@ export function CategoryTable({
       {!isLoading && categories.length === 0 && (
         <div className="bg-muted/5 flex flex-col items-center justify-center py-24 text-center">
           <div className="bg-primary/10 text-primary/40 mb-6 rounded-4xl p-8 shadow-inner">
-            <LayoutGrid className="h-12 w-12" strokeWidth={1} />
+            {hasActiveFilters ? (
+              <Search className="h-12 w-12" strokeWidth={1} />
+            ) : (
+              <LayoutGrid className="h-12 w-12" strokeWidth={1} />
+            )}
           </div>
           <h3 className="text-xl font-bold tracking-tight">
-            No categories found
+            {hasActiveFilters ? "No matches found" : "No categories found"}
           </h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-sm font-medium opacity-60">
-            Excellent! The category list is currently clear or matches no
-            criteria.
+            {hasActiveFilters
+              ? "Try adjusting your keywords or clearing the filters to find what you are looking for."
+              : "Excellent! The category list is currently clear or matches no criteria."}
           </p>
         </div>
       )}

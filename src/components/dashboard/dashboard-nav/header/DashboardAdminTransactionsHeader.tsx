@@ -2,17 +2,17 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, Receipt } from "lucide-react";
+import { Download, Loader2, Receipt } from "lucide-react";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
 interface DashboardAdminTransactionsHeaderProps {
   onExportClick?: () => void;
-  onNewInvoiceClick?: () => void;
+  isExporting?: boolean;
 }
 
 const DashboardAdminTransactionsHeader = ({
   onExportClick,
-  onNewInvoiceClick,
+  isExporting = false,
 }: DashboardAdminTransactionsHeaderProps) => {
   return (
     <DashboardHeaderContainer>
@@ -39,26 +39,24 @@ const DashboardAdminTransactionsHeader = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onExportClick}
-            className="border-primary/20 hover:bg-primary/5 hidden h-9 rounded-full font-bold shadow-sm sm:flex"
-          >
+        {/* Export CSV only — New Invoice removed (payments are user-initiated) */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onExportClick}
+          disabled={isExporting}
+          className="border-primary/20 hover:bg-primary/5 h-9 rounded-full font-bold shadow-sm"
+        >
+          {isExporting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
             <Download className="mr-2 h-4 w-4" />
-            Export CSV
-          </Button>
-          <Button
-            size="sm"
-            onClick={onNewInvoiceClick}
-            className="h-9 rounded-full font-bold shadow-md"
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            <span className="hidden sm:inline">New Invoice</span>
-            <span className="sm:hidden">New</span>
-          </Button>
-        </div>
+          )}
+          <span className="hidden sm:inline">
+            {isExporting ? "Exporting…" : "Export CSV"}
+          </span>
+          <span className="sm:hidden">CSV</span>
+        </Button>
       </div>
     </DashboardHeaderContainer>
   );

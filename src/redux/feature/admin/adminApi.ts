@@ -11,6 +11,12 @@ import type {
   AdminJobSeekerStatus,
 } from "@/types/adminJobSeekers";
 import type { AdminJobRow, AdminJobStats } from "@/types/adminJobs";
+import type {
+  AdminAuditLogRow,
+  AdminStaffRole,
+  AdminStaffRow,
+  AdminStaffStats,
+} from "@/types/adminStaff";
 
 type Envelope<T> = {
   success: boolean;
@@ -39,6 +45,21 @@ export type AdminJobListArgs = {
   q?: string;
   type?: string | null;
   status?: "ACTIVE" | "DRAFT" | "CLOSED" | "EXPIRED" | null;
+};
+
+export type AdminStaffListArgs = {
+  page?: number;
+  limit?: number;
+  q?: string;
+  role?: AdminStaffRole | null;
+};
+
+export type AdminAuditLogListArgs = {
+  page?: number;
+  limit?: number;
+  staffId?: string;
+  entityType?: string;
+  action?: string;
 };
 
 const adminApi = baseApi.injectEndpoints({
@@ -163,15 +184,20 @@ const adminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["jobs"],
     }),
-    getStaffStats: builder.query<any, void>({
+    getStaffStats: builder.query<Envelope<AdminStaffStats>, void>({
       query: () => ({ url: "/admin/staff/stats", method: "GET" }),
       providesTags: ["admin"],
     }),
-    getStaffList: builder.query<any, any>({
-      query: (params) => ({
+    getStaffList: builder.query<Envelope<AdminStaffRow[]>, AdminStaffListArgs>({
+      query: (args) => ({
         url: "/admin/staff",
         method: "GET",
-        params,
+        params: {
+          page: args.page ?? 1,
+          limit: args.limit ?? 10,
+          q: args.q || undefined,
+          role: args.role || undefined,
+        },
       }),
       providesTags: ["admin"],
     }),
@@ -195,11 +221,20 @@ const adminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["admin"],
     }),
-    getAuditLogs: builder.query<any, any>({
-      query: (params) => ({
+    getAuditLogs: builder.query<
+      Envelope<AdminAuditLogRow[]>,
+      AdminAuditLogListArgs
+    >({
+      query: (args) => ({
         url: "/admin/audit-logs",
         method: "GET",
-        params,
+        params: {
+          page: args.page ?? 1,
+          limit: args.limit ?? 10,
+          staffId: args.staffId || undefined,
+          entityType: args.entityType || undefined,
+          action: args.action || undefined,
+        },
       }),
       providesTags: ["admin"],
     }),
@@ -219,6 +254,17 @@ const adminApi = baseApi.injectEndpoints({
         url: `/admin/staff/${userId}/status`,
         method: "PATCH",
         body: { isActive },
+      }),
+      invalidatesTags: ["admin"],
+    }),
+    updateStaffRole: builder.mutation<
+      Envelope<unknown>,
+      { userId: string; role: AdminStaffRole }
+    >({
+      query: ({ userId, role }) => ({
+        url: `/admin/staff/${userId}/role`,
+        method: "PATCH",
+        body: { role },
       }),
       invalidatesTags: ["admin"],
     }),
@@ -299,7 +345,9 @@ export const {
   useGetStaffStatsQuery,
   useCreateStaffMutation,
   useSetStaffStatusMutation,
+  useUpdateStaffRoleMutation,
   useGetAuditLogsQuery,
+  useLazyGetAuditLogsQuery,
   useGetDashboardOverviewStatsQuery,
   useGetRecentUsersQuery,
   useGetModerationQueueQuery,

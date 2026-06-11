@@ -1,18 +1,26 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Download, ShieldCheck, UserPlus } from "lucide-react";
+import {
+  AlertCircle,
+  Download,
+  Loader2,
+  ShieldCheck,
+  UserPlus,
+} from "lucide-react";
 import { Button } from "../../../ui/button";
 import DashboardHeaderContainer from "./DashboardHeaderContainer";
 
 interface DashboardAdminAdministratorsHeaderProps {
   onAddAdminClick?: () => void;
   onExportClick?: () => void;
+  isExporting?: boolean;
 }
 
 const DashboardAdminAdministratorsHeader = ({
   onAddAdminClick,
   onExportClick,
+  isExporting = false,
 }: DashboardAdminAdministratorsHeaderProps) => {
   return (
     <DashboardHeaderContainer>
@@ -45,10 +53,17 @@ const DashboardAdminAdministratorsHeader = ({
           <Button
             variant="outline"
             onClick={onExportClick}
+            disabled={isExporting}
             className="border-primary/20 text-primary hover:bg-primary/5 rounded-full font-bold sm:flex"
           >
-            <Download className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">Export Logs</span>
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
+            ) : (
+              <Download className="h-4 w-4 sm:mr-2" />
+            )}
+            <span className="hidden sm:inline">
+              {isExporting ? "Exporting..." : "Export Logs"}
+            </span>
           </Button>
           <Button
             onClick={onAddAdminClick}

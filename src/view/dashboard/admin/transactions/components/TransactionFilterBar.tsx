@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Filter, Search } from "lucide-react";
+import { ChevronDown, Filter, Search, X } from "lucide-react";
 
 interface TransactionFilterBarProps {
   searchTerm: string;
@@ -18,38 +18,96 @@ interface TransactionFilterBarProps {
   onStatusFilterChange: (value: string | null) => void;
 }
 
+const STATUS_OPTIONS = [
+  {
+    value: "PAID",
+    label: "Paid",
+    description: "Successfully completed",
+    dot: "bg-emerald-500",
+    text: "text-emerald-600",
+  },
+  {
+    value: "OVERDUE",
+    label: "Overdue",
+    description: "Under manual review",
+    dot: "bg-rose-500",
+    text: "text-rose-600",
+  },
+  {
+    value: "ABANDONED",
+    label: "Abandoned",
+    description: "Checkout opened, not paid",
+    dot: "bg-violet-500",
+    text: "text-violet-600",
+  },
+  {
+    value: "CANCELLED",
+    label: "Cancelled",
+    description: "Payment cancelled by user",
+    dot: "bg-slate-400",
+    text: "text-slate-500",
+  },
+  {
+    value: "REFUNDED",
+    label: "Refunded",
+    description: "Gateway returned failure",
+    dot: "bg-slate-400",
+    text: "text-slate-500",
+  },
+] as const;
+
 export function TransactionFilterBar({
   searchTerm,
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
 }: TransactionFilterBarProps) {
+  const activeOption = STATUS_OPTIONS.find((s) => s.value === statusFilter);
+
   return (
-    <div className="bg-card flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center">
+    <div className="bg-card flex flex-col gap-4 rounded-xl border p-4 sm:flex-row sm:items-center">
       <div className="relative flex-1">
-        <Search className="text-muted-foreground absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 opacity-50" />
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder="Search by invoice ID or company..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="bg-muted/30 ring-offset-background focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold focus-visible:ring-4"
+          className="bg-muted/50 ring-offset-background focus-visible:ring-primary rounded-full border-none pr-10 pl-10 focus-visible:ring-1"
         />
+        {searchTerm && (
+          <button
+            onClick={() => onSearchChange("")}
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+            aria-label="Clear search"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="hover:bg-muted h-11 items-center gap-3 rounded-full border-2 px-6 text-[11px] font-bold tracking-widest uppercase"
+              className="border-primary/20 flex items-center gap-2 rounded-full font-bold"
             >
-              <Filter className="text-primary h-4 w-4" />
-              {statusFilter ? statusFilter : "Settlement Status"}
-              <ChevronDown className="h-4 w-4 opacity-30" />
+              <Filter className="h-4 w-4" />
+              {activeOption ? (
+                <span className="flex items-center gap-1.5">
+                  <span
+                    className={`inline-block h-2 w-2 rounded-full ${activeOption.dot}`}
+                  />
+                  {activeOption.label}
+                </span>
+              ) : (
+                "Settlement Status"
+              )}
+              <ChevronDown className="h-4 w-4 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-52 rounded-xl border p-2 shadow-xl"
+            className="w-60 rounded-xl border p-2 shadow-xl"
           >
             <DropdownMenuItem
               onClick={() => onStatusFilterChange(null)}
@@ -58,13 +116,25 @@ export function TransactionFilterBar({
               All Statuses
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-1 border-dashed" />
-            {["PAID", "UNPAID", "OVERDUE", "REFUNDED"].map((status) => (
+            {STATUS_OPTIONS.map((s) => (
               <DropdownMenuItem
-                key={status}
-                onClick={() => onStatusFilterChange(status)}
-                className={`cursor-pointer rounded-lg py-2.5 font-bold ${status === "PAID" ? "text-emerald-600" : ""}`}
+                key={s.value}
+                onClick={() => onStatusFilterChange(s.value)}
+                className="cursor-pointer rounded-lg py-2 font-bold"
               >
-                {status}
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className={`inline-block h-2 w-2 shrink-0 rounded-full ${s.dot}`}
+                  />
+                  <div>
+                    <p className={`text-sm leading-none font-bold ${s.text}`}>
+                      {s.label}
+                    </p>
+                    <p className="text-muted-foreground mt-0.5 text-[10px] font-medium">
+                      {s.description}
+                    </p>
+                  </div>
+                </div>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -77,9 +147,9 @@ export function TransactionFilterBar({
               onSearchChange("");
               onStatusFilterChange(null);
             }}
-            className="text-muted-foreground hover:text-primary rounded-full text-[10px] font-bold tracking-widest uppercase"
+            className="text-muted-foreground hover:text-primary rounded-full font-bold"
           >
-            Clear Search
+            Reset
           </Button>
         )}
       </div>

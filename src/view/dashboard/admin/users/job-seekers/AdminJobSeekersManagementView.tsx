@@ -30,6 +30,7 @@ import {
   Github,
   Globe,
   Linkedin,
+  Loader2,
   MapPin,
   MoreVertical,
   Search,
@@ -38,10 +39,17 @@ import {
   UserX,
   Users,
 } from "lucide-react";
+import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
+import { downloadAdminJobSeekerResume } from "@/lib/pdfSource";
+import debounce from "debounce";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import DashboardAdminJobSeekersHeader from "../../../../../components/dashboard/dashboard-nav/header/DashboardAdminJobSeekersHeader";
-import type { AdminJobSeekerStatus } from "@/types/adminJobSeekers";
+import type {
+  AdminJobSeekerRow,
+  AdminJobSeekerStatus,
+} from "@/types/adminJobSeekers";
 import {
   useDeleteJobSeekerAdminMutation,
   useGetJobSeekerStatsQuery,
@@ -52,11 +60,32 @@ import {
 import AdminUsersSkeleton from "@/skeleton/dashboard/admin/AdminUsersSkeleton";
 
 const AdminJobSeekersManagementView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedStatus, setSelectedStatus] =
     useState<AdminJobSeekerStatus | null>(null);
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<AdminJobSeekerRow | null>(
+    null,
+  );
+  const [downloadingResumeId, setDownloadingResumeId] = useState<string | null>(
+    null,
+  );
   const limit = 20;
+
+  const applyDebouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setDebouncedSearch(value);
+        setPage(1);
+      }, 300),
+    [],
+  );
+
+  useEffect(() => {
+    applyDebouncedSearch(searchValue);
+    return () => applyDebouncedSearch.clear();
+  }, [applyDebouncedSearch, searchValue]);
 
   const {
     data: statsEnvelope,
@@ -73,7 +102,7 @@ const AdminJobSeekersManagementView = () => {
   } = useGetJobSeekersAdminQuery({
     page,
     limit,
-    q: searchTerm || undefined,
+    q: debouncedSearch || undefined,
     status: selectedStatus,
   });
 
@@ -120,7 +149,12 @@ const AdminJobSeekersManagementView = () => {
     ];
   }, [statsEnvelope]);
 
-  const statusOptions: AdminJobSeekerStatus[] = ["Hired", "Looking", "Active"];
+  const statusOptions: AdminJobSeekerStatus[] = [
+    "Hired",
+    "Looking",
+    "Active",
+    "Suspended",
+  ];
 
   const [suspend, { isLoading: suspending }] =
     useSuspendJobSeekerAdminMutation();
@@ -128,6 +162,52 @@ const AdminJobSeekersManagementView = () => {
     useReactivateJobSeekerAdminMutation();
   const [remove, { isLoading: deleting }] = useDeleteJobSeekerAdminMutation();
   const busy = suspending || reactivating || deleting;
+
+  const handleStatusToggle = async (jobSeeker: AdminJobSeekerRow) => {
+    try {
+      if (jobSeeker.status === "Suspended") {
+        await reactivate(jobSeeker.id).unwrap();
+        toast.success(`${jobSeeker.name} has been reactivated`);
+      } else {
+        await suspend(jobSeeker.id).unwrap();
+        toast.success(`${jobSeeker.name} has been suspended`);
+      }
+    } catch (error: unknown) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Failed to update candidate status";
+      toast.error(message);
+    }
+  };
+
+  const handleDownloadResume = async (jobSeeker: AdminJobSeekerRow) => {
+    if (!jobSeeker.hasResume) {
+      toast.error("No resume available for this candidate");
+      return;
+    }
+
+    setDownloadingResumeId(jobSeeker.id);
+    try {
+      await downloadAdminJobSeekerResume(
+        jobSeeker.id,
+        `${jobSeeker.name.replace(/\s+/g, "-")}-resume.pdf`,
+      );
+      toast.success("Resume downloaded successfully");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to download resume. Please try again.",
+      );
+    } finally {
+      setDownloadingResumeId(null);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    await remove(deleteTarget.id).unwrap();
+  };
 
   if (statsLoading || listLoading) {
     return <AdminUsersSkeleton />;
@@ -168,8 +248,8 @@ const AdminJobSeekersManagementView = () => {
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Search by candidate name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               className="bg-muted/50 ring-offset-background focus-visible:ring-primary rounded-full border-none pl-10 focus-visible:ring-1"
             />
           </div>
@@ -187,7 +267,10 @@ const AdminJobSeekersManagementView = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
-                  onClick={() => setSelectedStatus(null)}
+                  onClick={() => {
+                    setSelectedStatus(null);
+                    setPage(1);
+                  }}
                   className="cursor-pointer"
                 >
                   All Status
@@ -196,7 +279,10 @@ const AdminJobSeekersManagementView = () => {
                 {statusOptions.map((status) => (
                   <DropdownMenuItem
                     key={status}
-                    onClick={() => setSelectedStatus(status)}
+                    onClick={() => {
+                      setSelectedStatus(status);
+                      setPage(1);
+                    }}
                     className="cursor-pointer"
                   >
                     {status}
@@ -205,11 +291,12 @@ const AdminJobSeekersManagementView = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {(searchTerm || selectedStatus) && (
+            {(searchValue || selectedStatus) && (
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setSearchTerm("");
+                  setSearchValue("");
+                  setDebouncedSearch("");
                   setSelectedStatus(null);
                   setPage(1);
                 }}
@@ -336,56 +423,70 @@ const AdminJobSeekersManagementView = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link
-                              href={`/dashboard/profile?userId=${js.id}`}
-                              target="_blank"
+                      {downloadingResumeId === js.id ? (
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          disabled
+                          aria-label="Downloading resume"
+                        >
+                          <Loader2 className="text-primary h-4 w-4 animate-spin" />
+                        </Button>
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                              aria-label="Open actions menu"
                             >
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              View Full Profile
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <FileText className="mr-2 h-4 w-4" />
-                            Download Resume
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <TrendingUp className="mr-2 h-4 w-4" />
-                            Search Analytics
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="cursor-pointer text-amber-600"
-                            disabled={busy}
-                            onClick={() =>
-                              js.status === "Suspended"
-                                ? reactivate(js.id)
-                                : suspend(js.id)
-                            }
-                          >
-                            <UserX className="mr-2 h-4 w-4" />
-                            {js.status === "Suspended"
-                              ? "Reactivate User"
-                              : "Suspend User"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive cursor-pointer"
-                            disabled={busy}
-                            onClick={() => remove(js.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Profile
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              asChild
+                              className="cursor-pointer"
+                            >
+                              <Link
+                                href={`/browse-candidates/${js.id}`}
+                                target="_blank"
+                              >
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                                View Full Profile
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              disabled={!js.hasResume}
+                              onClick={() => handleDownloadResume(js)}
+                            >
+                              <FileText className="mr-2 h-4 w-4" />
+                              Download Resume
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="cursor-pointer text-amber-600"
+                              disabled={busy}
+                              onClick={() => handleStatusToggle(js)}
+                            >
+                              <UserX className="mr-2 h-4 w-4" />
+                              {js.status === "Suspended"
+                                ? "Reactivate User"
+                                : "Suspend User"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive cursor-pointer"
+                              disabled={busy}
+                              onClick={() => setDeleteTarget(js)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete Profile
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -429,6 +530,17 @@ const AdminJobSeekersManagementView = () => {
           </div>
         </div>
       </div>
+
+      <DeleteConfirmationModal
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete candidate profile?"
+        description="This will permanently remove the candidate from the platform and deactivate their account. This action cannot be undone."
+        itemName={deleteTarget?.name}
+      />
     </div>
   );
 };
