@@ -78,6 +78,7 @@ export default function PricingTierCard({
         cusName: user.fullName || "User",
         cusEmail: user.email || "",
         cusPhone: user.phone || "01700000000",
+        frontendUrl: window.location.origin,
       }).unwrap();
 
       if (res?.data?.gatewayUrl) {

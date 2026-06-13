@@ -1,8 +1,8 @@
 "use client";
+import { Badge } from "@/components/ui/badge";
 import { Apple, Play, Smartphone } from "lucide-react";
 import { motion } from "motion/react";
 import HoverHint from "../HoverHint";
-import { Badge } from "@/components/ui/badge";
 
 const MobileAppRecommend = () => {
   return (
@@ -99,7 +99,7 @@ const MobileAppRecommend = () => {
               </HoverHint>
 
               {/* Play Store Button */}
-              <HoverHint hint="Coming soon">
+              <HoverHint hint="Under Development">
                 <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-3.5 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-4.5">
                   {/* Dynamic Gradient Overlay */}
                   <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
