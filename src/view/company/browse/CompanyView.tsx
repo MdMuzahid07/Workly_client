@@ -300,7 +300,7 @@ const CompanyView = ({
 
         {/* All Companies Section */}
         <div className="border-border/40 mt-16 border-t pt-16">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-foreground text-2xl font-extrabold tracking-tight">
                 All Companies
@@ -311,18 +311,19 @@ const CompanyView = ({
               </p>
             </div>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <CompanyFilter
-                selectedFilter={currentIndustry}
-                onFilterChange={handleFilterChange}
-              />
+            <ViewToggle
+              viewType={viewType}
+              onViewChange={setViewType}
+              className="self-start sm:self-auto"
+            />
+          </div>
 
-              <ViewToggle
-                viewType={viewType}
-                onViewChange={setViewType}
-                className="self-start sm:self-auto"
-              />
-            </div>
+          {/* Full-width Category Filters Row */}
+          <div className="mt-8 border-b border-gray-100 pb-4 dark:border-slate-800">
+            <CompanyFilter
+              selectedFilter={currentIndustry}
+              onFilterChange={handleFilterChange}
+            />
           </div>
 
           <main className="mt-10">
