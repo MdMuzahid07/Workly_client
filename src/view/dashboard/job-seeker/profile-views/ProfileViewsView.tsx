@@ -6,7 +6,7 @@ import { Eye } from "lucide-react";
 
 export default function ProfileViewsView() {
   return (
-    <div className="mt-16 min-h-screen">
+    <div className="min-h-screen pt-16">
       {/* ================= Page Header ================= */}
       <DashboardHeaderContainer>
         <div className="flex items-center gap-2 sm:gap-3">

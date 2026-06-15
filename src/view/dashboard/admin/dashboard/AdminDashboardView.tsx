@@ -2,6 +2,7 @@
 "use client";
 
 import AdminDashboardHeader from "@/components/dashboard/dashboard-nav/header/AdminDashboardHeader";
+import { StatCard } from "@/components/shared/StatCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,13 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { StatCard } from "@/components/shared/StatCard";
-import AdminDashboardSkeleton from "@/skeleton/dashboard/admin/AdminDashboardSkeleton";
 import {
   useGetDashboardOverviewStatsQuery,
   useGetModerationQueueQuery,
   useGetRecentUsersQuery,
 } from "@/redux/feature/admin/adminApi";
+import AdminDashboardSkeleton from "@/skeleton/dashboard/admin/AdminDashboardSkeleton";
 import { formatDistanceToNow } from "date-fns";
 import {
   Activity,

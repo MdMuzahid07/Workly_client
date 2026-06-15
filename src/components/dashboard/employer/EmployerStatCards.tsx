@@ -1,6 +1,6 @@
+import { StatCard } from "@/components/shared/StatCard";
 import { EMPLOYER_ROUTES } from "@/constants/employerRoutes";
 import { Briefcase, Eye, TrendingUp, Users } from "lucide-react";
-import { StatCard } from "@/components/shared/StatCard";
 
 type EmployerStatCardsProps = {
   stats: {

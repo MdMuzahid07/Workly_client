@@ -16,47 +16,44 @@ const DashboardAdminPlansHeader = ({
 }: DashboardAdminPlansHeaderProps) => {
   return (
     <DashboardHeaderContainer>
-      <div className="flex h-full min-w-0 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
-            <CreditCard className="text-primary h-6 w-6" />
+      <div className="flex w-full items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <div className="bg-primary/10 ring-primary/5 shrink-0 rounded-lg p-2 ring-4">
+            <CreditCard className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
           </div>
           <div className="min-w-0">
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <h1 className="text-lg font-bold tracking-tight sm:text-xl">
+            <div className="flex items-center gap-2">
+              <h1 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-xl md:text-2xl">
                 Subscription Plans
               </h1>
               <Badge
                 variant="outline"
-                className="border-primary/20 bg-primary/5 text-primary hidden rounded-full px-2 py-0 text-[10px] font-bold tracking-wider uppercase sm:inline-flex"
+                className="border-primary/20 bg-primary/5 text-primary hidden rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase sm:inline-flex"
               >
                 Monetization
               </Badge>
             </div>
-            <p className="text-muted-foreground truncate text-xs font-medium opacity-80 sm:text-sm">
+            <p className="text-muted-foreground hidden truncate text-xs font-medium opacity-80 sm:block sm:text-sm">
               Manage product tiers, pricing, and feature accessibility.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Button
             variant="outline"
-            size="sm"
             onClick={onUpdatePricingClick}
-            className="border-primary/20 hover:bg-primary/5 hidden h-9 rounded-full font-bold shadow-sm sm:flex"
+            className="border-primary/20 hover:bg-primary/5 flex h-9 w-9 items-center justify-center rounded-full p-0 font-bold sm:h-9 sm:w-auto sm:px-4"
           >
-            <RefreshCcw className="mr-2 h-4 w-4" />
-            Update Pricing
+            <RefreshCcw className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Update Pricing</span>
           </Button>
           <Button
-            size="sm"
             onClick={onCreatePlanClick}
-            className="h-9 rounded-full font-bold shadow-md"
+            className="flex h-9 w-9 items-center justify-center rounded-full p-0 font-bold shadow-md sm:h-9 sm:w-auto sm:px-4"
           >
-            <Plus className="mr-1 h-4 w-4" />
+            <Plus className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Create Plan</span>
-            <span className="sm:hidden">New</span>
           </Button>
         </div>
       </div>

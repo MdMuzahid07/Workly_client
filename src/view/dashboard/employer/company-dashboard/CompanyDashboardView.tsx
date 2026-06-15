@@ -83,7 +83,7 @@ const CompanyDashboardView = () => {
   ];
 
   return (
-    <div className="mt-16 min-h-screen">
+    <div className="min-h-screen pt-16">
       <DashboardOverviewHeader companyData={companyData} />
       <div className="space-y-4 sm:space-y-6 sm:py-6">
         {/* Stats Cards */}
