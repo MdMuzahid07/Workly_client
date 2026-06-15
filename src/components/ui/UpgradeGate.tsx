@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
-import { useCanAccess } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Lock, Crown, ArrowRight, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { useCanAccess } from "@/hooks/useEntitlements";
 import { useAppSelector } from "@/redux/hooks";
 import { PlanFeatureFlags } from "@/types/subscription";
+import { ArrowRight, Crown, Lock, Sparkles } from "lucide-react";
+import Link from "next/link";
+import React from "react";
 
 interface UpgradeGateProps {
   feature: keyof PlanFeatureFlags;
@@ -51,7 +51,7 @@ export default function UpgradeGate({
     <div className="animate-in fade-in slide-in-from-bottom-4 flex w-full items-center justify-center px-4 py-12 duration-500">
       <Card className="border-primary/20 from-card to-background relative w-full max-w-lg overflow-hidden bg-linear-to-br shadow-2xl">
         {/* Top decorative gradient bar */}
-        <div className="via-primary absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-violet-500 to-emerald-500" />
+        <div className="via-primary absolute top-0 right-0 left-0 h-1.5 bg-linear-to-r from-violet-500 to-emerald-500" />
 
         {/* Glow effect in background */}
         <div className="bg-primary/10 pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full blur-3xl" />
@@ -81,7 +81,7 @@ export default function UpgradeGate({
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                 <div
-                  className="from-primary h-full rounded-full bg-gradient-to-r to-violet-500"
+                  className="from-primary h-full rounded-full bg-linear-to-r to-violet-500"
                   style={{
                     width: `${Math.min(100, (current / limit) * 100)}%`,
                   }}
