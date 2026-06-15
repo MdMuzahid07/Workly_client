@@ -7,6 +7,7 @@ import { ReactNode, useEffect, useState } from "react";
 import AdminSidebar from "./dashboard-nav/AdminSidebar";
 import EmployerSidebar from "./dashboard-nav/EmployerSidebar";
 import JobSeekerSidebar from "./dashboard-nav/JobSeekerSidebar";
+import SubscriptionExpiryModal from "./SubscriptionExpiryModal";
 
 export default function DashboardLayoutClient({
   children,
@@ -139,6 +140,7 @@ export default function DashboardLayoutClient({
         <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
           <main className="min-h-screen w-full min-w-0">{children}</main>
         </div>
+        <SubscriptionExpiryModal />
       </div>
     );
   }
@@ -171,6 +173,7 @@ export default function DashboardLayoutClient({
       <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
         <main className="min-h-screen w-full min-w-0">{children}</main>
       </div>
+      <SubscriptionExpiryModal />
     </div>
   );
 }

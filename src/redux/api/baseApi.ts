@@ -90,6 +90,7 @@ export const tagTypes = {
   Messages: "Messages",
   payments: "payments",
   plans: "plans",
+  subscriptions: "subscriptions",
 } as const;
 
 export type TagType = (typeof tagTypes)[keyof typeof tagTypes];

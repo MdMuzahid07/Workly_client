@@ -18,6 +18,7 @@ import { Button } from "../../../components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
+import { useCanAccess, useEntitlements } from "@/hooks/useEntitlements";
 import {
   useCreateApplicationMutation,
   useGetMyApplicationSummaryQuery,
@@ -80,12 +81,18 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     useCreateApplicationMutation();
 
   const user = useAppSelector((state) => state.auth.user);
-  const isPremium = user?.isPremium || false;
   const isJobSeeker = user?.role === "JOB_SEEKER";
 
-  const monthlyCount = summaryResponse?.data?.monthlyCount || 0;
-  const limitReached = !isPremium && isJobSeeker && monthlyCount >= 30;
-  const closeToLimit = !isPremium && isJobSeeker && monthlyCount >= 25;
+  const {
+    limit,
+    current: monthlyCount,
+    isLoading: isLimitLoading,
+  } = useCanAccess("maxMonthlyApplications");
+  const { planName } = useEntitlements();
+  const isPremium = planName === "Premium";
+
+  const limitReached = !isLimitLoading && monthlyCount >= limit;
+  const closeToLimit = !isLimitLoading && monthlyCount >= limit - 5;
   const {
     data: jobData,
     isLoading: isJobLoading,
@@ -210,7 +217,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  if (isJobLoading || isProfileLoading) {
+  if (isJobLoading || isProfileLoading || isLimitLoading) {
     return <JobApplyViewSkeleton />;
   }
 
@@ -268,13 +275,13 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
                 <div>
                   <p className="text-sm font-bold">
                     {limitReached
-                      ? "Monthly limit reached (30/30 applications)"
-                      : `Application usage: ${monthlyCount}/30 this month`}
+                      ? `Monthly limit reached (${monthlyCount}/${limit} applications)`
+                      : `Application usage: ${monthlyCount}/${limit} this month`}
                   </p>
                   <p className="text-xs font-medium opacity-80">
                     {limitReached
-                      ? "You've used all your free applications for this month. Upgrade to Premium for unlimited access."
-                      : "Free users can apply for up to 30 jobs per month. Go Premium for unlimited applications."}
+                      ? "You've used all your applications for this month. Upgrade to Premium for unlimited access."
+                      : "Free and Pro users have monthly application limits. Go Premium for unlimited applications."}
                   </p>
                 </div>
               </div>
@@ -285,7 +292,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
                   variant={limitReached ? "destructive" : "outline"}
                   className="rounded-xl font-bold"
                 >
-                  <Link href="/pricing">Upgrade to Premium</Link>
+                  <Link href="/dashboard/pricing">Upgrade to Premium</Link>
                 </Button>
               )}
             </div>
