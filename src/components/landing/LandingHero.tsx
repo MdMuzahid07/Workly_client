@@ -18,6 +18,8 @@ import { Suspense, useEffect, useState, type ComponentType } from "react";
 import { globeConfig, globeSampleAreas } from "../../constants";
 import { useGetSearchSuggestionsQuery } from "../../redux/feature/job/jobApi";
 import GlobeSkeleton from "../../skeleton/landing/home/GlobeSkeleton";
+import { useGetLandingStatsQuery } from "../../redux/feature/statistics/statisticsApi";
+import AnimatedCounter from "../shared/AnimatedCounter";
 
 interface WorldProps {
   data: typeof globeSampleAreas;
@@ -32,6 +34,17 @@ const LandingHero = ({ World }: LandingHeroProps) => {
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
+
+  const { data: statsRes } = useGetLandingStatsQuery();
+  const stats = statsRes?.data;
+
+  const trendingList = stats?.trendingKeywords || [
+    "React",
+    "UI/UX",
+    "Python",
+    "Remote",
+    "DevOps",
+  ];
   const [activeInput, setActiveInput] = useState<"keyword" | "location" | null>(
     null,
   );
@@ -392,18 +405,16 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   <TrendingUp className="text-primary h-3 w-3" />
                   Trending:
                 </span>
-                {["React", "UI/UX", "Python", "Remote", "DevOps"].map(
-                  (term, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => handleTrendingClick(term)}
-                      className="bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground hover:border-primary/20 cursor-pointer rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium transition-all"
-                    >
-                      {term}
-                    </button>
-                  ),
-                )}
+                {trendingList.map((term, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handleTrendingClick(term)}
+                    className="bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground hover:border-primary/20 cursor-pointer rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium transition-all"
+                  >
+                    {term}
+                  </button>
+                ))}
               </div>
             </motion.div>
 
@@ -417,19 +428,21 @@ const LandingHero = ({ World }: LandingHeroProps) => {
               {[
                 {
                   icon: Briefcase,
-                  value: "50K+",
+                  value: <AnimatedCounter value={stats?.activeJobs || 48200} />,
                   label: "Active Jobs",
                   color: "primary",
                 },
                 {
                   icon: Building2,
-                  value: "10K+",
+                  value: <AnimatedCounter value={stats?.companies || 9800} />,
                   label: "Companies",
                   color: "accent",
                 },
                 {
                   icon: Users,
-                  value: "12M+",
+                  value: (
+                    <AnimatedCounter value={stats?.jobSeekers || 12000000} />
+                  ),
                   label: "Job Seekers",
                   color: "primary",
                 },
@@ -487,7 +500,9 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                       <p className="text-muted-foreground text-xs font-medium">
                         Active Now
                       </p>
-                      <p className="text-foreground text-2xl font-bold">50K+</p>
+                      <p className="text-foreground text-2xl font-bold">
+                        <AnimatedCounter value={stats?.activeNow || 65000} />
+                      </p>
                     </div>
                   </div>
                 </Card>
@@ -509,7 +524,9 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                       <p className="text-muted-foreground text-xs font-medium">
                         Top Companies
                       </p>
-                      <p className="text-foreground text-2xl font-bold">10K+</p>
+                      <p className="text-foreground text-2xl font-bold">
+                        <AnimatedCounter value={stats?.companies || 9800} />
+                      </p>
                     </div>
                   </div>
                 </Card>
@@ -537,7 +554,9 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                       ))}
                     </div>
                     <span className="from-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
-                      Trusted by 12M+ Professionals
+                      Trusted by{" "}
+                      <AnimatedCounter value={stats?.jobSeekers || 12000000} />{" "}
+                      Professionals
                     </span>
                   </span>
                 </Badge>
