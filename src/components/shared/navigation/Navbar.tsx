@@ -125,85 +125,87 @@ const Navbar = () => {
   ];
 
   return (
-    <header
-      className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "border-b border-gray-100 bg-white/80 shadow-xs backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/80"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:h-20 md:px-6">
-        <div className="flex items-center gap-10">
-          <div className="flex items-center transition-opacity hover:opacity-80">
-            <WJLogo />
-          </div>
-
-          {/* Minimalist Desktop Navigation */}
-          {user?.email && isVerified && (
-            <nav className="hidden items-center gap-8 md:flex">
-              {navLinks.map((item) => {
-                const active = isActive(item.href);
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group relative text-[14px] font-semibold tracking-tight transition-colors ${
-                      active
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-primary"
-                    }`}
-                  >
-                    {item.name}
-                    {active && (
-                      <motion.div
-                        layoutId="nav-underline"
-                        className="bg-primary absolute -bottom-1 left-0 h-0.5 w-full rounded-full"
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          )}
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-4 md:flex">
-            {/* <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
-                <Search className="h-5 w-5" />
-             </Button> */}
-            <NotificationDropdown />
-            <ThemeSwitcher />
-          </div>
-
-          {user?.email && isVerified ? (
-            <ProfileDrop onSignOut={handleLogout} user={user} />
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button asChild variant="ghost" className="text-sm font-bold">
-                <Link href="/login">Log In</Link>
-              </Button>
-              <Button
-                asChild
-                className="btn-green-primary rounded-full px-5 text-sm font-bold shadow-xs"
-              >
-                <Link href="/register">Post a Job</Link>
-              </Button>
+    <>
+      <header
+        className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "border-b border-gray-100 bg-white/80 shadow-xs backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/80"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:h-20 md:px-6">
+          <div className="flex items-center gap-10">
+            <div className="flex items-center transition-opacity hover:opacity-80">
+              <WJLogo />
             </div>
-          )}
 
-          {user?.email && isVerified && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full text-green-500 md:hidden"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-          )}
+            {/* Minimalist Desktop Navigation */}
+            {user?.email && isVerified && (
+              <nav className="hidden items-center gap-8 md:flex">
+                {navLinks.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`group relative text-[14px] font-semibold tracking-tight transition-colors ${
+                        active
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-primary"
+                      }`}
+                    >
+                      {item.name}
+                      {active && (
+                        <motion.div
+                          layoutId="nav-underline"
+                          className="bg-primary absolute -bottom-1 left-0 h-0.5 w-full rounded-full"
+                        />
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden items-center gap-4 md:flex">
+              {/* <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
+                  <Search className="h-5 w-5" />
+               </Button> */}
+              <NotificationDropdown />
+              <ThemeSwitcher />
+            </div>
+
+            {user?.email && isVerified ? (
+              <ProfileDrop onSignOut={handleLogout} user={user} />
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button asChild variant="ghost" className="text-sm font-bold">
+                  <Link href="/login">Log In</Link>
+                </Button>
+                <Button
+                  asChild
+                  className="btn-green-primary rounded-full px-5 text-sm font-bold shadow-xs"
+                >
+                  <Link href="/register">Post a Job</Link>
+                </Button>
+              </div>
+            )}
+
+            {user?.email && isVerified && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full text-green-500 md:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Modern Mobile Menu */}
       <AnimatePresence>
@@ -214,7 +216,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 z-50 bg-slate-950/20 backdrop-blur-xs md:hidden"
+              className="fixed inset-0 z-40 bg-slate-950/20 backdrop-blur-xs md:hidden"
             />
             <motion.div
               initial={{ x: "100%" }}
@@ -316,7 +318,7 @@ const Navbar = () => {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 };
 

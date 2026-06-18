@@ -48,17 +48,20 @@ export function EmployerQuickActions() {
       </CardHeader>
       <CardContent>
         <nav
-          className="flex flex-col gap-3 sm:flex-row sm:flex-wrap"
+          className="scrollbar-none flex flex-row gap-2.5 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0"
           aria-label="Employer shortcuts"
         >
           {actions.map(({ href, label, icon: Icon, variant }) => (
-            <Link key={href} href={href} className="w-full sm:w-auto">
+            <Link key={href} href={href} className="w-auto shrink-0">
               <Button
                 variant={variant}
-                className={`w-full rounded-full font-bold sm:w-auto ${variant === "default" ? "shadow-sm" : ""}`}
+                className={`rounded-full px-3.5 py-2 text-xs font-bold sm:px-4 sm:py-2.5 sm:text-sm ${variant === "default" ? "shadow-sm" : ""}`}
               >
-                <Icon className="mr-2 h-4 w-4" aria-hidden />
-                {label}
+                <Icon
+                  className="mr-1.5 h-3.5 w-3.5 shrink-0 sm:mr-2 sm:h-4 sm:w-4"
+                  aria-hidden
+                />
+                <span>{label}</span>
               </Button>
             </Link>
           ))}

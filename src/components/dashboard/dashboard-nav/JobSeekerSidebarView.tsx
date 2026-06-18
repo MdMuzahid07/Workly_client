@@ -160,14 +160,14 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   return (
     <div className="bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex h-12 shrink-0 items-center justify-between px-4 sm:h-14">
+      <div className="flex h-12 shrink-0 items-center justify-between px-4 sm:h-14 lg:h-16">
         <WJLogo />
         <span className="pr-10 lg:pr-0">
           <ThemeToggleButtonCompact />
         </span>
       </div>
 
-      <Separator className="shrink-0 opacity-50" />
+      <Separator className="shrink-0" />
 
       {/* Profile Section */}
       <div className="shrink-0 px-4 py-6">
@@ -406,7 +406,7 @@ export default function JobSeekerSidebarView({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-primary/10 hover:bg-background fixed top-1 right-4 z-999 h-10 w-10 rounded-lg border transition-all sm:top-2"
+            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-full border transition-all sm:top-4"
             aria-label="Open sidebar"
           >
             <Menu className="text-primary h-5 w-5" />

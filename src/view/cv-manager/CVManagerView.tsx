@@ -8,6 +8,7 @@ import {
   useListResumesQuery,
   useUploadResumeMutation,
 } from "@/redux/feature/resume/resumeApi";
+import { useCanAccess, useEntitlements } from "@/hooks/useEntitlements";
 import { useAppSelector } from "@/redux/hooks";
 import { motion } from "framer-motion";
 import {
@@ -27,15 +28,19 @@ import CVCard from "../../components/main/cv-manager/CVCard";
 
 const CVManagerView = () => {
   const user = useAppSelector((state) => state.auth.user);
-  const isPremium = user?.isPremium || false;
   const isJobSeeker = user?.role === "JOB_SEEKER";
+
+  const { limit, isLoading: isLimitLoading } = useCanAccess("maxResumes");
+  const { planName } = useEntitlements();
+
+  const isPremium = planName === "Premium";
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: response, isLoading } = useListResumesQuery({});
   const [uploadResume, { isLoading: isUploading }] = useUploadResumeMutation();
 
   const resumes = response?.data || [];
-  const hasReachedLimit = !isPremium && resumes.length >= 1;
+  const hasReachedLimit = !isLimitLoading && resumes.length >= limit;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,7 +68,7 @@ const CVManagerView = () => {
   const triggerUpload = () => {
     if (hasReachedLimit) {
       toast.error(
-        "Free users can only maintain one resume version. Go Premium for unlimited uploads!",
+        `You have reached the maximum limit of ${limit} resume versions allowed by your current plan. Go Premium for unlimited uploads!`,
       );
       return;
     }
@@ -82,7 +87,7 @@ const CVManagerView = () => {
         accept=".pdf"
       />
 
-      {isLoading ? (
+      {isLoading || isLimitLoading ? (
         <CVManagerSkeleton />
       ) : (
         <div className="space-y-8 px-4 sm:px-6 sm:py-8">
@@ -90,7 +95,8 @@ const CVManagerView = () => {
             <div>
               <h2 className="text-xl font-bold tracking-tight">Your Resumes</h2>
               <p className="text-muted-foreground text-sm font-medium">
-                You have {resumes.length} active resumes on file.
+                You have {resumes.length} of{" "}
+                {limit === 9999 ? "unlimited" : limit} active resumes on file.
               </p>
             </div>
             <Button
@@ -141,7 +147,7 @@ const CVManagerView = () => {
             </motion.div>
           </div>
 
-          {/* Premium Upgrade Hint for Free Users */}
+          {/* Premium Upgrade Hint for Free/Pro Users */}
           {!isPremium && isJobSeeker && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -160,8 +166,9 @@ const CVManagerView = () => {
                     </h3>
                     <p className="text-muted-foreground max-w-xl text-sm leading-relaxed font-medium opacity-80">
                       Maintain multiple versions of your resume tailored for
-                      different roles. Premium members can upload up to 10
-                      distinct resumes for maximum application precision.
+                      different roles. Premium members can upload up to
+                      unlimited distinct resumes for maximum application
+                      precision.
                     </p>
                   </div>
                 </div>
@@ -170,7 +177,10 @@ const CVManagerView = () => {
                   size="lg"
                   className="shadow-primary/20 h-14 rounded-2xl px-8 font-black shadow-xl"
                 >
-                  <Link href="/pricing" className="flex items-center gap-2">
+                  <Link
+                    href="/dashboard/pricing"
+                    className="flex items-center gap-2"
+                  >
                     Upgrade to Premium
                     <ArrowRight className="h-5 w-5" />
                   </Link>

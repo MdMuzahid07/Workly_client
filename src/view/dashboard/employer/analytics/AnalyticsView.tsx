@@ -20,6 +20,7 @@ import type {
   EmployerAnalyticsPayload,
   EmployerAnalyticsPeriod,
 } from "@/types/employerAnalytics";
+import debounce from "debounce";
 import {
   Briefcase,
   CheckCircle2,
@@ -31,7 +32,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import debounce from "debounce";
 
 export default function AnalyticsView() {
   const { user } = useAppSelector((s) => s.auth);
@@ -124,7 +124,7 @@ export default function AnalyticsView() {
 
   if (user && !user.isPremium) {
     return (
-      <div className="mt-16 flex min-h-[calc(100vh-64px)] items-center justify-center p-4 sm:p-8">
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center p-4 pt-16 sm:p-8">
         <Card className="max-w-3xl overflow-hidden border">
           <CardContent className="p-12 text-center">
             <div className="bg-primary/10 mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full">
@@ -199,7 +199,7 @@ export default function AnalyticsView() {
   }
 
   return (
-    <div className="mt-16 min-h-screen">
+    <div className="min-h-screen pt-16">
       <DashboardAnalyticsHeader
         timeRange={timeRange}
         setTimeRange={setTimeRange}

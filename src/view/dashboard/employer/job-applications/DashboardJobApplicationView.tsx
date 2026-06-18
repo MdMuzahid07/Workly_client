@@ -368,7 +368,7 @@ const DashboardJobApplicationView = () => {
     activeTab !== "all";
 
   return (
-    <div className="mt-16 min-h-screen">
+    <div className="min-h-screen pt-16">
       <DashboardApplicationsHeader />
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">

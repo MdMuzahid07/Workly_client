@@ -54,14 +54,14 @@ export default function PricingTierCard({
 
   const handleCheckout = async () => {
     // If current plan, do nothing
-    if (isActivePlan || id === "free") return;
+    if (isActivePlan || id.toLowerCase() === "free") return;
 
     if (!user) {
       window.location.href = "/auth/login";
       return;
     }
 
-    if (id === "enterprise" || price === "Custom") {
+    if (id.toLowerCase() === "enterprise" || price === "Custom") {
       window.location.href = `mailto:sales@workly.com?subject=Enterprise Plan Inquiry from ${user.fullName}`;
       return;
     }
@@ -94,7 +94,8 @@ export default function PricingTierCard({
     }
   };
 
-  const isButtonDisabled = isActivePlan || id === "free" || isLoading;
+  const isButtonDisabled =
+    isActivePlan || id.toLowerCase() === "free" || isLoading;
 
   return (
     <Card

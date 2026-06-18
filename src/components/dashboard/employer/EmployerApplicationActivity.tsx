@@ -28,16 +28,16 @@ export function EmployerApplicationActivity({
           Pipeline health at a glance
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4">
         {isLoading ? (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-24 rounded-xl" />
+              <Skeleton key={i} className="h-[4.5rem] rounded-xl sm:h-24" />
             ))}
           </div>
         ) : summary ? (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
               {(
                 [
                   ["In review", summary.inReview],
@@ -46,25 +46,27 @@ export function EmployerApplicationActivity({
                   ["Rejected this month", summary.rejectedThisMonth],
                 ] as const
               ).map(([label, value]) => (
-                <div key={label} className="rounded-xl border p-4">
-                  <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                <div key={label} className="rounded-xl border p-3 sm:p-4">
+                  <p className="text-muted-foreground text-[10px] leading-tight tracking-wide uppercase sm:text-xs">
                     {label}
                   </p>
-                  <p className="text-primary text-2xl font-bold tabular-nums">
+                  <p className="text-primary mt-1 text-xl font-bold tabular-nums sm:text-2xl">
                     {value}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-xl border p-4">
-              <p className="text-sm font-semibold">Status breakdown</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="rounded-xl border p-3 sm:p-4">
+              <p className="text-xs font-semibold sm:text-sm">
+                Status breakdown
+              </p>
+              <div className="mt-2 grid gap-1.5 sm:mt-3 sm:grid-cols-2 sm:gap-2">
                 {Object.entries(summary.byStatus || {}).map(
                   ([status, count]) => (
                     <div
                       key={status}
-                      className="bg-muted flex items-center justify-between gap-3 rounded-lg p-3 text-sm"
+                      className="bg-muted flex items-center justify-between gap-2 rounded-lg p-2 text-xs sm:p-3 sm:text-sm"
                     >
                       <span>{humanizeJobOrApplicationStatus(status)}</span>
                       <span className="font-semibold tabular-nums">

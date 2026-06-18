@@ -3,8 +3,8 @@
 import { EmployerApplicationActivity } from "@/components/dashboard/employer/EmployerApplicationActivity";
 import { EmployerDashboardAlerts } from "@/components/dashboard/employer/EmployerDashboardAlerts";
 import { EmployerQuickActions } from "@/components/dashboard/employer/EmployerQuickActions";
-import { EmployerRecentTeamMembers } from "@/components/dashboard/employer/EmployerRecentTeamMembers";
 import { EmployerRecentJobs } from "@/components/dashboard/employer/EmployerRecentJobs";
+import { EmployerRecentTeamMembers } from "@/components/dashboard/employer/EmployerRecentTeamMembers";
 import { EmployerStatCards } from "@/components/dashboard/employer/EmployerStatCards";
 import { useEmployerDashboard } from "@/hooks/useEmployerDashboard";
 import EmployerDashboardSkeleton from "@/skeleton/dashboard/employer/dashboard/EmployerDashboardSkeleton";

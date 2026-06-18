@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AnalyticsView from "../../../../view/dashboard/employer/analytics/AnalyticsView";
+import UpgradeGate from "@/components/ui/UpgradeGate";
 
 export const metadata: Metadata = {
   title: "Performance Analytics",
@@ -8,5 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default function EmployerAnalyticsPage() {
-  return <AnalyticsView />;
+  return (
+    <UpgradeGate
+      feature="canViewAnalytics"
+      title="Advanced Analytics Locked"
+      description="Access deep insights on candidate conversion funnels, job performance trends, and team metrics. Upgrade to Growth or Enterprise to unlock."
+    >
+      <AnalyticsView />
+    </UpgradeGate>
+  );
 }

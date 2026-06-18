@@ -6,30 +6,29 @@ import CandidateFeatureComparisonTable from "@/components/dashboard/pricing/Cand
 import CandidatePricingFAQ from "@/components/dashboard/pricing/CandidatePricingFAQ";
 import CandidateSubscriptionStatusCard from "@/components/dashboard/pricing/CandidateSubscriptionStatusCard";
 import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
-import { useGetMyApplicationsQuery } from "@/redux/feature/application/applicationApi";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
-import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
+import { useGetMySubscriptionQuery } from "@/redux/feature/subscription/subscriptionApi";
 import JobSeekerPricingSkeleton from "@/skeleton/dashboard/job-seeker/pricing/JobSeekerPricingSkeleton";
 import { Package, Shield, Zap } from "lucide-react";
 
 export default function JobSeekerPricingView() {
-  const { data: profileRes, isLoading: isProfileLoading } =
-    useGetProfileQuery(undefined);
+  const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
   const { data: plansRes, isLoading: isPlansLoading } = useGetPlansQuery({
     type: "candidate",
     isActive: true,
   });
-  const { data: applicationsRes, isLoading: isApplicationsLoading } =
-    useGetMyApplicationsQuery(undefined);
 
-  const user = profileRes?.data?.user;
-  const isPremium = user?.isPremium || false;
+  const subData = subRes?.data;
+  const activePlanName = subData?.planName || "Free";
 
-  const activePlanId = isPremium ? "cand_pro" : "cand_free";
-
-  const applicationsUsed = Array.isArray(applicationsRes?.data)
-    ? applicationsRes.data.length
-    : 0;
+  const getRenewalDateString = () => {
+    if (!subData?.endDate) return "Never";
+    return new Date(subData.endDate).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const mapDbPlanToCardProps = (plan: any) => {
     const nameLower = plan.name.toLowerCase();
@@ -50,12 +49,12 @@ export default function JobSeekerPricingView() {
       variant = "primary";
       popular = true;
       cta = "Upgrade to Pro";
-    } else if (nameLower.includes("elite")) {
+    } else if (nameLower.includes("premium") || nameLower.includes("elite")) {
       icon = Shield;
       color = "text-violet-500";
       borderColor = "border-violet-200 dark:border-violet-900/50";
       bgColor = "bg-violet-50/50 dark:bg-violet-900/10";
-      cta = "Upgrade to Elite";
+      cta = "Upgrade to Premium";
     } else if (nameLower.includes("free")) {
       cta = "Current Plan";
     }
@@ -96,7 +95,7 @@ export default function JobSeekerPricingView() {
   };
 
   const plans = plansRes?.data || [];
-  const isLoading = isProfileLoading || isPlansLoading || isApplicationsLoading;
+  const isLoading = isSubLoading || isPlansLoading;
 
   return (
     <div className="min-h-screen pt-15">
@@ -108,10 +107,12 @@ export default function JobSeekerPricingView() {
           <div className="space-y-10">
             {/* Current Subscription Status */}
             <CandidateSubscriptionStatusCard
-              currentPlan={isPremium ? "Pro Candidate" : "Free Seeker"}
-              applicationsUsed={applicationsUsed}
-              applicationsLimit={isPremium ? 120 : 40}
-              renewalDate="Next Billing Cycle"
+              currentPlan={activePlanName}
+              applicationsUsed={subData?.usage?.applicationsSubmitted || 0}
+              applicationsLimit={
+                subData?.features?.maxMonthlyApplications || 40
+              }
+              renewalDate={getRenewalDateString()}
             />
 
             <div className="space-y-8 pt-6">
@@ -130,7 +131,7 @@ export default function JobSeekerPricingView() {
                 {plans.map((plan: any) => {
                   const cardProps = mapDbPlanToCardProps(plan);
                   const isActive =
-                    activePlanId.toLowerCase() === plan.name.toLowerCase();
+                    activePlanName.toLowerCase() === plan.name.toLowerCase();
                   return (
                     <PricingTierCard
                       key={plan.id}

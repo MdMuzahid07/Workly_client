@@ -6,25 +6,23 @@ import FeatureComparisonTable from "@/components/dashboard/pricing/FeatureCompar
 import PricingFAQ from "@/components/dashboard/pricing/PricingFAQ";
 import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
 import SubscriptionStatusCard from "@/components/dashboard/pricing/SubscriptionStatusCard";
-import { useGetMyCompanyQuery } from "@/redux/feature/company/companyApi";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
-import { Loader2, Package, Shield, Star, Zap } from "lucide-react";
+import { useGetMySubscriptionQuery } from "@/redux/feature/subscription/subscriptionApi";
+import { Loader2, Package, Shield, Zap } from "lucide-react";
 
 export default function EmployerPricingView() {
-  const { data: myCompanyRes, isLoading: isCompanyLoading } =
-    useGetMyCompanyQuery(undefined);
+  const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
   const { data: plansRes, isLoading: isPlansLoading } = useGetPlansQuery({
     type: "employer",
     isActive: true,
   });
 
-  const company = myCompanyRes?.data;
-  const subscription = company?.subscription;
-  const activePlanName = subscription?.plan?.name || "emp_free";
+  const subData = subRes?.data;
+  const activePlanName = subData?.planName || "Free";
 
   const getRenewalDateString = () => {
-    if (!subscription?.endDate) return "Never";
-    return new Date(subscription.endDate).toLocaleDateString("en-US", {
+    if (!subData?.endDate) return "Never";
+    return new Date(subData.endDate).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -42,26 +40,23 @@ export default function EmployerPricingView() {
     let popular = false;
     let cta = "Upgrade";
 
-    if (nameLower.includes("starter")) {
-      icon = Star;
-      color = "text-amber-500";
-      borderColor = "border-amber-200 dark:border-amber-900/50";
-      bgColor = "bg-amber-50/50 dark:bg-amber-900/10";
-      cta = "Upgrade to Starter";
-    } else if (nameLower.includes("pro")) {
+    if (nameLower.includes("growth") || nameLower.includes("pro")) {
       icon = Zap;
       color = "text-primary";
       borderColor = "border-primary/30";
       bgColor = "bg-primary/5";
       variant = "primary";
       popular = true;
-      cta = "Upgrade to Pro";
-    } else if (nameLower.includes("enterprise")) {
+      cta = "Upgrade to Growth";
+    } else if (
+      nameLower.includes("enterprise") ||
+      nameLower.includes("ultimate")
+    ) {
       icon = Shield;
       color = "text-violet-500";
       borderColor = "border-violet-200 dark:border-violet-900/50";
       bgColor = "bg-violet-50/50 dark:bg-violet-900/10";
-      cta = "Contact Sales";
+      cta = "Upgrade to Enterprise";
     } else if (nameLower.includes("free")) {
       cta = "Current Plan";
     }
@@ -103,7 +98,7 @@ export default function EmployerPricingView() {
   };
 
   const plans = plansRes?.data || [];
-  const isLoading = isCompanyLoading || isPlansLoading;
+  const isLoading = isSubLoading || isPlansLoading;
 
   return (
     <div className="min-h-screen pt-15">
@@ -117,16 +112,9 @@ export default function EmployerPricingView() {
           <div className="space-y-10">
             {/* Current Subscription Status */}
             <SubscriptionStatusCard
-              currentPlan={
-                activePlanName
-                  .replace("emp_", "")
-                  .replace("cand_", "")
-                  .charAt(0)
-                  .toUpperCase() +
-                activePlanName.replace("emp_", "").replace("cand_", "").slice(1)
-              }
-              jobPostsUsed={company?.jobs?.length || 0}
-              jobPostsLimit={subscription?.plan?.maxActiveJobs || 1}
+              currentPlan={activePlanName}
+              jobPostsUsed={subData?.usage?.jobsPosted || 0}
+              jobPostsLimit={subData?.features?.maxActiveJobs || 1}
               renewalDate={getRenewalDateString()}
             />
 

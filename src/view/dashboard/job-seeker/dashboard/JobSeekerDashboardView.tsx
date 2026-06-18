@@ -2,6 +2,8 @@
 
 import { JobApplicationsChart } from "@/components/dashboard/charts/JobApplicationsChart";
 import { ProfileViewsChart } from "@/components/dashboard/charts/ProfileViewsChart";
+import DashboardJobSeekerHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobSeekerHeader";
+import { StatCard } from "@/components/shared/StatCard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,11 +18,9 @@ import {
   useGetSavedJobsQuery,
 } from "@/redux/feature/profile/profileApi";
 import { useAppSelector } from "@/redux/hooks";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import { Bookmark, FileText, Search, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
-import { StatCard } from "@/components/shared/StatCard";
-import DashboardJobSeekerHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobSeekerHeader";
-import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 
 import JobSeekerDashboardSkeleton from "@/skeleton/dashboard/job-seeker/dashboard/JobSeekerDashboardSkeleton";
 
@@ -56,7 +56,7 @@ export default function JobSeekerDashboardView() {
   const appliedCount = applications.length;
 
   return (
-    <div className="mt-16 min-h-screen">
+    <div className="min-h-screen pt-16">
       <DashboardJobSeekerHeader />
       {isLoading ? (
         <JobSeekerDashboardSkeleton />
