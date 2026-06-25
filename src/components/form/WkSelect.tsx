@@ -15,7 +15,7 @@ interface WKSelectProps {
   name: string;
   label?: string;
   placeholder?: string;
-  options: { value: string; label: string }[];
+  options: readonly { value: string; label: string }[];
   required?: boolean;
   className?: string;
   disabled?: boolean;

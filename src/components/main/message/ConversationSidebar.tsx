@@ -1,10 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { Conversation } from "@/types/message";
+
+interface ConversationSidebarProps {
+  showMobileChat: boolean;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  filteredConversations: Conversation[];
+  selectedConversation: string | null;
+  handleConversationSelect: (conversationId: string) => void;
+}
 
 const ConversationSidebar = ({
   showMobileChat,
@@ -13,14 +22,7 @@ const ConversationSidebar = ({
   filteredConversations,
   selectedConversation,
   handleConversationSelect,
-}: {
-  showMobileChat: boolean;
-  searchQuery: any;
-  setSearchQuery: (query: string) => void;
-  filteredConversations: any;
-  selectedConversation: string | null;
-  handleConversationSelect: (conversationId: string) => void;
-}) => {
+}: ConversationSidebarProps) => {
   return (
     <div
       className={`lg:col-span-4 xl:col-span-3 ${showMobileChat ? "hidden lg:block" : "block"} h-full`}
@@ -45,7 +47,7 @@ const ConversationSidebar = ({
         <CardContent className="flex-1 overflow-hidden p-0">
           <ScrollArea className="h-[calc(100vh-200px)] lg:h-[calc(100vh-260px)]">
             <div className="space-y-0.5 pb-8 lg:space-y-1.5 lg:px-3">
-              {filteredConversations.map((conversation: any) => {
+              {filteredConversations.map((conversation: Conversation) => {
                 const isActive = selectedConversation === conversation.id;
                 return (
                   <div
@@ -78,7 +80,7 @@ const ConversationSidebar = ({
                           <AvatarFallback className="from-primary/10 to-primary/20 text-primary rounded-2xl bg-linear-to-br text-base font-black lg:text-sm">
                             {conversation.participantName
                               .split(" ")
-                              .map((n: any) => n[0])
+                              .map((n: string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
@@ -108,7 +110,7 @@ const ConversationSidebar = ({
                         >
                           {conversation.lastMessage}
                         </p>
-                        {conversation.unreadCount > 0 && (
+                        {(conversation.unreadCount ?? 0) > 0 && (
                           <Badge className="bg-primary text-primary-foreground shadow-primary/30 animate-in zoom-in h-5.5 min-w-[22px] rounded-full px-1.5 text-[10px] font-black shadow-xl">
                             {conversation.unreadCount}
                           </Badge>

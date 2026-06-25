@@ -120,7 +120,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-2 transition-opacity hover:opacity-80"
+        className="group flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80"
       >
         <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 dark:border-slate-800">
           {user?.avatar ? (
@@ -170,7 +170,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-muted-foreground hover:text-foreground flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-slate-900"
+                  className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-slate-900"
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -189,7 +189,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
                   onSignOut?.();
                   setIsOpen(false);
                 }}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-50 dark:hover:bg-red-950/20"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-50 dark:hover:bg-red-950/20"
               >
                 <LogOut className="h-4 w-4" />
                 Log Out

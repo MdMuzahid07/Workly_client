@@ -163,7 +163,7 @@ const LandingHowItWorks = () => {
             >
               {steps.map((step, index) => (
                 <div key={index} className="relative">
-                  <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary/20 hover:shadow-primary/5 relative h-full overflow-hidden rounded-2xl border bg-linear-to-b p-8 backdrop-blur-md transition-all duration-500 hover:shadow-xl">
+                  <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary relative h-full overflow-hidden rounded-2xl border bg-linear-to-b p-8 backdrop-blur-md transition-all duration-500">
                     {/* Background Sequence Watermark */}
                     <span className="text-foreground/[0.04] group-hover:text-primary/[0.08] absolute top-4 right-6 text-7xl font-extrabold transition-all duration-500 select-none">
                       {step.number}
@@ -174,7 +174,7 @@ const LandingHowItWorks = () => {
 
                     <div className="relative z-10 flex flex-col items-center text-center">
                       {/* Step Icon Container */}
-                      <div className="from-primary/10 to-accent/10 border-primary/10 group-hover:from-primary group-hover:to-accent group-hover:shadow-primary/20 text-primary mb-6 flex h-16 w-16 origin-center items-center justify-center rounded-2xl border bg-linear-to-br transition-all duration-500 will-change-transform group-hover:rotate-6 group-hover:text-white group-hover:shadow-lg">
+                      <div className="from-primary/10 to-accent/10 border-primary/10 group-hover:from-primary group-hover:to-accent text-primary mb-6 flex h-16 w-16 origin-center items-center justify-center rounded-2xl border bg-linear-to-br transition-all duration-500 will-change-transform group-hover:rotate-6 group-hover:text-white">
                         <step.icon className="h-8 w-8" />
                       </div>
 

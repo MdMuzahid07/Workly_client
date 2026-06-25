@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -11,11 +10,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import type { Message } from "@/types/message";
 
 interface MediaLightboxProps {
   isOpen: boolean;
   onClose: () => void;
-  mediaItems: any[];
+  mediaItems: Message[];
   initialIndex: number;
 }
 
@@ -88,7 +88,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
             </div>
 
             <a
-              href={currentItem.fileUrl}
+              href={currentItem.fileUrl ?? undefined}
               download
               className="rounded-xl bg-white/10 p-2.5 text-white backdrop-blur-md transition-all hover:bg-white/20"
             >
@@ -114,7 +114,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
           >
             <Image
               src={currentItem.fileUrl || "/placeholder.svg"}
-              alt={currentItem.fileName}
+              alt={currentItem.fileName || "Media"}
               fill
               className="object-contain shadow-2xl"
               unoptimized={
@@ -149,7 +149,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
 
         {/* Thumbnail Strip */}
         <div className="no-scrollbar absolute right-0 bottom-6 left-0 z-50 flex justify-center gap-2 overflow-x-auto p-4">
-          {mediaItems.map((item, idx) => (
+          {mediaItems.map((item: Message, idx: number) => (
             <div
               key={item.id}
               onClick={() => setCurrentIndex(idx)}

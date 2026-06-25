@@ -39,9 +39,12 @@ const DeleteConfirmationModal = ({
       await onConfirm();
       onOpenChange(false);
       toast.success("Successfully deleted!");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to delete. Please try again.");
+    } catch (error: unknown) {
+      const msg =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete. Please try again.";
+      toast.error(msg);
     } finally {
       setIsDeleting(false);
     }

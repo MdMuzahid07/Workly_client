@@ -1,19 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Edit2, HeartHandshake, Trash2 } from "lucide-react";
+import type { VolunteerWork } from "@/types/profile";
+
+interface VolunteerSectionProps {
+  volunteer?: VolunteerWork[];
+  onAdd?: () => void;
+  onEdit?: (vol: VolunteerWork, index: number) => void;
+  onDelete?: (index: number) => void;
+}
 
 export const VolunteerSection = ({
   volunteer = [],
   onAdd,
   onEdit,
   onDelete,
-}: {
-  volunteer: any[];
-  onAdd?: () => void;
-  onEdit?: (vol: any, index: number) => void;
-  onDelete?: (index: number) => void;
-}) => {
+}: VolunteerSectionProps) => {
   return (
     <SectionCard
       title="Volunteer Work"

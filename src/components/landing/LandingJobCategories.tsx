@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   BarChart3,
   Briefcase,
@@ -19,71 +17,71 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import getIconComponent from "../../helper/getIconComponent";
 import { useGetCategoriesQuery } from "../../redux/feature/category/categoryApi";
+import type { ComponentType } from "react";
 
-const categories = [
+interface RawCategory {
+  id?: string;
+  name: string;
+  icon?: string;
+  _count?: { jobs?: number };
+}
+
+interface DisplayCategory {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  count: string;
+  color: string;
+  isReal?: boolean;
+}
+
+const categories: DisplayCategory[] = [
   {
     icon: Code2,
     title: "Software Engineering",
     count: "12,540+ open positions",
-    color: "primary",
-    bgColor: "bg-primary/5",
-    hoverBg: "hover:bg-primary/10",
+    color: "bg-primary",
   },
   {
     icon: Palette,
     title: "UI/UX & Creative Design",
     count: "8,210+ open positions",
-    color: "accent",
-    bgColor: "bg-accent/5",
-    hoverBg: "hover:bg-accent/10",
+    color: "bg-accent",
   },
   {
     icon: Layers,
     title: "Product Management",
     count: "4,190+ open positions",
-    color: "primary",
-    bgColor: "bg-primary/5",
-    hoverBg: "hover:bg-primary/10",
+    color: "bg-primary",
   },
   {
     icon: TrendingUp,
     title: "Marketing & Growth",
     count: "6,800+ open positions",
-    color: "accent",
-    bgColor: "bg-accent/5",
-    hoverBg: "hover:bg-accent/10",
+    color: "bg-accent",
   },
   {
     icon: CircleDollarSign,
     title: "Finance & Accounting",
     count: "5,340+ open positions",
-    color: "primary",
-    bgColor: "bg-primary/5",
-    hoverBg: "hover:bg-primary/10",
+    color: "bg-primary",
   },
   {
     icon: Headset,
     title: "Customer Support & Success",
     count: "3,110+ open positions",
-    color: "accent",
-    bgColor: "bg-accent/5",
-    hoverBg: "hover:bg-accent/10",
+    color: "bg-accent",
   },
   {
     icon: BarChart3,
     title: "Data Science & AI",
     count: "7,850+ open positions",
-    color: "primary",
-    bgColor: "bg-primary/5",
-    hoverBg: "hover:bg-primary/10",
+    color: "bg-primary",
   },
   {
     icon: Briefcase,
     title: "Human Resources & Recruiting",
     count: "2,490+ open positions",
-    color: "accent",
-    bgColor: "bg-accent/5",
-    hoverBg: "hover:bg-accent/10",
+    color: "bg-accent",
   },
 ];
 
@@ -93,9 +91,9 @@ const LandingJobCategoriesSkeleton = () => {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header Skeleton */}
         <div className="mb-16 flex flex-col items-center text-center sm:mb-20">
-          <Skeleton className="mb-4 h-9 w-44 rounded-full" />
-          <Skeleton className="mb-4 h-10 w-96 rounded-md" />
-          <Skeleton className="h-5 w-80 rounded-md" />
+          <div className="bg-muted mb-4 h-9 w-44 animate-pulse rounded-full" />
+          <div className="bg-muted mb-4 h-10 w-96 animate-pulse rounded-md" />
+          <div className="bg-muted h-5 w-80 animate-pulse rounded-md" />
         </div>
 
         {/* Categories Grid Skeleton */}
@@ -106,9 +104,9 @@ const LandingJobCategoriesSkeleton = () => {
               className="border-border/40 bg-card/50 relative rounded-2xl border p-6 backdrop-blur-md"
             >
               <div className="space-y-4">
-                <Skeleton className="h-12 w-12 rounded-xl" />
-                <Skeleton className="h-6 w-3/4 rounded-md" />
-                <Skeleton className="h-4 w-1/2 rounded-md" />
+                <div className="bg-muted h-12 w-12 animate-pulse rounded-xl" />
+                <div className="bg-muted h-6 w-3/4 animate-pulse rounded-md" />
+                <div className="bg-muted h-4 w-1/2 animate-pulse rounded-md" />
               </div>
             </Card>
           ))}
@@ -122,11 +120,11 @@ const LandingJobCategories = () => {
   const router = useRouter();
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetCategoriesQuery(undefined);
-  const fetchedCategories = categoriesData?.data || [];
+  const fetchedCategories: RawCategory[] = categoriesData?.data || [];
 
-  const displayCategories =
-    fetchedCategories?.length > 0
-      ? fetchedCategories.slice(0, 8).map((cat: any) => {
+  const displayCategories: DisplayCategory[] =
+    fetchedCategories.length > 0
+      ? fetchedCategories.slice(0, 8).map((cat: RawCategory) => {
           const { icon: IconComponent, color } = getIconComponent(cat.icon);
           return {
             icon: IconComponent,
@@ -139,15 +137,9 @@ const LandingJobCategories = () => {
             isReal: true,
           };
         })
-      : categories.map((cat) => ({
-          icon: cat.icon,
-          title: cat.title,
-          count: cat.count,
-          color: cat.color === "primary" ? "bg-primary" : "bg-accent",
-          isReal: false,
-        }));
+      : categories;
 
-  const handleCategoryClick = (cat: any) => {
+  const handleCategoryClick = (cat: DisplayCategory) => {
     router.push(`/jobs?category=${encodeURIComponent(cat.title)}`);
   };
 
@@ -206,7 +198,7 @@ const LandingJobCategories = () => {
 
         {/* Categories Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {displayCategories.map((cat: any, index: number) => (
+          {displayCategories.map((cat: DisplayCategory, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -220,7 +212,7 @@ const LandingJobCategories = () => {
             >
               <Card
                 onClick={() => handleCategoryClick(cat)}
-                className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative cursor-pointer overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500 hover:shadow-lg"
+                className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative cursor-pointer overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500"
               >
                 {/* Dynamic Gradient Overlay */}
                 <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +15,12 @@ import "swiper/css";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useGetCompaniesQuery } from "../../redux/feature/company/companyApi";
+import type { CompanyListing, DisplayCompany } from "@/types/company";
 
-const premiumCompanies = [
+const premiumCompanies: DisplayCompany[] = [
   {
     name: "Workly Tech Solutions",
+    slug: "workly-tech-solutions",
     industry: "Software & IT Services",
     location: "San Francisco, CA (Remote)",
     jobsCount: "15 active jobs",
@@ -29,6 +30,7 @@ const premiumCompanies = [
   },
   {
     name: "Vertex Creative Labs",
+    slug: "vertex-creative-labs",
     industry: "Design & Agency",
     location: "Austin, TX (Hybrid)",
     jobsCount: "8 active jobs",
@@ -38,6 +40,7 @@ const premiumCompanies = [
   },
   {
     name: "Novus Health Systems",
+    slug: "novus-health-systems",
     industry: "Healthcare & Biotech",
     location: "Boston, MA (On-site)",
     jobsCount: "12 active jobs",
@@ -47,6 +50,7 @@ const premiumCompanies = [
   },
   {
     name: "Quantum Fintech Group",
+    slug: "quantum-fintech-group",
     industry: "Financial Technology",
     location: "New York, NY (Remote)",
     jobsCount: "6 active jobs",
@@ -56,6 +60,7 @@ const premiumCompanies = [
   },
   {
     name: "Apex Global Systems",
+    slug: "apex-global-systems",
     industry: "Cloud & DevOps",
     location: "Seattle, WA (Remote)",
     jobsCount: "10 active jobs",
@@ -65,6 +70,7 @@ const premiumCompanies = [
   },
   {
     name: "Stripe Payments Corp",
+    slug: "stripe-payments-corp",
     industry: "Fintech & Payments",
     location: "Miami, FL (Hybrid)",
     jobsCount: "5 active jobs",
@@ -74,46 +80,55 @@ const premiumCompanies = [
   },
 ];
 
+const logoBgOptions = [
+  "bg-primary/10 text-primary",
+  "bg-accent/10 text-accent",
+  "bg-blue-600/10 text-blue-600",
+  "bg-purple-600/10 text-purple-600",
+  "bg-orange-500/10 text-orange-500",
+  "bg-indigo-600/10 text-indigo-600",
+] as const;
+
+const getIndustryName = (industry: CompanyListing["industry"]): string => {
+  if (!industry) return "Technology";
+  if (typeof industry === "string") return industry;
+  return industry.name;
+};
+
+const mapCompanyToDisplay = (comp: CompanyListing): DisplayCompany => {
+  const randomBg =
+    logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
+  return {
+    name: comp.name,
+    slug: comp.slug || comp.id,
+    industry: getIndustryName(comp.industry),
+    location: comp.location || "Remote",
+    jobsCount:
+      comp.openJobs !== undefined
+        ? `${comp.openJobs} active jobs`
+        : "Hiring actively",
+    initial: comp.name ? comp.name[0].toUpperCase() : "C",
+    logoBg: randomBg,
+    tagline: comp.description
+      ? comp.description.slice(0, 75) + "..."
+      : "Building elite digital solutions.",
+    isReal: true,
+  };
+};
+
 const LandingFeaturedCompanies = () => {
   const router = useRouter();
   const { data: companiesData } = useGetCompaniesQuery({ limit: 10 });
 
-  const fetchedCompanies =
+  const fetchedCompanies: CompanyListing[] =
     companiesData?.data?.result || companiesData?.data || [];
 
-  const displayCompanies =
-    fetchedCompanies?.length > 0
-      ? fetchedCompanies.slice(0, 8).map((comp: any) => {
-          const logoBgOptions = [
-            "bg-primary/10 text-primary",
-            "bg-accent/10 text-accent",
-            "bg-blue-600/10 text-blue-600",
-            "bg-purple-600/10 text-purple-600",
-            "bg-orange-500/10 text-orange-500",
-            "bg-indigo-600/10 text-indigo-600",
-          ];
-          const randomBg =
-            logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
-          return {
-            name: comp.name,
-            slug: comp.slug || comp.id,
-            industry: comp.industry?.name || comp.industry || "Technology",
-            location: comp.location || "Remote",
-            jobsCount:
-              comp.openJobs !== undefined
-                ? `${comp.openJobs} active jobs`
-                : "Hiring actively",
-            initial: comp.name ? comp.name[0].toUpperCase() : "C",
-            logoBg: randomBg,
-            tagline: comp.description
-              ? comp.description.slice(0, 75) + "..."
-              : "Building elite digital solutions.",
-            isReal: true,
-          };
-        })
+  const displayCompanies: DisplayCompany[] =
+    fetchedCompanies.length > 0
+      ? fetchedCompanies.slice(0, 8).map(mapCompanyToDisplay)
       : premiumCompanies;
 
-  const handleCompanyClick = (company: any) => {
+  const handleCompanyClick = (company: DisplayCompany) => {
     if (company.isReal) {
       router.push(`/companies/${company.slug}`);
     } else {
@@ -188,9 +203,9 @@ const LandingFeaturedCompanies = () => {
             }}
             className="premium-employers-slider w-full py-4"
           >
-            {displayCompanies.map((company: any, index: number) => (
+            {displayCompanies.map((company: DisplayCompany, index: number) => (
               <SwiperSlide key={index} className="h-auto">
-                <Card className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500 hover:shadow-lg">
+                <Card className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500">
                   {/* Dynamic Gradient Overlay */}
                   <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
@@ -203,7 +218,7 @@ const LandingFeaturedCompanies = () => {
                         {company.initial}
                       </div>
 
-                      {/* Redesigned Premium Badge */}
+                      {/* Premium Badge */}
                       <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-600 uppercase shadow-sm shadow-amber-500/5 dark:text-amber-500">
                         <Crown className="h-3.5 w-3.5 fill-amber-500/20 text-amber-500" />
                         PRO Member

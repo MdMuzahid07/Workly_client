@@ -30,6 +30,8 @@ interface Notification {
   message: string;
   isRead: boolean;
   timestamp: string;
+  /** Alias required by NotificationItem */
+  createdAt: string;
   metadata?: {
     jobTitle?: string;
     companyName?: string;
@@ -92,11 +94,11 @@ const NotificationView = () => {
     title: n.title,
     message: n.message,
     isRead: n.isRead,
+    createdAt: n.createdAt || "",
     timestamp: n.createdAt
       ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })
       : "",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    metadata: (n.metadata as any) ?? undefined,
+    metadata: (n.metadata as Record<string, string | undefined>) ?? undefined,
   }));
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;

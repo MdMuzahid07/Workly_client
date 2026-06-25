@@ -1,23 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Input } from "../../../ui/input";
 import { Label } from "../../../ui/label";
 import { Slider } from "../../../ui/slider";
 
-const ExperienceRange = ({
-  updateFilters,
-  filters,
-}: {
-  updateFilters: any;
-  filters: any;
-}) => {
+interface CandidateFilters {
+  experienceRange: [number, number];
+  location?: string;
+  industry?: string;
+  skills?: string[];
+}
+
+interface ExperienceRangeProps {
+  updateFilters: (partial: Partial<CandidateFilters>) => void;
+  filters: CandidateFilters;
+}
+
+const ExperienceRange = ({ updateFilters, filters }: ExperienceRangeProps) => {
   const handleRangeChange = (value: number[]) => {
-    updateFilters({ experienceRange: value });
+    updateFilters({ experienceRange: value as [number, number] });
   };
 
   const handleInputChange = (index: number, val: string) => {
     const num = parseInt(val) || 0;
-    const newRange = [...filters.experienceRange];
+    const newRange = [...filters.experienceRange] as [number, number];
     newRange[index] = num;
     updateFilters({ experienceRange: newRange });
   };

@@ -1,7 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Edit2, GraduationCap, Trash2 } from "lucide-react";
+import type { Certification, Education } from "@/types/profile";
+
+interface EducationListProps {
+  education?: Education[];
+  certifications?: Certification[];
+  onAdd?: () => void;
+  onAddCertificate?: () => void;
+  onEditEdu?: (edu: Education, index: number) => void;
+  onDeleteEdu?: (index: number) => void;
+  onEditCert?: (cert: Certification, index: number) => void;
+  onDeleteCert?: (index: number) => void;
+}
 
 const EducationList = ({
   education = [],
@@ -12,17 +23,7 @@ const EducationList = ({
   onDeleteEdu,
   onEditCert,
   onDeleteCert,
-}: {
-  education: any[];
-
-  certifications?: any[];
-  onAdd?: () => void;
-  onAddCertificate?: () => void;
-  onEditEdu?: (edu: any, index: number) => void;
-  onDeleteEdu?: (index: number) => void;
-  onEditCert?: (cert: any, index: number) => void;
-  onDeleteCert?: (index: number) => void;
-}) => {
+}: EducationListProps) => {
   return (
     <div className="space-y-6">
       <SectionCard
@@ -59,7 +60,9 @@ const EducationList = ({
                     <div className="text-muted-foreground mb-1 text-xs tracking-wider uppercase">
                       Univeristy/Institute
                     </div>
-                    <div className="font-medium">{edu.institute}</div>
+                    <div className="font-medium">
+                      {edu.institute ?? edu.institution}
+                    </div>
                   </div>
                   <div className="flex gap-8">
                     <div>
@@ -125,14 +128,14 @@ const EducationList = ({
                   <div>
                     <h4 className="font-semibold">{cert.name}</h4>
                     <p className="text-muted-foreground text-sm">
-                      {cert.issuingOrg || cert.organization}
+                      {cert.issuingOrg ?? cert.organization}
                     </p>
                     <p className="text-muted-foreground mt-1 text-xs">
                       {cert.issueDate
                         ? `Issued ${new Date(cert.issueDate).toLocaleDateString(undefined, { year: "numeric", month: "short" })}`
                         : ""}
-                      {cert.expiryDate || cert.expirationDate
-                        ? ` · Expires ${new Date(cert.expiryDate || cert.expirationDate).toLocaleDateString(undefined, { year: "numeric", month: "short" })}`
+                      {(cert.expiryDate ?? cert.expirationDate)
+                        ? ` · Expires ${new Date((cert.expiryDate ?? cert.expirationDate)!).toLocaleDateString(undefined, { year: "numeric", month: "short" })}`
                         : ""}
                     </p>
                   </div>

@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowUpRight,
   BadgeCheck,
   Briefcase,
+  ChevronLeft,
+  ChevronRight,
   MapPin,
   Star,
   Users,
@@ -16,7 +19,8 @@ import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import "swiper/css";
-import { Autoplay } from "swiper/modules";
+import "swiper/css/navigation";
+import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import CandidateCard from "../../../components/main/candidates/CandidateCard";
 import CandidateSidebarFilter from "../../../components/main/candidates/filter/CandidateSidebarFilter";
@@ -46,13 +50,19 @@ const DEFAULT_FILTERS: Filters = {
 const FeaturedCandidatesSkeleton = () => {
   return (
     <div className="mt-12">
-      <div className="mb-6 flex items-center gap-2">
-        <Skeleton className="h-6 w-6 rounded-full" />
-        <Skeleton className="h-6 w-40 rounded-md" />
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-6 w-6 rounded-full" />
+          <Skeleton className="h-6 w-40 rounded-md" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
       </div>
 
-      <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
-        {[1, 2].map((i) => (
+      <div className="grid w-full grid-cols-1 gap-6 py-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
           <Card
             key={i}
             className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
@@ -71,14 +81,14 @@ const FeaturedCandidatesSkeleton = () => {
               </div>
 
               {/* Metadata */}
-              <div className="flex items-center gap-2">
+              <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold">
                 <Skeleton className="h-4 w-16 rounded-md" />
                 <Skeleton className="h-4 w-20 rounded-md" />
                 <Skeleton className="h-4 w-24 rounded-md" />
               </div>
 
               {/* Skills */}
-              <div className="flex gap-1.5 pt-2">
+              <div className="flex flex-wrap items-center gap-1.5 pt-2">
                 <Skeleton className="h-6 w-14 rounded-lg" />
                 <Skeleton className="h-6 w-18 rounded-lg" />
                 <Skeleton className="h-6 w-12 rounded-lg" />
@@ -177,7 +187,7 @@ const BrowseCandidatesView = () => {
     return (
       <Card
         onClick={() => router.push(`/browse-candidates/${candidate.id}`)}
-        className="group hover:border-primary/50 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
       >
         <div className="relative z-10 flex-1 space-y-4">
           {/* Header Row */}
@@ -317,43 +327,63 @@ const BrowseCandidatesView = () => {
         ) : (
           featuredCandidates.length > 0 && (
             <div className="mt-12">
-              <div className="mb-6 flex items-center gap-2">
-                <Users className="text-primary h-5.5 w-5.5 shrink-0" />
-                <h2 className="text-foreground text-xl font-bold tracking-tight">
-                  Featured Profiles
-                </h2>
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="text-primary h-5.5 w-5.5 shrink-0" />
+                  <h2 className="text-foreground text-xl font-bold tracking-tight">
+                    Featured Profiles
+                  </h2>
+                </div>
+
+                {/* Custom Navigation Buttons */}
+                {featuredCandidates.length > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="featured-candidates-prev border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="featured-candidates-next border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              {featuredCandidates.length < 2 ? (
-                <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
-                  {featuredCandidates.map((candidate: any, index: number) =>
-                    renderFeaturedCard(candidate, index),
-                  )}
-                </div>
-              ) : (
-                <Swiper
-                  modules={[Autoplay]}
-                  spaceBetween={20}
-                  slidesPerView={1}
-                  loop={featuredCandidates.length > 2}
-                  autoplay={{
-                    delay: 3000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true,
-                  }}
-                  breakpoints={{
-                    768: { slidesPerView: 1.5 },
-                    1024: { slidesPerView: 2 },
-                  }}
-                  className="w-full py-4"
-                >
-                  {featuredCandidates.map((candidate: any, index: number) => (
-                    <SwiperSlide key={candidate.id || index} className="h-auto">
-                      {renderFeaturedCard(candidate, index)}
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              )}
+              <Swiper
+                modules={[Autoplay, Navigation]}
+                spaceBetween={24}
+                slidesPerView={1}
+                speed={800}
+                grabCursor={true}
+                loop={featuredCandidates.length > 3}
+                autoplay={{
+                  delay: 4000,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                navigation={{
+                  nextEl: ".featured-candidates-next",
+                  prevEl: ".featured-candidates-prev",
+                }}
+                breakpoints={{
+                  640: { slidesPerView: 2, spaceBetween: 20 },
+                  1024: { slidesPerView: 3, spaceBetween: 24 },
+                }}
+                className="w-full py-4"
+              >
+                {featuredCandidates.map((candidate: any, index: number) => (
+                  <SwiperSlide key={candidate.id || index} className="h-auto">
+                    {renderFeaturedCard(candidate, index)}
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           )
         )}

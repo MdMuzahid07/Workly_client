@@ -1,20 +1,21 @@
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
+import type { WorkExperience } from "@/types/profile";
+
+interface ExperienceListProps {
+  experience?: WorkExperience[];
+  onAdd?: () => void;
+  onEdit?: (exp: WorkExperience, index: number) => void;
+  onDelete?: (index: number) => void;
+}
 
 const ExperienceList = ({
   experience = [],
   onAdd,
   onEdit,
   onDelete,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  experience: any[];
-  onAdd?: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onEdit?: (exp: any, index: number) => void;
-  onDelete?: (index: number) => void;
-}) => {
+}: ExperienceListProps) => {
   return (
     <SectionCard
       title="Work Experience"
@@ -40,7 +41,7 @@ const ExperienceList = ({
                     Designation
                   </div>
                   <div className="font-medium">
-                    {exp.jobTitle || exp.designation}
+                    {exp.jobTitle ?? exp.designation}
                   </div>
                 </div>
                 <div>

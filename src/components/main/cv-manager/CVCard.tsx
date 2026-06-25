@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +34,7 @@ interface Resume {
   fileSize: number;
   isDefault: boolean;
   uploadDate: string;
+  type?: string;
 }
 
 interface CVCardProps {
@@ -53,8 +53,9 @@ const CVCard = ({ resume, index }: CVCardProps) => {
       toast.loading("Deleting resume...", { id: "delete-resume" });
       await deleteResume(resume.id).unwrap();
       toast.success("Resume deleted successfully", { id: "delete-resume" });
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete resume", {
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Failed to delete resume", {
         id: "delete-resume",
       });
     }
@@ -65,8 +66,9 @@ const CVCard = ({ resume, index }: CVCardProps) => {
       toast.loading("Setting as primary...", { id: "set-default" });
       await setDefaultResume(resume.id).unwrap();
       toast.success("Primary resume updated", { id: "set-default" });
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to set primary resume", {
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Failed to set primary resume", {
         id: "set-default",
       });
     }
@@ -109,11 +111,7 @@ const CVCard = ({ resume, index }: CVCardProps) => {
                     variant="secondary"
                     className="bg-primary/10 text-primary rounded-lg border-none px-2 py-0.5 text-[10px] font-bold tracking-tight"
                   >
-                    {
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      //@ts-ignore
-                      resume.type
-                    }
+                    {resume.type || "PDF"}
                   </Badge>
                   {resume.isDefault && (
                     <Badge

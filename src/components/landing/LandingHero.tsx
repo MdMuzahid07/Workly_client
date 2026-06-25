@@ -392,7 +392,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                 {/* Action CTA */}
                 <button
                   type="submit"
-                  className="bg-primary hover:bg-primary/95 shadow-primary/20 hover:shadow-primary/30 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white shadow-lg transition-all hover:scale-102 hover:shadow-xl sm:w-auto"
+                  className="bg-primary hover:bg-primary/90 focus-visible:ring-primary flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold text-white transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto"
                 >
                   <Search className="h-4 w-4" />
                   <span>Search Jobs</span>
@@ -491,7 +491,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                 transition={{ delay: 0.8, duration: 0.7 }}
                 className="absolute -top-4 -right-4 hidden sm:right-0 sm:block lg:-top-6 lg:-right-8"
               >
-                <Card className="group border-border/60 bg-card/90 hover:border-primary/40 hover:shadow-primary/10 p-4 shadow-xl backdrop-blur-xl transition-all hover:shadow-2xl">
+                <Card className="group border-border/60 bg-card/90 hover:border-primary p-4 shadow-xl backdrop-blur-xl transition-all">
                   <div className="flex items-center gap-3">
                     <div className="from-primary/20 to-primary/10 flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br">
                       <TrendingUp className="text-primary h-6 w-6" />
@@ -515,7 +515,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                 transition={{ delay: 0.9, duration: 0.7 }}
                 className="absolute -bottom-6 -left-4 hidden sm:left-0 sm:block lg:-bottom-10 lg:-left-8"
               >
-                <Card className="group border-border/60 bg-card/90 hover:border-accent/40 hover:shadow-accent/10 p-4 shadow-xl backdrop-blur-xl transition-all hover:shadow-2xl">
+                <Card className="group border-border/60 bg-card/90 hover:border-accent p-4 shadow-xl backdrop-blur-xl transition-all">
                   <div className="flex items-center gap-3">
                     <div className="from-accent/20 to-accent/10 flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br">
                       <Building2 className="text-accent h-6 w-6" />

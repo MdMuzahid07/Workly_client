@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@react-three/drei";
+import { Progress } from "@/components/ui/progress";
 
 interface Skill {
   skillName: string;
@@ -56,8 +56,6 @@ const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
                 </div>
                 <div className="space-y-2">
                   <Progress
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    //@ts-ignore
                     value={skillInfo.progress}
                     className="bg-muted h-2"
                   />

@@ -1,5 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from "@reduxjs/toolkit/query";
 import { logout, setCredentials } from "../feature/auth/authSlice";
 import { RootState } from "../store";
 
@@ -10,8 +14,6 @@ const url = process.env.NEXT_PUBLIC_BACKEND_URL
 const baseQuery = fetchBaseQuery({
   baseUrl: url,
   credentials: "include",
-  // extra added with fetchBaseQuery
-  // in prepareHeaders we get two parameters (header,api), we get the getState() from the api
   prepareHeaders: (headers, { getState }) => {
     const fromStore = (getState() as RootState).auth.accessToken;
     const fromStorage =
@@ -28,44 +30,46 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
-// when our access token invalidate we are getting an error,
-// we need to renew our access token by using refresh token
-// to do this we can make an custom base query by following redux documentation (Implementing a custom baseQuery);
-// we have to take tree arguments(args, api, and extraOptions) to create custom base query
-
-const baseQueryWithRefreshToken = async (
-  args: any,
-  api: any,
-  extraOptions: any,
-) => {
-  // we can call our baseQuery here with this three arguments received in custom base query
+/**
+ * Custom base query that transparently refreshes the access token on 401
+ * responses using the /auth/refresh endpoint, then retries the original request.
+ */
+const baseQueryWithRefreshToken: BaseQueryFn<
+  FetchArgs | string,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  let res;
+
   if (result?.error?.status === 401 && url) {
-    res = await fetch(`${url}/auth/refresh`, {
+    const refreshResponse = await fetch(`${url}/auth/refresh`, {
       method: "POST",
       credentials: "include",
     });
-  }
 
-  if (res) {
-    const data = await res.json();
+    if (refreshResponse.ok) {
+      const data = (await refreshResponse.json()) as {
+        data?: { accessToken?: string };
+      };
 
-    if (data?.data?.accessToken) {
-      const user = (api.getState() as RootState).auth.user;
+      if (data?.data?.accessToken) {
+        const user = (api.getState() as RootState).auth.user;
 
-      await api.dispatch(
-        setCredentials({
-          user,
-          accessToken: data?.data?.accessToken,
-        }),
-      );
+        api.dispatch(
+          setCredentials({
+            user,
+            accessToken: data.data.accessToken,
+          }),
+        );
 
-      result = await baseQuery(args, api, extraOptions);
+        // Retry the original request with the new token
+        result = await baseQuery(args, api, extraOptions);
+      } else {
+        api.dispatch(logout());
+      }
     } else {
       api.dispatch(logout());
     }
-    return result;
   }
 
   return result;
@@ -97,13 +101,6 @@ export type TagType = (typeof tagTypes)[keyof typeof tagTypes];
 
 const baseApi = createApi({
   reducerPath: "baseApi",
-  // baseQuery: fetchBaseQuery({
-  //     baseUrl: "http://localhost:5000/api/v1",
-  //     credentials: "include"
-  // }),
-  // cleaner syntax => just storing in a variable and using here
-  // we calling baseQuery in our custom base query, thats why it will call from there
-  // because we called our baseQuery in our custom base query thats why we need to set here the custom one
   baseQuery: baseQueryWithRefreshToken,
   tagTypes: Object.values(tagTypes),
   endpoints: () => ({}),

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
 interface Company {
@@ -35,6 +37,9 @@ interface Job {
   viewCount?: number;
   applyCount?: number;
   isSaved?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+  location?: string;
 }
 
 interface JobDetailsSidebarProps {
@@ -92,6 +97,11 @@ const CompanyInfoItem = ({
   </>
 );
 
+const formatJobType = (type: string) => {
+  if (!type) return "";
+  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 const JobDetailsSidebar = ({
   job,
   onApply,
@@ -126,29 +136,28 @@ const JobDetailsSidebar = ({
     { label: "Posted", value: postedTime, icon: STATS_ICONS.posted },
   ];
 
-  const similarJobs = [
-    {
-      title: "Full Stack Developer",
-      company: "WebTech Inc",
-      location: "Remote",
-      salary: "$30/hour",
-      type: "contract",
-    },
-    {
-      title: "React Developer",
-      company: "StartupXYZ",
-      location: "New York",
-      salary: "$1500 fixed",
-      type: "fixed-price",
-    },
-    {
-      title: "UI/UX Developer",
-      company: "DesignCorp",
-      location: "London",
-      salary: "$28/hour",
-      type: "contract",
-    },
-  ];
+  // Fetch similar jobs
+  const { data: similarJobsData, isLoading: similarLoading } = useGetJobsQuery({
+    limit: 10,
+  });
+
+  const similarJobsList = useMemo(() => {
+    const raw = (similarJobsData?.data?.result ||
+      similarJobsData?.data ||
+      []) as Job[];
+    const filtered = raw.filter((j: Job) => j.id !== job.id);
+
+    // Filter by same industry
+    const matching = filtered.filter(
+      (j: Job) => (j.industry?.name || j.company?.industry?.name) === industry,
+    );
+
+    if (matching.length > 0) {
+      return matching.slice(0, 3);
+    }
+    // Fallback to any other jobs if no industry matches
+    return filtered.slice(0, 3);
+  }, [similarJobsData, job.id, industry]);
 
   const handleApply = () => {
     onApply?.();
@@ -247,16 +256,42 @@ const JobDetailsSidebar = ({
           <CardTitle className="text-lg">Similar Jobs</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {similarJobs.map((similarJob, index) => (
-            <JobDetailsSimilarJobCard
-              key={index}
-              title={similarJob.title}
-              company={similarJob.company}
-              location={similarJob.location}
-              salary={similarJob.salary}
-              type={similarJob.type}
-            />
-          ))}
+          {similarLoading ? (
+            [1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="border-primary/10 animate-pulse space-y-2 rounded-2xl border p-4"
+              >
+                <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-slate-800" />
+                <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-slate-800" />
+                <div className="h-3 w-1/4 rounded bg-gray-200 dark:bg-slate-800" />
+              </div>
+            ))
+          ) : similarJobsList.length === 0 ? (
+            <div className="text-muted-foreground py-4 text-center text-xs font-semibold">
+              No similar jobs found
+            </div>
+          ) : (
+            similarJobsList.map((similarJob: Job, index: number) => {
+              const salaryStr =
+                similarJob.salaryMin && similarJob.salaryMax
+                  ? `$${Math.round(similarJob.salaryMin / 1000)}k - $${Math.round(similarJob.salaryMax / 1000)}k / yr`
+                  : similarJob.salaryMin
+                    ? `$${Math.round(similarJob.salaryMin / 1000)}k+ / yr`
+                    : "Competitive Salary";
+              return (
+                <JobDetailsSimilarJobCard
+                  key={similarJob.id || index}
+                  id={similarJob.id}
+                  title={similarJob.title}
+                  company={similarJob.company?.name || "Verified Partner"}
+                  location={similarJob.location || "Remote"}
+                  salary={salaryStr}
+                  type={formatJobType(similarJob.jobType || "Full-Time")}
+                />
+              );
+            })
+          )}
         </CardContent>
       </Card>
     </aside>

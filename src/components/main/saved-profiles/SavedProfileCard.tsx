@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -30,32 +29,35 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { Availability, Skill, UserProfileData } from "@/types/profile";
 
-const availabilityLabels: any = {
+const availabilityLabels: Record<Availability, string> = {
   immediate: "Immediate",
   "2_weeks": "2 Weeks",
   "1_month": "1 Month",
   not_available: "Not Available",
 };
 
-const availabilityColors: any = {
+const availabilityColors: Record<Availability, string> = {
   immediate: "bg-success/10 text-success border-success/20",
   "2_weeks": "bg-primary/10 text-primary border-primary/20",
   "1_month": "bg-warning/10 text-warning border-warning/20",
   not_available: "bg-muted text-muted-foreground border-border",
 };
 
+interface SavedProfileCardProps {
+  profile: UserProfileData;
+  index: number;
+  onRemove?: () => void;
+  onShortlist?: () => void;
+}
+
 const SavedProfileCard = ({
   profile: rawProfile,
   index,
   onRemove,
   onShortlist,
-}: {
-  profile: any;
-  index: number;
-  onRemove?: () => void;
-  onShortlist?: () => void;
-}) => {
+}: SavedProfileCardProps) => {
   // Map real user data to the expected profile structure
   const profile = {
     id: rawProfile.id,
@@ -69,7 +71,7 @@ const SavedProfileCard = ({
     phone: rawProfile.profile?.phone,
     skills: rawProfile.profile?.skills || [],
     education: rawProfile.profile?.education?.[0]
-      ? `${rawProfile.profile.education[0].degree} - ${rawProfile.profile.education[0].institution}`
+      ? `${rawProfile.profile.education[0].degree} - ${rawProfile.profile.education[0].institution ?? rawProfile.profile.education[0].institute}`
       : "Not Specified",
     summary: rawProfile.profile?.bio || "No biography provided.",
     resumeUrl: rawProfile.profile?.resumeUrl,
@@ -80,12 +82,12 @@ const SavedProfileCard = ({
     twitterUrl: rawProfile.profile?.twitterUrl,
     facebookUrl: rawProfile.profile?.facebookUrl,
     availability:
-      (rawProfile.profile?.preference?.availability?.toLowerCase() as any) ||
-      "immediate",
+      ((rawProfile.profile?.preference?.availability?.toLowerCase() as Availability) ||
+        "immediate") satisfies Availability,
     salaryExpectation: rawProfile.profile?.preference?.expectedSalary
       ? {
           min: rawProfile.profile.preference.expectedSalary,
-          max: rawProfile.profile.preference.expectedSalary, // Single value for now
+          max: rawProfile.profile.preference.expectedSalary,
           currency: "$",
         }
       : undefined,
@@ -179,9 +181,9 @@ const SavedProfileCard = ({
 
           {/* Skills */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {profile.skills.slice(0, 5).map((skill: any) => (
+            {profile.skills.slice(0, 5).map((skill: Skill) => (
               <Badge
-                key={skill.id}
+                key={skill.id ?? skill.skillName}
                 variant="secondary"
                 className="bg-primary/10 text-primary rounded-lg border-none px-2.5 py-1 text-xs font-bold"
               >
@@ -201,7 +203,7 @@ const SavedProfileCard = ({
           {/* Tags */}
           {profile.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
-              {profile.tags.map((tag: any, idx: number) => (
+              {profile.tags.map((tag: string, idx: number) => (
                 <div
                   key={idx}
                   className="bg-muted/50 text-muted-foreground rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase"
@@ -258,7 +260,6 @@ const SavedProfileCard = ({
           {/* Contact & Links */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
-              {/* Email */}
               <a
                 href={`mailto:${profile.email}`}
                 className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
@@ -266,8 +267,6 @@ const SavedProfileCard = ({
                 <Mail className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Email</span>
               </a>
-
-              {/* Phone */}
               {profile.phone && (
                 <a
                   href={`tel:${profile.phone}`}
@@ -277,8 +276,6 @@ const SavedProfileCard = ({
                   <span className="hidden sm:inline">Call</span>
                 </a>
               )}
-
-              {/* LinkedIn */}
               {profile.linkedinUrl && (
                 <a
                   href={profile.linkedinUrl}
@@ -290,8 +287,6 @@ const SavedProfileCard = ({
                   <span className="hidden sm:inline">LinkedIn</span>
                 </a>
               )}
-
-              {/* GitHub */}
               {profile.githubUrl && (
                 <a
                   href={profile.githubUrl}
@@ -303,8 +298,6 @@ const SavedProfileCard = ({
                   <span className="hidden sm:inline">GitHub</span>
                 </a>
               )}
-
-              {/* Portfolio */}
               {profile.portfolioUrl && (
                 <a
                   href={profile.portfolioUrl}
@@ -316,8 +309,6 @@ const SavedProfileCard = ({
                   <span className="hidden sm:inline">Portfolio</span>
                 </a>
               )}
-
-              {/* Twitter */}
               {profile.twitterUrl && (
                 <a
                   href={profile.twitterUrl}
@@ -329,8 +320,6 @@ const SavedProfileCard = ({
                   <span className="hidden sm:inline">Twitter</span>
                 </a>
               )}
-
-              {/* Facebook */}
               {profile.facebookUrl && (
                 <a
                   href={profile.facebookUrl}
@@ -351,7 +340,7 @@ const SavedProfileCard = ({
                   size="sm"
                   variant="outline"
                   className="h-9 rounded-full px-4 text-xs font-bold"
-                  onClick={() => window.open(profile.resumeUrl, "_blank")}
+                  onClick={() => window.open(profile.resumeUrl!, "_blank")}
                 >
                   <FileText className="mr-1.5 h-3.5 w-3.5" />
                   View Resume

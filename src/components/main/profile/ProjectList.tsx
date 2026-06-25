@@ -2,20 +2,21 @@ import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit2, ExternalLink, Trash2 } from "lucide-react";
+import type { Project } from "@/types/profile";
+
+interface ProjectListProps {
+  projects?: Project[];
+  onAdd?: () => void;
+  onEdit?: (project: Project, index: number) => void;
+  onDelete?: (index: number) => void;
+}
 
 export const ProjectList = ({
   projects = [],
   onAdd,
   onEdit,
   onDelete,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  projects: any[];
-  onAdd?: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onEdit?: (project: any, index: number) => void;
-  onDelete?: (index: number) => void;
-}) => {
+}: ProjectListProps) => {
   return (
     <SectionCard
       title="Projects & Case Studies"

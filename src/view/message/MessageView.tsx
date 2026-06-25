@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   AlertDialog,
@@ -61,12 +59,15 @@ interface Message {
   id: string;
   senderId: string;
   content: string;
-  messageType: "TEXT" | "IMAGE" | "FILE" | "LINK";
-  fileUrl?: string;
-  fileName?: string;
-  fileSize?: number;
+  messageType: "TEXT" | "IMAGE" | "FILE" | "LINK" | "AUDIO" | "VIDEO";
+  fileUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
   createdAt: string;
-  status: string;
+  /** Widened to string so socket updates (which carry raw API status) satisfy this type. */
+  status: "SENT" | "DELIVERED" | "READ" | "DELETED";
+  /** Only present on socket-emitted new_message events */
+  conversationId?: string;
   sender?: {
     fullName: string;
     profile?: {
@@ -131,7 +132,7 @@ const MessageView = () => {
   useEffect(() => {
     if (!socket || !selectedConversation) return;
 
-    const handleNewMessage = (message: any) => {
+    const handleNewMessage = (message: Message) => {
       if (message.conversationId === selectedConversation) {
         setAllMessages((prev) => {
           const exists = prev.some((m) => m.id === message.id);
@@ -198,44 +199,68 @@ const MessageView = () => {
     return undefined;
   }, [socket, selectedConversation, markAsRead]);
 
-  const conversations = (conversationsData?.data || []).map((conv: any) => {
-    const participant = conv.conversationParticipants.find(
-      (p: any) => p.userId !== currentUser?.id,
-    );
-    const myParticipant = conv.conversationParticipants.find(
-      (p: any) => p.userId === currentUser?.id,
-    );
+  const conversations = (conversationsData?.data || []).map(
+    (conv: {
+      id: string;
+      conversationParticipants: {
+        userId: string;
+        isBlocked?: boolean;
+        user?: {
+          fullName?: string;
+          profile?: {
+            avatarUrl?: string | null;
+            headline?: string | null;
+          } | null;
+        } | null;
+      }[];
+      lastMessage?: { content?: string; createdAt?: string } | null;
+    }) => {
+      const participant = conv.conversationParticipants.find(
+        (p) => p.userId !== currentUser?.id,
+      );
+      const myParticipant = conv.conversationParticipants.find(
+        (p) => p.userId === currentUser?.id,
+      );
 
-    return {
-      id: conv.id,
-      participantName: participant?.user?.fullName || "Unknown User",
-      participantAvatar:
-        participant?.user?.profile?.avatarUrl || "/placeholder.svg",
-      participantRole: participant?.user?.profile?.headline || "",
-      lastMessage: conv.lastMessage?.content || "No messages yet",
-      lastMessageTime: conv.lastMessage?.createdAt
-        ? formatDistanceToNow(new Date(conv.lastMessage.createdAt), {
-            addSuffix: true,
-          })
-        : "",
-      unreadCount: 0,
-      isOnline: false,
-      recipientId: participant?.userId,
-      isBlocked: myParticipant?.isBlocked || false,
-    };
-  });
+      return {
+        id: conv.id,
+        participantName: participant?.user?.fullName || "Unknown User",
+        participantAvatar:
+          participant?.user?.profile?.avatarUrl || "/placeholder.svg",
+        participantRole: participant?.user?.profile?.headline || "",
+        lastMessage: conv.lastMessage?.content || "No messages yet",
+        lastMessageTime: conv.lastMessage?.createdAt
+          ? formatDistanceToNow(new Date(conv.lastMessage.createdAt), {
+              addSuffix: true,
+            })
+          : "",
+        unreadCount: 0,
+        isOnline: false,
+        recipientId: participant?.userId,
+        isBlocked: myParticipant?.isBlocked || false,
+      };
+    },
+  );
 
-  const filteredConversations = conversations.filter(
-    (conv: any) =>
+  type ConversationItem = (typeof conversations)[number];
+
+  const filteredConversations: ConversationItem[] = conversations.filter(
+    (conv: ConversationItem) =>
       conv.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const currentConversation = conversations.find(
-    (conv: any) => conv.id === selectedConversation,
+  const currentConversation: ConversationItem | undefined = conversations.find(
+    (conv: ConversationItem) => conv.id === selectedConversation,
   );
 
-  const handleSendMessage = async (payloadOverride?: any) => {
+  const handleSendMessage = async (payloadOverride?: {
+    content?: string;
+    messageType?: "TEXT" | "IMAGE" | "FILE" | "LINK";
+    fileUrl?: string;
+    fileName?: string;
+    fileSize?: number;
+  }) => {
     if ((newMessage.trim() || payloadOverride) && selectedConversation) {
       const messageContent = payloadOverride?.content || newMessage;
       const recipientId = currentConversation?.recipientId;
@@ -274,9 +299,10 @@ const MessageView = () => {
           userId: currentUser?.id,
           isTyping: false,
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error sending message:", err);
-        toast.error(err?.data?.message || "Failed to send message");
+        const e = err as { data?: { message?: string }; message?: string };
+        toast.error(e?.data?.message || "Failed to send message");
         // Remove optimistic message on failure
         setAllMessages((prev) => prev.filter((m) => m.id.length > 15));
       }
@@ -312,7 +338,7 @@ const MessageView = () => {
       });
 
       toast.success("File uploaded successfully");
-    } catch (err) {
+    } catch {
       toast.error("Failed to upload file");
     } finally {
       setIsUploading(false);
@@ -325,7 +351,7 @@ const MessageView = () => {
     try {
       await blockUser(selectedConversation).unwrap();
       toast.success("User block status updated");
-    } catch (err) {
+    } catch {
       toast.error("Failed to update block status");
     }
   };
@@ -348,7 +374,7 @@ const MessageView = () => {
       await deleteConversation(selectedConversation).unwrap();
       setSelectedConversation(null);
       toast.success("Conversation deleted");
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete conversation");
     }
   };
@@ -371,7 +397,7 @@ const MessageView = () => {
       );
       toast.success("Message deleted");
       setMessageToDelete(null);
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete message");
     }
   };
@@ -873,7 +899,7 @@ const MessageView = () => {
                         <Smile className="h-5 w-5" />
                       </Button>
                       <Button
-                        onClick={handleSendMessage}
+                        onClick={() => handleSendMessage()}
                         disabled={!newMessage.trim()}
                         className="shadow-primary/20 bg-primary text-primary-foreground h-9 w-9 rounded-full p-0 shadow-xl transition-all hover:scale-110 active:scale-95 md:h-11 md:w-11"
                       >

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +15,9 @@ import {
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useGetJobsQuery } from "../../redux/feature/job/jobApi";
+import type { DisplayJob, JobListing } from "@/types/job";
 
-const featuredJobs = [
+const featuredJobs: DisplayJob[] = [
   {
     title: "Senior Full Stack Engineer (React & Node)",
     company: "TechCorp Global",
@@ -68,9 +68,67 @@ const featuredJobs = [
   },
 ];
 
-const formatJobType = (type: string) => {
+const logoBgOptions = [
+  "bg-blue-600/10 text-blue-600",
+  "bg-pink-600/10 text-pink-600",
+  "bg-purple-600/10 text-purple-600",
+  "bg-emerald-600/10 text-emerald-600",
+] as const;
+
+const formatJobType = (type: string): string => {
   if (!type) return "";
   return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const mapJobToDisplay = (job: JobListing): DisplayJob => {
+  const randomBg =
+    logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
+
+  let salaryStr = "Competitive";
+  if (
+    job.salaryMin !== undefined &&
+    job.salaryMin !== null &&
+    job.salaryMax !== undefined &&
+    job.salaryMax !== null
+  ) {
+    salaryStr = `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k / year`;
+  } else if (job.salaryMin !== undefined && job.salaryMin !== null) {
+    salaryStr = `$${Math.round(job.salaryMin / 1000)}k+ / year`;
+  }
+
+  let postedStr = "Recently";
+  if (job.createdAt) {
+    const diffMs = Date.now() - new Date(job.createdAt).getTime();
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHrs < 1) {
+      postedStr = "Just now";
+    } else if (diffHrs < 24) {
+      postedStr = `${diffHrs} hour${diffHrs > 1 ? "s" : ""} ago`;
+    } else {
+      const diffDays = Math.floor(diffHrs / 24);
+      postedStr = `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+    }
+  }
+
+  return {
+    id: job.id,
+    title: job.title,
+    company: job.company?.name || "Verified Partner",
+    logoBg: randomBg,
+    companyInitial: job.company?.name ? job.company.name[0].toUpperCase() : "J",
+    location: job.location || "Remote",
+    salary: salaryStr,
+    type: job.jobType || "Full-Time",
+    postedTime: postedStr,
+    tags: job.skills
+      ? job.skills.split(",").slice(0, 3)
+      : ["React", "TypeScript", "Node.js"],
+    isPremium:
+      job.isPremium ||
+      (job.salaryMin != null && job.salaryMin > 120000) ||
+      false,
+    isReal: true,
+  };
 };
 
 const LandingFeaturedJobs = () => {
@@ -81,66 +139,15 @@ const LandingFeaturedJobs = () => {
     sortOrder: "desc",
   });
 
-  const fetchedJobs = jobsData?.data || [];
+  const fetchedJobs: JobListing[] = jobsData?.data || [];
 
-  const displayJobs =
-    fetchedJobs?.length > 0
-      ? fetchedJobs.slice(0, 4).map((job: any) => {
-          const logoBgOptions = [
-            "bg-blue-600/10 text-blue-600",
-            "bg-pink-600/10 text-pink-600",
-            "bg-purple-600/10 text-purple-600",
-            "bg-emerald-600/10 text-emerald-600",
-          ];
-          const randomBg =
-            logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
-
-          // Format salary
-          let salaryStr = "Competitive";
-          if (job.salaryMin !== undefined && job.salaryMax !== undefined) {
-            salaryStr = `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k / year`;
-          } else if (job.salaryMin !== undefined) {
-            salaryStr = `$${Math.round(job.salaryMin / 1000)}k+ / year`;
-          }
-
-          // Calculate relative posted time
-          let postedStr = "Recently";
-          if (job.createdAt) {
-            const diffMs = Date.now() - new Date(job.createdAt).getTime();
-            const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-            if (diffHrs < 1) {
-              postedStr = "Just now";
-            } else if (diffHrs < 24) {
-              postedStr = `${diffHrs} hour${diffHrs > 1 ? "s" : ""} ago`;
-            } else {
-              const diffDays = Math.floor(diffHrs / 24);
-              postedStr = `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
-            }
-          }
-
-          return {
-            id: job.id,
-            title: job.title,
-            company: job.company?.name || "Verified Partner",
-            logoBg: randomBg,
-            companyInitial: job.company?.name
-              ? job.company.name[0].toUpperCase()
-              : "J",
-            location: job.location || "Remote",
-            salary: salaryStr,
-            type: job.jobType || "Full-Time",
-            postedTime: postedStr,
-            tags: job.skills
-              ? job.skills.split(",").slice(0, 3)
-              : ["React", "TypeScript", "Node.js"],
-            isPremium: job.isPremium || job.salaryMin > 120000 || false,
-            isReal: true,
-          };
-        })
+  const displayJobs: DisplayJob[] =
+    fetchedJobs.length > 0
+      ? fetchedJobs.slice(0, 4).map(mapJobToDisplay)
       : featuredJobs;
 
-  const handleJobClick = (job: any) => {
-    if (job.isReal) {
+  const handleJobClick = (job: DisplayJob) => {
+    if (job.isReal && job.id) {
       router.push(`/jobs/${job.id}`);
     } else {
       router.push(`/jobs`);
@@ -215,7 +222,7 @@ const LandingFeaturedJobs = () => {
 
         {/* Featured Jobs Feed Grid */}
         <div className="grid gap-6">
-          {displayJobs.map((job: any, index: number) => (
+          {displayJobs.map((job: DisplayJob, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -227,7 +234,7 @@ const LandingFeaturedJobs = () => {
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-              <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary/20 hover:shadow-primary/5 relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border bg-linear-to-b p-6 backdrop-blur-md transition-all duration-500 hover:shadow-xl md:flex-row md:items-center">
+              <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border bg-linear-to-b p-6 backdrop-blur-md transition-all duration-500 md:flex-row md:items-center">
                 {/* Dynamic Gradient Overlay */}
                 <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 

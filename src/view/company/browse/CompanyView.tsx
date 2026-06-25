@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowUpRight,
   BadgeCheck,
+  ChevronLeft,
   ChevronRight,
   Crown,
   MapPin,
@@ -16,13 +19,66 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ViewToggle from "../../../components/shared/ViewToggle";
 import "swiper/css";
-import { Autoplay } from "swiper/modules";
+import "swiper/css/navigation";
+import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import CompanyCard from "../../../components/main/company/CompanyCard";
 import CompanyFilter from "../../../components/main/company/CompanyFilter";
 import Searchbar from "../../../components/main/jobs/Searchbar";
 import { useGetCompaniesQuery } from "../../../redux/feature/company/companyApi";
 import CompanyCardSkeleton from "../../../skeleton/company/browse/CompanyCardSkeleton";
+
+const FeaturedCompaniesSkeleton = () => {
+  return (
+    <div className="mt-16">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-6 w-6 rounded-full" />
+          <Skeleton className="h-6 w-40 rounded-md" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+      </div>
+
+      <div className="grid w-full grid-cols-1 gap-6 py-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <Card
+            key={i}
+            className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
+          >
+            <div className="space-y-4">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32 rounded-md" />
+                    <Skeleton className="h-3.5 w-20 rounded-md" />
+                  </div>
+                </div>
+                <Skeleton className="h-5 w-5 rounded-md" />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full rounded-md" />
+                <Skeleton className="h-4 w-5/6 rounded-md" />
+              </div>
+
+              {/* Metadata */}
+              <div className="border-border/40 flex items-center gap-4 border-t pt-4">
+                <Skeleton className="h-4 w-20 rounded-md" />
+                <Skeleton className="h-4 w-24 rounded-md" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const CompanyView = ({
   companies: initialCompanies,
@@ -73,10 +129,11 @@ const CompanyView = ({
   });
 
   // Fetch featured / verified companies
-  const { data: featuredData } = useGetCompaniesQuery({
-    isVerified: true,
-    limit: 6,
-  });
+  const { data: featuredData, isLoading: featuredLoading } =
+    useGetCompaniesQuery({
+      isVerified: true,
+      limit: 6,
+    });
 
   const featuredCompanies = useMemo(() => {
     const list = featuredData?.data?.result || featuredData?.data || [];
@@ -173,129 +230,163 @@ const CompanyView = ({
         />
 
         {/* Featured Partners Section */}
-        {featuredCompanies.length > 0 && (
-          <div className="mt-16">
-            <div className="mb-6 flex items-center gap-2">
-              <Crown className="text-primary h-5.5 w-5.5 shrink-0" />
-              <h2 className="text-foreground text-xl font-bold tracking-tight">
-                Featured Partners
-              </h2>
-            </div>
+        {featuredLoading ? (
+          <FeaturedCompaniesSkeleton />
+        ) : (
+          featuredCompanies.length > 0 && (
+            <div className="mt-16">
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Crown className="text-primary h-5.5 w-5.5 shrink-0" />
+                  <h2 className="text-foreground text-xl font-bold tracking-tight">
+                    Featured Partners
+                  </h2>
+                </div>
 
-            <Swiper
-              modules={[Autoplay]}
-              spaceBetween={20}
-              slidesPerView={1}
-              loop={featuredCompanies.length > 2}
-              autoplay={{
-                delay: 3000,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }}
-              breakpoints={{
-                768: { slidesPerView: 1.5 },
-                1024: { slidesPerView: 2 },
-              }}
-              className="w-full py-4"
-            >
-              {featuredCompanies.map((company: any, index: number) => {
-                const logoBgOptions = [
-                  "bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
-                  "bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400",
-                  "bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
-                  "bg-emerald-600/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
-                ];
-                const randomBg = logoBgOptions[index % logoBgOptions.length];
-                const initial = company.name
-                  ? company.name[0].toUpperCase()
-                  : "C";
-
-                return (
-                  <SwiperSlide key={company.id || index} className="h-auto">
-                    <div
-                      onClick={() => router.push(`/companies/${company.slug}`)}
-                      className="group hover:border-primary/50 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+                {/* Custom Navigation Buttons */}
+                {featuredCompanies.length > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="featured-companies-prev border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
                     >
-                      <div className="relative z-10 flex-1 space-y-4">
-                        {/* Header Row */}
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            {company.logoUrl ? (
-                              <div className="border-border/30 relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border bg-white p-1 shadow-sm dark:bg-slate-800">
-                                <Image
-                                  src={company.logoUrl}
-                                  alt={`${company.name} logo`}
-                                  fill
-                                  sizes="48px"
-                                  className="object-contain p-1"
-                                  loading="lazy"
-                                />
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="featured-companies-next border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <Swiper
+                modules={[Autoplay, Navigation]}
+                spaceBetween={24}
+                slidesPerView={1}
+                speed={800}
+                grabCursor={true}
+                loop={featuredCompanies.length > 3}
+                autoplay={{
+                  delay: 4000,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                navigation={{
+                  nextEl: ".featured-companies-next",
+                  prevEl: ".featured-companies-prev",
+                }}
+                breakpoints={{
+                  640: { slidesPerView: 2, spaceBetween: 20 },
+                  1024: { slidesPerView: 3, spaceBetween: 24 },
+                }}
+                className="w-full py-4"
+              >
+                {featuredCompanies.map((company: any, index: number) => {
+                  const logoBgOptions = [
+                    "bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
+                    "bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400",
+                    "bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
+                    "bg-emerald-600/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
+                  ];
+                  const randomBg = logoBgOptions[index % logoBgOptions.length];
+                  const initial = company.name
+                    ? company.name[0].toUpperCase()
+                    : "C";
+
+                  return (
+                    <SwiperSlide key={company.id || index} className="h-auto">
+                      <div
+                        onClick={() =>
+                          router.push(`/companies/${company.slug}`)
+                        }
+                        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+                      >
+                        <div className="relative z-10 flex-1 space-y-4">
+                          {/* Header Row */}
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              {company.logoUrl ? (
+                                <div className="border-border/30 relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border bg-white p-1 shadow-sm dark:bg-slate-800">
+                                  <Image
+                                    src={company.logoUrl}
+                                    alt={`${company.name} logo`}
+                                    fill
+                                    sizes="48px"
+                                    className="object-contain p-1"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              ) : (
+                                <div
+                                  className={`ring-primary/5 border-background flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-lg font-black shadow-xs ring-2 transition-all duration-300 ${randomBg}`}
+                                >
+                                  {initial}
+                                </div>
+                              )}
+                              <div className="min-w-0">
+                                <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold tracking-tight">
+                                  {company.name}
+                                  {company.isVerified && (
+                                    <BadgeCheck className="text-primary fill-primary/10 h-4 w-4 shrink-0" />
+                                  )}
+                                </h4>
+                                <span className="text-primary mt-0.5 block text-[11px] font-bold">
+                                  {company.industry?.name || "Verified Partner"}
+                                </span>
                               </div>
-                            ) : (
-                              <div
-                                className={`ring-primary/5 border-background flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-lg font-black shadow-xs ring-2 transition-all duration-300 ${randomBg}`}
-                              >
-                                {initial}
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold tracking-tight">
-                                {company.name}
-                                {company.isVerified && (
-                                  <BadgeCheck className="text-primary fill-primary/10 h-4 w-4 shrink-0" />
-                                )}
-                              </h4>
-                              <span className="text-primary mt-0.5 block text-[11px] font-bold">
-                                {company.industry?.name || "Verified Partner"}
-                              </span>
+                            </div>
+
+                            {/* Top-Right Arrow Action */}
+                            <div className="text-muted-foreground/50 group-hover:text-primary p-1 transition-colors duration-300">
+                              <ArrowUpRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                             </div>
                           </div>
 
-                          {/* Top-Right Arrow Action */}
-                          <div className="text-muted-foreground/50 group-hover:text-primary p-1 transition-colors duration-300">
-                            <ArrowUpRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          {/* Description */}
+                          <p className="text-muted-foreground/80 line-clamp-2 text-xs leading-relaxed">
+                            {company.description ||
+                              "Building powerful and innovative digital solutions."}
+                          </p>
+
+                          {/* Bullet Divided Metadata Row (LinkedIn/Google style - Extremely Clean) */}
+                          <div className="text-muted-foreground/90 border-border/40 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-4 text-xs font-semibold">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="text-primary/60 h-3.5 w-3.5" />
+                              {company.location || "Remote"}
+                            </span>
+                            <span className="text-muted-foreground/30">•</span>
+                            <span className="flex items-center gap-1">
+                              <Users className="text-primary/60 h-3.5 w-3.5" />
+                              {company.size || "11-50"} staff
+                            </span>
+                            <span className="text-muted-foreground/30">•</span>
+                            {company.openJobs > 0 ? (
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                {company.openJobs} Openings
+                              </span>
+                            ) : company.openJobs === 0 ? (
+                              <span className="text-muted-foreground/60 font-semibold">
+                                No Openings
+                              </span>
+                            ) : (
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                Hiring Actively
+                              </span>
+                            )}
                           </div>
                         </div>
-
-                        {/* Description */}
-                        <p className="text-muted-foreground/80 line-clamp-2 text-xs leading-relaxed">
-                          {company.description ||
-                            "Building powerful and innovative digital solutions."}
-                        </p>
-
-                        {/* Bullet Divided Metadata Row (LinkedIn/Google style - Extremely Clean) */}
-                        <div className="text-muted-foreground/90 border-border/40 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-4 text-xs font-semibold">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="text-primary/60 h-3.5 w-3.5" />
-                            {company.location || "Remote"}
-                          </span>
-                          <span className="text-muted-foreground/30">•</span>
-                          <span className="flex items-center gap-1">
-                            <Users className="text-primary/60 h-3.5 w-3.5" />
-                            {company.size || "11-50"} staff
-                          </span>
-                          <span className="text-muted-foreground/30">•</span>
-                          {company.openJobs > 0 ? (
-                            <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                              {company.openJobs} Openings
-                            </span>
-                          ) : company.openJobs === 0 ? (
-                            <span className="text-muted-foreground/60 font-semibold">
-                              No Openings
-                            </span>
-                          ) : (
-                            <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                              Hiring Actively
-                            </span>
-                          )}
-                        </div>
                       </div>
-                    </div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-          </div>
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
+            </div>
+          )
         )}
 
         {/* All Companies Section */}

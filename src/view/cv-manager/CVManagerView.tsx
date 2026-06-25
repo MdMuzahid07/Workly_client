@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { Resume } from "@/types/profile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -58,8 +58,9 @@ const CVManagerView = () => {
       await uploadResume(formData).unwrap();
       toast.success("Resume uploaded successfully", { id: "upload-resume" });
       if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to upload resume", {
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Failed to upload resume", {
         id: "upload-resume",
       });
     }
@@ -115,7 +116,7 @@ const CVManagerView = () => {
 
           {/* CV Grid */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {resumes.map((resume: any, index: number) => (
+            {resumes.map((resume: Resume, index: number) => (
               <CVCard key={resume.id} resume={resume} index={index} />
             ))}
 

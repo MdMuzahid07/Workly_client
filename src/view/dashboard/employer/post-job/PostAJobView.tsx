@@ -62,11 +62,7 @@ const PostAJobView = () => {
 
   return (
     <div className="dark:bg-background/20 min-h-screen bg-slate-50/45 pt-16">
-      <DashboardPostAJobHeader
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        currentStep={currentStep}
-      />
+      <DashboardPostAJobHeader />
 
       <div className="container mx-auto px-4 py-6 sm:px-6 lg:py-10">
         <UpgradeGate

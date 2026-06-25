@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Separator } from "@radix-ui/react-select";
 import {
@@ -20,14 +21,14 @@ import {
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import type { UserProfileData } from "@/types/profile";
 
-const ProfileSidebar = ({
-  user,
-  setIsEditModalOpen,
-}: {
-  user: any;
-  setIsEditModalOpen: any;
-}) => {
+interface ProfileSidebarProps {
+  user: UserProfileData;
+  setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ProfileSidebar = ({ user, setIsEditModalOpen }: ProfileSidebarProps) => {
   return (
     <div className="hidden space-y-6 lg:col-span-4 lg:block">
       <Card className="bg-card rounded-2xl">

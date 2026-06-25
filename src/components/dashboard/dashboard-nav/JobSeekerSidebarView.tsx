@@ -291,8 +291,6 @@ export default function JobSeekerSidebarView({
 
   const handleConfirmSignOut = async () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
       await logoutUser().unwrap();
     } catch (error) {
       console.log(error);

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,19 +10,40 @@ import {
 import { CheckCircle2, MoreVertical, X } from "lucide-react";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
+import type { NotificationItem, NotificationType } from "@/types/notification";
+import type { ReactNode } from "react";
+
+interface NotificationCardProps {
+  notification: NotificationItem;
+  getNotificationColor: (type: NotificationType) => string;
+  getNotificationIcon: (type: NotificationType) => ReactNode;
+  deleteNotification: (id: string) => void;
+  markAsRead: (id: string) => void;
+}
+
+/** Safely cast the opaque metadata to a displayable record */
+interface NotificationMeta {
+  jobTitle?: string;
+  companyName?: string;
+  applicationStatus?: string;
+}
+
+const getMetadata = (raw: unknown): NotificationMeta => {
+  if (raw !== null && typeof raw === "object") {
+    return raw as NotificationMeta;
+  }
+  return {};
+};
+
 const NotificationCard = ({
   notification,
   getNotificationColor,
   getNotificationIcon,
   deleteNotification,
   markAsRead,
-}: {
-  notification: any;
-  getNotificationColor: any;
-  getNotificationIcon: any;
-  deleteNotification: any;
-  markAsRead: any;
-}) => {
+}: NotificationCardProps) => {
+  const meta = getMetadata(notification.metadata);
+
   return (
     <Card
       key={notification.id}
@@ -62,27 +81,29 @@ const NotificationCard = ({
                 <p className="text-muted-foreground mb-2 text-sm">
                   {notification.message}
                 </p>
-                {notification.metadata && (
+                {(meta.jobTitle ||
+                  meta.companyName ||
+                  meta.applicationStatus) && (
                   <div className="mb-2 flex flex-wrap gap-2">
-                    {notification.metadata.jobTitle && (
+                    {meta.jobTitle && (
                       <Badge variant="secondary" className="text-xs">
-                        {notification.metadata.jobTitle}
+                        {meta.jobTitle}
                       </Badge>
                     )}
-                    {notification.metadata.companyName && (
+                    {meta.companyName && (
                       <Badge variant="outline" className="text-xs">
-                        {notification.metadata.companyName}
+                        {meta.companyName}
                       </Badge>
                     )}
-                    {notification.metadata.applicationStatus && (
+                    {meta.applicationStatus && (
                       <Badge variant="default" className="text-xs">
-                        {notification.metadata.applicationStatus}
+                        {meta.applicationStatus}
                       </Badge>
                     )}
                   </div>
                 )}
                 <p className="text-muted-foreground text-xs">
-                  {notification.timestamp}
+                  {notification.createdAt}
                 </p>
               </div>
 

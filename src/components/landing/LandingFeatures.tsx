@@ -64,13 +64,13 @@ const LandingFeatures = () => {
                 ease: [0.21, 1.02, 0.47, 0.98],
               }}
             >
-              <Card className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative h-full overflow-hidden rounded-2xl border p-8 backdrop-blur-md transition-all duration-500 hover:shadow-lg">
+              <Card className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative h-full overflow-hidden rounded-2xl border p-8 backdrop-blur-md transition-all duration-500">
                 {/* Dynamic Gradient Overlay */}
                 <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                 <div className="relative z-10 flex h-full flex-col">
                   {/* Premium Icon Container */}
-                  <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary group-hover:shadow-primary/30 mb-8 inline-flex h-16 w-16 origin-center items-center justify-center rounded-2xl ring-1 transition-all duration-500 will-change-transform group-hover:rotate-12 group-hover:text-white group-hover:shadow-xl">
+                  <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary mb-8 inline-flex h-16 w-16 origin-center items-center justify-center rounded-2xl ring-1 transition-all duration-500 will-change-transform group-hover:rotate-12 group-hover:text-white">
                     <feature.icon className="h-8 w-8" />
                   </div>
 

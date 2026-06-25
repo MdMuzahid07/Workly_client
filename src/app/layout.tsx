@@ -4,8 +4,6 @@ import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
 import SocketProvider from "../provider/SocketProvider";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
 import "./globals.css";
 
 const barlow = Barlow({

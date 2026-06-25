@@ -1,7 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Award, BookOpen, Edit2, Trash2, UserCheck } from "lucide-react";
+import type {
+  Award as AwardType,
+  Publication,
+  Reference,
+} from "@/types/profile";
+
+interface AdditionalInfoProps {
+  awards?: AwardType[];
+  publications?: Publication[];
+  references?: Reference[];
+  onAddAward?: () => void;
+  onAddPublication?: () => void;
+  onAddReference?: () => void;
+  onEditAward?: (award: AwardType, index: number) => void;
+  onDeleteAward?: (index: number) => void;
+  onEditPublication?: (pub: Publication, index: number) => void;
+  onDeletePublication?: (index: number) => void;
+  onEditReference?: (ref: Reference, index: number) => void;
+  onDeleteReference?: (index: number) => void;
+}
 
 export const AdditionalInfo = ({
   awards = [],
@@ -16,20 +35,7 @@ export const AdditionalInfo = ({
   onDeletePublication,
   onEditReference,
   onDeleteReference,
-}: {
-  awards?: any[];
-  publications?: any[];
-  references?: any[];
-  onAddAward?: () => void;
-  onAddPublication?: () => void;
-  onAddReference?: () => void;
-  onEditAward?: (award: any, index: number) => void;
-  onDeleteAward?: (index: number) => void;
-  onEditPublication?: (pub: any, index: number) => void;
-  onDeletePublication?: (index: number) => void;
-  onEditReference?: (ref: any, index: number) => void;
-  onDeleteReference?: (index: number) => void;
-}) => {
+}: AdditionalInfoProps) => {
   return (
     <div className="space-y-6">
       <SectionCard
@@ -49,9 +55,9 @@ export const AdditionalInfo = ({
                   <div>
                     <h4 className="font-medium">{award.title}</h4>
                     <p className="text-muted-foreground text-sm">
-                      {award.issuer || award.organization}{" "}
-                      {award.issueDate || award.date
-                        ? `- ${new Date(award.issueDate || award.date).toLocaleDateString()}`
+                      {award.issuer ?? award.organization}{" "}
+                      {(award.issueDate ?? award.date)
+                        ? `- ${new Date((award.issueDate ?? award.date)!).toLocaleDateString()}`
                         : ""}
                     </p>
                   </div>
@@ -102,8 +108,8 @@ export const AdditionalInfo = ({
                     <h4 className="font-medium">{pub.title}</h4>
                     <p className="text-muted-foreground text-sm">
                       {pub.publisher}{" "}
-                      {pub.publishDate || pub.date
-                        ? `· ${new Date(pub.publishDate || pub.date).toLocaleDateString()}`
+                      {(pub.publishDate ?? pub.date)
+                        ? `· ${new Date((pub.publishDate ?? pub.date)!).toLocaleDateString()}`
                         : ""}
                     </p>
                   </div>

@@ -83,7 +83,7 @@ const LandingStatus = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
-              className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative overflow-hidden rounded-2xl border p-6 text-center backdrop-blur-sm transition-all duration-500 hover:shadow-lg sm:p-8"
+              className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative overflow-hidden rounded-2xl border p-6 text-center backdrop-blur-sm transition-all duration-500 sm:p-8"
             >
               <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 

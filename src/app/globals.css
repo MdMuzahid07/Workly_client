@@ -66,19 +66,21 @@
   --radius: 0.625rem;
 
   /* Light Theme - Professional Green Design */
-  --background: hsl(0 0% 100%); /* Pure white background */
-  --foreground: hsl(0 0% 3.9%); /* Near black text */
+  --background: hsl(0 0% 100%);
+  /* Pure white background */
+  --foreground: hsl(0 0% 3.9%);
+  /* Near black text */
 
-  --card: hsl(0 0% 100%); /* Pure white cards */
+  --card: hsl(0 0% 100%);
+  /* Pure white cards */
   --card-foreground: hsl(0 0% 3.9%);
 
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(0 0% 3.9%);
 
   /* Primary Green - Chateau Green 500 */
-  --primary: hsl(
-    145 55% 45%
-  ); /* Roughly #33b267 converted to HSL for consistency with previous system */
+  --primary: hsl(145 55% 45%);
+  /* Roughly #33b267 converted to HSL for consistency with previous system */
   --primary-foreground: hsl(0 0% 98%);
 
   /* Secondary - Light green accent */
@@ -108,14 +110,20 @@
   /* Borders and inputs */
   --border: hsl(142 15% 90%);
   --input: hsl(142 15% 95%);
-  --ring: hsl(142 76% 36%); /* Focus ring matches primary */
+  --ring: hsl(142 76% 36%);
+  /* Focus ring matches primary */
 
   /* Charts - Professional green palette */
-  --chart-1: hsl(142 76% 36%); /* Main brand green */
-  --chart-2: hsl(160 60% 45%); /* Teal */
-  --chart-3: hsl(120 50% 40%); /* Forest green */
-  --chart-4: hsl(180 40% 50%); /* Light blue-green */
-  --chart-5: hsl(100 60% 30%); /* Dark green */
+  --chart-1: hsl(142 76% 36%);
+  /* Main brand green */
+  --chart-2: hsl(160 60% 45%);
+  /* Teal */
+  --chart-3: hsl(120 50% 40%);
+  /* Forest green */
+  --chart-4: hsl(180 40% 50%);
+  /* Light blue-green */
+  --chart-5: hsl(100 60% 30%);
+  /* Dark green */
 
   /* Sidebar */
   --sidebar: hsl(142 15% 98%);
@@ -130,19 +138,21 @@
 
 .dark {
   /* Dark Theme - Professional Green Design */
-  --background: hsl(0 0% 3.9%); /* Very dark background */
-  --foreground: hsl(0 0% 98%); /* Light text */
+  --background: hsl(0 0% 3.9%);
+  /* Very dark background */
+  --foreground: hsl(0 0% 98%);
+  /* Light text */
 
-  --card: oklch(17.959% 0.02188 120.952); /* Dark card background */
+  --card: oklch(17.959% 0.02188 120.952);
+  /* Dark card background */
   --card-foreground: oklch(0.95 0.01 120);
 
   --popover: hsl(0 0% 3.9%);
   --popover-foreground: hsl(0 0% 98%);
 
   /* Primary - Chateau Green 400 */
-  --primary: hsl(
-    143 45% 52%
-  ); /* Roughly #4fb877 for slightly brighter primary in dark mode */
+  --primary: hsl(143 45% 52%);
+  /* Roughly #4fb877 for slightly brighter primary in dark mode */
   --primary-foreground: hsl(0 0% 3.9%);
 
   /* Secondary - Dark green accent */
@@ -175,11 +185,16 @@
   --ring: hsl(142 76% 50%);
 
   /* Charts - Adjusted for dark mode */
-  --chart-1: hsl(142 76% 50%); /* Brighter brand green */
-  --chart-2: hsl(160 60% 55%); /* Brighter teal */
-  --chart-3: hsl(120 50% 50%); /* Brighter forest green */
-  --chart-4: hsl(180 40% 60%); /* Brighter blue-green */
-  --chart-5: hsl(100 60% 40%); /* Brighter dark green */
+  --chart-1: hsl(142 76% 50%);
+  /* Brighter brand green */
+  --chart-2: hsl(160 60% 55%);
+  /* Brighter teal */
+  --chart-3: hsl(120 50% 50%);
+  /* Brighter forest green */
+  --chart-4: hsl(180 40% 60%);
+  /* Brighter blue-green */
+  --chart-5: hsl(100 60% 40%);
+  /* Brighter dark green */
 
   /* Sidebar */
   --sidebar: hsl(142 15% 8%);
@@ -444,6 +459,38 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Premium Swiper Smooth Slide Easing & Pill Pagination */
+.swiper-wrapper {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.swiper-pagination {
+  bottom: 0px !important;
+}
+
+.swiper-pagination-bullet {
+  background: var(--color-muted-foreground, #64748b) !important;
+  opacity: 0.35 !important;
+  width: 8px !important;
+  height: 8px !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #10b981 !important; /* Premium Emerald green matching Workly primary color */
+  opacity: 1 !important;
+  width: 24px !important;
+  border-radius: 4px !important;
+}
+
+.swiper-slide {
+  height: auto !important;
+  display: flex !important;
+  will-change: transform;
 }
