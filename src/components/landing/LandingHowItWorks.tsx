@@ -159,31 +159,31 @@ const LandingHowItWorks = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.45 }}
-              className="grid gap-4 sm:grid-cols-3 sm:gap-8"
+              className="grid gap-4 lg:grid-cols-3 lg:gap-8"
             >
               {steps.map((step, index) => (
                 <div key={index} className="relative">
-                  <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary relative h-full overflow-hidden rounded-2xl border bg-linear-to-b p-4 backdrop-blur-md transition-all duration-500 sm:p-8">
+                  <Card className="group border-border/40 from-card/60 to-card/10 hover:border-primary relative h-full overflow-hidden rounded-2xl border bg-linear-to-b p-4 backdrop-blur-md transition-all duration-500 lg:p-8">
                     {/* Background Sequence Watermark */}
-                    <span className="text-foreground/[0.04] group-hover:text-primary/[0.08] absolute top-3 right-4 text-5xl font-extrabold transition-all duration-500 select-none sm:top-4 sm:right-6 sm:text-7xl">
+                    <span className="text-foreground/[0.04] group-hover:text-primary/[0.08] absolute top-3 right-4 text-5xl font-extrabold transition-all duration-500 select-none lg:top-4 lg:right-6 lg:text-7xl">
                       {step.number}
                     </span>
 
                     {/* Glowing Accent Corner Overlay */}
                     <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                    <div className="relative z-10 flex h-full flex-row items-start gap-4 sm:flex-col sm:items-center sm:text-center">
+                    <div className="relative z-10 flex h-full flex-row items-start gap-4 lg:flex-col lg:items-center lg:text-center">
                       {/* Step Icon Container */}
-                      <div className="from-primary/10 to-accent/10 border-primary/10 group-hover:from-primary group-hover:to-accent text-primary flex h-11 w-11 shrink-0 origin-center items-center justify-center rounded-xl border bg-linear-to-br transition-all duration-500 will-change-transform group-hover:rotate-6 group-hover:text-white sm:h-16 sm:w-16 sm:rounded-2xl">
-                        <step.icon className="h-5.5 w-5.5 sm:h-8 sm:w-8" />
+                      <div className="from-primary/10 to-accent/10 border-primary/10 group-hover:from-primary group-hover:to-accent text-primary flex h-11 w-11 shrink-0 origin-center items-center justify-center rounded-xl border bg-linear-to-br transition-all duration-500 will-change-transform group-hover:rotate-6 group-hover:text-white lg:h-16 lg:w-16 lg:rounded-2xl">
+                        <step.icon className="h-5.5 w-5.5 lg:h-8 lg:w-8" />
                       </div>
 
                       {/* Content */}
-                      <div className="min-w-0 flex-1 space-y-1 text-left sm:mt-6 sm:text-center">
-                        <h3 className="text-foreground group-hover:text-primary text-base font-bold tracking-tight transition-all duration-500 sm:text-xl">
+                      <div className="min-w-0 flex-1 space-y-1 text-left lg:mt-6 lg:text-center">
+                        <h3 className="text-foreground group-hover:text-primary text-base font-bold tracking-tight transition-all duration-500 lg:text-xl">
                           {step.title}
                         </h3>
-                        <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                        <p className="text-muted-foreground text-xs leading-relaxed lg:text-sm">
                           {step.desc}
                         </p>
                       </div>
@@ -192,7 +192,7 @@ const LandingHowItWorks = () => {
 
                   {/* Connecting Arrows for non-last steps in larger views */}
                   {index < 2 && (
-                    <div className="text-primary/45 pointer-events-none absolute top-1/2 -right-6 z-20 hidden translate-x-1/2 -translate-y-1/2 sm:block lg:-right-3">
+                    <div className="text-primary/45 pointer-events-none absolute top-1/2 -right-6 z-20 hidden translate-x-1/2 -translate-y-1/2 lg:-right-3 lg:block">
                       <motion.div
                         animate={{ x: [0, 4, 0] }}
                         transition={{
