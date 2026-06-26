@@ -1,9 +1,52 @@
 import { Award, Briefcase, Building2, Users } from "lucide-react";
 import { motion } from "motion/react";
+import { useGetLandingStatsQuery } from "../../redux/feature/statistics/statisticsApi";
+import AnimatedCounter from "../shared/AnimatedCounter";
 
 const LandingStatus = () => {
+  const { data: statsRes, isLoading } = useGetLandingStatsQuery();
+  const stats = statsRes?.data;
+
+  const getFormatType = (val: number, isPercent = false) => {
+    if (isPercent) return "percent" as const;
+    if (val >= 1000000) return "M" as const;
+    if (val >= 1000) return "K" as const;
+    return "commas" as const;
+  };
+
+  const statItems = [
+    {
+      icon: Briefcase,
+      value: stats?.activeJobs ?? 0,
+      label: "Active Jobs",
+      color: "primary",
+      formatType: getFormatType(stats?.activeJobs ?? 0),
+    },
+    {
+      icon: Building2,
+      value: stats?.companies ?? 0,
+      label: "Companies",
+      color: "accent",
+      formatType: getFormatType(stats?.companies ?? 0),
+    },
+    {
+      icon: Users,
+      value: stats?.jobSeekers ?? 0,
+      label: "Job Seekers",
+      color: "primary",
+      formatType: getFormatType(stats?.jobSeekers ?? 0),
+    },
+    {
+      icon: Award,
+      value: stats?.successRate ?? 95,
+      label: "Success Rate",
+      color: "accent",
+      formatType: getFormatType(stats?.successRate ?? 95, true),
+    },
+  ];
+
   return (
-    <section className="bg-background relative overflow-hidden py-16 sm:py-20 lg:py-24">
+    <section className="bg-background relative overflow-hidden py-10 sm:py-16 lg:py-24">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-[0.08]" />
 
@@ -40,43 +83,18 @@ const LandingStatus = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-12 text-center lg:mb-16"
+          className="mb-8 text-center sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-foreground text-3xl font-bold sm:text-4xl">
-            Trusted by Millions
+          <h2 className="text-foreground text-2xl font-bold sm:text-4xl">
+            Designed for Your Success
           </h2>
-          <p className="text-muted-foreground mt-3 text-base sm:text-lg">
+          <p className="text-muted-foreground mt-2.5 text-xs sm:text-lg">
             Join our thriving community of job seekers and employers
           </p>
         </motion.div>
 
         <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
-          {[
-            {
-              icon: Briefcase,
-              value: "50K+",
-              label: "Active Jobs",
-              color: "primary",
-            },
-            {
-              icon: Building2,
-              value: "10K+",
-              label: "Companies",
-              color: "accent",
-            },
-            {
-              icon: Users,
-              value: "12M+",
-              label: "Job Seekers",
-              color: "primary",
-            },
-            {
-              icon: Award,
-              value: "95%",
-              label: "Success Rate",
-              color: "accent",
-            },
-          ].map((stat, index) => (
+          {statItems.map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -96,9 +114,16 @@ const LandingStatus = () => {
                   />
                 </div>
 
-                <div className="text-foreground mb-2 text-3xl font-bold transition-all duration-500 sm:text-4xl lg:text-5xl">
-                  {stat.value}
-                </div>
+                {isLoading || !stats ? (
+                  <div className="bg-muted/60 mx-auto my-2.5 h-8 w-20 animate-pulse rounded" />
+                ) : (
+                  <div className="text-foreground mb-2 text-3xl font-bold transition-all duration-500 sm:text-4xl lg:text-5xl">
+                    <AnimatedCounter
+                      value={stat.value}
+                      formatType={stat.formatType}
+                    />
+                  </div>
+                )}
 
                 <div className="text-muted-foreground text-sm font-medium sm:text-base">
                   {stat.label}

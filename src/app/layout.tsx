@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { Barlow } from "next/font/google";
 import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
 import SocketProvider from "../provider/SocketProvider";
 import "./globals.css";
-
-const barlow = Barlow({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
-  variable: "--font-barlow",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -34,10 +27,7 @@ export default function RootLayout({
       // fix theme style mismatch
       suppressHydrationWarning
     >
-      <body
-        className={` ${barlow.variable} antialiased`}
-        suppressHydrationWarning
-      >
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
