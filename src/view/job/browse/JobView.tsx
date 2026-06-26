@@ -201,34 +201,38 @@ const JobView = () => {
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[250px] w-full overflow-hidden bg-slate-900 md:h-[300px]">
-        <div className="absolute inset-0 z-0">
+      <div className="relative h-[220px] w-full overflow-hidden bg-slate-950 sm:h-[250px] md:h-[280px] lg:h-[320px]">
+        {/* Background glow orbs */}
+        <div className="pointer-events-none absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
             alt="Office background"
-            className="h-full w-full object-cover opacity-40 grayscale"
+            className="h-full w-full object-cover opacity-25 grayscale"
             fill
+            priority
           />
-          <div className="absolute inset-0 bg-linear-to-b from-slate-900/40 via-slate-900/60 to-slate-900" />
+          <div className="to-primary/15 absolute inset-0 bg-linear-to-tr from-slate-950 via-slate-900/95" />
+          <div className="bg-primary/5 absolute -top-40 -right-40 h-[450px] w-[450px] rounded-full blur-[110px]" />
+          <div className="bg-primary/5 absolute -bottom-40 -left-40 h-[450px] w-[450px] rounded-full blur-[110px]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-4 text-3xl font-bold text-white md:text-5xl">
+        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center gap-3 px-4 text-center">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
             Find Your Next Job
           </h1>
 
-          <nav className="flex items-center gap-2 text-sm text-gray-300">
+          <nav className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 backdrop-blur-xs">
             <Link href="/" className="hover:text-primary transition-colors">
               Home
             </Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="font-medium text-white">Find Your Next Job</span>
+            <ChevronRight className="h-3 w-3 text-slate-500" />
+            <span className="text-white">Find Jobs</span>
           </nav>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:-mt-10">
+      <div className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 pb-20 sm:-mt-12 md:-mt-14 lg:-mt-16">
         <Searchbar onSearch={handleSearch} hidePadding />
 
         {/* Featured Elite Opportunities Slider Component */}
@@ -246,11 +250,16 @@ const JobView = () => {
             {data?.meta?.total || 0} JOBS FOUND
           </h2>
 
-          <ViewToggle viewType={viewType} onViewChange={setViewType} />
+          <div className="flex items-center gap-3">
+            <div className="lg:hidden">
+              <Sidebar onFiltersChange={handleFiltersChange} />
+            </div>
+            <ViewToggle viewType={viewType} onViewChange={setViewType} />
+          </div>
         </div>
 
         <div className="grid grid-cols-12 gap-8">
-          {/* Sidebar - only show if list view or desktop */}
+          {/* Sidebar - only show on desktop */}
           <div className="col-span-12 lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 hidden lg:block">
               {/* <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white"> */}
@@ -259,9 +268,6 @@ const JobView = () => {
                 className="w-full"
               />
               {/* </ScrollArea> */}
-            </div>
-            <div className="lg:hidden">
-              <Sidebar onFiltersChange={handleFiltersChange} />
             </div>
           </div>
 
@@ -282,8 +288,8 @@ const JobView = () => {
               <div
                 className={
                   viewType === "grid"
-                    ? "grid grid-cols-1 gap-5 md:grid-cols-2"
-                    : "flex flex-col gap-5"
+                    ? "grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5"
+                    : "flex flex-col gap-2.5 sm:gap-3 md:gap-3.5 lg:gap-5"
                 }
               >
                 {isLoading &&

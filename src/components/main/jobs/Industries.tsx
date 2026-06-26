@@ -103,21 +103,21 @@ const Industries = ({
             <SwiperSlide key={category.id} className="w-auto!">
               <Button
                 onClick={() => toggleSelection(category.id)}
-                className={`group h-auto cursor-pointer rounded-full border px-6 py-2 whitespace-nowrap shadow-xs transition-colors ${isSelected ? "bg-primary text-white" : "bg-card text-foreground dark:hover:bg-card hover:bg-white"}`}
+                className={`group inline-flex h-auto cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs whitespace-nowrap shadow-xs transition-colors md:gap-2 md:px-5 md:py-2 md:text-sm ${isSelected ? "bg-primary text-white" : "bg-card text-foreground dark:hover:bg-card hover:bg-white"}`}
               >
                 <CategoryIcon
-                  className={`h-5 w-5 ${color} rounded-full p-0.5 text-white`}
+                  className={`h-4 w-4 md:h-5 md:w-5 ${color} shrink-0 rounded-full p-0.5 text-white`}
                 />
-                {category.name}
+                <span>{category.name}</span>
                 {category._count?.jobs !== undefined ? (
                   <p
-                    className={`text-foreground ml-2 text-xs ${isSelected ? "text-white" : ""}`}
+                    className={`text-foreground ml-1 text-[10px] md:ml-2 md:text-xs ${isSelected ? "text-white" : ""}`}
                   >
                     {category._count.jobs}
                   </p>
                 ) : category.count ? (
                   <p
-                    className={`text-foreground ml-2 text-xs ${isSelected ? "text-white" : ""}`}
+                    className={`text-foreground ml-1 text-[10px] md:ml-2 md:text-xs ${isSelected ? "text-white" : ""}`}
                   >
                     {category.count.split(" ")[0]}
                   </p>
