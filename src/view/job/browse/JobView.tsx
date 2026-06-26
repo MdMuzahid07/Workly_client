@@ -162,7 +162,13 @@ const JobView = () => {
       if (currentPage === 1) {
         setAllJobs(data.data);
       } else {
-        setAllJobs((prev) => [...prev, ...data.data]);
+        setAllJobs((prev) => {
+          const combined = [...prev, ...data.data];
+          return combined.filter(
+            (job, index, self) =>
+              self.findIndex((j) => j.id === job.id) === index,
+          );
+        });
       }
     }
   }, [data, currentPage]);

@@ -28,7 +28,7 @@ import ViewToggle from "../../../components/shared/ViewToggle";
 import { useGetCompaniesQuery } from "../../../redux/feature/company/companyApi";
 import CompanyCardSkeleton from "../../../skeleton/company/browse/CompanyCardSkeleton";
 
-/* ── Skeleton ───────────────────────────────────────────── */
+/* ==================== Skeleton ==================== */
 const FeaturedCompaniesSkeleton = () => (
   <div className="mt-8 sm:mt-10 lg:mt-14">
     <div className="mb-4 flex items-center justify-between sm:mb-5">
@@ -73,7 +73,7 @@ const FeaturedCompaniesSkeleton = () => (
   </div>
 );
 
-/* ── Main View ──────────────────────────────────────────── */
+/* ==================== Main View ==================== */
 const CompanyView = ({
   companies: initialCompanies,
 }: {
@@ -134,7 +134,13 @@ const CompanyView = ({
 
   useEffect(() => {
     if (data?.data && currentPage > 1) {
-      setAllCompanies((prev) => [...prev, ...data.data]);
+      setAllCompanies((prev) => {
+        const combined = [...prev, ...data.data];
+        return combined.filter(
+          (company, index, self) =>
+            self.findIndex((c) => c.id === company.id) === index,
+        );
+      });
     }
   }, [data, currentPage]);
 
@@ -173,10 +179,10 @@ const CompanyView = ({
     ? currentPage < data.meta.pages
     : initialCompanies?.length === limit;
 
-  /* ── Render ─────────────────────────────────────────── */
+  /* ==================== Render ==================== */
   return (
     <div className="bg-background min-h-screen">
-      {/* ── Hero Section ───────────────────────────────── */}
+      {/* ==================== Hero Section ==================== */}
       <div className="relative h-[200px] w-full overflow-hidden bg-slate-950 sm:h-60 md:h-[280px] lg:h-80">
         {/* Background */}
         <div className="pointer-events-none absolute inset-0 z-0">
@@ -208,7 +214,7 @@ const CompanyView = ({
         </div>
       </div>
 
-      {/* ── Main Content ────────────────────────────────── */}
+      {/* ==================== Main Content ==================== */}
       <div className="relative z-20 mx-auto -mt-7 max-w-7xl px-4 pb-16 sm:-mt-9 sm:px-6 md:-mt-11 lg:-mt-13 lg:px-8">
         {/* Search Bar — floats over hero */}
         <Searchbar
@@ -223,7 +229,7 @@ const CompanyView = ({
           }}
         />
 
-        {/* ── Featured Partners ───────────────────────── */}
+        {/* ==================== Featured Partners ==================== */}
         {featuredLoading ? (
           <FeaturedCompaniesSkeleton />
         ) : (
@@ -380,7 +386,7 @@ const CompanyView = ({
           )
         )}
 
-        {/* ── All Companies Section ───────────────────── */}
+        {/* ==================== All Companies Section ==================== */}
         <section className="border-border/30 mt-8 sm:mt-10 lg:mt-16">
           {/* Header row */}
           <div className="flex items-center justify-between gap-2.5">

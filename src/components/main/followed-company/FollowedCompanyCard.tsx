@@ -35,7 +35,7 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
     >
-      <Card className="group bg-card relative overflow-hidden border">
+      <Card className="group bg-card relative overflow-hidden rounded-2xl border">
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">

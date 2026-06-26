@@ -164,14 +164,20 @@ const CandidateDetailsSkeleton = () => {
               <CardHeader>
                 <Skeleton className="h-5 w-16" />
               </CardHeader>
-              <CardContent className="space-y-3">
-                {[1, 2, 3].map((i) => (
+              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1">
+                {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="bg-primary/5 flex items-center gap-3 rounded-lg p-3"
+                    className="border-primary/10 bg-primary/5 flex items-center justify-between rounded-xl border p-3"
                   >
-                    <Skeleton className="h-5 w-5 shrink-0 rounded-full" />
-                    <Skeleton className="h-4 w-32" />
+                    <div className="flex w-full min-w-0 items-center gap-3">
+                      <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+                      <div className="flex w-full min-w-0 flex-col gap-1.5">
+                        <Skeleton className="h-3.5 w-16 rounded" />
+                        <Skeleton className="h-2.5 w-24 rounded" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-4 shrink-0 rounded" />
                   </div>
                 ))}
               </CardContent>
@@ -184,7 +190,7 @@ const CandidateDetailsSkeleton = () => {
                 <Skeleton className="mx-auto h-6 w-36" />
                 <Skeleton className="mx-auto h-4 w-full" />
                 <Skeleton className="mx-auto h-4 w-5/6" />
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="h-10 w-full rounded-xl" />
               </div>
             </Card>
           </div>

@@ -26,12 +26,24 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { CompanyDetails } from "@/app/(main)/companies/[slug]/page";
 import CompanyDetailsSidebar from "../../../components/main/company/companyDetails/CompanyDetailsSidebar";
 import getIconComponent from "../../../helper/getIconComponent";
+import { useParams } from "next/navigation";
+import { useGetCompanyBySlugQuery } from "@/redux/feature/company/companyApi";
+import CompanyDetailsSkeleton from "@/skeleton/company/details/CompanyDetailsSkeleton";
 
-interface CompanyDetailsViewProps {
-  companyDetails: CompanyDetails | null;
-}
+const CompanyDetailsView = () => {
+  const params = useParams();
+  const slug = params.slug as string;
 
-const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useGetCompanyBySlugQuery(slug, {
+    skip: !slug,
+  });
+
+  const companyDetails = response?.data as CompanyDetails | undefined;
+
   console.log(companyDetails, "companyDetails");
   //* infinite scroll state for jobs start here =============>
   const [visibleJobsCount, setVisibleJobsCount] = useState(4);
@@ -114,11 +126,36 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
     };
   };
 
-  if (!companyDetails) {
+  if (isLoading) {
+    return <CompanyDetailsSkeleton />;
+  }
+
+  if (error || !companyDetails) {
     return (
-      <div className="bg-primary/2 min-h-screen md:pt-16">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <p className="text-secondary-foreground">Company not found.</p>
+      <div className="flex min-h-[85vh] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
+            Company Not Found
+          </h2>
+          <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+            The company you are looking for does not exist or has been removed.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              variant="default"
+              className="rounded-xl px-6 font-bold"
+              onClick={() => (window.location.href = "/companies")}
+            >
+              Browse Companies
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-xl px-6 font-bold"
+              onClick={() => window.history.back()}
+            >
+              Go Back
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -185,7 +222,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
             {/* Premium Header Card */}
-            <Card className="border-primary/10 bg-background/60 overflow-hidden border backdrop-blur-xl">
+            <Card className="border-primary/10 bg-background/50 overflow-hidden border backdrop-blur-sm">
               <CardHeader className="p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
@@ -253,18 +290,18 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
 
                   <div className="flex items-center gap-2 self-start md:shrink-0">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
-                      className="rounded-xl border border-white/5 bg-white/5 hover:bg-white/10"
+                      className="hover:bg-primary/5 hover:text-primary rounded-xl border-gray-200 transition-colors duration-200 dark:border-slate-800"
                     >
-                      <Heart className="h-5 w-5" />
+                      <Heart className="h-5 w-5 text-gray-400" />
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
-                      className="rounded-xl border border-white/5 bg-white/5 hover:bg-white/10"
+                      className="hover:bg-primary/5 hover:text-primary rounded-xl border-gray-200 transition-colors duration-200 dark:border-slate-800"
                     >
-                      <Share2 className="h-5 w-5" />
+                      <Share2 className="h-5 w-5 text-gray-400" />
                     </Button>
                   </div>
                 </div>
@@ -272,7 +309,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
             </Card>
 
             {/* About Company */}
-            <Card>
+            <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
@@ -311,7 +348,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
 
             {/* Core Values */}
             {companyDetails.values && companyDetails.values.length > 0 && (
-              <Card>
+              <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -363,7 +400,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
 
             {/* Benefits & Perks */}
             {companyDetails.benefits && companyDetails.benefits.length > 0 && (
-              <Card>
+              <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5" />
@@ -411,7 +448,7 @@ const CompanyDetailsView = ({ companyDetails }: CompanyDetailsViewProps) => {
             {/* Open Positions */}
             <Card
               id="open-positions"
-              className="border-primary/10 bg-background/60 scroll-mt-24 backdrop-blur-xl"
+              className="border-primary/10 bg-background/50 scroll-mt-24 border backdrop-blur-sm"
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

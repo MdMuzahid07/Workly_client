@@ -24,8 +24,8 @@ import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import CandidateCard from "../../../components/main/candidates/CandidateCard";
 import CandidateSidebarFilter from "../../../components/main/candidates/filter/CandidateSidebarFilter";
+import CandidateMobileSidebar from "../../../components/main/candidates/filter/CandidateMobileSidebar";
 import Searchbar from "../../../components/main/jobs/Searchbar";
-import Sidebar from "../../../components/main/jobs/Sidebar";
 import PageHero from "../../../components/shared/PageHero";
 import ViewToggle from "../../../components/shared/ViewToggle";
 import { useGetCandidatesQuery } from "../../../redux/feature/candidate/candidateApi";
@@ -187,38 +187,38 @@ const BrowseCandidatesView = () => {
     return (
       <Card
         onClick={() => router.push(`/browse-candidates/${candidate.id}`)}
-        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-300 hover:shadow-md sm:p-6 dark:border-slate-800 dark:bg-slate-900/50"
       >
-        <div className="relative z-10 flex-1 space-y-4">
+        <div className="relative z-10 flex-1 space-y-3 sm:space-y-4">
           {/* Header Row */}
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-50 p-0 dark:bg-slate-800">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-gray-50 p-0 dark:bg-slate-800">
                 {!isPlaceholderAvatar ? (
                   <Image
                     src={candidate.profile.avatarUrl!}
                     alt={candidate.fullName}
                     fill
-                    sizes="48px"
+                    sizes="40px"
                     className="object-cover"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="bg-primary/5 text-primary border-primary/10 flex h-full w-full items-center justify-center rounded-xl border text-lg font-bold">
+                  <div className="bg-primary/5 text-primary border-primary/10 flex h-full w-full items-center justify-center rounded-xl border text-sm font-bold sm:text-lg">
                     {initials}
                   </div>
                 )}
               </div>
               <div className="min-w-0">
-                <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold tracking-tight">
+                <h4 className="text-foreground flex items-center gap-1 truncate text-xs font-bold tracking-tight sm:text-sm">
                   {candidate.fullName}
-                  <BadgeCheck className="h-4 w-4 shrink-0 fill-emerald-500/10 text-emerald-500" />
+                  <BadgeCheck className="h-3.5 w-3.5 shrink-0 fill-emerald-500/10 text-emerald-500 sm:h-4 sm:w-4" />
                   {candidate.profile?.totalExperienceYears &&
                     candidate.profile.totalExperienceYears > 5 && (
                       <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-400 text-yellow-400" />
                     )}
                 </h4>
-                <span className="text-muted-foreground block truncate text-[11px] font-semibold">
+                <span className="text-muted-foreground block truncate text-[10px] font-semibold sm:text-[11px]">
                   {displayHeadline}
                 </span>
               </div>
@@ -226,19 +226,19 @@ const BrowseCandidatesView = () => {
 
             {/* Top-Right Arrow Action */}
             <div className="text-muted-foreground/50 group-hover:text-primary p-1 transition-colors duration-300">
-              <ArrowUpRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <ArrowUpRight className="h-4.5 w-4.5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:h-5 sm:w-5" />
             </div>
           </div>
 
           {/* Bullet Divided Metadata Row (LinkedIn style) */}
-          <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold">
+          <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-semibold sm:text-xs">
             <span className="flex items-center gap-1">
-              <MapPin className="text-primary/60 h-3.5 w-3.5" />
+              <MapPin className="text-primary/60 h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {candidate.profile?.location || "Not specified"}
             </span>
             <span className="text-muted-foreground/30">•</span>
             <span className="flex items-center gap-1">
-              <Briefcase className="text-primary/60 h-3.5 w-3.5" />
+              <Briefcase className="text-primary/60 h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {experienceText}
             </span>
             {candidate.profile?.preference?.jobType && (
@@ -252,20 +252,20 @@ const BrowseCandidatesView = () => {
           </div>
 
           {/* Skills Badges */}
-          <div className="flex flex-wrap items-center gap-1.5 pt-2">
+          <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-2">
             {(candidate.profile?.skills?.slice(0, 3) || []).map(
               (skill: any) => (
                 <Badge
                   key={skill.id}
                   variant="secondary"
-                  className="bg-primary/5 text-primary/95 border-primary/10 rounded-lg border px-2.5 py-1 text-[10px] font-extrabold tracking-wide uppercase transition-colors"
+                  className="bg-primary/5 text-primary/95 border-primary/10 rounded-lg border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase transition-colors sm:px-2.5 sm:py-1 sm:text-[10px]"
                 >
                   {skill.skillName}
                 </Badge>
               ),
             )}
             {!candidate.profile?.skills?.length && (
-              <span className="text-muted-foreground text-[10px]">
+              <span className="text-muted-foreground text-[9px] sm:text-[10px]">
                 No skills listed
               </span>
             )}
@@ -280,7 +280,13 @@ const BrowseCandidatesView = () => {
       if (currentPage === 1) {
         setAllCandidates(data.data);
       } else {
-        setAllCandidates((prev) => [...prev, ...data.data]);
+        setAllCandidates((prev) => {
+          const combined = [...prev, ...data.data];
+          return combined.filter(
+            (candidate, index, self) =>
+              self.findIndex((c) => c.id === candidate.id) === index,
+          );
+        });
       }
     }
   }, [data, currentPage]);
@@ -318,15 +324,27 @@ const BrowseCandidatesView = () => {
         backgroundImage="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400&auto=format&fit=crop"
       />
 
-      <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:-mt-10">
-        <Searchbar onSearch={handleSearch} hidePadding />
+      {/* ==================== Main Content Area ==================== */}
+      <div className="relative z-20 mx-auto -mt-8 max-w-7xl px-4 pb-20 sm:-mt-10 md:-mt-12 lg:-mt-14">
+        {/* Search Bar - floats over hero */}
+        <div className="mb-8 sm:mb-10 lg:mb-12">
+          <Searchbar
+            onSearch={handleSearch}
+            hidePadding
+            buttonLabel="Find Talent"
+            placeholder={{
+              search: "Candidate Name, Skills, or Keywords",
+              location: "City, State or ZIP",
+            }}
+          />
+        </div>
 
-        {/* Featured Profiles Section */}
+        {/* ==================== Featured Profiles ==================== */}
         {featuredLoading ? (
           <FeaturedCandidatesSkeleton />
         ) : (
           featuredCandidates.length > 0 && (
-            <div className="mt-12">
+            <section className="mb-8 sm:mb-10 lg:mb-14">
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Users className="text-primary h-5.5 w-5.5 shrink-0" />
@@ -384,95 +402,118 @@ const BrowseCandidatesView = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            </div>
+            </section>
           )
         )}
 
-        <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
-              <Users className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-foreground text-xl font-bold tracking-tight">
-                {data?.meta?.total || 0} CANDIDATES FOUND
-              </h2>
-              <p className="text-muted-foreground text-xs font-medium">
-                Browse and connect with top industry experts
-              </p>
-            </div>
-          </div>
-
-          <ViewToggle viewType={viewType} onViewChange={setViewType} />
-        </div>
-
-        <div className="grid grid-cols-12 gap-8">
-          {/* Sidebar */}
-          <div className="col-span-12 lg:col-span-4 xl:col-span-3">
-            <div className="sticky top-24 hidden lg:block">
-              {/* <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white shadow-sm"> */}
-              <CandidateSidebarFilter
-                onFiltersChange={handleFiltersChange}
-                className="w-full"
-              />
-              {/* </ScrollArea> */}
-            </div>
-            <div className="lg:hidden">
-              <Sidebar onFiltersChange={handleFiltersChange} />
-            </div>
-          </div>
-
-          <div className="col-span-12 lg:col-span-8 xl:col-span-9">
-            <InfiniteScroll
-              dataLength={allCandidates.length}
-              next={loadMore}
-              hasMore={data?.meta ? currentPage < data.meta.pages : false}
-              loader={<CandidateCardSkeleton viewType={viewType} />}
-              endMessage={
-                <p className="text-muted-foreground py-8 text-center font-medium italic">
-                  {allCandidates.length > 0
-                    ? "You've seen all available candidates"
-                    : ""}
+        {/* ==================== Main Listing Grid/List with Sidebar ==================== */}
+        <section className="border-border/30 border-t pt-8 sm:pt-10 lg:pt-12">
+          {/* Header Row */}
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                <Users className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-foreground text-base font-extrabold tracking-tight sm:text-xl lg:text-2xl">
+                  {data?.meta?.total || 0} Candidates Found
+                </h2>
+                <p className="text-muted-foreground mt-0.5 text-[11px] leading-tight font-medium sm:text-sm">
+                  Browse and connect with top industry experts
                 </p>
-              }
-            >
-              <div
-                className={
-                  viewType === "grid"
-                    ? "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
-                    : "flex flex-col gap-5"
+              </div>
+            </div>
+
+            <div className="flex w-full items-center justify-between gap-2.5 border-t border-gray-100/80 pt-3 sm:w-auto sm:justify-end sm:border-0 sm:pt-0 dark:border-slate-800/80">
+              <div className="lg:hidden">
+                <CandidateMobileSidebar onFiltersChange={handleFiltersChange} />
+              </div>
+              <ViewToggle viewType={viewType} onViewChange={setViewType} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 gap-6 md:gap-8">
+            {/* Sidebar - only show on desktop */}
+            <div className="col-span-12 lg:col-span-4 xl:col-span-3">
+              <div className="sticky top-24 hidden lg:block">
+                <CandidateSidebarFilter
+                  onFiltersChange={handleFiltersChange}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Candidates List / Grid */}
+            <div className="col-span-12 lg:col-span-8 xl:col-span-9">
+              <InfiniteScroll
+                dataLength={allCandidates.length}
+                next={loadMore}
+                hasMore={data?.meta ? currentPage < data.meta.pages : false}
+                loader={
+                  <div
+                    className={
+                      viewType === "grid"
+                        ? "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                        : "flex flex-col gap-5"
+                    }
+                  >
+                    {[...Array(3)].map((_, i) => (
+                      <CandidateCardSkeleton
+                        key={`loader-${i}`}
+                        viewType={viewType}
+                      />
+                    ))}
+                  </div>
+                }
+                endMessage={
+                  <p className="text-muted-foreground py-8 text-center font-medium italic">
+                    {allCandidates.length > 0
+                      ? "You've seen all available candidates"
+                      : ""}
+                  </p>
                 }
               >
-                {isLoading &&
-                  currentPage === 1 &&
-                  [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
-                    <CandidateCardSkeleton key={index} viewType={viewType} />
+                <div
+                  className={
+                    viewType === "grid"
+                      ? "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                      : "flex flex-col gap-5"
+                  }
+                >
+                  {isLoading &&
+                    currentPage === 1 &&
+                    [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
+                      <CandidateCardSkeleton key={index} viewType={viewType} />
+                    ))}
+
+                  {error && (
+                    <div className="text-destructive py-20 text-center font-bold">
+                      Something went wrong, please try again later.
+                    </div>
+                  )}
+
+                  {allCandidates.length === 0 && !isLoading && !error && (
+                    <div className="bg-card rounded-2xl border border-dashed py-32 text-center font-medium opacity-50">
+                      No candidates found matching your criteria.
+                    </div>
+                  )}
+
+                  {allCandidates.map((candidate: any) => (
+                    <Suspense
+                      key={candidate?.id}
+                      fallback={<CandidateCardSkeleton viewType={viewType} />}
+                    >
+                      <CandidateCard
+                        candidate={candidate}
+                        viewType={viewType}
+                      />
+                    </Suspense>
                   ))}
-
-                {error && (
-                  <div className="text-destructive py-20 text-center font-bold">
-                    Something went wrong, please try again later.
-                  </div>
-                )}
-
-                {allCandidates.length === 0 && !isLoading && !error && (
-                  <div className="bg-card rounded-3xl border border-dashed py-32 text-center font-medium opacity-50">
-                    No candidates found matching your criteria.
-                  </div>
-                )}
-
-                {allCandidates.map((candidate: any) => (
-                  <Suspense
-                    key={candidate?.id}
-                    fallback={<CandidateCardSkeleton viewType={viewType} />}
-                  >
-                    <CandidateCard candidate={candidate} viewType={viewType} />
-                  </Suspense>
-                ))}
-              </div>
-            </InfiniteScroll>
+                </div>
+              </InfiniteScroll>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

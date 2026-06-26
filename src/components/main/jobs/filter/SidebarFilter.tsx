@@ -103,7 +103,7 @@ const SidebarFilter = ({
 
   return (
     <div className={className}>
-      <Card className="bg-background h-fit rounded-3xl">
+      <Card className="bg-background h-fit rounded-2xl">
         <CardHeader className="px-5 py-5 sm:px-6">
           <div className="flex items-center justify-between">
             <CardTitle className="text-foreground text-base font-bold tracking-tight uppercase">

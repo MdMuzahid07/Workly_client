@@ -20,7 +20,7 @@ const companyApi = baseApi.injectEndpoints({
 
     getCompanyBySlug: builder.query({
       query: (slug: string) => ({
-        url: `/company/companies/${slug}`,
+        url: `/company/company/${slug}`,
         method: "GET",
       }),
     }),

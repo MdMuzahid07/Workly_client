@@ -28,7 +28,7 @@ import { CreditCard, Download, Eye, MoreVertical, Receipt } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ==================== Types ====================
 
 export interface MappedTransaction {
   id: string; // tranId
@@ -63,7 +63,7 @@ interface TransactionTableProps {
   rawTransactions: RawTransaction[];
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ==================== Helpers ====================
 
 const getStatusStyles = (status: string) => {
   switch (status) {
@@ -129,7 +129,7 @@ const downloadTextFile = (filename: string, content: string) => {
   URL.revokeObjectURL(url);
 };
 
-// ─── View Details Dialog ──────────────────────────────────────────────────────
+// ==================== View Details Dialog ====================
 
 function TransactionDetailsDialog({
   mapped,
@@ -223,7 +223,7 @@ function TransactionDetailsDialog({
   );
 }
 
-// ─── Main Table ───────────────────────────────────────────────────────────────
+// ==================== Main Table ====================
 
 export function TransactionTable({
   transactions,

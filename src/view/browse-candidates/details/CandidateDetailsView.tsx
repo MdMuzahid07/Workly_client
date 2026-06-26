@@ -22,6 +22,7 @@ import {
   Github,
   Twitter,
   Facebook,
+  ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -461,63 +462,120 @@ const CandidateDetailsView = () => {
                   Links
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1">
                 {profile.linkedInUrl && (
                   <a
                     href={profile.linkedInUrl}
                     target="_blank"
-                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                    rel="noopener noreferrer"
+                    className="group border-primary/10 bg-primary/5 hover:bg-primary/10 hover:border-primary/20 flex items-center justify-between rounded-xl border p-3 transition-all duration-300"
                   >
-                    <Linkedin className="text-primary h-5 w-5" />
-                    <span className="text-sm font-medium">
-                      LinkedIn Profile
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 group-hover:bg-primary/20 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors">
+                        <Linkedin className="h-5 w-5" />
+                      </div>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="text-foreground truncate text-sm font-semibold">
+                          LinkedIn
+                        </span>
+                        <span className="text-muted-foreground truncate text-[11px]">
+                          View profile
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>
                 )}
                 {profile.githubUrl && (
                   <a
                     href={profile.githubUrl}
                     target="_blank"
-                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                    rel="noopener noreferrer"
+                    className="group border-primary/10 bg-primary/5 hover:bg-primary/10 hover:border-primary/20 flex items-center justify-between rounded-xl border p-3 transition-all duration-300"
                   >
-                    <Github className="text-primary h-5 w-5" />
-                    <span className="text-sm font-medium">GitHub Profile</span>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 group-hover:bg-primary/20 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors">
+                        <Github className="h-5 w-5" />
+                      </div>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="text-foreground truncate text-sm font-semibold">
+                          GitHub
+                        </span>
+                        <span className="text-muted-foreground truncate text-[11px]">
+                          View repositories
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>
                 )}
                 {profile.websiteUrl && (
                   <a
                     href={profile.websiteUrl}
                     target="_blank"
-                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                    rel="noopener noreferrer"
+                    className="group border-primary/10 bg-primary/5 hover:bg-primary/10 hover:border-primary/20 flex items-center justify-between rounded-xl border p-3 transition-all duration-300"
                   >
-                    <Globe className="text-primary h-5 w-5" />
-                    <span className="text-sm font-medium">
-                      Personal Website
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 group-hover:bg-primary/20 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors">
+                        <Globe className="h-5 w-5" />
+                      </div>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="text-foreground truncate text-sm font-semibold">
+                          Website
+                        </span>
+                        <span className="text-muted-foreground truncate text-[11px]">
+                          Visit site
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>
                 )}
                 {profile.twitterUrl && (
                   <a
                     href={profile.twitterUrl}
                     target="_blank"
-                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                    rel="noopener noreferrer"
+                    className="group border-primary/10 bg-primary/5 hover:bg-primary/10 hover:border-primary/20 flex items-center justify-between rounded-xl border p-3 transition-all duration-300"
                   >
-                    <Twitter className="text-primary h-5 w-5" />
-                    <span className="text-sm font-medium">
-                      Twitter / X Profile
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 group-hover:bg-primary/20 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors">
+                        <Twitter className="h-5 w-5" />
+                      </div>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="text-foreground truncate text-sm font-semibold">
+                          Twitter / X
+                        </span>
+                        <span className="text-muted-foreground truncate text-[11px]">
+                          View feed
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>
                 )}
                 {profile.facebookUrl && (
                   <a
                     href={profile.facebookUrl}
                     target="_blank"
-                    className="bg-primary/5 hover:bg-primary/10 flex items-center gap-3 rounded-lg p-3 transition-all"
+                    rel="noopener noreferrer"
+                    className="group border-primary/10 bg-primary/5 hover:bg-primary/10 hover:border-primary/20 flex items-center justify-between rounded-xl border p-3 transition-all duration-300"
                   >
-                    <Facebook className="text-primary h-5 w-5" />
-                    <span className="text-sm font-medium">
-                      Facebook Profile
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 group-hover:bg-primary/20 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors">
+                        <Facebook className="h-5 w-5" />
+                      </div>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="text-foreground truncate text-sm font-semibold">
+                          Facebook
+                        </span>
+                        <span className="text-muted-foreground truncate text-[11px]">
+                          View profile
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>
                 )}
               </CardContent>
@@ -534,7 +592,7 @@ const CandidateDetailsView = () => {
                 <Button
                   onClick={handleStartChat}
                   disabled={isCreatingChat}
-                  className="btn-green-primary w-full rounded-full font-bold"
+                  className="btn-green-primary w-full rounded-xl font-bold"
                 >
                   Contact Now
                 </Button>

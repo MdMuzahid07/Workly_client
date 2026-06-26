@@ -107,14 +107,14 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-primary/5 border">
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardContent className="p-6">
           <Button
             disabled={
               isStatusLoading || isFollowingMutation || isUnfollowingMutation
             }
             onClick={handleToggleFollow}
-            className="bg-primary hover:bg-primary mb-3 w-full text-white"
+            className="bg-primary hover:bg-primary/95 mb-3 h-11 w-full rounded-xl font-bold text-white shadow-sm transition-transform active:scale-98"
           >
             {isFollowingMutation || isUnfollowingMutation ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -123,7 +123,7 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
           </Button>
           <Button
             variant="outline"
-            className="border-primary/20 hover:border-primary/45 hover:bg-primary/5 text-foreground hover:text-primary w-full bg-transparent font-semibold transition-all duration-300 active:scale-98"
+            className="border-primary/20 hover:bg-primary/5 hover:text-primary h-11 w-full rounded-xl bg-transparent font-bold transition-all duration-300 active:scale-98"
             onClick={() => {
               document
                 .getElementById("open-positions")
@@ -135,7 +135,7 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-primary/5 border">
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Company Stats</CardTitle>
         </CardHeader>
@@ -180,7 +180,7 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
       </Card>
 
       {(company?.contactEmail || company?.contactPhone) && (
-        <Card className="bg-primary/5 border">
+        <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Contact Information</CardTitle>
           </CardHeader>
@@ -225,7 +225,7 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
         </Card>
       )}
 
-      <Card className="bg-primary/5 border">
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Connect With Us</CardTitle>
         </CardHeader>
@@ -259,7 +259,7 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:bg-primary/2 border-primary/10 flex items-center gap-3 rounded-lg border p-3 transition-colors"
+                  className="hover:bg-primary/5 border-primary/10 flex items-center gap-3 rounded-xl border p-3 transition-all duration-200"
                 >
                   <div
                     className={`flex h-8 w-8 items-center justify-center rounded ${meta.color}`}
@@ -282,7 +282,7 @@ const CompanyDetailsSidebar = ({ company }: { company: Company }) => {
       </Card>
 
       {/* Similar Companies */}
-      <Card className="bg-primary/5 border">
+      <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Similar Companies</CardTitle>
         </CardHeader>

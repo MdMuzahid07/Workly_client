@@ -98,53 +98,12 @@ export async function generateMetadata({
   };
 }
 
-const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
-  const { slug } = await params;
-
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/v1/company/company/${slug}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      next: { revalidate: revalidate },
-    });
-
-    if (!res.ok) {
-      return (
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600">
-              Failed to load company
-            </h1>
-            <p className="text-gray-600">Status: {res.status}</p>
-          </div>
-        </div>
-      );
-    }
-
-    const company = await res.json();
-    const companyDetails = company.data as CompanyDetails;
-
-    return (
-      <>
-        <CompanyDetailsView companyDetails={companyDetails} />
-      </>
-    );
-  } catch (error) {
-    console.error("Error fetching company:", error);
-
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">
-            Something went wrong
-          </h1>
-          <p className="text-gray-600">Please try again later</p>
-        </div>
-      </div>
-    );
-  }
+const page = () => {
+  return (
+    <>
+      <CompanyDetailsView />
+    </>
+  );
 };
 
 export default page;

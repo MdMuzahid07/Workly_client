@@ -1,91 +1,235 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 const JobHeaderSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <div className="flex items-start justify-between">
-        <div className="flex-1 space-y-3">
-          <div className="flex gap-2">
-            <Skeleton className="h-5 w-20 rounded-full" />
-            <Skeleton className="h-5 w-16 rounded-full" />
+  <Card className="border-primary/10 bg-background/60 animate-pulse overflow-hidden border backdrop-blur-xl">
+    <CardHeader className="p-8">
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-1 flex-col gap-6 md:flex-row">
+          <div className="bg-card border-primary/10 relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border p-2 shadow-2xl md:h-24 md:w-24">
+            <Skeleton className="h-full w-full rounded-2xl" />
           </div>
-          <Skeleton className="h-7 w-2/3" />
-          <div className="flex flex-wrap gap-3">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-          </div>
-          <div className="flex flex-wrap gap-6">
-            <Skeleton className="h-5 w-36" />
-            <Skeleton className="h-5 w-24" />
+          <div className="flex-1 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Skeleton className="h-5.5 w-16 rounded-md" />
+              <Skeleton className="h-5.5 w-20 rounded-md" />
+              <Skeleton className="h-5.5 w-14 rounded-md" />
+            </div>
+            <Skeleton className="h-8 w-3/4 rounded-lg md:h-10" />
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Skeleton className="h-4 w-32 rounded" />
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-4 w-20 rounded" />
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Skeleton className="h-9 w-9 rounded-md" />
-          <Skeleton className="h-9 w-9 rounded-md" />
-          <Skeleton className="h-9 w-9 rounded-md" />
+        <div className="flex shrink-0 items-center gap-2">
+          <Skeleton className="h-10 w-10 rounded-xl" />
+          <Skeleton className="h-10 w-10 rounded-xl" />
         </div>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-4 border-t border-gray-100 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="bg-primary/5 flex items-center gap-3 rounded-2xl p-4"
+          >
+            <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+            <div className="flex-1 space-y-1.5">
+              <Skeleton className="h-3 w-16 rounded" />
+              <Skeleton className="h-4 w-24 rounded" />
+            </div>
+          </div>
+        ))}
       </div>
     </CardHeader>
   </Card>
 );
 
-const SectionSkeleton = ({ title }: { title: string }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle>{title}</CardTitle>
+const ContentCardSkeleton = ({ lines = 3 }: { lines?: number }) => (
+  <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
+    <CardHeader className="pb-3">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-5 rounded-md" />
+        <Skeleton className="h-6 w-32 rounded-md" />
+      </div>
     </CardHeader>
     <CardContent className="space-y-3">
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-      <Skeleton className="h-4 w-2/3" />
+      {Array.from({ length: lines }).map((_, i) => (
+        <Skeleton
+          key={i}
+          className={cn(
+            "h-4 rounded-md",
+            i === lines - 1 ? "w-2/3" : i === 0 ? "w-full" : "w-5/6",
+          )}
+        />
+      ))}
+    </CardContent>
+  </Card>
+);
+
+const RequirementsSkeleton = () => (
+  <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
+    <CardHeader>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-5 rounded-md" />
+        <Skeleton className="h-6 w-56 rounded-md" />
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="bg-primary/5 flex items-start gap-3 rounded-xl p-4"
+          >
+            <Skeleton className="mt-1 h-2 w-2 shrink-0 rounded-full" />
+            <div className="w-full space-y-2">
+              <Skeleton className="h-4 w-full rounded" />
+              <Skeleton className="h-4 w-4/5 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const RequiredSkillsSkeleton = () => (
+  <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
+    <CardHeader>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-5 rounded-md" />
+        <Skeleton className="h-6 w-36 rounded-md" />
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div className="flex flex-wrap gap-3">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} className="h-10 w-24 rounded-xl" />
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const BenefitsSkeleton = () => (
+  <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
+    <CardHeader>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-5 rounded-md" />
+        <Skeleton className="h-6 w-40 rounded-md" />
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="bg-primary/5 flex animate-pulse items-start gap-4 rounded-2xl p-4"
+          >
+            <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+            <div className="mt-0.5 flex-1 space-y-1.5">
+              <Skeleton className="h-4 w-1/2 rounded" />
+              <Skeleton className="h-3 w-3/4 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const AboutCompanySkeleton = () => (
+  <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
+    <CardHeader>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-5 rounded-md" />
+        <Skeleton className="h-6 w-44 rounded-md" />
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full rounded" />
+        <Skeleton className="h-4 w-5/6 rounded" />
+        <Skeleton className="h-4 w-2/3 rounded" />
+      </div>
+      <div className="flex flex-wrap items-center gap-4 pt-1">
+        <Skeleton className="h-5 w-36 rounded-md" />
+        <Skeleton className="h-5 w-24 rounded-md" />
+      </div>
     </CardContent>
   </Card>
 );
 
 const SidebarSkeleton = () => (
-  <div className="space-y-6">
-    <Card>
-      <CardContent className="space-y-3 p-6">
-        <Skeleton className="h-10 w-full rounded-md" />
-        <Skeleton className="h-10 w-full rounded-md" />
+  <div className="animate-pulse space-y-6">
+    <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full rounded-xl" />
+          <Skeleton className="h-12 w-full rounded-xl" />
+        </div>
       </CardContent>
     </Card>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>About Company</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-28" />
-        <Skeleton className="h-4 w-24" />
-      </CardContent>
-    </Card>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>Job Statistics</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-24" />
-      </CardContent>
-    </Card>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>Similar Jobs</CardTitle>
+    <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-8 rounded-lg" />
+          <Skeleton className="h-6 w-36 rounded-md" />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="space-y-2 rounded-xl border p-3">
-            <Skeleton className="h-4 w-40" />
-            <Skeleton className="h-3 w-28" />
-            <Skeleton className="h-3 w-20" />
+          <div key={i} className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-4 w-20 rounded" />
+            </div>
+            <div className="bg-border/20 h-px w-full" />
+          </div>
+        ))}
+        <Skeleton className="mt-4 h-10 w-full rounded-xl" />
+      </CardContent>
+    </Card>
+
+    <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+      <CardHeader className="pb-4">
+        <Skeleton className="h-6 w-32 rounded-md" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-8 w-8 rounded-lg" />
+                <Skeleton className="h-4 w-20 rounded" />
+              </div>
+              <Skeleton className="h-4 w-12 rounded" />
+            </div>
+            <div className="bg-border/20 h-px w-full" />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+
+    <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
+      <CardHeader className="pb-4">
+        <Skeleton className="h-6 w-28 rounded-md" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="border-primary/10 space-y-2 rounded-2xl border p-4"
+          >
+            <Skeleton className="h-4.5 w-3/4 rounded bg-gray-200 dark:bg-slate-800" />
+            <Skeleton className="h-3.5 w-1/2 rounded bg-gray-200 dark:bg-slate-800" />
+            <Skeleton className="h-3.5 w-1/3 rounded bg-gray-200 dark:bg-slate-800" />
           </div>
         ))}
       </CardContent>
@@ -95,16 +239,21 @@ const SidebarSkeleton = () => (
 
 const JobDetailsSkeleton = () => {
   return (
-    <div className="bg-primary/2 min-h-screen">
-      <div className="container mx-auto px-4 py-8 sm:px-6 md:mt-16 lg:px-8">
+    <div className="bg-background min-h-screen">
+      {/* Dynamic Banner Section Skeleton */}
+      <div className="bg-muted relative h-64 w-full animate-pulse overflow-hidden lg:h-80">
+        <div className="from-background via-background/40 absolute inset-0 bg-linear-to-t to-transparent" />
+      </div>
+
+      <div className="relative mx-auto -mt-32 max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <JobHeaderSkeleton />
-            <SectionSkeleton title="Job Description" />
-            <SectionSkeleton title="Requirements" />
-            <SectionSkeleton title="Responsibilities" />
-            <SectionSkeleton title="Skills" />
-            <SectionSkeleton title="Benefits & Perks" />
+            <ContentCardSkeleton lines={4} />
+            <RequirementsSkeleton />
+            <RequiredSkillsSkeleton />
+            <BenefitsSkeleton />
+            <AboutCompanySkeleton />
           </div>
           <SidebarSkeleton />
         </div>

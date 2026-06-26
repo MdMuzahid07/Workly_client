@@ -23,7 +23,7 @@ const ViewToggle = ({
         className="h-6 w-6 cursor-pointer rounded-full transition-all duration-300 active:scale-95"
         onClick={() => onViewChange("list")}
       >
-        <List className="h-2 w-2" />
+        <List className="h-3.5 w-3.5" />
       </Button>
       <Button
         variant={viewType === "grid" ? "default" : "ghost"}
@@ -31,7 +31,7 @@ const ViewToggle = ({
         className="h-6 w-6 cursor-pointer rounded-full transition-all duration-300 active:scale-95"
         onClick={() => onViewChange("grid")}
       >
-        <LayoutGrid className="h-2 w-2" />
+        <LayoutGrid className="h-3.5 w-3.5" />
       </Button>
     </div>
   );
