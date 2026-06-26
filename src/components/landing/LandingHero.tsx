@@ -277,9 +277,9 @@ const LandingHero = ({ World }: LandingHeroProps) => {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-8 lg:grid-cols-12">
+        <div className="grid items-center gap-8 md:grid-cols-12">
           {/* LEFT COLUMN: Values Slider & Unified Search */}
-          <div className="w-full space-y-4 text-left sm:space-y-6 lg:col-span-7">
+          <div className="w-full space-y-4 text-left sm:space-y-6 md:col-span-7">
             {/* Slide Header Pills */}
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {SLIDES.map((slide, index) => {
@@ -303,7 +303,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
             </div>
 
             {/* Slider Copy Container (Steady minimum height to avoid jumping layout) */}
-            <div className="relative min-h-[190px] overflow-hidden sm:min-h-[155px]">
+            <div className="xs:min-h-[200px] relative min-h-[220px] overflow-hidden md:min-h-[280px] lg:min-h-[200px] xl:min-h-[180px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSlide}
@@ -367,7 +367,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
             <div className="search-form-container max-w-2xl space-y-3">
               <form
                 onSubmit={handleSearchSubmit}
-                className="bg-card/75 border-border/70 flex flex-col gap-2 rounded-2xl border p-2 backdrop-blur-md sm:flex-row sm:items-center sm:gap-0"
+                className="bg-card/75 border-border/70 flex flex-col gap-2 rounded-2xl border p-2 backdrop-blur-md lg:flex-row lg:items-center lg:gap-0"
               >
                 <div className="relative flex-1">
                   <Search className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
@@ -415,7 +415,8 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   )}
                 </div>
 
-                <div className="bg-border/60 hidden h-6 w-px sm:block" />
+                <div className="bg-border/60 hidden h-6 w-px lg:block" />
+                <div className="bg-border/60 my-0.5 block h-px w-full lg:hidden" />
 
                 <div className="relative flex-1">
                   <MapPin className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
@@ -465,9 +466,9 @@ const LandingHero = ({ World }: LandingHeroProps) => {
 
                 <button
                   type="submit"
-                  className="bg-primary hover:bg-primary/95 flex h-9.5 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-extrabold text-white transition-all sm:h-11 sm:w-auto sm:gap-2 sm:px-6 sm:text-sm"
+                  className="bg-primary hover:bg-primary/95 flex h-9.5 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-extrabold text-white transition-all lg:h-11 lg:w-auto lg:gap-2 lg:px-6 lg:text-sm"
                 >
-                  <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <Search className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
                   <span>Search Jobs</span>
                 </button>
               </form>
@@ -539,7 +540,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
           </div>
 
           {/* RIGHT COLUMN: HIGH-TECH 3D GLOBE BACKDROP WITH OFFSET SLIDING INTERACTIVE WIDGETS */}
-          <div className="relative mx-auto flex h-[340px] w-full max-w-[440px] items-center justify-center overflow-visible sm:h-[400px] lg:col-span-5 lg:h-[440px]">
+          <div className="relative mx-auto flex h-[340px] w-full max-w-[440px] items-center justify-center overflow-visible sm:h-[400px] md:col-span-5 md:h-[400px] lg:col-span-5 lg:h-[440px]">
             {/* Globe Background Visual - Always active as high-end dimensional backdrop */}
             <div className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-100 sm:scale-105">
               <Suspense fallback={<GlobeSkeleton />}>
@@ -548,7 +549,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
             </div>
 
             {/* Interactive Slide overlays - Offset slightly for premium multi-layered look */}
-            <div className="xs:max-w-[310px] xs:right-2 absolute -right-2 bottom-6 z-10 w-full max-w-[290px] sm:right-4 sm:bottom-10 sm:max-w-[330px] lg:bottom-12">
+            <div className="xs:max-w-[310px] xs:right-2 absolute -right-2 bottom-6 z-10 w-full max-w-[290px] sm:right-4 sm:bottom-10 sm:max-w-[330px] md:right-2 md:bottom-8 md:max-w-[310px] lg:right-4 lg:bottom-12 lg:max-w-[330px]">
               <AnimatePresence
                 initial={false}
                 custom={direction}
