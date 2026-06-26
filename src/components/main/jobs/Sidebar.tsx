@@ -36,10 +36,10 @@ const Sidebar = ({ onFiltersChange }: MobileFilterDrawerProps) => {
         <Button
           variant="outline"
           size="sm"
-          className="border-border flex h-8.5 cursor-pointer items-center rounded-lg bg-white px-2.5 shadow-xs hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800"
+          className="border-border flex h-7.5 cursor-pointer items-center rounded-md bg-white px-2 text-[11px] shadow-xs hover:bg-slate-50 sm:h-8.5 sm:px-2.5 sm:text-xs dark:bg-slate-900 dark:hover:bg-slate-800"
         >
-          <Filter className="text-primary mr-1.5 h-3.5 w-3.5" />
-          <span className="text-xs font-semibold">Filters</span>
+          <Filter className="text-primary mr-1 h-3 w-3 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
+          <span className="font-semibold">Filters</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-full p-0 sm:max-w-md">

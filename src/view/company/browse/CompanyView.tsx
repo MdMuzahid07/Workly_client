@@ -17,7 +17,6 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import ViewToggle from "../../../components/shared/ViewToggle";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
@@ -25,61 +24,56 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import CompanyCard from "../../../components/main/company/CompanyCard";
 import CompanyFilter from "../../../components/main/company/CompanyFilter";
 import Searchbar from "../../../components/main/jobs/Searchbar";
+import ViewToggle from "../../../components/shared/ViewToggle";
 import { useGetCompaniesQuery } from "../../../redux/feature/company/companyApi";
 import CompanyCardSkeleton from "../../../skeleton/company/browse/CompanyCardSkeleton";
 
-const FeaturedCompaniesSkeleton = () => {
-  return (
-    <div className="mt-16">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <Skeleton className="h-6 w-40 rounded-md" />
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <Skeleton className="h-8 w-8 rounded-full" />
-        </div>
+/* ── Skeleton ───────────────────────────────────────────── */
+const FeaturedCompaniesSkeleton = () => (
+  <div className="mt-8 sm:mt-10 lg:mt-14">
+    <div className="mb-4 flex items-center justify-between sm:mb-5">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-5 rounded-full" />
+        <Skeleton className="h-5 w-36 rounded-md" />
       </div>
-
-      <div className="grid w-full grid-cols-1 gap-6 py-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <Card
-            key={i}
-            className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
-          >
-            <div className="space-y-4">
-              {/* Header Row */}
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-12 w-12 rounded-xl" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32 rounded-md" />
-                    <Skeleton className="h-3.5 w-20 rounded-md" />
-                  </div>
-                </div>
-                <Skeleton className="h-5 w-5 rounded-md" />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full rounded-md" />
-                <Skeleton className="h-4 w-5/6 rounded-md" />
-              </div>
-
-              {/* Metadata */}
-              <div className="border-border/40 flex items-center gap-4 border-t pt-4">
-                <Skeleton className="h-4 w-20 rounded-md" />
-                <Skeleton className="h-4 w-24 rounded-md" />
-              </div>
-            </div>
-          </Card>
-        ))}
+      <div className="flex items-center gap-1.5">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-8 rounded-full" />
       </div>
     </div>
-  );
-};
+    <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+      {[1, 2, 3].map((i) => (
+        <Card
+          key={i}
+          className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 sm:p-5 dark:border-slate-800 dark:bg-slate-900/50"
+        >
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Skeleton className="h-10 w-10 rounded-xl sm:h-11 sm:w-11" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-28 rounded-md" />
+                  <Skeleton className="h-3 w-16 rounded-md" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-4 rounded" />
+            </div>
+            <div className="space-y-1.5">
+              <Skeleton className="h-3.5 w-full rounded-md" />
+              <Skeleton className="h-3.5 w-4/5 rounded-md" />
+            </div>
+            <div className="flex items-center gap-3 border-t border-gray-100 pt-3 dark:border-slate-800">
+              <Skeleton className="h-3.5 w-16 rounded-md" />
+              <Skeleton className="h-3.5 w-20 rounded-md" />
+            </div>
+          </div>
+        </Card>
+      ))}
+    </div>
+  </div>
+);
 
+/* ── Main View ──────────────────────────────────────────── */
 const CompanyView = ({
   companies: initialCompanies,
 }: {
@@ -101,7 +95,6 @@ const CompanyView = ({
   const [viewType, setViewType] = useState<"grid" | "list">("grid");
   const limit = 12;
 
-  // Sync state when props change (initial load or filter change)
   useEffect(() => {
     if (initialCompanies) {
       setAllCompanies(initialCompanies);
@@ -124,11 +117,9 @@ const CompanyView = ({
   );
 
   const { data, isLoading } = useGetCompaniesQuery(params, {
-    // Skip fetching the first page if we already have initialCompanies from the server
     skip: currentPage === 1 && !!initialCompanies,
   });
 
-  // Fetch featured / verified companies
   const { data: featuredData, isLoading: featuredLoading } =
     useGetCompaniesQuery({
       isVerified: true,
@@ -138,7 +129,6 @@ const CompanyView = ({
   const featuredCompanies = useMemo(() => {
     const list = featuredData?.data?.result || featuredData?.data || [];
     if (list.length >= 2) return list;
-    // Fallback to first few from the general list
     return allCompanies.slice(0, 6);
   }, [featuredData, allCompanies]);
 
@@ -150,23 +140,21 @@ const CompanyView = ({
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) params.set(name, value);
-      else params.delete(name);
-      return params.toString();
+      const p = new URLSearchParams(searchParams.toString());
+      if (value) p.set(name, value);
+      else p.delete(name);
+      return p.toString();
     },
     [searchParams],
   );
 
   const handleSearch = (searchData: { search: string; location: string }) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (searchData.search) params.set("q", searchData.search);
-    else params.delete("q");
-
-    if (searchData.location) params.set("location", searchData.location);
-    else params.delete("location");
-
-    router.push(`${pathname}?${params.toString()}`);
+    const p = new URLSearchParams(searchParams.toString());
+    if (searchData.search) p.set("q", searchData.search);
+    else p.delete("q");
+    if (searchData.location) p.set("location", searchData.location);
+    else p.delete("location");
+    router.push(`${pathname}?${p.toString()}`);
   };
 
   const handleFilterChange = (value: string) => {
@@ -177,7 +165,6 @@ const CompanyView = ({
     if (data?.meta && currentPage < data.meta.pages) {
       setCurrentPage((prev) => prev + 1);
     } else if (!data && initialCompanies && initialCompanies.length === limit) {
-      // If we only have initial data and haven't fetched more yet
       setCurrentPage(2);
     }
   };
@@ -186,37 +173,44 @@ const CompanyView = ({
     ? currentPage < data.meta.pages
     : initialCompanies?.length === limit;
 
+  /* ── Render ─────────────────────────────────────────── */
   return (
     <div className="bg-background min-h-screen">
-      {/* Hero Section */}
-      <div className="relative h-[250px] w-full overflow-hidden bg-slate-900 md:h-[300px]">
-        <div className="absolute inset-0 z-0">
+      {/* ── Hero Section ───────────────────────────────── */}
+      <div className="relative h-[200px] w-full overflow-hidden bg-slate-950 sm:h-60 md:h-[280px] lg:h-80">
+        {/* Background */}
+        <div className="pointer-events-none absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
             alt="Commercial buildings"
-            className="h-full w-full object-cover opacity-30 grayscale"
+            className="h-full w-full object-cover opacity-20 grayscale"
             width={1440}
-            height={300}
+            height={320}
+            priority
           />
-          <div className="absolute inset-0 bg-linear-to-b from-slate-900/40 via-slate-900/60 to-slate-900" />
+          <div className="to-primary/10 absolute inset-0 bg-linear-to-tr from-slate-950 via-slate-900/95" />
+          <div className="bg-primary/6 absolute -top-40 -right-40 h-[400px] w-[400px] rounded-full blur-[110px]" />
+          <div className="bg-primary/6 absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full blur-[110px]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-4 text-3xl font-bold text-white md:text-5xl">
+        {/* Hero Content */}
+        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center gap-3 px-4 text-center">
+          <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
             Explore Top Companies
           </h1>
-
-          <nav className="flex items-center gap-2 text-sm text-gray-400">
+          <nav className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 backdrop-blur-xs">
             <Link href="/" className="hover:text-primary transition-colors">
               Home
             </Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="font-medium text-white">Companies</span>
+            <ChevronRight className="h-3 w-3 text-slate-500" />
+            <span className="text-white">Companies</span>
           </nav>
         </div>
       </div>
 
-      <div className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 pb-20">
+      {/* ── Main Content ────────────────────────────────── */}
+      <div className="relative z-20 mx-auto -mt-7 max-w-7xl px-4 pb-16 sm:-mt-9 sm:px-6 md:-mt-11 lg:-mt-13 lg:px-8">
+        {/* Search Bar — floats over hero */}
         <Searchbar
           onSearch={handleSearch}
           initialSearch={currentSearch}
@@ -229,21 +223,20 @@ const CompanyView = ({
           }}
         />
 
-        {/* Featured Partners Section */}
+        {/* ── Featured Partners ───────────────────────── */}
         {featuredLoading ? (
           <FeaturedCompaniesSkeleton />
         ) : (
           featuredCompanies.length > 0 && (
-            <div className="mt-16">
-              <div className="mb-6 flex items-center justify-between">
+            <section className="mt-8 sm:mt-10 lg:mt-14">
+              {/* Section Header */}
+              <div className="mb-4 flex items-center justify-between sm:mb-5">
                 <div className="flex items-center gap-2">
-                  <Crown className="text-primary h-5.5 w-5.5 shrink-0" />
-                  <h2 className="text-foreground text-xl font-bold tracking-tight">
+                  <Crown className="text-primary h-4.5 w-4.5 shrink-0 sm:h-5 sm:w-5" />
+                  <h2 className="text-foreground text-base font-bold tracking-tight sm:text-lg lg:text-xl">
                     Featured Partners
                   </h2>
                 </div>
-
-                {/* Custom Navigation Buttons */}
                 {featuredCompanies.length > 1 && (
                   <div className="flex items-center gap-1.5">
                     <Button
@@ -264,12 +257,13 @@ const CompanyView = ({
                 )}
               </div>
 
+              {/* Swiper */}
               <Swiper
                 modules={[Autoplay, Navigation]}
-                spaceBetween={24}
+                spaceBetween={12}
                 slidesPerView={1}
                 speed={800}
-                grabCursor={true}
+                grabCursor
                 loop={featuredCompanies.length > 3}
                 autoplay={{
                   delay: 4000,
@@ -281,19 +275,20 @@ const CompanyView = ({
                   prevEl: ".featured-companies-prev",
                 }}
                 breakpoints={{
-                  640: { slidesPerView: 2, spaceBetween: 20 },
-                  1024: { slidesPerView: 3, spaceBetween: 24 },
+                  480: { slidesPerView: 1.25, spaceBetween: 12 },
+                  640: { slidesPerView: 2, spaceBetween: 14 },
+                  1024: { slidesPerView: 3, spaceBetween: 18 },
                 }}
-                className="w-full py-4"
+                className="w-full pt-0.5 pb-1"
               >
                 {featuredCompanies.map((company: any, index: number) => {
-                  const logoBgOptions = [
+                  const bgOptions = [
                     "bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
                     "bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400",
                     "bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
                     "bg-emerald-600/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
                   ];
-                  const randomBg = logoBgOptions[index % logoBgOptions.length];
+                  const randomBg = bgOptions[index % bgOptions.length];
                   const initial = company.name
                     ? company.name[0].toUpperCase()
                     : "C";
@@ -304,35 +299,35 @@ const CompanyView = ({
                         onClick={() =>
                           router.push(`/companies/${company.slug}`)
                         }
-                        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+                        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-300 hover:shadow-md sm:p-5 dark:border-slate-800 dark:bg-slate-900/50"
                       >
-                        <div className="relative z-10 flex-1 space-y-4">
-                          {/* Header Row */}
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex items-center gap-3">
+                        <div className="relative z-10 space-y-3">
+                          {/* Header */}
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-2.5">
                               {company.logoUrl ? (
-                                <div className="border-border/30 relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border bg-white p-1 shadow-sm dark:bg-slate-800">
+                                <div className="border-border/30 relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border bg-white p-1 shadow-xs sm:h-11 sm:w-11 dark:bg-slate-800">
                                   <Image
                                     src={company.logoUrl}
                                     alt={`${company.name} logo`}
                                     fill
-                                    sizes="48px"
+                                    sizes="44px"
                                     className="object-contain p-1"
                                     loading="lazy"
                                   />
                                 </div>
                               ) : (
                                 <div
-                                  className={`ring-primary/5 border-background flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-lg font-black shadow-xs ring-2 transition-all duration-300 ${randomBg}`}
+                                  className={`border-background ring-primary/5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-base font-black shadow-xs ring-2 transition-all duration-300 sm:h-11 sm:w-11 ${randomBg}`}
                                 >
                                   {initial}
                                 </div>
                               )}
                               <div className="min-w-0">
-                                <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold tracking-tight">
+                                <h4 className="text-foreground flex items-center gap-1 truncate text-sm font-bold">
                                   {company.name}
                                   {company.isVerified && (
-                                    <BadgeCheck className="text-primary fill-primary/10 h-4 w-4 shrink-0" />
+                                    <BadgeCheck className="text-primary fill-primary/10 h-3.5 w-3.5 shrink-0" />
                                   )}
                                 </h4>
                                 <span className="text-primary mt-0.5 block text-[11px] font-bold">
@@ -340,10 +335,8 @@ const CompanyView = ({
                                 </span>
                               </div>
                             </div>
-
-                            {/* Top-Right Arrow Action */}
-                            <div className="text-muted-foreground/50 group-hover:text-primary p-1 transition-colors duration-300">
-                              <ArrowUpRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            <div className="text-muted-foreground/40 group-hover:text-primary shrink-0 pt-0.5 transition-colors duration-300">
+                              <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                             </div>
                           </div>
 
@@ -353,26 +346,24 @@ const CompanyView = ({
                               "Building powerful and innovative digital solutions."}
                           </p>
 
-                          {/* Bullet Divided Metadata Row (LinkedIn/Google style - Extremely Clean) */}
-                          <div className="text-muted-foreground/90 border-border/40 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-4 text-xs font-semibold">
+                          {/* Meta */}
+                          <div className="text-muted-foreground/80 flex flex-wrap items-center gap-x-1.5 gap-y-1 border-t border-gray-100 pt-3 text-xs font-semibold dark:border-slate-800">
                             <span className="flex items-center gap-1">
-                              <MapPin className="text-primary/60 h-3.5 w-3.5" />
+                              <MapPin className="text-primary/60 h-3 w-3" />
                               {company.location || "Remote"}
                             </span>
-                            <span className="text-muted-foreground/30">•</span>
+                            <span className="opacity-30">•</span>
                             <span className="flex items-center gap-1">
-                              <Users className="text-primary/60 h-3.5 w-3.5" />
+                              <Users className="text-primary/60 h-3 w-3" />
                               {company.size || "11-50"} staff
                             </span>
-                            <span className="text-muted-foreground/30">•</span>
+                            <span className="opacity-30">•</span>
                             {company.openJobs > 0 ? (
                               <span className="font-bold text-emerald-600 dark:text-emerald-400">
                                 {company.openJobs} Openings
                               </span>
                             ) : company.openJobs === 0 ? (
-                              <span className="text-muted-foreground/60 font-semibold">
-                                No Openings
-                              </span>
+                              <span className="opacity-60">No Openings</span>
                             ) : (
                               <span className="font-bold text-emerald-600 dark:text-emerald-400">
                                 Hiring Actively
@@ -385,23 +376,23 @@ const CompanyView = ({
                   );
                 })}
               </Swiper>
-            </div>
+            </section>
           )
         )}
 
-        {/* All Companies Section */}
-        <div className="border-border/40 mt-16 border-t pt-16">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        {/* ── All Companies Section ───────────────────── */}
+        <section className="border-border/30 mt-8 sm:mt-10 lg:mt-16">
+          {/* Header row */}
+          <div className="flex items-center justify-between gap-2.5">
             <div>
-              <h2 className="text-foreground text-2xl font-extrabold tracking-tight">
+              <h2 className="text-foreground text-xl font-extrabold tracking-tight sm:text-2xl">
                 All Companies
               </h2>
-              <p className="text-muted-foreground mt-1 text-sm font-medium">
+              <p className="text-muted-foreground mt-0.5 text-xs font-medium sm:text-sm">
                 Showing {allCompanies.length} of{" "}
                 {data?.meta?.total || allCompanies.length} companies
               </p>
             </div>
-
             <ViewToggle
               viewType={viewType}
               onViewChange={setViewType}
@@ -409,15 +400,16 @@ const CompanyView = ({
             />
           </div>
 
-          {/* Full-width Category Filters Row */}
-          <div className="mt-8 border-b border-gray-100 pb-4 dark:border-slate-800">
+          {/* Filter chips */}
+          <div className="mt-4 pb-1 sm:mt-5">
             <CompanyFilter
               selectedFilter={currentIndustry}
               onFilterChange={handleFilterChange}
             />
           </div>
 
-          <main className="mt-10">
+          {/* Card grid */}
+          <main className="mt-5 sm:mt-6 lg:mt-8">
             <InfiniteScroll
               dataLength={allCompanies.length}
               next={loadMoreCompanies}
@@ -426,12 +418,12 @@ const CompanyView = ({
                 <div
                   className={
                     viewType === "grid"
-                      ? "mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                      : "mt-6 flex flex-col gap-5"
+                      ? "mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
+                      : "mt-3 flex flex-col gap-2.5 sm:gap-3"
                   }
                 >
-                  {[...Array(3)].map((_, index) => (
-                    <CompanyCardSkeleton key={`loading-${index}`} />
+                  {[...Array(3)].map((_, i) => (
+                    <CompanyCardSkeleton key={`loading-${i}`} />
                   ))}
                 </div>
               }
@@ -441,8 +433,8 @@ const CompanyView = ({
               <div
                 className={
                   viewType === "grid"
-                    ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                    : "flex flex-col gap-5"
+                    ? "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
+                    : "flex flex-col gap-2.5 sm:gap-3 lg:gap-4"
                 }
               >
                 {allCompanies.length > 0 ? (
@@ -457,11 +449,11 @@ const CompanyView = ({
                     />
                   ))
                 ) : isLoading ? (
-                  [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
-                    <CompanyCardSkeleton key={index} />
+                  [...Array(viewType === "grid" ? 12 : 6)].map((_, i) => (
+                    <CompanyCardSkeleton key={i} />
                   ))
                 ) : (
-                  <div className="col-span-full py-20 text-center font-medium opacity-50">
+                  <div className="col-span-full py-16 text-center font-medium opacity-50 sm:py-20">
                     No companies found matching your criteria.
                   </div>
                 )}
@@ -469,11 +461,11 @@ const CompanyView = ({
             </InfiniteScroll>
 
             {hasMoreCompanies && (
-              <div className="mt-16 border-t border-gray-50 pt-16 text-center dark:border-slate-800">
+              <div className="mt-10 border-t border-gray-100 pt-8 text-center sm:mt-12 sm:pt-10 dark:border-slate-800">
                 <Button
                   variant="default"
                   size="lg"
-                  className="shadow-primary/20 transform rounded-full px-12 font-bold shadow-xl transition-all hover:scale-105"
+                  className="shadow-primary/20 rounded-full px-10 font-bold shadow-xl transition-all hover:scale-105 sm:px-12"
                   onClick={loadMoreCompanies}
                 >
                   Load More Companies
@@ -481,7 +473,7 @@ const CompanyView = ({
               </div>
             )}
           </main>
-        </div>
+        </section>
       </div>
     </div>
   );

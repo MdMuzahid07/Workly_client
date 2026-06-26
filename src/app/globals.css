@@ -497,3 +497,79 @@
   display: flex !important;
   will-change: transform;
 }
+
+/* Premium Ease Animations for Dialog & Sheet Panels */
+[data-slot="sheet-overlay"][data-state="open"] {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+[data-slot="sheet-overlay"][data-state="closed"] {
+  animation: fadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-slot="sheet-content"][data-state="open"][data-side="left"] {
+  animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+[data-slot="sheet-content"][data-state="closed"][data-side="left"] {
+  animation: slideOutLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-slot="sheet-content"][data-state="open"][data-side="right"] {
+  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+[data-slot="sheet-content"][data-state="closed"][data-side="right"] {
+  animation: slideOutRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}

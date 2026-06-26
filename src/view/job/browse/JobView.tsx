@@ -201,7 +201,7 @@ const JobView = () => {
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[220px] w-full overflow-hidden bg-slate-950 sm:h-[250px] md:h-[280px] lg:h-[320px]">
+      <div className="relative h-[220px] w-full overflow-hidden bg-slate-950 sm:h-[250px] md:h-[280px] lg:h-80">
         {/* Background glow orbs */}
         <div className="pointer-events-none absolute inset-0 z-0">
           <Image
@@ -232,93 +232,121 @@ const JobView = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 pb-20 sm:-mt-12 md:-mt-14 lg:-mt-16">
-        <Searchbar onSearch={handleSearch} hidePadding />
+      <div className="relative z-20 mx-auto -mt-8 max-w-7xl px-4 pb-20 sm:-mt-10 md:-mt-12 lg:-mt-14">
+        {/* Search Bar - floats over hero */}
+        <div className="mb-8 sm:mb-10 lg:mb-12">
+          <Searchbar onSearch={handleSearch} hidePadding />
+        </div>
 
-        {/* Featured Elite Opportunities Slider Component */}
-        <FeaturedJobsSlider jobs={featuredJobs} isLoading={featuredLoading} />
-        <div className="mt-8">
+        {/* Featured Elite Opportunities Slider */}
+        <section className="mb-8 sm:mb-10 lg:mb-14">
+          <FeaturedJobsSlider jobs={featuredJobs} isLoading={featuredLoading} />
+        </section>
+
+        {/* Popular Industries */}
+        <section className="mb-8 sm:mb-10 lg:mb-14">
           <Industries
             onCategorySelect={handleCategorySelect}
             multipleSelect={false}
             categories={categories?.data}
             isLoading={categoriesLoading}
           />
-        </div>
-        <div className="mt-8 mb-6 flex items-center justify-between sm:mt-12">
-          <h2 className="text-foreground text-xl font-bold tracking-tight uppercase">
-            {data?.meta?.total || 0} JOBS FOUND
-          </h2>
+        </section>
 
-          <div className="flex items-center gap-3">
-            <div className="lg:hidden">
-              <Sidebar onFiltersChange={handleFiltersChange} />
+        {/* Main Job Listing Grid/List with Sidebar */}
+        <section className="border-border/30 border-t pt-8 sm:pt-10 lg:pt-12">
+          {/* Header Row */}
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+            <div>
+              <h2 className="text-foreground text-lg font-extrabold tracking-tight sm:text-xl lg:text-2xl">
+                {data?.meta?.total || 0} Jobs Found
+              </h2>
+              <p className="text-muted-foreground mt-0.5 text-xs font-medium sm:text-sm">
+                Explore matching career opportunities
+              </p>
             </div>
-            <ViewToggle viewType={viewType} onViewChange={setViewType} />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-12 gap-8">
-          {/* Sidebar - only show on desktop */}
-          <div className="col-span-12 lg:col-span-4 xl:col-span-3">
-            <div className="sticky top-24 hidden lg:block">
-              {/* <ScrollArea className="dark:bg-foreground h-[calc(100vh-120px)] w-full overflow-hidden rounded-3xl border bg-white"> */}
-              <SidebarFilter
-                onFiltersChange={handleFiltersChange}
-                className="w-full"
-              />
-              {/* </ScrollArea> */}
+            <div className="flex items-center gap-2.5 self-end sm:self-auto">
+              <div className="lg:hidden">
+                <Sidebar onFiltersChange={handleFiltersChange} />
+              </div>
+              <ViewToggle viewType={viewType} onViewChange={setViewType} />
             </div>
           </div>
 
-          <div className="col-span-12 lg:col-span-8 xl:col-span-9">
-            <InfiniteScroll
-              dataLength={allJobs.length}
-              next={loadMore}
-              hasMore={data?.meta ? currentPage < data.meta.pages : false}
-              loader={<JobCardSkeleton />}
-              endMessage={
-                <p className="text-muted-foreground py-8 text-center font-medium italic">
-                  {allJobs.length > 0
-                    ? "You've reached the end of the list"
-                    : ""}
-                </p>
-              }
-            >
-              <div
-                className={
-                  viewType === "grid"
-                    ? "grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5"
-                    : "flex flex-col gap-2.5 sm:gap-3 md:gap-3.5 lg:gap-5"
+          <div className="grid grid-cols-12 gap-6 md:gap-8">
+            {/* Sidebar - only show on desktop */}
+            <div className="col-span-12 lg:col-span-4 xl:col-span-3">
+              <div className="sticky top-24 hidden lg:block">
+                <SidebarFilter
+                  onFiltersChange={handleFiltersChange}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Jobs List / Grid */}
+            <div className="col-span-12 lg:col-span-8 xl:col-span-9">
+              <InfiniteScroll
+                dataLength={allJobs.length}
+                next={loadMore}
+                hasMore={data?.meta ? currentPage < data.meta.pages : false}
+                loader={
+                  <div
+                    className={
+                      viewType === "grid"
+                        ? "grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5 xl:grid-cols-3"
+                        : "flex flex-col gap-3 sm:gap-3.5 lg:gap-4"
+                    }
+                  >
+                    {[...Array(3)].map((_, i) => (
+                      <JobCardSkeleton key={`loader-${i}`} />
+                    ))}
+                  </div>
+                }
+                endMessage={
+                  <p className="text-muted-foreground py-8 text-center font-medium italic">
+                    {allJobs.length > 0
+                      ? "You've reached the end of the list"
+                      : ""}
+                  </p>
                 }
               >
-                {isLoading &&
-                  currentPage === 1 &&
-                  [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
-                    <JobCardSkeleton key={index} />
+                <div
+                  className={
+                    viewType === "grid"
+                      ? "grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5 xl:grid-cols-3"
+                      : "flex flex-col gap-3 sm:gap-3.5 lg:gap-4"
+                  }
+                >
+                  {isLoading &&
+                    currentPage === 1 &&
+                    [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
+                      <JobCardSkeleton key={index} />
+                    ))}
+
+                  {error && (
+                    <div className="text-destructive py-20 text-center font-bold">
+                      Something went wrong, please try again later.
+                    </div>
+                  )}
+
+                  {allJobs.length === 0 && !isLoading && !error && (
+                    <div className="py-20 text-center font-medium opacity-50">
+                      No jobs found.
+                    </div>
+                  )}
+
+                  {allJobs.map((job: any) => (
+                    <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
+                      <JobCard job={job} viewType={viewType} />
+                    </Suspense>
                   ))}
-
-                {error && (
-                  <div className="text-destructive py-20 text-center font-bold">
-                    Something went wrong, please try again later.
-                  </div>
-                )}
-
-                {allJobs.length === 0 && !isLoading && !error && (
-                  <div className="py-20 text-center font-medium opacity-50">
-                    No jobs found.
-                  </div>
-                )}
-
-                {allJobs.map((job: any) => (
-                  <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
-                    <JobCard job={job} viewType={viewType} />
-                  </Suspense>
-                ))}
-              </div>
-            </InfiniteScroll>
+                </div>
+              </InfiniteScroll>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
