@@ -174,7 +174,7 @@ const LandingHowItWorks = () => {
 
                     <div className="relative z-10 flex h-full flex-row items-start gap-4 lg:flex-col lg:items-center lg:text-center">
                       {/* Step Icon Container */}
-                      <div className="from-primary/10 to-accent/10 border-primary/10 group-hover:from-primary group-hover:to-accent text-primary flex h-11 w-11 shrink-0 origin-center items-center justify-center rounded-xl border bg-linear-to-br transition-all duration-500 will-change-transform group-hover:rotate-6 group-hover:text-white lg:h-16 lg:w-16 lg:rounded-2xl">
+                      <div className="from-primary/10 to-accent/10 border-primary/10 group-hover:from-primary group-hover:to-accent text-primary flex h-11 w-11 shrink-0 origin-center items-center justify-center rounded-xl border bg-linear-to-br transition-all duration-500 will-change-transform group-hover:scale-110 group-hover:text-white lg:h-16 lg:w-16 lg:rounded-2xl">
                         <step.icon className="h-5.5 w-5.5 lg:h-8 lg:w-8" />
                       </div>
 

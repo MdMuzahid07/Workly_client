@@ -4,8 +4,13 @@ import { Apple, Bell, Play, Smartphone, Star, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import QRCode from "react-qr-code";
 import HoverHint from "../HoverHint";
+import { useGetPublicSystemSettingsQuery } from "@/redux/feature/admin/adminApi";
 
 const MobileAppRecommend = () => {
+  const { data: settingsData } = useGetPublicSystemSettingsQuery();
+  const qrCodeUrl =
+    settingsData?.data?.qrCodeUrl || "https://mdmuzahid.vercel.app";
+
   return (
     <section className="relative overflow-hidden py-16 sm:py-24">
       {/* Decorative Background Elements */}
@@ -52,7 +57,7 @@ const MobileAppRecommend = () => {
                 className="mb-6 inline-flex"
               >
                 <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold backdrop-blur-sm transition-all">
-                  <Smartphone className="h-3.5 w-3.5 animate-pulse" />
+                  <Smartphone className="h-3.5 w-3.5" />
                   Available on iOS & Android
                 </Badge>
               </motion.div>
@@ -84,51 +89,13 @@ const MobileAppRecommend = () => {
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 lg:justify-start"
+                className="flex w-full flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-8 lg:justify-start lg:gap-10"
               >
-                {/* App Store Button */}
-                <HoverHint hint="Coming soon">
-                  <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-3.5">
-                    {/* Dynamic Gradient Overlay */}
-                    <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                    <Apple className="relative z-10 h-6 w-6 text-white transition-colors duration-300 sm:h-7 sm:w-7" />
-
-                    <div className="relative z-10 flex flex-col items-start leading-none">
-                      <span className="mb-0.5 text-[8px] font-extrabold tracking-widest text-zinc-400 uppercase sm:mb-1.5 sm:text-[9px]">
-                        Download on the
-                      </span>
-                      <span className="text-sm font-black tracking-wide sm:text-lg">
-                        App Store
-                      </span>
-                    </div>
-                  </button>
-                </HoverHint>
-
-                {/* Play Store Button */}
-                <HoverHint hint="Under Development">
-                  <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-3.5">
-                    {/* Dynamic Gradient Overlay */}
-                    <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                    <Play className="relative z-10 h-6 w-6 fill-white text-white transition-colors duration-300 sm:h-7 sm:w-7" />
-
-                    <div className="relative z-10 flex flex-col items-start leading-none">
-                      <span className="mb-0.5 text-[8px] font-extrabold tracking-widest text-zinc-400 uppercase sm:mb-1.5 sm:text-[9px]">
-                        Get it on
-                      </span>
-                      <span className="text-sm font-black tracking-wide sm:text-lg">
-                        Google Play
-                      </span>
-                    </div>
-                  </button>
-                </HoverHint>
-
                 {/* QR Code Section */}
-                <div className="border-border/25 flex items-center gap-3 lg:border-l lg:pl-6">
+                <div className="order-1 flex flex-col items-center justify-center gap-3 sm:order-2 sm:flex-row sm:border-l sm:border-zinc-200 sm:pl-6 lg:pl-8 dark:sm:border-zinc-800">
                   <div className="bg-background border-border/50 flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border p-2 shadow-sm sm:h-24 sm:w-24 lg:h-28 lg:w-28">
                     <QRCode
-                      value="https://mdmuzahid.vercel.app"
+                      value={qrCodeUrl}
                       size={200}
                       bgColor="transparent"
                       fgColor="currentColor"
@@ -136,7 +103,7 @@ const MobileAppRecommend = () => {
                       level="M"
                     />
                   </div>
-                  <div className="flex flex-col text-left">
+                  <div className="flex flex-col text-center sm:text-left">
                     <span className="text-foreground text-sm leading-none font-bold">
                       Scan to Download
                     </span>
@@ -144,6 +111,47 @@ const MobileAppRecommend = () => {
                       Use phone camera
                     </span>
                   </div>
+                </div>
+
+                {/* Buttons Container */}
+                <div className="order-2 flex flex-row items-center justify-center gap-3 sm:flex-col sm:gap-4 lg:order-1 lg:items-start lg:justify-start">
+                  {/* App Store Button */}
+                  <HoverHint hint="Coming soon">
+                    <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-2 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-3.5">
+                      {/* Dynamic Gradient Overlay */}
+                      <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                      <Apple className="relative z-10 h-5 w-5 text-white transition-colors duration-300 sm:h-7 sm:w-7" />
+
+                      <div className="relative z-10 flex flex-col items-start leading-none">
+                        <span className="mb-0.5 text-[7px] font-extrabold tracking-widest text-zinc-400 uppercase sm:mb-1.5 sm:text-[9px]">
+                          Download on the
+                        </span>
+                        <span className="text-xs font-black tracking-wide sm:text-lg">
+                          App Store
+                        </span>
+                      </div>
+                    </button>
+                  </HoverHint>
+
+                  {/* Play Store Button */}
+                  <HoverHint hint="Under Development">
+                    <button className="group hover:border-primary/50 hover:shadow-primary/5 relative z-10 flex cursor-pointer items-center gap-2 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-98 sm:gap-4 sm:rounded-2xl sm:px-8 sm:py-3.5">
+                      {/* Dynamic Gradient Overlay */}
+                      <div className="from-primary/20 to-accent/20 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                      <Play className="relative z-10 h-5 w-5 fill-white text-white transition-colors duration-300 sm:h-7 sm:w-7" />
+
+                      <div className="relative z-10 flex flex-col items-start leading-none">
+                        <span className="mb-0.5 text-[7px] font-extrabold tracking-widest text-zinc-400 uppercase sm:mb-1.5 sm:text-[9px]">
+                          Get it on
+                        </span>
+                        <span className="text-xs font-black tracking-wide sm:text-lg">
+                          Google Play
+                        </span>
+                      </div>
+                    </button>
+                  </HoverHint>
                 </div>
               </motion.div>
             </div>
@@ -184,7 +192,7 @@ const MobileAppRecommend = () => {
                 }}
                 className="bg-background/95 border-primary/20 absolute right-0 bottom-16 z-20 flex max-w-[140px] items-center gap-2.5 rounded-xl border p-3 shadow-xl backdrop-blur-md sm:right-4 md:right-8 lg:-right-4"
               >
-                <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 animate-bounce items-center justify-center rounded-lg">
+                <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
                   <Bell className="h-4 w-4" />
                 </div>
                 <div className="flex min-w-0 flex-col">
@@ -226,12 +234,22 @@ const MobileAppRecommend = () => {
 
                   {/* App Navigation */}
                   <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                    <div className="flex items-center gap-1">
-                      <div className="bg-primary/20 text-primary flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold">
-                        W
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-500">
+                        <svg
+                          className="h-3 w-3"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M3 12l3 9 4-14 4 14 3-9" />
+                        </svg>
                       </div>
-                      <span className="text-[9px] font-bold text-white">
-                        Workly
+                      <span className="text-[9.5px] font-black tracking-tight text-white">
+                        Workly<span className="text-emerald-500">Job</span>
                       </span>
                     </div>
                     <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />

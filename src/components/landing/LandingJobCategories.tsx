@@ -200,51 +200,77 @@ const LandingJobCategories = () => {
 
         {/* Categories Grid */}
         <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-          {displayCategories.map((cat: DisplayCategory, index: number) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                delay: index * 0.1,
-                duration: 0.6,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="h-full"
-            >
-              <Card
-                onClick={() => handleCategoryClick(cat)}
-                className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative h-full cursor-pointer overflow-hidden rounded-2xl border p-4 backdrop-blur-md transition-all duration-500 sm:p-6"
+          {displayCategories.map((cat: DisplayCategory, index: number) => {
+            const colors = (() => {
+              if (cat.color === "bg-primary") {
+                return {
+                  bg: "bg-primary/10",
+                  text: "text-primary",
+                  hoverBg: "group-hover:bg-primary",
+                };
+              }
+              if (cat.color === "bg-accent") {
+                return {
+                  bg: "bg-accent/10",
+                  text: "text-accent",
+                  hoverBg: "group-hover:bg-accent",
+                };
+              }
+              return {
+                bg: "bg-emerald-500/10",
+                text: "text-emerald-500",
+                hoverBg: "group-hover:bg-emerald-500",
+              };
+            })();
+
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.6,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="h-full"
               >
-                {/* Dynamic Gradient Overlay */}
-                <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <Card
+                  onClick={() => handleCategoryClick(cat)}
+                  className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative h-full cursor-pointer overflow-hidden rounded-2xl border p-4 backdrop-blur-md transition-all duration-500 sm:p-6"
+                >
+                  {/* Dynamic Gradient Overlay */}
+                  <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                <div className="relative z-10 flex h-full flex-col justify-between">
-                  <div>
-                    {/* Category Icon Container */}
-                    <div className="bg-muted/65 group-hover:bg-primary mb-3 flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-500 group-hover:text-white sm:mb-6 sm:h-12 sm:w-12">
-                      <cat.icon className="h-5 w-5 transition-transform duration-500 sm:h-6 sm:w-6" />
+                  <div className="relative z-10 flex h-full flex-col justify-between">
+                    <div>
+                      {/* Category Icon Container */}
+                      <div
+                        className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-500 will-change-transform group-hover:scale-110 group-hover:text-white sm:mb-6 sm:h-12 sm:w-12 ${colors.bg} ${colors.text} ${colors.hoverBg}`}
+                      >
+                        <cat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+
+                      {/* Content */}
+                      <h3 className="text-foreground group-hover:text-primary text-sm font-bold tracking-tight transition-all duration-500 sm:text-lg">
+                        {cat.title}
+                      </h3>
                     </div>
-
-                    {/* Content */}
-                    <h3 className="text-foreground group-hover:text-primary text-sm font-bold tracking-tight transition-all duration-500 sm:text-lg">
-                      {cat.title}
-                    </h3>
+                    {cat.count ? (
+                      <p className="text-muted-foreground mt-1.5 text-[10px] sm:mt-2 sm:text-sm">
+                        {cat.count}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground/50 mt-1.5 text-[10px] italic sm:mt-2 sm:text-sm">
+                        Coming soon
+                      </p>
+                    )}
                   </div>
-                  {cat.count ? (
-                    <p className="text-muted-foreground mt-1.5 text-[10px] sm:mt-2 sm:text-sm">
-                      {cat.count}
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground/50 mt-1.5 text-[10px] italic sm:mt-2 sm:text-sm">
-                      Coming soon
-                    </p>
-                  )}
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

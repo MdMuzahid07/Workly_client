@@ -319,7 +319,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   className="space-y-3"
                 >
                   <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase">
-                    <Sparkles className="h-3 w-3 animate-pulse" />
+                    <Sparkles className="h-3 w-3" />
                     <span>Explore {activeSlide.badgeText}</span>
                   </div>
 
@@ -476,7 +476,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
               {/* Trending searches */}
               <div className="flex flex-wrap items-center gap-2 px-1 pt-0.5">
                 <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
-                  <TrendingUp className="text-primary h-3.5 w-3.5 animate-pulse" />
+                  <TrendingUp className="text-primary h-3.5 w-3.5" />
                   Trending:
                 </span>
                 {trendingList.map((term, i) => (
@@ -613,7 +613,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
             {/* Live active candidate indicator overlaying the globe bottom */}
             <div className="border-border bg-card/90 absolute right-2 bottom-1 left-2 z-20 flex items-center justify-between rounded-xl border p-2.5 backdrop-blur-md">
               <div className="flex items-center gap-1.5">
-                <Radio className="text-primary h-3.5 w-3.5 shrink-0 animate-pulse" />
+                <Radio className="text-primary h-3.5 w-3.5 shrink-0" />
                 <span className="text-foreground text-[10px] font-bold">
                   Network online
                 </span>

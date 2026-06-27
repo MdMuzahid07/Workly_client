@@ -42,28 +42,28 @@ const HelpCenterView = () => {
   const categories = [
     {
       id: "seeker",
-      icon: <User className="h-5 w-5" />,
+      icon: User,
       title: "Job Seeker Support",
       description: "Managing your profile, applications, and job alerts.",
       count: "12 articles",
     },
     {
       id: "employer",
-      icon: <Building className="h-5 w-5" />,
+      icon: Building,
       title: "Employer Support",
       description: "Posting jobs, managing candidates, and company profiles.",
       count: "8 articles",
     },
     {
       id: "safety",
-      icon: <ShieldCheck className="h-5 w-5" />,
+      icon: ShieldCheck,
       title: "Trust & Safety",
       description: "Keeping your account secure and reporting issues.",
       count: "5 articles",
     },
     {
       id: "billing",
-      icon: <CreditCard className="h-5 w-5" />,
+      icon: CreditCard,
       title: "Billing & Subscriptions",
       description: "Managing invoices, premium upgrades, and payment gateways.",
       count: "6 articles",
@@ -183,16 +183,13 @@ const HelpCenterView = () => {
   return (
     <div className="bg-background min-h-screen">
       {/* Premium Hero Search Section with Chateau Green accents */}
-      <section className="from-primary/10 via-primary/5 relative overflow-hidden bg-linear-to-b to-transparent pt-32 pb-20 md:pt-40 md:pb-28">
+      <section className="from-primary/10 via-primary/5 relative overflow-hidden bg-linear-to-b to-transparent pt-20 pb-12 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28">
         <div className="bg-primary/5 pointer-events-none absolute top-1/4 left-1/10 h-72 w-72 rounded-full blur-3xl" />
         <div className="pointer-events-none absolute top-1/3 right-1/10 h-72 w-72 rounded-full bg-emerald-500/5 blur-3xl" />
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold tracking-wide uppercase">
-            <LifeBuoy
-              className="animate-spin-slow h-3.5 w-3.5"
-              style={{ animationDuration: "8s" }}
-            />
+            <LifeBuoy className="h-3.5 w-3.5" />
             <span>Support Center</span>
           </div>
 
@@ -212,7 +209,7 @@ const HelpCenterView = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search for articles (e.g. 'resume', 'billing', 'verify')"
-              className="border-border/60 bg-card/80 focus-visible:ring-primary/20 focus-visible:border-primary/50 h-14 rounded-2xl pr-24 pl-12 text-base backdrop-blur-xs transition-all"
+              className="border-border/40 hover:border-primary/30 bg-card/75 focus-visible:ring-primary/10 focus-visible:border-primary h-14 rounded-2xl pr-24 pl-12 text-base shadow-xs backdrop-blur-md transition-all duration-300"
             />
             <Button
               onClick={handleSearchSubmit}
@@ -225,40 +222,40 @@ const HelpCenterView = () => {
       </section>
 
       {/* Main Container */}
-      <div className="mx-auto max-w-7xl px-4 pb-28 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-28 lg:px-8">
         {/* Categories Section */}
-        <div className="-mt-10 mb-20">
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="-mt-6 mb-10 sm:-mt-10 sm:mb-20">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
             {categories.map((category) => {
               const isActive = activeCategory === category.id;
               return (
                 <Card
                   key={category.id}
                   onClick={() => handleCategoryClick(category.id)}
-                  className={`group cursor-pointer rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 ${
+                  className={`group cursor-pointer rounded-2xl border transition-all duration-500 hover:-translate-y-1 hover:shadow-md ${
                     isActive
                       ? "ring-primary/10 border-primary bg-primary/5 ring-2"
-                      : "border-border/50 bg-card hover:border-primary/60"
+                      : "border-border/40 bg-card hover:border-primary/40"
                   }`}
                 >
-                  <CardContent className="space-y-4 p-6">
+                  <CardContent className="flex h-full flex-col justify-between space-y-2 p-3.5 sm:space-y-4 sm:p-6">
                     <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 ${
+                      className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-500 will-change-transform sm:h-11 sm:w-11 ${
                         isActive
-                          ? "bg-primary text-white"
-                          : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"
+                          ? "bg-primary scale-110 text-white"
+                          : "bg-primary/10 text-primary group-hover:bg-primary group-hover:scale-110 group-hover:text-white"
                       }`}
                     >
-                      {category.icon}
+                      <category.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
                     <div>
-                      <h3 className="text-foreground text-base font-bold">
+                      <h3 className="text-foreground truncate text-xs font-bold sm:text-base">
                         {category.title}
                       </h3>
-                      <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
+                      <p className="text-muted-foreground mt-0.5 line-clamp-2 text-[10px] leading-relaxed sm:mt-1 sm:text-xs">
                         {category.description}
                       </p>
-                      <span className="text-primary mt-4 block text-[10px] font-bold tracking-wider uppercase">
+                      <span className="text-primary mt-2 block text-[9px] font-bold tracking-wider uppercase sm:mt-4 sm:text-[10px]">
                         {category.count}
                       </span>
                     </div>
@@ -271,7 +268,7 @@ const HelpCenterView = () => {
 
         {/* FAQ Section */}
         <div id="faq-section" className="max-w-3.5xl mx-auto scroll-mt-24">
-          <div className="mb-10 text-center">
+          <div className="mb-6 text-center sm:mb-10">
             <h2 className="text-3xl font-extrabold tracking-tight">
               Frequently Asked Questions
             </h2>
@@ -303,12 +300,16 @@ const HelpCenterView = () => {
           </div>
 
           {filteredFaqs.length > 0 ? (
-            <Accordion type="single" collapsible className="w-full space-y-4">
+            <Accordion
+              type="single"
+              collapsible
+              className="w-full space-y-3 sm:space-y-4"
+            >
               {filteredFaqs.map((faq, index) => (
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="border-border/50 bg-card hover:border-primary/40 rounded-2xl border px-6 py-1.5 transition-all duration-300"
+                  className="border-border/40 bg-card hover:border-primary/30 rounded-2xl border px-6 py-1.5 shadow-xs transition-all duration-300 hover:shadow-sm"
                 >
                   <AccordionTrigger className="hover:text-primary text-left text-base font-semibold transition-colors duration-300 hover:no-underline">
                     {faq.question}
@@ -335,7 +336,7 @@ const HelpCenterView = () => {
                   setSearchQuery("");
                   setActiveCategory("all");
                 }}
-                className="mt-6 h-9 rounded-xl font-bold"
+                className="mt-6 h-9 cursor-pointer rounded-xl font-bold"
               >
                 Reset Search Filters
               </Button>
@@ -344,7 +345,7 @@ const HelpCenterView = () => {
         </div>
 
         {/* Contact CTA card */}
-        <div className="bg-primary/5 border-primary/10 relative mx-auto mt-28 max-w-4xl overflow-hidden rounded-3xl border p-8 text-center md:p-12">
+        <div className="bg-primary/5 border-primary/10 relative mx-auto mt-14 max-w-4xl overflow-hidden rounded-2xl border p-5 text-center shadow-xs transition-all duration-500 hover:shadow-md sm:mt-28 sm:rounded-3xl sm:p-12">
           <div className="bg-primary/10 pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 rounded-full blur-2xl" />
           <div className="bg-primary/10 pointer-events-none absolute -top-10 -left-10 h-40 w-40 rounded-full blur-2xl" />
 
@@ -361,13 +362,13 @@ const HelpCenterView = () => {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link href="/contact-us" className="w-full sm:w-auto">
-                <Button className="h-11 w-full gap-2 rounded-xl px-8 text-sm font-bold transition-all">
+                <Button className="h-11 w-full cursor-pointer gap-2 rounded-xl px-8 text-sm font-bold transition-all hover:scale-102 active:scale-98">
                   Contact Support
                 </Button>
               </Link>
               <Button
                 variant="outline"
-                className="border-border/60 hover:bg-card h-11 w-full rounded-xl px-8 text-sm font-bold transition-all sm:w-auto"
+                className="border-border/40 hover:bg-card/80 h-11 w-full cursor-pointer rounded-xl px-8 text-sm font-bold transition-all hover:scale-102 active:scale-98 sm:w-auto"
               >
                 Live Chat Support
               </Button>

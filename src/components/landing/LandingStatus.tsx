@@ -106,13 +106,30 @@ const LandingStatus = () => {
               <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
               <div className="relative">
-                <div
-                  className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-${stat.color}/10 transition-all duration-500 group-hover:bg-${stat.color}/20 sm:h-16 sm:w-16`}
-                >
-                  <stat.icon
-                    className={`h-7 w-7 text-${stat.color} sm:h-8 sm:w-8`}
-                  />
-                </div>
+                {(() => {
+                  const colorMap = {
+                    primary: {
+                      bg: "bg-primary/10",
+                      text: "text-primary",
+                      hoverBg: "group-hover:bg-primary",
+                    },
+                    accent: {
+                      bg: "bg-accent/10",
+                      text: "text-accent",
+                      hoverBg: "group-hover:bg-accent",
+                    },
+                  };
+                  const colors =
+                    colorMap[stat.color as "primary" | "accent"] ||
+                    colorMap.primary;
+                  return (
+                    <div
+                      className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-500 will-change-transform group-hover:scale-110 group-hover:text-white sm:h-16 sm:w-16 ${colors.bg} ${colors.text} ${colors.hoverBg}`}
+                    >
+                      <stat.icon className="h-7 w-7 sm:h-8 sm:w-8" />
+                    </div>
+                  );
+                })()}
 
                 {isLoading || !stats ? (
                   <div className="bg-muted/60 mx-auto my-2.5 h-8 w-20 animate-pulse rounded" />

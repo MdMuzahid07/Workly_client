@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   },
 };
 
+import MaintenanceModeProvider from "../provider/MaintenanceModeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,7 +38,9 @@ export default function RootLayout({
           storageKey="workly-theme"
         >
           <ReduxProvider>
-            <SocketProvider>{children}</SocketProvider>
+            <SocketProvider>
+              <MaintenanceModeProvider>{children}</MaintenanceModeProvider>
+            </SocketProvider>
           </ReduxProvider>
         </ThemeProvider>
         <Toaster

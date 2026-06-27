@@ -131,7 +131,7 @@ const AdminDashboardView = () => {
                 },
                 {
                   icon: Activity,
-                  label: "System Logs",
+                  label: "System Settings",
                   href: "/admin/settings",
                   color: "text-amber-500 bg-amber-500/10",
                 },

@@ -72,7 +72,7 @@ const LandingFeatures = () => {
                 <div className="relative z-10 flex h-full flex-col justify-between">
                   <div>
                     {/* Premium Icon Container */}
-                    <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary mb-4 inline-flex h-10 w-10 origin-center items-center justify-center rounded-xl ring-1 transition-all duration-500 will-change-transform group-hover:rotate-12 group-hover:text-white sm:mb-8 sm:h-16 sm:w-16 sm:rounded-2xl">
+                    <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary mb-4 inline-flex h-10 w-10 origin-center items-center justify-center rounded-xl ring-1 transition-all duration-500 will-change-transform group-hover:scale-110 group-hover:text-white sm:mb-8 sm:h-16 sm:w-16 sm:rounded-2xl">
                       <feature.icon className="h-5 w-5 sm:h-8 sm:w-8" />
                     </div>
 
