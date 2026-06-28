@@ -4,33 +4,21 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ConversationSidebarSkeleton = () => (
-  <div className="lg:col-span-4 xl:col-span-3">
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+  <div className="xl:col-span-3.5 h-full lg:col-span-4">
+    <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
+      <CardHeader className="border-border/40 border-b p-3.5 sm:p-4">
         <Skeleton className="h-10 w-full rounded-full" />
       </CardHeader>
 
-      <CardContent className="p-0">
-        <div className="space-y-2 px-4">
+      <CardContent className="flex-1 p-2">
+        <div className="space-y-2">
           {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="hover:bg-muted/40 flex items-start space-x-3 rounded-lg border border-transparent p-3"
-            >
-              <div className="relative">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                {i % 2 === 0 && (
-                  <div className="bg-primary border-background absolute -right-1 -bottom-1 h-3 w-3 rounded-full border-2"></div>
-                )}
+            <div key={i} className="flex items-center gap-3 rounded-xl p-3">
+              <Skeleton className="h-11 w-11 shrink-0 rounded-xl sm:h-12 sm:w-12" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-4 w-2/3 rounded-md" />
+                <Skeleton className="h-3 w-full rounded-md" />
               </div>
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-3 w-2/3" />
-                <Skeleton className="h-2 w-1/2" />
-                <Skeleton className="h-3 w-full" />
-              </div>
-              {i === 0 && (
-                <Skeleton className="h-5 w-5 rounded-full" /> // unread badge placeholder
-              )}
             </div>
           ))}
         </div>
@@ -40,55 +28,53 @@ const ConversationSidebarSkeleton = () => (
 );
 
 const ChatAreaSkeleton = () => (
-  <div className="flex flex-col lg:col-span-8 xl:col-span-9">
-    <Card className="flex h-full flex-col">
-      <CardHeader className="border-border hidden border-b pb-3 lg:block">
+  <div className="xl:col-span-8.5 hidden h-full flex-col lg:col-span-8 lg:flex">
+    <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
+      <CardHeader className="border-border/40 border-b p-3.5 sm:p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <div>
-              <Skeleton className="h-3 w-32" />
-              <Skeleton className="mt-1 h-2 w-24" />
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-xl sm:h-11 sm:w-11" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-32 rounded-md" />
+              <Skeleton className="h-3 w-24 rounded-md" />
             </div>
           </div>
-          <div className="flex space-x-2">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-9 w-9 rounded-md" />
-            ))}
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-8 w-8 rounded-full" />
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 space-y-6 overflow-y-auto p-4">
-        {[...Array(7)].map((_, i) => (
+      <CardContent className="bg-muted/5 flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
+        {[...Array(5)].map((_, i) => (
           <div
             key={i}
             className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
           >
             <div
-              className={`flex max-w-[80%] items-start space-x-2 ${
-                i % 2 === 0 ? "" : "flex-row-reverse space-x-reverse"
+              className={`flex max-w-[75%] items-end gap-2 ${
+                i % 2 === 0 ? "" : "flex-row-reverse"
               }`}
             >
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <div className="space-y-2">
+              <Skeleton className="h-7 w-7 shrink-0 rounded-lg" />
+              <div className="space-y-1.5">
                 <Skeleton
-                  className={`h-5 w-[180px] rounded-lg ${
-                    i % 2 === 0 ? "bg-muted" : "bg-primary/40"
+                  className={`h-10 w-[180px] rounded-2xl sm:w-[240px] ${
+                    i % 2 === 0 ? "bg-card" : "bg-primary/40"
                   }`}
                 />
-                <Skeleton className="h-3 w-10" />
+                <Skeleton className="h-3 w-12 rounded-md" />
               </div>
             </div>
           </div>
         ))}
       </CardContent>
 
-      <div className="border-border flex items-center space-x-2 border-t p-4">
-        <Skeleton className="h-10 w-10 rounded-md" />
-        <Skeleton className="h-10 flex-1 rounded-md" />
-        <Skeleton className="h-10 w-10 rounded-md" />
-        <Skeleton className="h-10 w-10 rounded-md" />
+      <div className="border-border/40 flex items-center gap-2 border-t p-2.5 sm:p-3">
+        <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+        <Skeleton className="h-10 flex-1 rounded-full" />
+        <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
       </div>
     </Card>
   </div>
@@ -96,18 +82,10 @@ const ChatAreaSkeleton = () => (
 
 const MessageViewSkeleton = () => {
   return (
-    <div className="md:bg-primary/2 bg-background min-h-screen md:pt-20">
-      <div className="border-border bg-card sticky top-0 z-50 flex w-full border-b md:hidden">
-        <div className="p-4">
-          <Skeleton className="h-6 w-40" />
-        </div>
-      </div>
-
-      <div className="mx-auto px-4 py-6">
-        <div className="grid h-[calc(100vh-200px)] grid-cols-1 gap-6 lg:grid-cols-12">
-          <ConversationSidebarSkeleton />
-          <ChatAreaSkeleton />
-        </div>
+    <div className="min-h-screen space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
+      <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
+        <ConversationSidebarSkeleton />
+        <ChatAreaSkeleton />
       </div>
     </div>
   );

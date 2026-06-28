@@ -15,9 +15,11 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/profile/profileApi";
+import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
 import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import {
   Briefcase,
+  Camera,
   Check,
   CheckCircle2,
   GraduationCap,
@@ -29,7 +31,7 @@ import {
   Zap,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/overview/ProfileSkeleton";
@@ -126,6 +128,36 @@ const ProfileView = () => {
   const user = data?.data;
 
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [uploadSingleFile, { isLoading: isUploadingAvatar }] =
+    useUploadSingleFileMutation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadSingleFile(formData).unwrap();
+      if (res.success && res.data?.url) {
+        const newAvatarUrl = res.data.url;
+        setLocalProfile((prev: any) => ({ ...prev, avatarUrl: newAvatarUrl }));
+        toast.success("Image uploaded! Click 'Save Changes' to apply.");
+      }
+    } catch (err: any) {
+      console.error("Failed to upload avatar:", err);
+      toast.error(err?.data?.message || "Failed to upload profile picture");
+    } finally {
+      if (e.target) e.target.value = "";
+    }
+  };
 
   // Local state to track all changes before global save
   const [localProfile, setLocalProfile] = useState<any>(null);
@@ -274,6 +306,15 @@ const ProfileView = () => {
   return (
     <div className="bg-background min-h-screen pt-3 pb-12 sm:pt-4 sm:pb-16 lg:pt-6 lg:pb-20">
       <div className="space-y-4 px-3 sm:space-y-6 sm:px-6 lg:space-y-8 lg:px-8">
+        {/* Hidden File Input for Avatar Upload */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleAvatarUpload}
+          className="hidden"
+          accept="image/*"
+        />
+
         {/* Header Profile Card */}
         <Card className="border-border bg-card/60 relative gap-0 overflow-hidden rounded-2xl border p-0 backdrop-blur-xl transition-all duration-300">
           {/* Cover Banner (Waves on mobile, delicate gradient on desktop) */}
@@ -289,7 +330,7 @@ const ProfileView = () => {
               />
             </div>
             {/* Desktop Gradient Banner */}
-            <div className="from-primary/15 via-primary/10 to-primary/5 absolute inset-0 hidden bg-gradient-to-r sm:block" />
+            <div className="from-primary/15 via-primary/10 to-primary/5 absolute inset-0 hidden bg-linear-to-r sm:block" />
 
             {/* Progress Bar overlay (only for mobile, since desktop has it below) */}
             <Progress
@@ -315,10 +356,17 @@ const ProfileView = () => {
             <div className="flex flex-col items-center text-center sm:hidden">
               {/* Centered Overlapping Avatar */}
               <div className="relative -mt-14 mb-4 shrink-0">
-                <div className="bg-background border-background relative h-24 w-24 overflow-hidden rounded-full border-[3px] ring-[3px] ring-emerald-500/90 transition-transform duration-300 hover:scale-102 dark:ring-emerald-400/90">
-                  {user?.profile?.avatarUrl ? (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group bg-background border-background relative h-24 w-24 cursor-pointer overflow-hidden rounded-full border-[3px] ring-[3px] ring-emerald-500/90 transition-transform duration-300 hover:scale-102 dark:ring-emerald-400/90"
+                >
+                  {localProfile?.avatarUrl || user?.profile?.avatarUrl ? (
                     <Image
-                      src={user?.profile?.avatarUrl || "/placeholder.svg"}
+                      src={
+                        localProfile?.avatarUrl ||
+                        user?.profile?.avatarUrl ||
+                        "/placeholder.svg"
+                      }
                       alt="User"
                       width={96}
                       height={96}
@@ -330,9 +378,22 @@ const ProfileView = () => {
                       <User className="h-12 w-12" />
                     </div>
                   )}
+                  {/* Camera Hover Overlay */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    {isUploadingAvatar ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Camera className="h-6 w-6 text-white" />
+                        <span className="mt-0.5 text-[9px] font-bold tracking-wider uppercase">
+                          Upload
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 {/* Check Overlay badge */}
-                <div className="border-background absolute right-1 bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-emerald-500 text-white">
+                <div className="border-background pointer-events-none absolute right-1 bottom-1 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-emerald-500 text-white">
                   <Check className="h-3 w-3 stroke-[3.5] font-extrabold text-white" />
                 </div>
               </div>
@@ -368,10 +429,17 @@ const ProfileView = () => {
             {/* --- Tablet/Desktop View (Inline/Previous Layout) --- */}
             <div className="-mt-10 mb-0 hidden sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div className="flex min-w-0 items-center gap-4">
-                <div className="border-background bg-muted relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 shadow-sm">
-                  {user?.profile?.avatarUrl ? (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group border-background bg-muted relative h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-full border-4 shadow-sm"
+                >
+                  {localProfile?.avatarUrl || user?.profile?.avatarUrl ? (
                     <Image
-                      src={user?.profile?.avatarUrl || "/placeholder.svg"}
+                      src={
+                        localProfile?.avatarUrl ||
+                        user?.profile?.avatarUrl ||
+                        "/placeholder.svg"
+                      }
                       alt="User"
                       width={80}
                       height={80}
@@ -383,6 +451,19 @@ const ProfileView = () => {
                       <User className="h-10 sm:h-10" />
                     </div>
                   )}
+                  {/* Camera Hover Overlay */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    {isUploadingAvatar ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Camera className="h-5 w-5 text-white" />
+                        <span className="mt-0.5 text-[8px] font-bold tracking-wider uppercase">
+                          Upload
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="min-w-0 pt-2">
                   <h2 className="text-foreground truncate text-lg font-bold tracking-tight md:text-xl">

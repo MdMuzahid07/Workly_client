@@ -62,57 +62,57 @@ const JobViewHistoryView = () => {
       {isLoading ? (
         <JobViewHistorySkeleton />
       ) : (
-        <div className="space-y-6 px-4 sm:px-6 sm:py-8">
+        <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
           {/* Filter Bar */}
-          <Card className="bg-card rounded-xl border">
-            <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-center">
-                {/* Search Placeholder */}
-                <div className="group relative max-w-md flex-1">
+          <Card className="bg-card rounded-2xl border">
+            <CardContent className="flex flex-col gap-3 p-3.5 sm:p-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-center">
+                {/* Search Input */}
+                <div className="group relative w-full max-w-md flex-1">
                   <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
                   <Input
                     placeholder="Search your history..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
+                    className="bg-muted/20 border-border focus:bg-background h-9 rounded-full pl-9 text-xs transition-all sm:h-10 sm:text-sm"
                   />
                 </div>
 
-                {/* Job Type Filter UI */}
-                <div className="flex items-center gap-3">
-                  <span className="text-muted-foreground/60 text-[10px] font-black tracking-widest uppercase">
-                    Type:
-                  </span>
-                  <Select
-                    value={jobTypeFilter}
-                    onValueChange={setJobTypeFilter}
-                  >
-                    <SelectTrigger className="bg-muted/20 border-border h-10 w-48 cursor-pointer rounded-full font-bold">
-                      <SelectValue placeholder="All types" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      {jobTypes.map((type) => (
-                        <SelectItem
-                          key={type}
-                          className="cursor-pointer rounded-lg font-medium"
-                          value={type}
-                        >
-                          {type === "all"
-                            ? "All Types"
-                            : type.replace("_", " ")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                {/* Filter and Button Row on Mobile */}
+                <div className="flex w-full items-center justify-between gap-2 md:w-auto md:justify-start">
+                  <div className="flex flex-1 items-center gap-2 md:flex-initial">
+                    <span className="text-muted-foreground/60 hidden text-[10px] font-black tracking-widest uppercase sm:inline-block">
+                      Type:
+                    </span>
+                    <Select
+                      value={jobTypeFilter}
+                      onValueChange={setJobTypeFilter}
+                    >
+                      <SelectTrigger className="bg-muted/20 border-border h-8 w-full cursor-pointer rounded-full text-xs font-bold sm:h-10 sm:text-sm md:w-48">
+                        <SelectValue placeholder="All types" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {jobTypes.map((type) => (
+                          <SelectItem
+                            key={type}
+                            className="cursor-pointer rounded-lg text-xs font-medium sm:text-sm"
+                            value={type}
+                          >
+                            {type === "all"
+                              ? "All Types"
+                              : type.replace("_", " ")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="flex items-center gap-2">
-                <Link href="/dashboard/find-jobs">
-                  <Button className="h-11 rounded-full px-6 font-bold shadow-sm">
-                    Find More Jobs
-                  </Button>
-                </Link>
+                  <Link href="/dashboard/find-jobs" className="shrink-0">
+                    <Button className="h-8 rounded-full px-3 text-xs font-bold shadow-xs sm:h-10 sm:px-6 sm:text-sm">
+                      Find More
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>

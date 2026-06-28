@@ -57,7 +57,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
         className="fixed inset-0 !top-0 !left-0 z-10000! m-0 flex h-screen! w-screen! max-w-none! !translate-x-0 !translate-y-0 flex-col items-center justify-center rounded-none border-none bg-black p-0 shadow-none outline-none"
       >
         {/* Header Actions */}
-        <div className="absolute top-0 right-0 left-0 z-50 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent p-6">
+        <div className="absolute top-0 right-0 left-0 z-50 flex items-center justify-between bg-linear-to-b from-black/60 to-transparent p-6">
           <div className="flex flex-col">
             <span className="text-lg font-black tracking-tight text-white">
               {currentItem.fileName || "Image"}

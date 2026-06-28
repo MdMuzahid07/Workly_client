@@ -369,7 +369,7 @@ export default function EmployerSidebarView({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-full border transition-all sm:top-4"
+            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded border transition-all sm:top-4"
             aria-label="Open sidebar"
           >
             <Menu className="text-primary h-5 w-5" />

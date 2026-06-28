@@ -7,14 +7,14 @@ export default function JobSeekerDashboardSkeleton() {
   return (
     <div className="animate-pulse space-y-3 px-3 py-3 sm:space-y-6 sm:px-6 sm:py-6 lg:px-8 lg:py-6">
       {/* 4 Stats Cards */}
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-2 xl:grid-cols-4 xl:gap-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-4 xl:gap-6">
         {/* Card 1: Profile Completion */}
-        <Card className="bg-card border shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+        <Card className="bg-card rounded-2xl border shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3.5 pb-1 sm:p-4 sm:pb-1.5 lg:p-5 lg:pb-2 xl:p-6 xl:pb-2">
             <Skeleton className="h-3.5 w-16 rounded-md sm:w-28" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </CardHeader>
-          <CardContent className="space-y-1.5 p-3 pt-0 sm:p-6 sm:pt-0">
+          <CardContent className="space-y-1.5 p-3.5 pt-0 sm:p-4 sm:pt-0 lg:p-5 lg:pt-0 xl:p-6 xl:pt-0">
             <Skeleton className="h-6 w-12 rounded-md sm:h-8 sm:w-16" />
             <Skeleton className="h-3 w-full rounded-md" />
             <Skeleton className="h-3.5 w-16 rounded-md sm:h-4 sm:w-20" />
@@ -22,12 +22,12 @@ export default function JobSeekerDashboardSkeleton() {
         </Card>
 
         {/* Card 2: Applications */}
-        <Card className="bg-card border shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+        <Card className="bg-card rounded-2xl border shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3.5 pb-1 sm:p-4 sm:pb-1.5 lg:p-5 lg:pb-2 xl:p-6 xl:pb-2">
             <Skeleton className="h-3.5 w-16 rounded-md sm:w-24" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </CardHeader>
-          <CardContent className="space-y-1.5 p-3 pt-0 sm:p-6 sm:pt-0">
+          <CardContent className="space-y-1.5 p-3.5 pt-0 sm:p-4 sm:pt-0 lg:p-5 lg:pt-0 xl:p-6 xl:pt-0">
             <Skeleton className="h-6 w-10 rounded-md sm:h-8 sm:w-12" />
             <Skeleton className="h-3 w-full rounded-md" />
             <Skeleton className="h-3.5 w-20 rounded-md sm:h-4 sm:w-28" />
@@ -35,12 +35,12 @@ export default function JobSeekerDashboardSkeleton() {
         </Card>
 
         {/* Card 3: Saved Jobs */}
-        <Card className="bg-card border shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+        <Card className="bg-card rounded-2xl border shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3.5 pb-1 sm:p-4 sm:pb-1.5 lg:p-5 lg:pb-2 xl:p-6 xl:pb-2">
             <Skeleton className="h-3.5 w-16 rounded-md sm:w-20" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </CardHeader>
-          <CardContent className="space-y-1.5 p-3 pt-0 sm:p-6 sm:pt-0">
+          <CardContent className="space-y-1.5 p-3.5 pt-0 sm:p-4 sm:pt-0 lg:p-5 lg:pt-0 xl:p-6 xl:pt-0">
             <Skeleton className="h-6 w-8 rounded-md sm:h-8 sm:w-10" />
             <Skeleton className="h-3 w-full rounded-md" />
             <Skeleton className="h-3.5 w-16 rounded-md sm:h-4 sm:w-24" />
@@ -48,12 +48,12 @@ export default function JobSeekerDashboardSkeleton() {
         </Card>
 
         {/* Card 4: Recommended */}
-        <Card className="bg-card border shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+        <Card className="bg-card rounded-2xl border shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3.5 pb-1 sm:p-4 sm:pb-1.5 lg:p-5 lg:pb-2 xl:p-6 xl:pb-2">
             <Skeleton className="h-3.5 w-20 rounded-md sm:w-28" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </CardHeader>
-          <CardContent className="space-y-1.5 p-3 pt-0 sm:p-6 sm:pt-0">
+          <CardContent className="space-y-1.5 p-3.5 pt-0 sm:p-4 sm:pt-0 lg:p-5 lg:pt-0 xl:p-6 xl:pt-0">
             <Skeleton className="h-6 w-24 rounded-md sm:h-8 sm:w-32" />
             <Skeleton className="h-3 w-full rounded-md" />
             <Skeleton className="h-3.5 w-24 rounded-md sm:h-4 sm:w-32" />

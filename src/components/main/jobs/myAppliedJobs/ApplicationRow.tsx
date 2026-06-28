@@ -72,9 +72,9 @@ export const ApplicationRow = ({
 
   return (
     <TableRow className="group hover:bg-muted/40 border-none transition-colors">
-      <TableCell className="py-4 pl-6">
-        <div className="flex items-center gap-4">
-          <div className="bg-muted text-muted-foreground group-hover:bg-background relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border p-1.5 text-[10px] font-semibold transition-colors">
+      <TableCell className="py-3 pl-3 sm:py-4 sm:pl-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="bg-muted text-muted-foreground group-hover:bg-background relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border p-1.5 text-[10px] font-semibold transition-colors sm:h-10 sm:w-10">
             {app.job.company.logoUrl ? (
               <Image
                 src={app.job.company.logoUrl}
@@ -83,17 +83,17 @@ export const ApplicationRow = ({
                 fill
               />
             ) : (
-              <Building2 className="h-5 w-5 opacity-40" />
+              <Building2 className="h-4 w-4 opacity-40 sm:h-5 sm:w-5" />
             )}
           </div>
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             <Link
               href={jobHref}
-              className="text-foreground group-hover:text-primary text-sm font-bold transition-colors"
+              className="text-foreground group-hover:text-primary line-clamp-1 text-xs font-bold transition-colors sm:text-sm"
             >
               {app.job.title}
             </Link>
-            <span className="text-muted-foreground text-[11px] font-medium tracking-tight uppercase">
+            <span className="text-muted-foreground line-clamp-1 text-[10px] font-medium tracking-tight uppercase sm:text-[11px]">
               {app.job.company.name}
             </span>
           </div>
@@ -104,11 +104,11 @@ export const ApplicationRow = ({
           {location}
         </span>
       </TableCell>
-      <TableCell className="py-4">
+      <TableCell className="px-2 py-3 sm:px-4 sm:py-4">
         <div className="flex justify-center">
           <Badge
             variant="outline"
-            className={`rounded-full border px-3 py-1 text-[10px] font-bold tracking-wider uppercase ${getStatusColor(app.status)}`}
+            className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold tracking-wider whitespace-nowrap uppercase sm:px-3 sm:py-1 sm:text-[10px] ${getStatusColor(app.status)}`}
           >
             {getStatusLabel(app.status)}
           </Badge>
@@ -123,7 +123,7 @@ export const ApplicationRow = ({
           })}
         </span>
       </TableCell>
-      <TableCell className="py-4 pr-6 text-right">
+      <TableCell className="py-3 pr-3 text-right sm:py-4 sm:pr-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

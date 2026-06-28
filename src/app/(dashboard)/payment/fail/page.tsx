@@ -13,7 +13,7 @@ export default function PaymentFailPage() {
     "The transaction was declined by the bank or gateway partner.";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-slate-50 via-slate-100 to-red-50/30 p-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950/20">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-tr from-slate-50 via-slate-100 to-red-50/30 p-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950/20">
       <Card className="bg-background/60 dark:bg-background/40 relative w-full max-w-lg overflow-hidden border border-red-500/20 p-8 text-center shadow-2xl backdrop-blur-xl">
         {/* Glow Effects */}
         <div className="absolute -top-12 -left-12 h-24 w-24 rounded-full bg-red-500/10 blur-xl"></div>
@@ -23,7 +23,7 @@ export default function PaymentFailPage() {
           <AlertCircle className="h-10 w-10 text-red-500" />
         </div>
 
-        <h1 className="bg-gradient-to-r from-red-500 to-rose-500 bg-clip-text text-3xl font-black tracking-tight text-transparent dark:from-red-400 dark:to-rose-400">
+        <h1 className="bg-linear-to-r from-red-500 to-rose-500 bg-clip-text text-3xl font-black tracking-tight text-transparent dark:from-red-400 dark:to-rose-400">
           Payment Failed
         </h1>
         <p className="text-muted-foreground text-md mt-2">
