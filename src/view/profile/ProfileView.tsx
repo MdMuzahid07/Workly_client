@@ -381,7 +381,13 @@ const ProfileView = () => {
                     </div>
                   )}
                   {/* Camera Hover Overlay */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <div
+                    className={`absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white transition-opacity duration-200 ${
+                      isUploadingAvatar
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  >
                     {isUploadingAvatar ? (
                       <Loader2 className="h-6 w-6 animate-spin text-white" />
                     ) : (
@@ -454,7 +460,13 @@ const ProfileView = () => {
                     </div>
                   )}
                   {/* Camera Hover Overlay */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <div
+                    className={`absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white transition-opacity duration-200 ${
+                      isUploadingAvatar
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  >
                     {isUploadingAvatar ? (
                       <Loader2 className="h-5 w-5 animate-spin text-white" />
                     ) : (
