@@ -5,16 +5,36 @@ const ALWAYS_ALLOW = [
   "/maintenance",
   "/login",
   "/register",
+  "/forgot-password",
+  "/verify-email",
+  "/verification-sent",
+  "/reset-password",
   "/_next",
   "/favicon.ico",
-  "/api", // Next.js API routes (if any)
+  "/api",
 ];
 
-const isAdminFromCookie = (request: NextRequest): boolean => {
+const PROTECTED_ROUTES = [
+  "/jobs",
+  "/companies",
+  "/browse-candidates",
+  "/create-company",
+  "/saved-jobs",
+  "/applied-jobs",
+  "/messages",
+  "/notifications",
+  "/dashboard",
+  "/employer",
+  "/admin",
+];
+
+const getTokenFromCookie = (request: NextRequest): string | undefined => {
+  return request.cookies.get("accessToken")?.value;
+};
+
+const isAdminFromToken = (token?: string): boolean => {
+  if (!token) return false;
   try {
-    // Match the cookie name used in ReduxProvider: accessToken
-    const token = request.cookies.get("accessToken")?.value;
-    if (!token) return false;
     const decoded = jwtDecode<{ role?: string }>(token);
     return decoded.role === "ADMIN" || decoded.role === "SUPER_ADMIN";
   } catch {
@@ -23,12 +43,30 @@ const isAdminFromCookie = (request: NextRequest): boolean => {
 };
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
-  if (ALWAYS_ALLOW.some((p) => pathname.startsWith(p))) {
+  // 1. Skip static/public assets and bypass paths
+  if (
+    ALWAYS_ALLOW.some((p) => pathname === p || pathname.startsWith(p + "/"))
+  ) {
     return NextResponse.next();
   }
 
+  const token = getTokenFromCookie(request);
+
+  // 2. Enforce Authentication on Protected Routes
+  const isProtected = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/"),
+  );
+
+  if (isProtected && !token) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = `?callbackUrl=${encodeURIComponent(pathname + search)}`;
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // 3. System Maintenance Interception
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2000);
 
@@ -41,19 +79,18 @@ export async function middleware(request: NextRequest) {
       cache: "no-store",
     });
 
-    if (!res.ok) return NextResponse.next();
+    if (res.ok) {
+      const json = await res.json();
+      const inMaintenance: boolean = json?.data?.maintenanceMode ?? false;
 
-    const json = await res.json();
-    const inMaintenance: boolean = json?.data?.maintenanceMode ?? false;
-
-    if (inMaintenance && !isAdminFromCookie(request)) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/maintenance";
-      return NextResponse.redirect(url);
+      if (inMaintenance && !isAdminFromToken(token)) {
+        const maintUrl = request.nextUrl.clone();
+        maintUrl.pathname = "/maintenance";
+        return NextResponse.redirect(maintUrl);
+      }
     }
   } catch {
-    // Fail open: don't block users if our status endpoint is unreachable
-    return NextResponse.next();
+    // Fail open if maintenance endpoint is unreachable
   } finally {
     clearTimeout(timeout);
   }
