@@ -1,10 +1,12 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import DashboardProfileHeader from "@/components/dashboard/dashboard-nav/header/DashboardProfileHeader";
 
 const ProfileSkeleton = () => {
   return (
-    <div className="bg-background min-h-screen pt-3 pb-12 sm:pt-4 sm:pb-16 lg:pt-6 lg:pb-20">
+    <div className="bg-background min-h-screen">
+      <DashboardProfileHeader />
       <div className="space-y-4 px-3 sm:space-y-6 sm:px-6 lg:space-y-8 lg:px-8">
         {/* Header Profile Card Skeleton */}
         <Card className="border-border/80 bg-card relative gap-0 overflow-hidden rounded-2xl border p-0">

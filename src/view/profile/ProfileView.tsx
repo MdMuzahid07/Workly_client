@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import DashboardProfileHeader from "@/components/dashboard/dashboard-nav/header/DashboardProfileHeader";
 import { AdditionalInfo } from "@/components/main/profile/AdditionalInfo";
 import EducationList from "@/components/main/profile/EducationList";
 import ExperienceList from "@/components/main/profile/ExperienceList";
@@ -304,7 +305,8 @@ const ProfileView = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen pt-3 pb-12 sm:pt-4 sm:pb-16 lg:pt-6 lg:pb-20">
+    <div className="bg-background min-h-screen">
+      <DashboardProfileHeader />
       <div className="space-y-4 px-3 sm:space-y-6 sm:px-6 lg:space-y-8 lg:px-8">
         {/* Hidden File Input for Avatar Upload */}
         <input

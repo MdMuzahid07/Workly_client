@@ -48,7 +48,7 @@ export function ProfileInsightsPanel() {
   }
 
   return (
-    <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
+    <div className="space-y-4 px-3.5 pb-4 sm:space-y-6 sm:px-6 sm:pb-8">
       {/* ================= Stats Cards (2 per row on mobile) ================= */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-4 xl:gap-6">
         {/* Period Views */}

@@ -1,4 +1,6 @@
 "use client";
+import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
+import DashboardEmployerMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerMessagesHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -468,7 +470,12 @@ const MessageView = () => {
   }
 
   return (
-    <div className="min-h-screen space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
+    <div className="min-h-screen px-3.5 sm:px-6">
+      {currentUser?.role === "EMPLOYER" ? (
+        <DashboardEmployerMessagesHeader />
+      ) : (
+        <DashboardMessagesHeader />
+      )}
       <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
         {/* Conversations Sidebar */}
         <ConversationSidebar

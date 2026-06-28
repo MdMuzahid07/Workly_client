@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
 
 const ConversationSidebarSkeleton = () => (
   <div className="xl:col-span-3.5 h-full lg:col-span-4">
@@ -82,10 +83,13 @@ const ChatAreaSkeleton = () => (
 
 const MessageViewSkeleton = () => {
   return (
-    <div className="min-h-screen space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
-      <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
-        <ConversationSidebarSkeleton />
-        <ChatAreaSkeleton />
+    <div className="min-h-screen">
+      <DashboardMessagesHeader />
+      <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
+        <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
+          <ConversationSidebarSkeleton />
+          <ChatAreaSkeleton />
+        </div>
       </div>
     </div>
   );
