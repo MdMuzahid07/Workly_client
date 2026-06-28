@@ -28,7 +28,7 @@ export function StatCard({
   testId,
 }: StatCardProps) {
   return (
-    <Card className="bg-card group overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md">
+    <Card className="bg-card group overflow-hidden rounded-xl border transition-all duration-300">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle
           id={testId ? `${testId}-title` : undefined}

@@ -47,7 +47,13 @@ const SignInForm = () => {
       const resData = (response as any).data;
 
       if (resData?.accessToken && resData?.email) {
+        // Store in localStorage for client-side access
         localStorage.setItem("accessToken", resData.accessToken);
+
+        // CRITICAL: Also set a cookie so Next.js middleware can read the token
+        // during server-side route protection checks before navigation completes.
+        // Without this cookie, middleware redirects back to /login on every first click.
+        document.cookie = `accessToken=${resData.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
 
         const decodedToken = jwtDecode(resData.accessToken) as {
           isVerified: boolean;
@@ -76,7 +82,8 @@ const SignInForm = () => {
         }
 
         toast.success("Login successful!");
-        router.push(callbackUrl);
+        // Use replace so the login page is removed from browser history
+        router.replace(callbackUrl);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

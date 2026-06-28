@@ -162,7 +162,7 @@ export default function JobSeekerBillingView() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/30 pt-15 pb-20 dark:bg-transparent">
+    <div className="min-h-screen bg-slate-50/30 pt-8 pb-20 dark:bg-transparent">
       <DashboardCandidateBillingHeader />
 
       <div className="animate-in fade-in px-4 py-8 duration-500 sm:px-6 lg:px-8">

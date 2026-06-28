@@ -12,6 +12,7 @@ import {
   useUpdateUserSettingsMutation,
 } from "@/redux/feature/profile/profileApi";
 import { useAppDispatch } from "@/redux/hooks";
+import JobSeekerSettingsSkeleton from "@/skeleton/dashboard/job-seeker/settings/JobSeekerSettingsSkeleton";
 import JobSeekerPersonalInformationView from "@/view/dashboard/job-seeker/personal-information/JobSeekerPersonalInformationView";
 import JobSeekerSecurityView from "@/view/dashboard/job-seeker/security/JobSeekerSecurityView";
 import {
@@ -30,7 +31,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import JobSeekerSettingsSkeleton from "@/skeleton/dashboard/job-seeker/settings/JobSeekerSettingsSkeleton";
 
 interface SettingItem {
   id: string;
@@ -195,7 +195,7 @@ export default function JobSeekerSettingsView() {
   }
 
   return (
-    <div className="min-h-screen pt-16 lg:pt-20">
+    <div className="min-h-screen pt-8">
       <DashboardSettingsHeader
         isSaving={isSaving}
         onSave={handleSaveSettings}

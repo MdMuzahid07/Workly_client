@@ -21,8 +21,8 @@ import { useEffect, useMemo, useState } from "react";
 import JobCard from "../../components/main/jobs/JobCard";
 import StatsCards from "../../components/main/saved-jobs/StatsCards";
 
-import SavedJobsViewSkeleton from "@/skeleton/saved-jobs/SavedJobsViewSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
+import SavedJobsViewSkeleton from "@/skeleton/saved-jobs/SavedJobsViewSkeleton";
 
 const SavedJobsView = () => {
   // Query States
@@ -102,7 +102,7 @@ const SavedJobsView = () => {
   }
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardSavedJobsHeader />
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">

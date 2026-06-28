@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetJobViewHistoryQuery } from "@/redux/feature/jobView/jobViewApi";
-import { AnimatePresence } from "framer-motion";
 import JobViewHistorySkeleton from "@/skeleton/job-history/JobViewHistorySkeleton";
+import { AnimatePresence } from "framer-motion";
 import { Briefcase, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -57,7 +57,7 @@ const JobViewHistoryView = () => {
   }, [response?.data]);
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardJobViewHistoryHeader />
       {isLoading ? (
         <JobViewHistorySkeleton />

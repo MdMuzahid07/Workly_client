@@ -14,6 +14,7 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/profile/profileApi";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import {
   Briefcase,
   CheckCircle2,
@@ -28,7 +29,6 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/overview/ProfileSkeleton";
-import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 
 import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicInfoForm";
 import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
@@ -37,6 +37,7 @@ import { ExperienceForm } from "@/components/dashboard/profile-tabs/forms/Experi
 import { ProjectForm } from "@/components/dashboard/profile-tabs/forms/ProjectForm";
 import { SocialLinksForm } from "@/components/dashboard/profile-tabs/forms/SocialLinksForm";
 import { VideoResumeForm } from "@/components/dashboard/profile-tabs/forms/VideoResumeForm";
+import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,6 @@ import { ReferenceForm } from "../../components/dashboard/profile-tabs/forms/Ref
 import { SoftSkillsForm } from "../../components/dashboard/profile-tabs/forms/SoftSkillsForm";
 import { VolunteerForm } from "../../components/dashboard/profile-tabs/forms/VolunteerForm";
 import { Button } from "../../components/ui/button";
-import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
 const createLocalProfile = (userData: any) => {
   const profile = userData.profile || {};
@@ -268,7 +268,7 @@ const ProfileView = () => {
   }
 
   return (
-    <div className="bg-background mt-16 min-h-screen pt-8 pb-20">
+    <div className="bg-background min-h-screen pt-8 pb-20">
       <div className="space-y-8 px-4 md:px-6">
         {/* Header Section */}
         <div className="space-y-6">

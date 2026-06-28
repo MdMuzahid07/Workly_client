@@ -56,7 +56,7 @@ export default function JobSeekerDashboardView() {
   const appliedCount = applications.length;
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardJobSeekerHeader />
       {isLoading ? (
         <JobSeekerDashboardSkeleton />

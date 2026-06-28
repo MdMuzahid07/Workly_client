@@ -77,7 +77,11 @@ const SignUpForm = () => {
       const resData = (response as any).data;
 
       if (resData?.accessToken && resData?.email) {
+        // Store in localStorage for client-side access
         localStorage.setItem("accessToken", resData.accessToken);
+
+        // CRITICAL: Also set cookie so middleware sees token before navigation
+        document.cookie = `accessToken=${resData.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
 
         dispatch(
           setCredentials({
@@ -93,7 +97,7 @@ const SignUpForm = () => {
         );
 
         toast.success("Please verify your email!");
-        router.push("/verify-email");
+        router.replace("/verify-email");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

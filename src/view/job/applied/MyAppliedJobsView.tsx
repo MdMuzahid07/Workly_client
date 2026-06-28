@@ -5,6 +5,16 @@ import { ApplicationRow } from "@/components/main/jobs/myAppliedJobs/Application
 import { ApplicationStats } from "@/components/main/jobs/myAppliedJobs/ApplicationStats";
 import ErrorState from "@/components/main/jobs/myAppliedJobs/ErrorState";
 import PaginationBar from "@/components/shared/PaginationBar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,16 +42,6 @@ import {
 import { ApplicationStatus, MyAppliedJob } from "@/types/application";
 import debounce from "debounce";
 import { AnimatePresence } from "framer-motion";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { AlertTriangle, FilterX, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -207,7 +207,7 @@ const MyAppliedJobsView = () => {
   }
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardAppliedJobsHeader />
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">

@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetFollowedCompaniesQuery } from "@/redux/feature/follow/followApi";
-import { AnimatePresence } from "framer-motion";
 import FollowedCompaniesSkeleton from "@/skeleton/followed-company/FollowedCompaniesSkeleton";
+import { AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -96,7 +96,7 @@ const FollowedCompaniesView = () => {
   }, [followedData?.meta?.industries]);
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardFollowedCompaniesHeader />
 
       {isLoading ? (

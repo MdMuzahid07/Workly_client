@@ -1,15 +1,16 @@
 "use client";
 
-import { Resume } from "@/types/profile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCanAccess, useEntitlements } from "@/hooks/useEntitlements";
 import { cn } from "@/lib/utils";
 import {
   useListResumesQuery,
   useUploadResumeMutation,
 } from "@/redux/feature/resume/resumeApi";
-import { useCanAccess, useEntitlements } from "@/hooks/useEntitlements";
 import { useAppSelector } from "@/redux/hooks";
+import CVManagerSkeleton from "@/skeleton/cv-manager/CVManagerSkeleton";
+import { Resume } from "@/types/profile";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -19,7 +20,6 @@ import {
   ShieldCheck,
   UploadCloud,
 } from "lucide-react";
-import CVManagerSkeleton from "@/skeleton/cv-manager/CVManagerSkeleton";
 import Link from "next/link";
 import { useRef } from "react";
 import { toast } from "sonner";
@@ -77,7 +77,7 @@ const CVManagerView = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardCVManagerHeader />
 
       <input

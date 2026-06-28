@@ -1,12 +1,12 @@
 "use client";
 
-import { ProfileInsightsPanel } from "@/components/dashboard/profile-views/ProfileInsightsPanel";
 import DashboardHeaderContainer from "@/components/dashboard/dashboard-nav/header/DashboardHeaderContainer";
+import { ProfileInsightsPanel } from "@/components/dashboard/profile-views/ProfileInsightsPanel";
 import { Eye } from "lucide-react";
 
 export default function ProfileViewsView() {
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       {/* ================= Page Header ================= */}
       <DashboardHeaderContainer>
         <div className="flex items-center gap-2 sm:gap-3">

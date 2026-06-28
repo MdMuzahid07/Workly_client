@@ -146,7 +146,7 @@ const NotificationView = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardNotificationHeader />
 
       {isNotifLoading ? (

@@ -98,7 +98,7 @@ export default function JobSeekerPricingView() {
   const isLoading = isSubLoading || isPlansLoading;
 
   return (
-    <div className="min-h-screen pt-15">
+    <div className="min-h-screen pt-8">
       <DashboardCandidatePricingHeader />
       {isLoading ? (
         <JobSeekerPricingSkeleton />

@@ -98,7 +98,7 @@ const RecommendedJobsView = () => {
 
   if (!isPremium) {
     return (
-      <div className="min-h-screen pt-16">
+      <div className="min-h-screen pt-8">
         <DashboardRecommendedJobsHeader />
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-20">
           <motion.div
