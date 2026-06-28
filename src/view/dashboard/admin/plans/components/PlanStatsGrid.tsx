@@ -32,17 +32,22 @@ const stats = [
 
 export function PlanStatsGrid() {
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
       {stats.map((stat, idx) => (
-        <Card key={idx} className="bg-card rounded-xl border">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-muted-foreground text-xs font-bold tracking-widest uppercase opacity-70">
+        <Card
+          key={idx}
+          className="bg-card rounded-xl border p-3.5 shadow-xs sm:p-6"
+        >
+          <CardHeader className="flex flex-row items-center justify-between p-0 pb-1 sm:pb-2">
+            <CardTitle className="text-muted-foreground truncate text-[10px] font-bold tracking-wider uppercase opacity-70 sm:text-xs">
               {stat.label}
             </CardTitle>
-            <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            <stat.icon
+              className={`h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 ${stat.color}`}
+            />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <CardContent className="p-0 pt-1 sm:pt-2">
+            <div className="text-lg font-extrabold tracking-tight sm:text-3xl">
               {stat.value}
             </div>
           </CardContent>
