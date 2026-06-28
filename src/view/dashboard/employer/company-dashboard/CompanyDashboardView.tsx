@@ -87,7 +87,7 @@ const CompanyDashboardView = () => {
       <DashboardOverviewHeader companyData={companyData} />
       <div className="space-y-4 sm:space-y-6 sm:py-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 lg:gap-6 xl:grid-cols-4">
           <Card className="bg-card transition-shadow hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium sm:text-sm">
