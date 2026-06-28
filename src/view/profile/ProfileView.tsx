@@ -450,27 +450,27 @@ const ProfileView = () => {
             <TabsList className="bg-muted/30 border-border/50 flex h-10 w-full min-w-max gap-1 rounded-full border p-1 whitespace-nowrap lg:grid lg:h-12 lg:min-w-0 lg:grid-cols-4 lg:whitespace-normal">
               <TabsTrigger
                 value="personal"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full flex-shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:flex-shrink-1 lg:px-5 lg:text-sm"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
               >
                 <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Personal &
                 Portfolio
               </TabsTrigger>
               <TabsTrigger
                 value="professional"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full flex-shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:flex-shrink-1 lg:px-5 lg:text-sm"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
               >
                 <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Professional
               </TabsTrigger>
               <TabsTrigger
                 value="education"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full flex-shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:flex-shrink-1 lg:px-5 lg:text-sm"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
               >
                 <GraduationCap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />{" "}
                 Education & Growth
               </TabsTrigger>
               <TabsTrigger
                 value="skills"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full flex-shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:flex-shrink-1 lg:px-5 lg:text-sm"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
               >
                 <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Skills &
                 Preferences
