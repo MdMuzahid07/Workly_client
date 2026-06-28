@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CompanyProfile } from "@/types/company-profile";
 import { PROFILE_TABS } from "@/constants/company-mock-data";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
-import Loading from "../../../../app/loading";
+import CompanyProfileSkeleton from "@/skeleton/dashboard/employer/company-profile/CompanyProfileSkeleton";
 import DashboardCompanyProfileHeader from "../../../../components/dashboard/dashboard-nav/header/DashboardCompanyProfileHeader";
 import CompanyProfileBenefitsTab from "../../../../components/dashboard/profile-tabs/CompanyProfileBenefitsTab";
 import CompanyProfileCultureValuesTab from "../../../../components/dashboard/profile-tabs/CompanyProfileCultureValuesTab";
@@ -42,11 +42,7 @@ const ManageCompanyProfileView = () => {
 
   // Loading state
   if (isLoading || !currentProfile) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <CompanyProfileSkeleton />;
   }
 
   return (
@@ -72,20 +68,18 @@ const ManageCompanyProfileView = () => {
           className="w-full space-y-8"
         >
           {/* Tab list */}
-          <div className="scrollbar-none -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-            <TabsList className="bg-muted/40 border-border h-10 w-full justify-start rounded-full border p-0">
-              {PROFILE_TABS.map((tab) => (
-                <TabsTrigger
-                  key={tab.id}
-                  value={tab.id}
-                  className="data-[state=active]:bg-primary/10 flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold tracking-tight transition-all duration-300"
-                >
-                  <tab.icon className="text-muted-foreground group-data-[state=active]:text-primary h-4.5 w-4.5 transition-colors" />
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
+          <TabsList className="bg-muted/40 border-border scrollbar-none flex h-11 w-full flex-nowrap justify-start gap-1 overflow-x-auto rounded-full border p-1 sm:h-12">
+            {PROFILE_TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full shrink-0 items-center gap-2 rounded-full px-5 text-xs font-bold tracking-tight whitespace-nowrap transition-all duration-300 sm:px-6 sm:text-sm"
+              >
+                <tab.icon className="h-4 w-4 shrink-0 transition-colors" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
           {/* Tab content */}
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">

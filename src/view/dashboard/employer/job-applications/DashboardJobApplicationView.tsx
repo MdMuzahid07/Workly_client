@@ -392,12 +392,12 @@ const DashboardJobApplicationView = () => {
           hasActiveFilters={hasActiveFilters}
         />
 
-        <div className="rounded-2xl border px-4 py-6 md:px-6 md:py-8">
+        <div className="bg-card rounded-2xl border p-4 shadow-xs sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={handleTabChange}>
-            <TabsList className="bg-card h-10 w-full flex-wrap justify-start border p-0">
+            <TabsList className="bg-muted/30 border-border scrollbar-none h-auto w-full flex-nowrap justify-start gap-1.5 overflow-x-auto rounded-full border p-1 sm:w-auto">
               {TAB_STATUSES.map((tab) => (
                 <TabsTrigger
-                  className="min-w-32 rounded-full py-3"
+                  className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold sm:text-sm"
                   key={tab.value}
                   value={tab.value}
                 >

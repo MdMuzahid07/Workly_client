@@ -78,28 +78,52 @@ const JobManagementTabs = ({
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="mb-6 grid w-full grid-cols-4 border p-0 lg:w-auto">
-        <TabsTrigger value="all" className="gap-2">
-          All Jobs
-          <Badge variant="secondary" className="ml-1">
+      <TabsList className="mb-6 grid h-auto w-full grid-cols-4 rounded-full border p-1 sm:inline-flex sm:w-auto">
+        <TabsTrigger
+          value="all"
+          className="gap-1 px-2 py-1.5 text-xs font-semibold sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+        >
+          <span>All Jobs</span>
+          <Badge
+            variant="secondary"
+            className="py-0.2 px-1.5 text-[10px] font-bold sm:text-xs"
+          >
             {totalCount}
           </Badge>
         </TabsTrigger>
-        <TabsTrigger value="active" className="gap-2">
-          Active
-          <Badge variant="secondary" className="ml-1">
+        <TabsTrigger
+          value="active"
+          className="gap-1 px-2 py-1.5 text-xs font-semibold sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+        >
+          <span>Active</span>
+          <Badge
+            variant="secondary"
+            className="py-0.2 px-1.5 text-[10px] font-bold sm:text-xs"
+          >
             {activeCount}
           </Badge>
         </TabsTrigger>
-        <TabsTrigger value="draft" className="gap-2">
-          Draft
-          <Badge variant="secondary" className="ml-1">
+        <TabsTrigger
+          value="draft"
+          className="gap-1 px-2 py-1.5 text-xs font-semibold sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+        >
+          <span>Draft</span>
+          <Badge
+            variant="secondary"
+            className="py-0.2 px-1.5 text-[10px] font-bold sm:text-xs"
+          >
             {draftCount}
           </Badge>
         </TabsTrigger>
-        <TabsTrigger value="closed" className="gap-2">
-          Closed
-          <Badge variant="secondary" className="ml-1">
+        <TabsTrigger
+          value="closed"
+          className="gap-1 px-2 py-1.5 text-xs font-semibold sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+        >
+          <span>Closed</span>
+          <Badge
+            variant="secondary"
+            className="py-0.2 px-1.5 text-[10px] font-bold sm:text-xs"
+          >
             {closedCount}
           </Badge>
         </TabsTrigger>

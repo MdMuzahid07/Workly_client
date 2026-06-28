@@ -97,6 +97,8 @@ const MessageView = () => {
     index: 0,
   });
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showDeleteConvModal, setShowDeleteConvModal] = useState(false);
 
   // API Queries
   const { data: conversationsData, isLoading: isConversationsLoading } =
@@ -342,10 +344,17 @@ const MessageView = () => {
   const handleBlockUser = async () => {
     if (!selectedConversation) return;
     try {
+      const wasBlocked = currentConversation?.isBlocked;
       await blockUser(selectedConversation).unwrap();
-      toast.success("User block status updated");
+      toast.success(
+        wasBlocked
+          ? `Unblocked ${currentConversation?.participantName || "user"}`
+          : `Blocked ${currentConversation?.participantName || "user"}`,
+      );
     } catch {
       toast.error("Failed to update block status");
+    } finally {
+      setShowBlockModal(false);
     }
   };
 
@@ -370,6 +379,8 @@ const MessageView = () => {
       toast.success("Conversation deleted");
     } catch {
       toast.error("Failed to delete conversation");
+    } finally {
+      setShowDeleteConvModal(false);
     }
   };
 
@@ -580,7 +591,7 @@ const MessageView = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer rounded-lg text-xs font-medium"
-                          onClick={handleBlockUser}
+                          onClick={() => setShowBlockModal(true)}
                         >
                           <ShieldAlert className="mr-2 h-4 w-4" />
                           {currentConversation.isBlocked
@@ -589,7 +600,7 @@ const MessageView = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer rounded-lg text-xs font-medium"
-                          onClick={handleDeleteConversation}
+                          onClick={() => setShowDeleteConvModal(true)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Conversation
@@ -870,12 +881,73 @@ const MessageView = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteMessage}
-              className="bg-destructive hover:bg-destructive/90 rounded-xl"
+              className="bg-destructive hover:bg-destructive/90 rounded-full"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Block/Unblock Confirmation Modal */}
+      <AlertDialog open={showBlockModal} onOpenChange={setShowBlockModal}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {currentConversation?.isBlocked ? "Unblock User" : "Block User"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {currentConversation?.isBlocked
+                ? `Are you sure you want to unblock ${currentConversation?.participantName || "this user"}? They will be able to send you messages again.`
+                : `Are you sure you want to block ${currentConversation?.participantName || "this user"}? They will no longer be able to send you messages or contact you.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBlockUser}
+              className={
+                currentConversation?.isBlocked
+                  ? "bg-primary hover:bg-primary/90 text-primary-foreground rounded-full"
+                  : "bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full"
+              }
+            >
+              {currentConversation?.isBlocked ? "Unblock User" : "Block User"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Conversation Confirmation Modal */}
+      <AlertDialog
+        open={showDeleteConvModal}
+        onOpenChange={setShowDeleteConvModal}
+      >
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this entire conversation with{" "}
+              {currentConversation?.participantName || "this user"}? This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConversation}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full"
+            >
+              Delete Conversation
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

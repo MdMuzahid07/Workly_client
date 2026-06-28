@@ -30,33 +30,33 @@ export default function ApplicationsSkeleton() {
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         {/* Status Cards Skeletons */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="bg-card border">
-              <CardContent className="flex items-center justify-between p-5">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-7 w-12" />
+            <Card key={i} className="bg-card border shadow-xs">
+              <CardContent className="flex items-center justify-between p-3.5 sm:p-5">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-3.5 w-20 sm:w-24" />
+                  <Skeleton className="h-6 w-10 sm:h-7 sm:w-12" />
                 </div>
-                <Skeleton className="h-10 w-10 rounded-full" />
+                <Skeleton className="h-8 w-8 rounded-full sm:h-10 sm:w-10" />
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Filter Bar Skeleton */}
-        <Card className="bg-card border p-4">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <Skeleton className="h-10 w-full max-w-sm rounded-lg" />
-            <Skeleton className="h-10 w-44 rounded-lg" />
-            <Skeleton className="h-10 w-44 rounded-lg" />
+        <Card className="bg-card border p-4 shadow-xs">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <Skeleton className="h-10 w-full max-w-sm rounded-xl" />
+            <Skeleton className="h-10 w-44 rounded-xl" />
+            <Skeleton className="h-10 w-44 rounded-xl" />
           </div>
         </Card>
 
         {/* Table List Skeleton */}
-        <div className="bg-card rounded-2xl border px-4 py-6 md:px-6 md:py-8">
+        <div className="bg-card rounded-2xl border p-4 shadow-xs sm:p-6 md:p-8">
           <Tabs value="all" className="w-full">
-            <TabsList className="bg-card h-10 w-full flex-wrap justify-start border p-0">
+            <TabsList className="bg-muted/30 border-border scrollbar-none h-auto w-full flex-nowrap justify-start gap-1.5 overflow-x-auto rounded-2xl border p-1 sm:w-auto">
               {[
                 "All",
                 "Submitted",
@@ -67,11 +67,11 @@ export default function ApplicationsSkeleton() {
               ].map((label, idx) => (
                 <TabsTrigger
                   key={idx}
-                  className="min-w-32 rounded-full py-3"
+                  className="shrink-0 rounded-full px-4 py-2 text-xs sm:text-sm"
                   value={idx === 0 ? "all" : label.toUpperCase()}
                   disabled
                 >
-                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-16 sm:w-20" />
                 </TabsTrigger>
               ))}
             </TabsList>

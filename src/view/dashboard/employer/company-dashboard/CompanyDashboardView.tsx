@@ -87,70 +87,70 @@ const CompanyDashboardView = () => {
       <DashboardOverviewHeader companyData={companyData} />
       <div className="space-y-4 sm:space-y-6 sm:py-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 lg:gap-6 xl:grid-cols-4">
-          <Card className="bg-card transition-shadow hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-2 lg:gap-6 xl:grid-cols-4">
+          <Card className="bg-card shadow-xs transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+              <CardTitle className="truncate text-xs font-medium sm:text-sm">
                 Total Jobs
               </CardTitle>
-              <Briefcase className="text-muted-foreground h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+              <Briefcase className="text-muted-foreground h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
               <div className="text-primary text-xl font-bold sm:text-2xl">
                 {companyData.stats.totalJobs}
               </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+              <p className="text-muted-foreground mt-0.5 truncate text-[10px] sm:mt-1 sm:text-xs">
                 +2 from last month
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
+          <Card className="bg-card shadow-xs transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+              <CardTitle className="truncate text-xs font-medium sm:text-sm">
                 Active Jobs
               </CardTitle>
-              <TrendingUp className="text-muted-foreground h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+              <TrendingUp className="text-muted-foreground h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
               <div className="text-primary text-xl font-bold sm:text-2xl">
                 {companyData.stats.activeJobs}
               </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+              <p className="text-muted-foreground mt-0.5 truncate text-[10px] sm:mt-1 sm:text-xs">
                 Currently hiring
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
+          <Card className="bg-card shadow-xs transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+              <CardTitle className="truncate text-xs font-medium sm:text-sm">
                 Applications
               </CardTitle>
-              <Eye className="text-muted-foreground h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+              <Eye className="text-muted-foreground h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
               <div className="text-primary text-xl font-bold sm:text-2xl">
                 {companyData.stats.totalApplications}
               </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+              <p className="text-muted-foreground mt-0.5 truncate text-[10px] sm:mt-1 sm:text-xs">
                 +12 this week
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-card transition-shadow hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
+          <Card className="bg-card shadow-xs transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+              <CardTitle className="truncate text-xs font-medium sm:text-sm">
                 Team members
               </CardTitle>
-              <Users className="text-muted-foreground h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+              <Users className="text-muted-foreground h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
               <div className="text-primary text-xl font-bold sm:text-2xl">
                 {companyData.stats.totalTeamMembers}
               </div>
-              <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+              <p className="text-muted-foreground mt-0.5 truncate text-[10px] sm:mt-1 sm:text-xs">
                 +5 this quarter
               </p>
             </CardContent>

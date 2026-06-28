@@ -87,33 +87,33 @@ const SavedProfilesView = () => {
 
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         {/* Stats Summary */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card className="bg-card border">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+          <Card className="bg-card border shadow-xs transition-all hover:shadow-md">
+            <CardContent className="p-3.5 sm:p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-muted-foreground truncate text-[11px] font-medium sm:text-xs">
                     Total Saved
                   </p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-foreground mt-0.5 text-xl font-bold sm:text-2xl">
                     {allSavedProfiles.length}
                   </p>
                 </div>
-                <div className="bg-primary/10 text-primary rounded-full p-3">
-                  <Bookmark className="h-5 w-5" />
+                <div className="bg-primary/10 text-primary shrink-0 rounded-full p-2.5 sm:p-3">
+                  <Bookmark className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">
+          <Card className="bg-card border shadow-xs transition-all hover:shadow-md">
+            <CardContent className="p-3.5 sm:p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-muted-foreground truncate text-[11px] font-medium sm:text-xs">
                     Immediate Available
                   </p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-foreground mt-0.5 text-xl font-bold sm:text-2xl">
                     {
                       allSavedProfiles.filter(
                         (p: any) =>
@@ -122,26 +122,26 @@ const SavedProfilesView = () => {
                     }
                   </p>
                 </div>
-                <div className="bg-success/10 text-success rounded-full p-3">
-                  <Bookmark className="h-5 w-5" />
+                <div className="bg-success/10 text-success shrink-0 rounded-full p-2.5 sm:p-3">
+                  <Bookmark className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">
+          <Card className="bg-card col-span-2 border shadow-xs transition-all hover:shadow-md sm:col-span-1">
+            <CardContent className="p-3.5 sm:p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-muted-foreground truncate text-[11px] font-medium sm:text-xs">
                     Filtered Results
                   </p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-foreground mt-0.5 text-xl font-bold sm:text-2xl">
                     {filteredProfiles.length}
                   </p>
                 </div>
-                <div className="bg-accent/10 text-accent rounded-full p-3">
-                  <Search className="h-5 w-5" />
+                <div className="bg-accent/10 text-accent shrink-0 rounded-full p-2.5 sm:p-3">
+                  <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
               </div>
             </CardContent>
@@ -149,56 +149,69 @@ const SavedProfilesView = () => {
         </div>
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-xl border">
-          <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-center">
+        <Card className="bg-card rounded-xl border shadow-xs">
+          <CardContent className="flex flex-col gap-3 p-3.5 sm:p-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-center">
               {/* Search Input */}
-              <div className="group relative max-w-md flex-1">
+              <div className="group relative w-full max-w-md flex-1">
                 <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
                 <Input
                   placeholder="Search by name, position, or skills..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
+                  className="bg-muted/20 border-border focus:bg-background h-9.5 rounded-full pl-9 text-xs transition-all sm:h-11 sm:text-sm"
                 />
               </div>
 
-              {/* Availability Filter */}
-              <div className="flex items-center gap-3">
-                <span className="text-muted-foreground/60 text-[10px] font-black tracking-widest whitespace-nowrap uppercase">
-                  Availability:
-                </span>
-                <Select
-                  value={availabilityFilter}
-                  onValueChange={setAvailabilityFilter}
-                >
-                  <SelectTrigger className="bg-muted/20 border-border h-10 w-48 cursor-pointer rounded-full font-bold">
-                    <SelectValue placeholder="All Candidates" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    {availabilityOptions.map((option) => (
-                      <SelectItem
-                        key={option}
-                        className="cursor-pointer rounded-lg font-medium"
-                        value={option}
-                      >
-                        {option === "all"
-                          ? "All Candidates"
-                          : option === "immediate"
-                            ? "Immediate"
-                            : option === "2_weeks"
-                              ? "2 Weeks"
-                              : option === "1_month"
-                                ? "1 Month"
-                                : "Not Available"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Availability Filter & Action Button Row */}
+              <div className="flex items-center justify-between gap-2.5 md:justify-start">
+                <div className="flex flex-1 items-center gap-2 md:flex-initial">
+                  <span className="text-muted-foreground/60 hidden text-[10px] font-black tracking-widest whitespace-nowrap uppercase sm:inline-block">
+                    Availability:
+                  </span>
+                  <Select
+                    value={availabilityFilter}
+                    onValueChange={setAvailabilityFilter}
+                  >
+                    <SelectTrigger className="bg-muted/20 border-border h-9 w-full cursor-pointer rounded-full text-xs font-semibold sm:h-10 sm:text-sm md:w-48">
+                      <SelectValue placeholder="All Candidates" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      {availabilityOptions.map((option) => (
+                        <SelectItem
+                          key={option}
+                          className="cursor-pointer rounded-lg text-xs font-medium sm:text-sm"
+                          value={option}
+                        >
+                          {option === "all"
+                            ? "All Candidates"
+                            : option === "immediate"
+                              ? "Immediate"
+                              : option === "2_weeks"
+                                ? "2 Weeks"
+                                : option === "1_month"
+                                  ? "1 Month"
+                                  : "Not Available"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="shrink-0 md:hidden">
+                  <Link href="/browse-candidates">
+                    <Button
+                      size="sm"
+                      className="h-9 rounded-full px-4 text-xs font-bold shadow-xs"
+                    >
+                      Browse
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-2 md:flex">
               <Link href="/browse-candidates">
                 <Button className="h-11 rounded-full px-6 font-bold shadow-sm">
                   Browse Candidates
