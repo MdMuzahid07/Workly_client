@@ -2,14 +2,13 @@
 "use client";
 
 import DashboardCandidatePricingHeader from "@/components/dashboard/dashboard-nav/header/DashboardCandidatePricingHeader";
-import CandidateFeatureComparisonTable from "@/components/dashboard/pricing/CandidateFeatureComparisonTable";
 import CandidatePricingFAQ from "@/components/dashboard/pricing/CandidatePricingFAQ";
 import CandidateSubscriptionStatusCard from "@/components/dashboard/pricing/CandidateSubscriptionStatusCard";
 import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
 import { useGetMySubscriptionQuery } from "@/redux/feature/subscription/subscriptionApi";
 import JobSeekerPricingSkeleton from "@/skeleton/dashboard/job-seeker/pricing/JobSeekerPricingSkeleton";
-import { Package, Shield, Zap } from "lucide-react";
+import { Package, Shield, ShieldCheck, Zap } from "lucide-react";
 
 export default function JobSeekerPricingView() {
   const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
@@ -60,13 +59,44 @@ export default function JobSeekerPricingView() {
     }
 
     let parsedFeatures: string[] = [];
-    if (Array.isArray(plan.features)) {
+    if (Array.isArray(plan.features) && plan.features.length > 0) {
       parsedFeatures = plan.features;
     } else if (typeof plan.features === "string") {
       try {
         parsedFeatures = JSON.parse(plan.features);
       } catch {
         parsedFeatures = [];
+      }
+    }
+
+    if (!parsedFeatures || parsedFeatures.length === 0) {
+      if (nameLower.includes("free")) {
+        parsedFeatures = [
+          "40 job applications / month",
+          "Single active CV / resume upload",
+          "Standard candidate profile visibility",
+          "7 days profile views history (basic)",
+          "In-app job alerts & notifications",
+          "Standard community support",
+        ];
+      } else if (nameLower.includes("pro")) {
+        parsedFeatures = [
+          "120 job applications / month",
+          "Multiple active CVs / resumes upload",
+          "3x candidate profile visibility boost",
+          "Direct messaging to Hiring Managers",
+          "Full 'Who Viewed My Profile' tracker",
+          "Instant real-time email job alerts",
+        ];
+      } else if (nameLower.includes("premium") || nameLower.includes("elite")) {
+        parsedFeatures = [
+          "Unlimited job applications / month",
+          "Unlimited CV uploads & templates",
+          "5x Featured Candidate profile boost",
+          "Guaranteed HR application response tracking",
+          "1-on-1 expert monthly career counseling",
+          "Professional CV & resume expert review",
+        ];
       }
     }
 
@@ -115,19 +145,25 @@ export default function JobSeekerPricingView() {
               renewalDate={getRenewalDateString()}
             />
 
-            <div className="space-y-8 pt-6">
-              <div className="text-center">
-                <h2 className="text-foreground text-3xl font-black tracking-tight sm:text-4xl">
-                  Land your dream job faster
-                </h2>
-                <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
-                  Upgrade your search with high profile boosts, unlimited job
-                  applications, and expert 1-on-1 career assistance.
-                </p>
+            <div className="space-y-8 pt-4">
+              <div className="space-y-6 text-center">
+                <div className="bg-primary/10 border-primary/20 text-primary inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-bold shadow-xs">
+                  <ShieldCheck className="h-4 w-4" />
+                  Elevate Your Career Search
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-foreground text-2xl font-black tracking-tight sm:text-4xl">
+                    Land your dream job faster
+                  </h2>
+                  <p className="text-muted-foreground mx-auto max-w-2xl text-sm sm:text-base">
+                    Upgrade your search with high profile boosts, unlimited job
+                    applications, and expert 1-on-1 career assistance.
+                  </p>
+                </div>
               </div>
 
               {/* Pricing Tiers Grid */}
-              <div className="grid grid-cols-1 gap-8 pt-8 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-8 pt-4 md:grid-cols-3">
                 {plans.map((plan: any) => {
                   const cardProps = mapDbPlanToCardProps(plan);
                   const isActive =
@@ -143,9 +179,6 @@ export default function JobSeekerPricingView() {
                 })}
               </div>
             </div>
-
-            {/* Feature Comparison */}
-            <CandidateFeatureComparisonTable />
 
             {/* FAQ Section */}
             <CandidatePricingFAQ />
