@@ -85,9 +85,21 @@ const SignInForm = () => {
         // Use replace so the login page is removed from browser history
         router.replace(callbackUrl);
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.data?.errorSources?.message || "Login failed");
+    } catch (error) {
+      interface ApiErrorData {
+        success?: boolean;
+        message?: string;
+        errorSources?: {
+          path?: string | string[];
+          message?: string;
+        };
+      }
+      const err = error as {
+        data?: ApiErrorData;
+      };
+      toast.error(
+        err.data?.message || err.data?.errorSources?.message || "Login failed",
+      );
       console.error("Login error:", error);
     }
   };

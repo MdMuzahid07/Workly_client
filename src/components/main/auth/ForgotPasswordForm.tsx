@@ -22,16 +22,33 @@ const ForgotPasswordForm = () => {
   const handleSubmit = async (data: ForgetPasswordFormData) => {
     const result = await forgotPassword({ email: data.email });
 
-    if (result && result.data) {
-      toast.success(result.data.message);
+    interface ApiErrorData {
+      success?: boolean;
+      message?: string;
+      errorSources?: {
+        path?: string | string[];
+        message?: string;
+      };
+    }
+
+    const successResult = result as {
+      data?: { success?: boolean; message?: string };
+    };
+    const errorResult = result as {
+      error?: { status?: number; data?: ApiErrorData; error?: string };
+    };
+
+    if (successResult.data) {
+      toast.success(successResult.data.message || "Reset link sent!");
       setIsSubmitted(true);
-    } else if (result && "error" in result) {
-      toast.error(
-        "error" in result.error
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (result.error as any).error
-          : "An error occurred. Please try again.",
-      );
+    } else if (errorResult.error) {
+      const err = errorResult.error;
+      const errMsg =
+        err.data?.message ||
+        err.data?.errorSources?.message ||
+        err.error ||
+        "An error occurred. Please try again.";
+      toast.error(errMsg);
     }
   };
 

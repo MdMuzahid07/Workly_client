@@ -26,6 +26,10 @@ export default function GoogleAuthCallbackPage() {
       const userData = JSON.parse(userParam);
       localStorage.setItem("accessToken", accessToken);
 
+      // Set cookie so Next.js middleware can read the token
+      // during server-side route protection checks before navigation completes.
+      document.cookie = `accessToken=${accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+
       // Decode token to get isVerified (same pattern as SignInView)
       const decodedToken = jwtDecode(accessToken) as {
         isVerified: boolean;

@@ -31,6 +31,7 @@ const signUpSchema = z
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
+      .max(72, "Password cannot exceed 72 characters")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
       .regex(/[a-z]/, "Password must contain at least one lowercase letter")
       .regex(/[0-9]/, "Password must contain at least one number")
@@ -99,9 +100,23 @@ const SignUpForm = () => {
         toast.success("Please verify your email!");
         router.replace("/verify-email");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Registration failed");
+    } catch (error) {
+      interface ApiErrorData {
+        success?: boolean;
+        message?: string;
+        errorSources?: {
+          path?: string | string[];
+          message?: string;
+        };
+      }
+      const err = error as {
+        data?: ApiErrorData;
+      };
+      toast.error(
+        err.data?.message ||
+          err.data?.errorSources?.message ||
+          "Registration failed",
+      );
       console.error("Registration error:", error);
     }
   };

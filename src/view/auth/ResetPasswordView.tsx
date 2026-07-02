@@ -16,6 +16,7 @@ const passwordSchema = z
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
+      .max(72, "Password cannot exceed 72 characters")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
       .regex(/[a-z]/, "Password must contain at least one lowercase letter")
       .regex(/[0-9]/, "Password must contain at least one number")
@@ -47,19 +48,45 @@ const ResetPasswordView = () => {
     setSubmitting(true);
     setError(null);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await resetPassword({
+    interface ApiErrorData {
+      success?: boolean;
+      message?: string;
+      errorSources?: {
+        path?: string | string[];
+        message?: string;
+      };
+    }
+
+    const result = await resetPassword({
       token,
       newPassword: data.password,
       confirmPassword: data.confirmPassword,
     });
 
-    if (result && result.data && result.data.success) {
+    const successResult = result as {
+      data?: { success?: boolean; message?: string };
+    };
+    const errorResult = result as { error?: { data?: ApiErrorData } };
+
+    if (successResult.data && successResult.data.success) {
       setIsSubmitted(true);
       setSubmitting(false);
-      toast.success(result.data.message);
+      toast.success(
+        successResult.data.message || "Password updated successfully",
+      );
+    } else if (errorResult.error) {
+      const errorData = errorResult.error.data;
+      const errMsg =
+        errorData?.message ||
+        errorData?.errorSources?.message ||
+        "Failed to reset password. Please try again.";
+      setError(errMsg);
+      toast.error(errMsg);
+      setSubmitting(false);
     } else {
-      setError("Failed to reset password. Please try again.");
+      const errMsg = "Failed to reset password. Please try again.";
+      setError(errMsg);
+      toast.error(errMsg);
       setSubmitting(false);
     }
   };

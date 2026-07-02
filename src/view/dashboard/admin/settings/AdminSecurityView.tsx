@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -45,8 +44,8 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
       toast.error("New passwords do not match");
       return;
     }
-    if (formData.newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+    if (formData.newPassword.length < 8 || formData.newPassword.length > 72) {
+      toast.error("Password must be between 8 and 72 characters");
       return;
     }
 
@@ -57,8 +56,23 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
       }).unwrap();
       toast.success("Security settings updated successfully");
       onBack();
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to update security settings");
+    } catch (err) {
+      interface ApiErrorData {
+        success?: boolean;
+        message?: string;
+        errorSources?: {
+          path?: string | string[];
+          message?: string;
+        };
+      }
+      const error = err as {
+        data?: ApiErrorData;
+      };
+      toast.error(
+        error.data?.message ||
+          error.data?.errorSources?.message ||
+          "Failed to update security settings",
+      );
     }
   };
 
