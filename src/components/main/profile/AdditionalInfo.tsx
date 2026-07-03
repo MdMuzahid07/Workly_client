@@ -1,7 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Award, BookOpen, Edit2, Trash2, UserCheck } from "lucide-react";
+import type {
+  Award as AwardType,
+  Publication,
+  Reference,
+} from "@/types/profile";
+
+interface AdditionalInfoProps {
+  awards?: AwardType[];
+  publications?: Publication[];
+  references?: Reference[];
+  onAddAward?: () => void;
+  onAddPublication?: () => void;
+  onAddReference?: () => void;
+  onEditAward?: (award: AwardType, index: number) => void;
+  onDeleteAward?: (index: number) => void;
+  onEditPublication?: (pub: Publication, index: number) => void;
+  onDeletePublication?: (index: number) => void;
+  onEditReference?: (ref: Reference, index: number) => void;
+  onDeleteReference?: (index: number) => void;
+}
 
 export const AdditionalInfo = ({
   awards = [],
@@ -16,20 +35,7 @@ export const AdditionalInfo = ({
   onDeletePublication,
   onEditReference,
   onDeleteReference,
-}: {
-  awards?: any[];
-  publications?: any[];
-  references?: any[];
-  onAddAward?: () => void;
-  onAddPublication?: () => void;
-  onAddReference?: () => void;
-  onEditAward?: (award: any, index: number) => void;
-  onDeleteAward?: (index: number) => void;
-  onEditPublication?: (pub: any, index: number) => void;
-  onDeletePublication?: (index: number) => void;
-  onEditReference?: (ref: any, index: number) => void;
-  onDeleteReference?: (index: number) => void;
-}) => {
+}: AdditionalInfoProps) => {
   return (
     <div className="space-y-6">
       <SectionCard
@@ -42,25 +48,27 @@ export const AdditionalInfo = ({
             {awards.map((award, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between gap-4 rounded-lg border bg-amber-50/50 p-4"
+                className="flex flex-col justify-between gap-3 rounded-lg border bg-amber-50/50 p-4 sm:flex-row sm:items-center sm:gap-4"
               >
                 <div className="flex items-center gap-4">
-                  <Award className="h-8 w-8 text-amber-500" />
+                  <Award className="h-8 w-8 shrink-0 text-amber-500" />
                   <div>
-                    <h4 className="font-medium">{award.title}</h4>
-                    <p className="text-muted-foreground text-sm">
-                      {award.issuer || award.organization}{" "}
-                      {award.issueDate || award.date
-                        ? `- ${new Date(award.issueDate || award.date).toLocaleDateString()}`
+                    <h4 className="text-sm font-semibold sm:text-base">
+                      {award.title}
+                    </h4>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
+                      {award.issuer ?? award.organization}{" "}
+                      {(award.issueDate ?? award.date)
+                        ? `- ${new Date((award.issueDate ?? award.date)!).toLocaleDateString()}`
                         : ""}
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex shrink-0 justify-end gap-2 border-t pt-2 sm:border-t-0 sm:pt-0">
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-muted-foreground hover:text-primary h-8 w-8"
+                    className="text-muted-foreground hover:text-primary hover:bg-primary/10 h-8 w-8"
                     onClick={() => onEditAward?.(award, index)}
                   >
                     <Edit2 className="h-4 w-4" />
@@ -68,7 +76,7 @@ export const AdditionalInfo = ({
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                     onClick={() => onDeleteAward?.(index)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -94,25 +102,27 @@ export const AdditionalInfo = ({
             {publications.map((pub, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between gap-4 rounded-lg border p-4"
+                className="flex flex-col justify-between gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:gap-4"
               >
                 <div className="flex items-center gap-4">
-                  <BookOpen className="h-8 w-8 text-blue-500" />
+                  <BookOpen className="h-8 w-8 shrink-0 text-blue-500" />
                   <div>
-                    <h4 className="font-medium">{pub.title}</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <h4 className="text-sm font-semibold sm:text-base">
+                      {pub.title}
+                    </h4>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
                       {pub.publisher}{" "}
-                      {pub.publishDate || pub.date
-                        ? `· ${new Date(pub.publishDate || pub.date).toLocaleDateString()}`
+                      {(pub.publishDate ?? pub.date)
+                        ? `· ${new Date((pub.publishDate ?? pub.date)!).toLocaleDateString()}`
                         : ""}
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex shrink-0 justify-end gap-2 border-t pt-2 sm:border-t-0 sm:pt-0">
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-muted-foreground hover:text-primary h-8 w-8"
+                    className="text-muted-foreground hover:text-primary hover:bg-primary/10 h-8 w-8"
                     onClick={() => onEditPublication?.(pub, index)}
                   >
                     <Edit2 className="h-4 w-4" />
@@ -120,7 +130,7 @@ export const AdditionalInfo = ({
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                     onClick={() => onDeletePublication?.(index)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -146,29 +156,31 @@ export const AdditionalInfo = ({
             {references.map((ref, index) => (
               <div
                 key={index}
-                className="flex items-start justify-between gap-4 rounded-lg border p-4"
+                className="flex flex-col justify-between gap-3 rounded-lg border p-4 sm:flex-row sm:items-start sm:gap-4"
               >
                 <div className="flex items-start gap-4">
-                  <UserCheck className="mt-1 h-5 w-5 text-green-500" />
+                  <UserCheck className="mt-1 h-5 w-5 shrink-0 text-green-500" />
                   <div>
-                    <h4 className="font-medium">{ref.name}</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <h4 className="text-sm font-semibold sm:text-base">
+                      {ref.name}
+                    </h4>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
                       {ref.relationship}{" "}
                       {ref.company ? `at ${ref.company}` : ""}
                     </p>
                     {(ref.email || ref.phone) && (
-                      <p className="text-muted-foreground mt-1 text-xs">
+                      <p className="text-muted-foreground mt-1 text-[10px] sm:text-xs">
                         {ref.email} {ref.email && ref.phone ? "|" : ""}{" "}
                         {ref.phone}
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex shrink-0 justify-end gap-2 border-t pt-2 sm:border-t-0 sm:pt-0">
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-muted-foreground hover:text-primary h-8 w-8"
+                    className="text-muted-foreground hover:text-primary hover:bg-primary/10 h-8 w-8"
                     onClick={() => onEditReference?.(ref, index)}
                   >
                     <Edit2 className="h-4 w-4" />
@@ -176,7 +188,7 @@ export const AdditionalInfo = ({
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                     onClick={() => onDeleteReference?.(index)}
                   >
                     <Trash2 className="h-4 w-4" />

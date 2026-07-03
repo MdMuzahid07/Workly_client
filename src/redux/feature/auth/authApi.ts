@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../../api/baseApi";
 import { IUser } from "./authSlice";
 
@@ -24,6 +23,11 @@ interface IAuthError {
   };
 }
 
+interface IChangePasswordData {
+  oldPassword?: string;
+  newPassword?: string;
+}
+
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     registerUser: builder.mutation<ILoginResponse, IRegisterData>({
@@ -43,7 +47,7 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    logoutUser: builder.mutation({
+    logoutUser: builder.mutation<void, void>({
       query: () => ({
         url: "/auth/logout",
         method: "POST",
@@ -99,7 +103,7 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    changePassword: builder.mutation<any, any>({
+    changePassword: builder.mutation<{ message: string }, IChangePasswordData>({
       query: (data) => ({
         url: "/auth/change-password",
         method: "POST",

@@ -12,8 +12,6 @@ export const jobSchema = z
       .min(1, "Discipline is required")
       .max(255, "Discipline must not exceed 255 characters"),
     industryId: z.string().min(1, "Industry is required"),
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
     jobType: z.enum(
       [
         "FULL_TIME",
@@ -24,7 +22,7 @@ export const jobSchema = z
         "REMOTE",
       ],
       {
-        required_error: "Job type is required",
+        error: "Job type is required",
       },
     ),
     experienceLevel: z

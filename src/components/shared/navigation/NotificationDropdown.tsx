@@ -27,8 +27,19 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import CompactNotificationCard from "./CompactNotificationCard";
+
+interface NotificationMetadata {
+  jobId?: string;
+  applicationId?: string;
+  conversationId?: string;
+  jobTitle?: string;
+  companyName?: string;
+  senderName?: string;
+  applicationStatus?: string;
+}
 
 interface Notification {
   id: string;
@@ -37,12 +48,9 @@ interface Notification {
   message: string;
   isRead: boolean;
   timestamp: string;
-  metadata?: {
-    jobTitle?: string;
-    companyName?: string;
-    senderName?: string;
-    applicationStatus?: string;
-  };
+  jobId?: string | null;
+  applicationId?: string | null;
+  metadata?: NotificationMetadata;
 }
 
 const getNotificationIcon = (type: Notification["type"]) => {
@@ -83,6 +91,8 @@ const getNotificationColor = (type: Notification["type"]) => {
 };
 
 const NotificationDropdown = () => {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth) || {};
   const isEmployer = user?.role === "EMPLOYER" || (user?.role as number) === 1;
 
@@ -108,10 +118,12 @@ const NotificationDropdown = () => {
       timestamp: n.createdAt
         ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })
         : "",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      metadata: (n.metadata as any) ?? undefined,
+      jobId: n.jobId,
+      applicationId: n.applicationId,
+      metadata: (n.metadata as NotificationMetadata) ?? undefined,
     }));
   }, [listEnvelope]);
+
   const notificationUrl = isEmployer
     ? "/employer/notifications"
     : "/dashboard/notifications";
@@ -124,6 +136,79 @@ const NotificationDropdown = () => {
     }
   };
 
+  const handleNotificationClick = async (notification: Notification) => {
+    try {
+      if (!notification.isRead) {
+        await markAsRead(notification.id);
+      }
+    } catch {
+      // ignore
+    }
+
+    setIsOpen(false);
+
+    let targetUrl = notificationUrl;
+
+    const jobId = notification.jobId || notification.metadata?.jobId;
+    const conversationId = notification.metadata?.conversationId;
+
+    switch (notification.type) {
+      case "APPLICATION_RECEIVED":
+        targetUrl = isEmployer
+          ? "/employer/applications"
+          : "/dashboard/applied-jobs";
+        break;
+      case "APPLICATION_STATUS_CHANGE":
+        targetUrl = "/dashboard/applied-jobs";
+        break;
+      case "MESSAGE_RECEIVED":
+        targetUrl = isEmployer ? "/employer/messages" : "/dashboard/messages";
+        if (conversationId) {
+          targetUrl += `?conversationId=${conversationId}`;
+        }
+        break;
+      case "INTERVIEW_SCHEDULED":
+        targetUrl = isEmployer
+          ? "/employer/applications"
+          : "/dashboard/applied-jobs";
+        break;
+      case "NEW_JOB_MATCH":
+        if (jobId) {
+          targetUrl = `/jobs/${jobId}`;
+        } else {
+          targetUrl = isEmployer
+            ? "/employer/jobs"
+            : "/dashboard/recommended-jobs";
+        }
+        break;
+      case "JOB_VIEWED":
+      case "PROFILE_VIEWED":
+        targetUrl = isEmployer
+          ? "/employer/analytics"
+          : "/dashboard/profile-views";
+        break;
+      case "JOB_CLOSED":
+      case "JOB_EXPIRING":
+        if (jobId) {
+          targetUrl = `/jobs/${jobId}`;
+        } else {
+          targetUrl = isEmployer ? "/employer/jobs" : "/dashboard/saved-jobs";
+        }
+        break;
+      case "PROFILE_INCOMPLETE":
+        targetUrl = isEmployer
+          ? "/employer/company-profile"
+          : "/dashboard/profile";
+        break;
+      case "SYSTEM_ANNOUNCEMENT":
+      default:
+        targetUrl = notificationUrl;
+        break;
+    }
+
+    router.push(targetUrl);
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteNotification = (id: string) => {
     // TODO: Implement delete notification API call
@@ -131,7 +216,7 @@ const NotificationDropdown = () => {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild className="h-8 w-8">
         <Button
           variant="ghost"
@@ -194,7 +279,7 @@ const NotificationDropdown = () => {
                         message={notification.message}
                         timestamp={notification.timestamp}
                         isRead={notification.isRead}
-                        onClick={() => markAsRead(notification.id)}
+                        onClick={() => handleNotificationClick(notification)}
                       />
                     </motion.div>
                   ))}
@@ -206,7 +291,7 @@ const NotificationDropdown = () => {
           {recentNotifications.length > 0 && (
             <div className="bg-background sticky bottom-0 border-t">
               <div className="p-2">
-                <Link href={notificationUrl}>
+                <Link href={notificationUrl} onClick={() => setIsOpen(false)}>
                   <Button
                     variant="ghost"
                     className="text-primary hover:bg-accent w-full justify-between"

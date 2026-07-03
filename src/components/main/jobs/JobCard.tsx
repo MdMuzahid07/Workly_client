@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Bookmark, Briefcase, Clock, MapPin } from "lucide-react";
+import { ArrowRight, Bookmark, Briefcase, Clock, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -61,25 +61,26 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
     return (
       <Card
         className={cn(
-          "group relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 transition-all duration-300",
+          "group relative flex h-full flex-col overflow-hidden rounded-2xl border p-4 transition-all duration-300 sm:p-5",
           inDashboard
             ? "bg-card border-border/50"
-            : "hover:border-primary/50 bg-card border-gray-100 dark:border-slate-800",
+            : "hover:border-primary/50 bg-card border-gray-100 hover:shadow-md dark:border-slate-800",
         )}
       >
         <CardContent className="flex flex-1 flex-col p-0">
-          <div className="mb-4 flex items-start justify-between">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-50 p-2 dark:bg-slate-800">
+          {/* Top row: logo + bookmark */}
+          <div className="mb-3 flex items-start justify-between sm:mb-4">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-gray-50 p-0 sm:h-11 sm:w-11 dark:bg-slate-800">
               {job?.company?.logo ? (
                 <Image
                   src={job.company.logo}
                   alt={job.company.name}
-                  className="h-full w-full object-contain"
-                  width={48}
-                  height={48}
+                  className="h-full w-full rounded-lg object-cover"
+                  width={44}
+                  height={44}
                 />
               ) : (
-                <Briefcase className="text-primary/40 h-6 w-6" />
+                <Briefcase className="text-primary/40 h-5.5 w-5.5 sm:h-6 sm:w-6" />
               )}
             </div>
             <HoverHint hint={job.isSaved ? "Unsave job" : "Save job"}>
@@ -96,7 +97,7 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
               >
                 <Bookmark
                   className={cn(
-                    "h-4.5 w-4.5 transition-all duration-200",
+                    "h-4 w-4 transition-all duration-200",
                     job.isSaved ? "fill-primary" : "",
                   )}
                 />
@@ -104,62 +105,68 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
             </HoverHint>
           </div>
 
-          <div className="mb-1">
-            <Link
-              href={`/jobs/${job?.id}`}
-              className="hover:text-primary transition-colors"
-            >
-              <h3 className="text-foreground line-clamp-1 text-base font-bold">
-                {job?.title}
-              </h3>
-            </Link>
-          </div>
+          {/* Title */}
+          <Link
+            href={`/jobs/${job?.id}`}
+            className="hover:text-primary mb-1 transition-colors"
+          >
+            <h3 className="text-foreground line-clamp-2 text-sm leading-snug font-bold sm:text-base md:min-h-[2.75rem]">
+              {job?.title}
+            </h3>
+          </Link>
 
-          <p className="text-muted-foreground mb-3 text-xs font-medium">
+          {/* Company */}
+          <p className="text-muted-foreground mb-2.5 text-xs font-semibold">
             {job?.company?.name}
           </p>
 
-          <div className="mb-4 flex flex-wrap gap-2">
-            {job?.isFeatured && (
-              <Badge
-                variant="default"
-                className="bg-primary/10 text-primary rounded-md border-0 py-0 text-[9px] font-bold tracking-wider uppercase"
-              >
-                Featured
-              </Badge>
-            )}
-            {job?.isRemote && (
-              <Badge
-                variant="secondary"
-                className="rounded-md border-0 bg-slate-100 py-0 text-[9px] font-bold tracking-wider text-slate-600 uppercase dark:bg-slate-800 dark:text-slate-300"
-              >
-                Remote
-              </Badge>
-            )}
-          </div>
+          {/* Badges — only shown when present */}
+          {(job?.isFeatured || job?.isRemote) && (
+            <div className="mb-3.5 flex flex-wrap gap-1">
+              {job?.isFeatured && (
+                <Badge
+                  variant="default"
+                  className="bg-primary/10 text-primary rounded-md border-0 px-1.5 py-0 text-[9px] font-bold tracking-wider uppercase"
+                >
+                  Featured
+                </Badge>
+              )}
+              {job?.isRemote && (
+                <Badge
+                  variant="secondary"
+                  className="rounded-md border-0 bg-slate-100 px-1.5 py-0 text-[9px] font-bold tracking-wider text-slate-600 uppercase dark:bg-slate-800 dark:text-slate-300"
+                >
+                  Remote
+                </Badge>
+              )}
+            </div>
+          )}
 
-          <div className="mb-4 flex flex-col gap-2 border-b border-gray-100 pb-4 dark:border-slate-800">
-            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-              <MapPin className="text-primary h-3.5 w-3.5 opacity-70" />
+          {/* Location & Type (Sleek side-by-side row with bullet divider) */}
+          <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-gray-100 pb-3 text-[11px] sm:text-xs dark:border-slate-800/80">
+            <span className="text-muted-foreground flex min-w-0 items-center gap-1">
+              <MapPin className="text-primary h-3.5 w-3.5 shrink-0 opacity-70" />
               <span className="truncate">{job?.location}</span>
-            </div>
-            <div className="text-muted-foreground flex items-center gap-1.5 text-xs capitalize">
-              <Clock className="text-primary h-3.5 w-3.5 opacity-70" />
+            </span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="text-muted-foreground flex items-center gap-1 capitalize">
+              <Clock className="text-primary h-3.5 w-3.5 shrink-0 opacity-70" />
               <span>{job?.jobType.replace("_", " ").toLowerCase()}</span>
-            </div>
+            </span>
           </div>
 
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
-            <div className="text-foreground text-sm font-bold sm:text-base sm:font-black">
+          {/* Salary + Details */}
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-1">
+            <div className="text-foreground text-xs font-bold whitespace-nowrap sm:text-sm lg:text-[15px] lg:font-extrabold">
               {job?.currency === "USD" ? "$" : job?.currency}
-              {job?.salaryMin?.toLocaleString()} -{" "}
+              {job?.salaryMin?.toLocaleString()}–
               {job?.salaryMax?.toLocaleString()}
             </div>
             <Link href={`/jobs/${job?.id}`}>
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-primary/5 hover:text-primary h-8 rounded-full px-3 text-xs font-bold"
+                className="hover:bg-primary/5 hover:text-primary h-7.5 rounded-full px-3 text-[11px] font-bold sm:h-8 sm:text-xs"
               >
                 Details
               </Button>
@@ -173,108 +180,145 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden rounded-3xl border transition-all duration-300",
+        "group relative overflow-hidden rounded-2xl border transition-all duration-300",
         inDashboard
-          ? "bg-card border-border p-6"
-          : "hover:border-primary/50 bg-card border-gray-100 px-3 py-5 md:px-12 md:py-14 dark:border-slate-800",
+          ? "bg-card border-border p-5 sm:p-6"
+          : "hover:border-primary/50 bg-card border-gray-100 hover:shadow-md dark:border-slate-800",
       )}
     >
-      <CardContent className="p-0">
-        <div className="flex flex-row gap-2 sm:items-center sm:gap-5">
-          {/* Left: Company Logo/Icon */}
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 p-2 sm:h-16 sm:w-16 dark:bg-slate-800">
-            {job?.company?.logo ? (
-              <Image
-                src={job.company.logo}
-                alt={job.company.name}
-                className="h-full w-full object-contain"
-                width={48}
-                height={48}
-              />
-            ) : (
-              <Briefcase className="text-primary/40 h-8 w-8" />
-            )}
-          </div>
+      <CardContent className={cn("p-0", !inDashboard && "p-4 sm:p-5 md:p-6")}>
+        <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+          {/* Main Info (Logo + Title/Meta) */}
+          <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-4">
+            {/* Logo */}
+            <Link
+              href={`/jobs/${job?.id}`}
+              className="border-border/20 relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border bg-white shadow-xs sm:h-12 sm:w-12 md:h-14 md:w-14 dark:bg-slate-800"
+              prefetch={false}
+            >
+              {job?.company?.logo ? (
+                <Image
+                  src={job.company.logo}
+                  alt={job.company.name}
+                  fill
+                  sizes="(max-width: 640px) 40px, 56px"
+                  className="rounded-xl object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Briefcase className="text-primary/40 h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                </div>
+              )}
+            </Link>
 
-          {/* Middle: Job Info */}
-          <div className="min-w-0 flex-1">
-            <div className="mb-1 flex items-center gap-1 sm:gap-2">
-              <Link
-                href={`/jobs/${job?.id}`}
-                className="hover:text-primary transition-colors"
-              >
-                <h3 className="text-foreground truncate text-sm font-bold sm:text-lg">
-                  {job?.title}
-                </h3>
-              </Link>
-            </div>
+            {/* Info details */}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Link
+                  href={`/jobs/${job?.id}`}
+                  className="hover:text-primary transition-colors"
+                  prefetch={false}
+                >
+                  <h3 className="text-foreground line-clamp-1 text-sm font-bold sm:text-base md:text-lg">
+                    {job?.title}
+                  </h3>
+                </Link>
+                {/* Badges */}
+                {(job?.isFeatured || job?.isRemote) && (
+                  <div className="flex flex-wrap gap-1">
+                    {job?.isFeatured && (
+                      <Badge
+                        variant="default"
+                        className="bg-primary/10 text-primary hover:bg-primary/20 rounded-md border-0 px-1.5 py-0 text-[9px] font-bold tracking-wider uppercase"
+                      >
+                        Featured
+                      </Badge>
+                    )}
+                    {job?.isRemote && (
+                      <Badge
+                        variant="secondary"
+                        className="rounded-md border-0 bg-slate-100 px-1.5 py-0 text-[9px] font-bold tracking-wider text-slate-600 uppercase dark:bg-slate-800 dark:text-slate-300"
+                      >
+                        Remote
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm">
-              <div className="flex items-center gap-1 sm:gap-1.5">
-                <MapPin className="text-primary h-3.5 w-3.5 opacity-70" />
-                <span>{job?.location}</span>
-              </div>
-              <div className="flex items-center gap-1 capitalize sm:gap-1.5">
-                <Clock className="text-primary h-3.5 w-3.5 opacity-70" />
-                <span>{job?.jobType.replace("_", " ").toLowerCase()}</span>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-1.5">
-                <Briefcase className="text-primary h-3.5 w-3.5 opacity-70" />
-                <span>
-                  Published {new Date(job?.createdAt).toLocaleDateString()}
+              <p className="text-muted-foreground mt-0.5 text-xs font-semibold sm:mt-1">
+                {job?.company?.name}
+              </p>
+
+              {/* Meta row */}
+              <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] sm:text-xs">
+                <span className="flex items-center gap-1">
+                  <MapPin className="text-primary h-3.5 w-3.5 shrink-0 opacity-70" />
+                  <span className="truncate">{job?.location}</span>
+                </span>
+                <span className="opacity-30">•</span>
+                <span className="flex items-center gap-1 capitalize">
+                  <Clock className="text-primary h-3.5 w-3.5 shrink-0 opacity-70" />
+                  <span>{job?.jobType.replace("_", " ").toLowerCase()}</span>
+                </span>
+                <span className="hidden opacity-30 sm:inline">•</span>
+                <span className="hidden items-center gap-1 sm:flex">
+                  <Briefcase className="text-primary h-3.5 w-3.5 shrink-0 opacity-70" />
+                  <span>
+                    Published {new Date(job?.createdAt).toLocaleDateString()}
+                  </span>
                 </span>
               </div>
             </div>
-
-            <div className="mt-3 flex flex-wrap gap-1 sm:gap-2">
-              {job?.isFeatured && (
-                <Badge
-                  variant="default"
-                  className="bg-primary/10 text-primary hover:bg-primary/20 rounded-md border-0 py-0 text-[10px] font-bold tracking-wider uppercase"
-                >
-                  Featured
-                </Badge>
-              )}
-              {job?.isRemote && (
-                <Badge
-                  variant="secondary"
-                  className="rounded-md border-0 bg-slate-100 py-0 text-[10px] font-bold tracking-wider text-slate-600 uppercase dark:bg-slate-800 dark:text-slate-300"
-                >
-                  Remote
-                </Badge>
-              )}
-            </div>
           </div>
 
-          {/* Right: Salary & Actions */}
-          <div className="flex flex-col items-end gap-1 sm:gap-3 sm:text-right">
+          {/* Divider on Mobile only */}
+          <div className="border-t border-gray-100 sm:hidden dark:border-slate-800/60" />
+
+          {/* Right Section (Salary + Actions) */}
+          <div className="flex shrink-0 items-center justify-between sm:flex-col sm:items-end sm:justify-center sm:gap-2.5">
+            {/* Salary */}
+            <div className="text-foreground text-sm font-bold whitespace-nowrap sm:text-base sm:font-black md:text-lg">
+              {job?.currency === "USD" ? "$" : job?.currency}
+              {job?.salaryMin?.toLocaleString()}–
+              {job?.salaryMax?.toLocaleString()}
+            </div>
+
+            {/* Actions */}
             <div className="flex items-center gap-2">
               <HoverHint hint={job.isSaved ? "Unsave job" : "Save job"}>
                 <Button
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "h-9 w-9 rounded-full transition-colors",
+                    "h-8 w-8 rounded-full transition-colors sm:h-8.5 sm:w-8.5",
                     job.isSaved
                       ? "bg-primary/10 text-primary hover:bg-primary/20"
                       : "hover:bg-primary/10 hover:text-primary text-slate-400",
                   )}
                   onClick={() => handleJobSave(job?.id)}
+                  type="button"
                 >
                   <Bookmark
                     className={cn(
-                      "h-5 w-5 transition-all duration-200",
+                      "h-4 w-4 transition-all duration-200 sm:h-4.5 sm:w-4.5",
                       job.isSaved ? "fill-primary" : "",
                     )}
                   />
                 </Button>
               </HoverHint>
-            </div>
 
-            <div className="text-foreground text-xs font-bold sm:text-xl sm:font-black">
-              {job?.currency === "USD" ? "$" : job?.currency}
-              {job?.salaryMin?.toLocaleString()} -{" "}
-              {job?.salaryMax?.toLocaleString()}
+              <Button
+                size="sm"
+                className="group/btn h-8 rounded-full px-4 text-xs font-bold"
+                asChild
+              >
+                <Link href={`/jobs/${job?.id}`} prefetch={false}>
+                  <span>Details</span>
+                  <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

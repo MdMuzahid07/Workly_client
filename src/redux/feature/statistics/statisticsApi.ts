@@ -7,6 +7,7 @@ export interface LandingStats {
   jobSeekers: number;
   activeNow: number;
   trendingKeywords: string[];
+  successRate: number;
 }
 
 export const statisticsApi = baseApi.injectEndpoints({

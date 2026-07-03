@@ -4,8 +4,8 @@
 import countries from "@/data/globe.json";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, extend, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
-import { Color, Fog, PerspectiveCamera, Scene, Vector3 } from "three";
+import { useEffect, useRef, useState, useMemo, memo } from "react";
+import { Color, Fog, PerspectiveCamera, Scene, Vector3, Group } from "three";
 import ThreeGlobe from "three-globe";
 declare module "@react-three/fiber" {
   interface ThreeElements {
@@ -62,15 +62,9 @@ interface WorldProps {
   data: Position[];
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-const numbersOfRings = [0];
-
 export function Globe({ globeConfig, data }: WorldProps) {
   const globeRef = useRef<ThreeGlobe | null>(null);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-ignore
-  const groupRef = useRef(Globe);
+  const groupRef = useRef<Group>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   const defaultProps = {
@@ -94,7 +88,7 @@ export function Globe({ globeConfig, data }: WorldProps) {
   useEffect(() => {
     if (!globeRef.current && groupRef.current) {
       globeRef.current = new ThreeGlobe();
-      (groupRef.current as any).add(globeRef.current);
+      groupRef.current.add(globeRef.current);
       setIsInitialized(true);
     }
   }, []);
@@ -274,12 +268,21 @@ export function WebGLRendererConfig() {
   return null;
 }
 
-export function World(props: WorldProps) {
+export const World = memo(function World(props: WorldProps) {
   const { globeConfig } = props;
-  const scene = new Scene();
-  scene.fog = new Fog(0xffffff, 400, 2000);
+
+  const scene = useMemo(() => {
+    const s = new Scene();
+    s.fog = new Fog(0xffffff, 400, 2000);
+    return s;
+  }, []);
+
+  const camera = useMemo(() => {
+    return new PerspectiveCamera(50, aspect, 180, 1800);
+  }, []);
+
   return (
-    <Canvas scene={scene} camera={new PerspectiveCamera(50, aspect, 180, 1800)}>
+    <Canvas scene={scene} camera={camera}>
       <WebGLRendererConfig />
       <ambientLight color={globeConfig.ambientLight} intensity={0.6} />
       <directionalLight
@@ -308,7 +311,7 @@ export function World(props: WorldProps) {
       />
     </Canvas>
   );
-}
+});
 
 export function hexToRgb(hex: string) {
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;

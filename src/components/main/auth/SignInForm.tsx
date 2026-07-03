@@ -47,7 +47,13 @@ const SignInForm = () => {
       const resData = (response as any).data;
 
       if (resData?.accessToken && resData?.email) {
+        // Store in localStorage for client-side access
         localStorage.setItem("accessToken", resData.accessToken);
+
+        // CRITICAL: Also set a cookie so Next.js middleware can read the token
+        // during server-side route protection checks before navigation completes.
+        // Without this cookie, middleware redirects back to /login on every first click.
+        document.cookie = `accessToken=${resData.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
 
         const decodedToken = jwtDecode(resData.accessToken) as {
           isVerified: boolean;
@@ -76,11 +82,24 @@ const SignInForm = () => {
         }
 
         toast.success("Login successful!");
-        router.push(callbackUrl);
+        // Use replace so the login page is removed from browser history
+        router.replace(callbackUrl);
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.data?.errorSources?.message || "Login failed");
+    } catch (error) {
+      interface ApiErrorData {
+        success?: boolean;
+        message?: string;
+        errorSources?: {
+          path?: string | string[];
+          message?: string;
+        };
+      }
+      const err = error as {
+        data?: ApiErrorData;
+      };
+      toast.error(
+        err.data?.message || err.data?.errorSources?.message || "Login failed",
+      );
       console.error("Login error:", error);
     }
   };
@@ -103,6 +122,7 @@ const SignInForm = () => {
               name="email"
               label="Email Address"
               type="email"
+              placeholder="Enter your email address"
               required
               className="form-input rounded-full transition-all duration-200"
             />
@@ -112,6 +132,7 @@ const SignInForm = () => {
                 name="password"
                 label="Password"
                 type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
                 required
                 className="form-input rounded-full pr-10 transition-all duration-200"
               />

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -11,11 +10,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import type { Message } from "@/types/message";
 
 interface MediaLightboxProps {
   isOpen: boolean;
   onClose: () => void;
-  mediaItems: any[];
+  mediaItems: Message[];
   initialIndex: number;
 }
 
@@ -57,7 +57,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
         className="fixed inset-0 !top-0 !left-0 z-10000! m-0 flex h-screen! w-screen! max-w-none! !translate-x-0 !translate-y-0 flex-col items-center justify-center rounded-none border-none bg-black p-0 shadow-none outline-none"
       >
         {/* Header Actions */}
-        <div className="absolute top-0 right-0 left-0 z-50 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent p-6">
+        <div className="absolute top-0 right-0 left-0 z-50 flex items-center justify-between bg-linear-to-b from-black/60 to-transparent p-6">
           <div className="flex flex-col">
             <span className="text-lg font-black tracking-tight text-white">
               {currentItem.fileName || "Image"}
@@ -88,7 +88,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
             </div>
 
             <a
-              href={currentItem.fileUrl}
+              href={currentItem.fileUrl ?? undefined}
               download
               className="rounded-xl bg-white/10 p-2.5 text-white backdrop-blur-md transition-all hover:bg-white/20"
             >
@@ -114,7 +114,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
           >
             <Image
               src={currentItem.fileUrl || "/placeholder.svg"}
-              alt={currentItem.fileName}
+              alt={currentItem.fileName || "Media"}
               fill
               className="object-contain shadow-2xl"
               unoptimized={
@@ -149,7 +149,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
 
         {/* Thumbnail Strip */}
         <div className="no-scrollbar absolute right-0 bottom-6 left-0 z-50 flex justify-center gap-2 overflow-x-auto p-4">
-          {mediaItems.map((item, idx) => (
+          {mediaItems.map((item: Message, idx: number) => (
             <div
               key={item.id}
               onClick={() => setCurrentIndex(idx)}

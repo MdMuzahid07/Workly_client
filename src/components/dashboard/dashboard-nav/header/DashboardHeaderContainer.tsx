@@ -10,7 +10,7 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
         const height = headerRef.current.offsetHeight;
         const parent = headerRef.current.parentElement;
         if (parent) {
-          parent.style.paddingTop = `${height}px`;
+          parent.style.paddingTop = `${height + 32}px`;
         }
       }
     };
@@ -32,14 +32,22 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <header
-      ref={headerRef}
-      className="border-border bg-card/95 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-sm lg:left-64"
-    >
-      <div className="mx-auto flex h-auto min-h-12 shrink-0 items-center justify-between gap-3 py-3 pr-16 pl-4 sm:h-auto sm:min-h-14 sm:py-4 sm:pr-16 sm:pl-6 lg:h-auto lg:min-h-16 lg:px-8 lg:py-0 lg:pr-8">
-        <div className="min-w-0 flex-1">{children}</div>
-      </div>
-    </header>
+    <>
+      <style>{`
+        .dashboard-header + * {
+          padding-top: 0 !important;
+          margin-top: 0 !important;
+        }
+      `}</style>
+      <header
+        ref={headerRef}
+        className="dashboard-header border-border bg-card/95 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-sm lg:left-64"
+      >
+        <div className="mx-auto flex h-auto min-h-12 shrink-0 items-center justify-between gap-3 py-3 pr-16 pl-4 sm:h-auto sm:min-h-14 sm:py-4 sm:pr-16 sm:pl-6 lg:h-auto lg:min-h-16 lg:px-8 lg:py-0 lg:pr-8">
+          <div className="min-w-0 flex-1">{children}</div>
+        </div>
+      </header>
+    </>
   );
 };
 

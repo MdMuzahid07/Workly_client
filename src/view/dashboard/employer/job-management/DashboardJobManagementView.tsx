@@ -328,19 +328,19 @@ const DashboardJobManagementView = () => {
       <div className="space-y-6 px-4 sm:px-6 sm:py-8">
         <JobStatusCards jobs={allJobs} />
 
-        <Card className="bg-card rounded-xl border">
-          <div className="border-border border-b p-6">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-foreground text-lg font-bold tracking-tight sm:text-xl">
+        <Card className="bg-card rounded-xl border shadow-xs">
+          <div className="border-border border-b p-4 sm:p-6">
+            <div className="flex flex-col gap-1 sm:gap-2">
+              <h2 className="text-foreground text-base font-bold tracking-tight sm:text-xl">
                 All Job Postings
               </h2>
-              <p className="text-muted-foreground text-sm font-medium opacity-80">
+              <p className="text-muted-foreground text-xs font-medium opacity-80 sm:text-sm">
                 Manage and track your job listings
               </p>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <JobFiltersAndSearch
               searchTerm={searchValue}
               setSearchTerm={setSearchValue}

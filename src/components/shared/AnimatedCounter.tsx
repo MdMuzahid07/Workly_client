@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 interface AnimatedCounterProps {
   value: number;
   duration?: number;
-  formatType?: "K" | "M" | "commas";
+  formatType?: "K" | "M" | "commas" | "percent";
 }
 
 export default function AnimatedCounter({
@@ -49,6 +49,9 @@ export default function AnimatedCounter({
     }
     if (formatType === "K") {
       return `${(num / 1000).toFixed(1)}K+`;
+    }
+    if (formatType === "percent") {
+      return `${num}%`;
     }
     return `${num.toLocaleString("en-US")}+`;
   };

@@ -31,7 +31,13 @@ const DevLoginShortcuts = () => {
       const resData = (response as any).data;
 
       if (resData?.accessToken && resData?.email) {
+        // Store in localStorage for client-side access
         localStorage.setItem("accessToken", resData.accessToken);
+
+        // CRITICAL: Also set a cookie so Next.js middleware can read the token
+        // during server-side route protection checks before navigation completes.
+        // Without this cookie, middleware redirects back to /login on every first click.
+        document.cookie = `accessToken=${resData.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
 
         const decodedToken = jwtDecode(resData.accessToken) as {
           isVerified: boolean;
@@ -62,16 +68,16 @@ const DevLoginShortcuts = () => {
         toast.dismiss(loadingToast);
         toast.success(`Logged in as ${role} successfully!`);
 
-        // Redirect based on role
+        // Use replace so the login page is not stacked in browser history
         if (
           decodedToken.role === "ADMIN" ||
           decodedToken.role === "SUPER_ADMIN"
         ) {
-          router.push("/admin");
+          router.replace("/admin");
         } else if (decodedToken.role === "EMPLOYER") {
-          router.push("/employer");
+          router.replace("/employer");
         } else {
-          router.push("/dashboard");
+          router.replace("/dashboard");
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

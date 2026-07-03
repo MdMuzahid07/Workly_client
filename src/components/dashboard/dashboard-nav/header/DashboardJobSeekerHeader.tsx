@@ -18,7 +18,7 @@ const DashboardJobSeekerHeader = () => {
             <h1 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-xl md:text-2xl">
               Welcome back, {user?.fullName?.split(" ")[0] || "there"}
             </h1>
-            <p className="text-muted-foreground truncate text-xs font-medium opacity-80 sm:text-sm">
+            <p className="text-muted-foreground flex truncate text-xs font-medium opacity-80 sm:text-sm">
               {`Here's`} an overview
               <span className="hidden sm:block">
                 &nbsp;of your job search activity

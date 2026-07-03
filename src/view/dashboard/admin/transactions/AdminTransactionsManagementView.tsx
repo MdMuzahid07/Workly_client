@@ -21,7 +21,7 @@ import {
   type RawTransaction,
 } from "./components/TransactionTable";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ==================== Helpers ====================
 
 const PLAN_LABELS: Record<string, string> = {
   emp_free: "Employer Free",
@@ -130,7 +130,7 @@ const downloadCSV = (filename: string, content: string) => {
   URL.revokeObjectURL(url);
 };
 
-// ─── View ─────────────────────────────────────────────────────────────────────
+// ==================== View ====================
 
 const AdminTransactionsManagementView = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -159,7 +159,7 @@ const AdminTransactionsManagementView = () => {
     setPage(1);
   };
 
-  // ── Paginated transaction list ───────────────────────────────────────────
+  // ==================== Paginated transaction list ====================
   const {
     data: listData,
     isLoading: isListLoading,
@@ -173,14 +173,14 @@ const AdminTransactionsManagementView = () => {
     status: statusFilter || undefined,
   });
 
-  // ── Stats cards ──────────────────────────────────────────────────────────
+  // ==================== Stats cards ====================
   const { data: statsData, isLoading: isStatsLoading } =
     useGetPaymentStatsQuery(undefined);
 
-  // ── Lazy export query ────────────────────────────────────────────────────
+  // ==================== Lazy export query ====================
   const [triggerExport] = useLazyGetTransactionsExportQuery();
 
-  // ── Data mapping ─────────────────────────────────────────────────────────
+  // ==================== Data mapping ====================
 
   const rawTransactions: RawTransaction[] = useMemo(
     () => listData?.data || [],
@@ -203,7 +203,7 @@ const AdminTransactionsManagementView = () => {
 
   const statsPayload = statsData?.data;
 
-  // ── Export handler ────────────────────────────────────────────────────────
+  // ==================== Export handler ====================
   const handleExportCSV = async () => {
     try {
       setIsExporting(true);
@@ -234,7 +234,7 @@ const AdminTransactionsManagementView = () => {
     }
   };
 
-  // ── Loading / Error states ────────────────────────────────────────────────
+  // ==================== Loading / Error states ====================
   if (isListLoading) {
     return <AdminPlansSkeleton showTransactions={true} />;
   }

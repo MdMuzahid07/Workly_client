@@ -43,6 +43,7 @@ const PageHero = ({
           className="h-full w-full object-cover opacity-[0.15] grayscale"
           fill
           priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
         />
         {/* Dark gradient fade */}
         <div
@@ -70,7 +71,7 @@ const PageHero = ({
       {/* Hero Content */}
       <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 text-center">
         <h1
-          className="mb-3 text-3xl leading-none font-extrabold tracking-tight md:text-5xl"
+          className="mb-3 text-3xl leading-tight font-extrabold tracking-tight md:text-5xl"
           style={{ color: "hsl(0 0% 98%)" }}
         >
           {plainPart && <>{plainPart} </>}

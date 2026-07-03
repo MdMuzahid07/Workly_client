@@ -75,7 +75,7 @@ export function EmployerRecentJobs({
           </ul>
         )}
         <Link href={EMPLOYER_ROUTES.jobs}>
-          <Button variant="outline" className="w-full rounded-full font-bold">
+          <Button variant="outline" className="w-full rounded-xl font-bold">
             <FileText className="mr-2 h-4 w-4" aria-hidden />
             View All Jobs
           </Button>

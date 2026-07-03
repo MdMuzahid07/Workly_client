@@ -12,8 +12,8 @@ export interface SkillRequired {
   skillName: string;
   experienceYears: number;
   isRequired: boolean;
-  priority: "HIGH" | "MEDIUM" | "GOOD_TO_HAVE";
-  description: string;
+  priority: "HIGH" | "MEDIUM" | "LOW" | "GOOD_TO_HAVE";
+  description?: string;
 }
 const CreateJobFromSkillSection = () => {
   const { watch, setValue } = useFormContext<JobFormData>();
@@ -27,8 +27,6 @@ const CreateJobFromSkillSection = () => {
       priority: "MEDIUM",
       description: "",
     };
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
     setValue("skillsRequired", [...skills, newSkill]);
   };
 

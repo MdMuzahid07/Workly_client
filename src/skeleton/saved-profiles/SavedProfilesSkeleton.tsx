@@ -5,15 +5,18 @@ export default function SavedProfilesSkeleton() {
   return (
     <div className="space-y-6 px-4 sm:px-6 sm:py-8">
       {/* Stats Summary Skeletons */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className="bg-card border">
-            <CardContent className="flex items-center justify-between p-4">
-              <div className="flex-1 space-y-2 pr-6">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-8 w-12" />
+          <Card
+            key={i}
+            className={`bg-card border shadow-xs ${i === 2 ? "col-span-2 sm:col-span-1" : ""}`}
+          >
+            <CardContent className="flex items-center justify-between p-3.5 sm:p-4">
+              <div className="flex-1 space-y-1.5 pr-2">
+                <Skeleton className="h-3.5 w-16 sm:w-20" />
+                <Skeleton className="h-6 w-10 sm:h-8 sm:w-12" />
               </div>
-              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-9 w-9 rounded-full sm:h-10 sm:w-10" />
             </CardContent>
           </Card>
         ))}

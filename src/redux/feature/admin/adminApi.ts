@@ -316,6 +316,10 @@ const adminApi = baseApi.injectEndpoints({
       query: () => ({ url: "/admin/settings", method: "GET" }),
       providesTags: ["admin"],
     }),
+    getPublicSystemSettings: builder.query<Envelope<any>, void>({
+      query: () => ({ url: "/admin/settings/public", method: "GET" }),
+      providesTags: ["admin"],
+    }),
     updateSystemSettings: builder.mutation<Envelope<any>, any>({
       query: (body) => ({
         url: "/admin/settings",
@@ -358,6 +362,7 @@ export const {
   useDeleteJobListingMutation,
   useApproveJobAdminMutation,
   useGetSystemSettingsQuery,
+  useGetPublicSystemSettingsQuery,
   useUpdateSystemSettingsMutation,
 } = adminApi;
 

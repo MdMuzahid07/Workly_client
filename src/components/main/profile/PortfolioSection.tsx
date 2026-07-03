@@ -9,19 +9,23 @@ import {
   Upload,
   Video,
 } from "lucide-react";
+import type { ProfileSocialLinks } from "@/types/profile";
+
+interface PortfolioSectionProps {
+  videoResumeUrl?: string;
+  socialLinks?: ProfileSocialLinks;
+  onAddVideoResume?: () => void;
+  onEditSocials?: () => void;
+}
 
 export const PortfolioSection = ({
   videoResumeUrl,
   socialLinks = {},
   onAddVideoResume,
   onEditSocials,
-}: {
-  videoResumeUrl?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  socialLinks?: any;
-  onAddVideoResume?: () => void;
-  onEditSocials?: () => void;
-}) => {
+}: PortfolioSectionProps) => {
+  const hasSocialLinks = Object.values(socialLinks).some((val) => !!val);
+
   return (
     <div className="space-y-6">
       {/* Video Resume */}
@@ -82,11 +86,11 @@ export const PortfolioSection = ({
       {/* Social Profiles */}
       <SectionCard
         title="Online Presence"
-        isCompleted={Object.values(socialLinks).some((val) => !!val)}
+        isCompleted={hasSocialLinks}
         completionPercentage={10}
         onEdit={onEditSocials}
       >
-        {!Object.values(socialLinks).some((val) => !!val) ? (
+        {!hasSocialLinks ? (
           <div className="text-muted-foreground p-2 text-sm">
             No professional links added yet. Click edit to add your social
             profiles.

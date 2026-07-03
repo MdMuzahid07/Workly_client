@@ -1,4 +1,5 @@
 "use client";
+
 import DashboardNotificationHeader from "@/components/dashboard/dashboard-nav/header/DashboardNotificationHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,6 +31,7 @@ interface Notification {
   message: string;
   isRead: boolean;
   timestamp: string;
+  createdAt: string;
   metadata?: {
     jobTitle?: string;
     companyName?: string;
@@ -42,17 +44,17 @@ const getNotificationIcon = (type: Notification["type"]) => {
   switch (type) {
     case "APPLICATION_RECEIVED":
     case "APPLICATION_STATUS_CHANGE":
-      return <Briefcase className="text-primary h-5 w-5" />;
+      return <Briefcase className="text-primary h-4 w-4 sm:h-5 sm:w-5" />;
     case "MESSAGE_RECEIVED":
-      return <MessageSquare className="h-5 w-5 text-blue-500" />;
+      return <MessageSquare className="h-4 w-4 text-blue-500 sm:h-5 sm:w-5" />;
     case "INTERVIEW_SCHEDULED":
-      return <Calendar className="h-5 w-5 text-orange-500" />;
+      return <Calendar className="h-4 w-4 text-orange-500 sm:h-5 sm:w-5" />;
     case "NEW_JOB_MATCH":
-      return <BellRing className="h-5 w-5 text-green-500" />;
+      return <BellRing className="h-4 w-4 text-emerald-500 sm:h-5 sm:w-5" />;
     case "SYSTEM_ANNOUNCEMENT":
-      return <BellRing className="h-5 w-5 text-yellow-500" />;
+      return <BellRing className="h-4 w-4 text-amber-500 sm:h-5 sm:w-5" />;
     default:
-      return <Bell className="text-muted-foreground h-5 w-5" />;
+      return <Bell className="text-muted-foreground h-4 w-4 sm:h-5 sm:w-5" />;
   }
 };
 
@@ -62,15 +64,15 @@ const getNotificationColor = (type: Notification["type"]) => {
     case "APPLICATION_STATUS_CHANGE":
       return "bg-primary/10 border-primary/20";
     case "MESSAGE_RECEIVED":
-      return "bg-blue-50 border-blue-200";
+      return "bg-blue-500/10 border-blue-500/20";
     case "INTERVIEW_SCHEDULED":
-      return "bg-orange-50 border-orange-200";
+      return "bg-orange-500/10 border-orange-500/20";
     case "NEW_JOB_MATCH":
-      return "bg-primary/10 border-green-200";
+      return "bg-emerald-500/10 border-emerald-500/20";
     case "SYSTEM_ANNOUNCEMENT":
-      return "bg-yellow-50 border-yellow-200";
+      return "bg-amber-500/10 border-amber-500/20";
     default:
-      return "bg-muted/50 border-border";
+      return "bg-muted border-border/60";
   }
 };
 
@@ -92,11 +94,11 @@ const NotificationView = () => {
     title: n.title,
     message: n.message,
     isRead: n.isRead,
+    createdAt: n.createdAt || "",
     timestamp: n.createdAt
       ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })
       : "",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    metadata: (n.metadata as any) ?? undefined,
+    metadata: (n.metadata as Record<string, string | undefined>) ?? undefined,
   }));
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -144,91 +146,89 @@ const NotificationView = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen">
       <DashboardNotificationHeader />
 
       {isNotifLoading ? (
         <NotificationsSkeleton />
       ) : (
-        <div className="space-y-6 px-4 py-8 sm:px-6">
-          <div>
-            {/* Filter Tabs */}
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="mb-8"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <TabsList className="bg-muted/10 h-10 w-full rounded-full border">
-                  <TabsTrigger
-                    value="all"
-                    className="w-full cursor-pointer rounded-full font-bold"
-                  >
-                    All
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="unread"
-                    className="w-full cursor-pointer rounded-full font-bold"
-                  >
-                    Unread {unreadCount > 0 && `(${unreadCount})`}
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="applications"
-                    className="w-full cursor-pointer rounded-full font-bold"
-                  >
-                    Applications
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="messages"
-                    className="w-full cursor-pointer rounded-full font-bold"
-                  >
-                    Messages
-                  </TabsTrigger>
-                </TabsList>
+        <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full space-y-4"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <TabsList className="bg-card border-border/60 flex h-auto w-full gap-1 rounded-full border p-1 shadow-2xs sm:h-11">
+                <TabsTrigger
+                  value="all"
+                  className="w-full flex-1 cursor-pointer rounded-full py-2 text-xs font-bold transition-all sm:py-2.5 sm:text-sm"
+                >
+                  All
+                </TabsTrigger>
+                <TabsTrigger
+                  value="unread"
+                  className="w-full flex-1 cursor-pointer rounded-full py-2 text-xs font-bold transition-all sm:py-2.5 sm:text-sm"
+                >
+                  Unread {unreadCount > 0 && `(${unreadCount})`}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="applications"
+                  className="w-full flex-1 cursor-pointer rounded-full py-2 text-xs font-bold transition-all sm:py-2.5 sm:text-sm"
+                >
+                  Applications
+                </TabsTrigger>
+                <TabsTrigger
+                  value="messages"
+                  className="w-full flex-1 cursor-pointer rounded-full py-2 text-xs font-bold transition-all sm:py-2.5 sm:text-sm"
+                >
+                  Messages
+                </TabsTrigger>
+              </TabsList>
 
-                {unreadCount > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={handleMarkAll}
-                    className="h-10 rounded-full font-bold shadow-xs transition-all active:scale-95"
-                  >
-                    <BellRing className="mr-2 h-4 w-4" />
-                    Mark all read
-                  </Button>
-                )}
-              </div>
-            </Tabs>
-
-            <div className="space-y-4">
-              {filteredNotifications.length > 0 ? (
-                filteredNotifications.map((notif) => (
-                  <NotificationCard
-                    key={notif.id}
-                    notification={notif}
-                    getNotificationColor={getNotificationColor}
-                    getNotificationIcon={getNotificationIcon}
-                    deleteNotification={deleteNotification}
-                    markAsRead={markAsRead}
-                  />
-                ))
-              ) : (
-                <Card className="bg-card rounded-xl border-2 border-dashed py-24 text-center">
-                  <CardContent className="flex flex-col items-center gap-4 p-0">
-                    <div className="bg-muted/20 rounded-full p-6">
-                      <Bell className="text-muted-foreground/20 h-10 w-10" />
-                    </div>
-                    <h3 className="text-foreground text-lg font-black tracking-tight">
-                      No notifications
-                    </h3>
-                    <p className="text-muted-foreground text-sm font-medium opacity-80">
-                      {activeTab === "unread"
-                        ? "You're all caught up! No unread notifications."
-                        : "You don't have any notifications yet."}
-                    </p>
-                  </CardContent>
-                </Card>
+              {unreadCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleMarkAll}
+                  className="h-9 shrink-0 rounded-xl text-xs font-bold shadow-xs transition-all active:scale-95 sm:text-sm"
+                >
+                  <BellRing className="mr-2 h-3.5 w-3.5" />
+                  Mark all read
+                </Button>
               )}
             </div>
+          </Tabs>
+
+          <div className="space-y-3 sm:space-y-4">
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notif) => (
+                <NotificationCard
+                  key={notif.id}
+                  notification={notif}
+                  getNotificationColor={getNotificationColor}
+                  getNotificationIcon={getNotificationIcon}
+                  deleteNotification={deleteNotification}
+                  markAsRead={markAsRead}
+                />
+              ))
+            ) : (
+              <Card className="bg-card rounded-2xl border-2 border-dashed py-16 text-center shadow-xs sm:py-24">
+                <CardContent className="flex flex-col items-center gap-3 p-4 sm:gap-4">
+                  <div className="bg-primary/10 rounded-full p-4 sm:p-5">
+                    <Bell className="text-primary h-8 w-8 sm:h-10 sm:w-10" />
+                  </div>
+                  <h3 className="text-foreground text-base font-bold tracking-tight sm:text-xl">
+                    No notifications
+                  </h3>
+                  <p className="text-muted-foreground max-w-sm text-xs font-medium opacity-80 sm:text-sm">
+                    {activeTab === "unread"
+                      ? "You're all caught up! No unread notifications."
+                      : "You don't have any notifications yet."}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { Resolver } from "react-hook-form";
 
 import { useGetCategoriesQuery } from "@/redux/feature/category/categoryApi";
 import {
@@ -245,9 +246,7 @@ export default function CreateNewJobForm({
       onSubmit={handleSubmit}
       defaultValues={!jobId ? (defaultValues as JobFormData) : undefined}
       values={jobId ? (defaultValues as JobFormData) : undefined}
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      resolver={zodResolver(jobSchema)}
+      resolver={zodResolver(jobSchema) as unknown as Resolver<JobFormData>}
     >
       {isJobLoading ? (
         <div className="flex min-h-[400px] items-center justify-center">

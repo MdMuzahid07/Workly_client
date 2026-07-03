@@ -100,49 +100,56 @@ export default function PricingTierCard({
   return (
     <Card
       className={cn(
-        "relative flex flex-col overflow-hidden border transition-all duration-300 hover:shadow-lg",
+        "bg-card relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:rounded-3xl",
         popular
-          ? "border-primary ring-primary/50 z-10 scale-105 ring-1"
+          ? "border-primary ring-primary/30 z-10 shadow-md ring-2"
           : borderColor,
       )}
     >
       {popular && (
-        <div className="absolute top-0 right-0">
-          <Badge className="bg-primary text-primary-foreground rounded-none rounded-bl-xl px-4 py-1.5 font-bold tracking-widest uppercase">
+        <div className="absolute top-3 right-4">
+          <Badge className="to-primary rounded-full border-none bg-linear-to-r from-emerald-500 px-3.5 py-1 text-[10px] font-extrabold tracking-widest text-white uppercase shadow-xs">
             Most Popular
           </Badge>
         </div>
       )}
 
-      <CardHeader className="p-8 pb-4">
-        <div className={cn("mb-4 inline-flex rounded-xl p-3", bgColor)}>
-          <Icon className={cn("h-6 w-6", color)} />
+      <CardHeader className="p-6 pb-4 sm:p-8">
+        <div
+          className={cn(
+            "ring-primary/5 mb-4 inline-flex self-start rounded-2xl p-3.5 ring-4",
+            bgColor,
+          )}
+        >
+          <Icon className={cn("h-6 w-6 sm:h-7 sm:w-7", color)} />
         </div>
-        <h3 className="text-foreground text-xl font-bold">{name}</h3>
-        <p className="text-muted-foreground line-clamp-2 text-sm">
+        <h3 className="text-foreground text-xl font-bold sm:text-2xl">
+          {name}
+        </h3>
+        <p className="text-muted-foreground line-clamp-2 pt-1 text-xs sm:text-sm">
           {description}
         </p>
       </CardHeader>
 
-      <CardContent className="flex-1 p-8 pt-4">
-        <div className="mb-8 flex items-baseline gap-1">
-          <span className="text-foreground text-4xl font-black tracking-tight">
+      <CardContent className="flex-1 p-6 pt-2 sm:p-8">
+        <div className="mb-6 flex items-baseline gap-1.5 border-b pb-6">
+          <span className="text-foreground text-3xl font-black tracking-tight sm:text-4xl">
             {price}
           </span>
           {period && (
-            <span className="text-muted-foreground text-sm font-medium">
+            <span className="text-muted-foreground text-xs font-medium sm:text-sm">
               {period}
             </span>
           )}
         </div>
 
-        <ul className="space-y-4">
+        <ul className="space-y-3.5">
           {features.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-3">
-              <div className="bg-primary/10 text-primary mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full">
-                <Check className="h-3 w-3" />
+              <div className="bg-primary/10 text-primary mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full">
+                <Check className="h-3 w-3 stroke-[3]" />
               </div>
-              <span className="text-foreground/80 text-sm leading-snug">
+              <span className="text-foreground/90 text-xs leading-snug font-medium sm:text-sm">
                 {feature}
               </span>
             </li>
@@ -150,20 +157,28 @@ export default function PricingTierCard({
         </ul>
       </CardContent>
 
-      <CardFooter className="p-8 pt-0">
+      <CardFooter className="p-6 pt-0 sm:p-8">
         <Button
           onClick={handleCheckout}
           disabled={isButtonDisabled}
           className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold transition-all",
-            variant === "primary"
-              ? "bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/40 shadow-lg"
-              : "hover:bg-primary/5 border-primary/20",
+            "flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-bold transition-all sm:h-12",
+            isActivePlan
+              ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/10 cursor-default border opacity-100"
+              : variant === "primary"
+                ? "bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 shadow-md"
+                : "hover:bg-primary/5 border-border/80 hover:border-primary/40",
           )}
-          variant={variant === "primary" ? "default" : "outline"}
+          variant={
+            isActivePlan
+              ? "secondary"
+              : variant === "primary"
+                ? "default"
+                : "outline"
+          }
         >
           {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-          {isActivePlan ? "Current Plan" : cta}
+          {isActivePlan ? "Current Active Plan" : cta}
         </Button>
       </CardFooter>
     </Card>

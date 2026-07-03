@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Language, Skill } from "@/types/profile";
 import { X } from "lucide-react";
 import { useState } from "react";
 
@@ -25,18 +25,9 @@ const AVAILABLE_SKILLS = [
   "Next.js",
 ];
 
-export const SkillsManager = ({
-  skills = [],
-  languages = [],
-  onAddSoftSkill,
-  onAddLanguage,
-  onAddTechnicalSkill,
-  onRemoveSkill,
-  onRemoveLanguage,
-}: {
-  skills: any[];
-
-  languages?: any[];
+interface SkillsManagerProps {
+  skills?: Skill[];
+  languages?: Language[];
   onAddSoftSkill?: () => void;
   onAddLanguage?: () => void;
   onAddTechnicalSkill?: (skill: {
@@ -46,7 +37,17 @@ export const SkillsManager = ({
   }) => void;
   onRemoveSkill?: (idOrIndex: string | number) => void;
   onRemoveLanguage?: (idOrIndex: string | number) => void;
-}) => {
+}
+
+export const SkillsManager = ({
+  skills = [],
+  languages = [],
+  onAddSoftSkill,
+  onAddLanguage,
+  onAddTechnicalSkill,
+  onRemoveSkill,
+  onRemoveLanguage,
+}: SkillsManagerProps) => {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [experience, setExperience] = useState("");
 
@@ -60,7 +61,7 @@ export const SkillsManager = ({
     Expert: 4,
   };
 
-  const getSkillDisplay = (skill: any) => {
+  const getSkillDisplay = (skill: Skill): string => {
     if (skill?.experienceYears === undefined || skill?.experienceYears === null)
       return "N/A";
     const years = Number(skill.experienceYears);

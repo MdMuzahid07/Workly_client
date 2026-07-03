@@ -117,12 +117,12 @@ const ApplicationCard = ({
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <div className="from-muted/50 to-muted border-border/60 group-hover:border-primary/40 relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border bg-linear-to-br p-2 shadow-inner transition-colors duration-300">
+                  <div className="from-muted/50 to-muted border-border/60 group-hover:border-primary/40 relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border bg-linear-to-br p-0 shadow-inner transition-colors duration-300">
                     {app.job.company.logoUrl ? (
                       <Image
                         src={app.job.company.logoUrl}
                         alt={app.job.company.name}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full rounded-2xl object-cover"
                         fill
                       />
                     ) : (

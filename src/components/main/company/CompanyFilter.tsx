@@ -84,7 +84,7 @@ const CompanyFilter = ({
             <SwiperSlide key={industry.id} className="w-auto!">
               <Badge
                 variant={isSelected ? "default" : "secondary"}
-                className={`cursor-pointer rounded-full border-gray-100 px-5 py-2 text-xs font-semibold shadow-sm transition-all duration-300 select-none ${
+                className={`mb-1 cursor-pointer rounded-full border-gray-100 px-5 py-2 text-xs font-semibold shadow-sm transition-all duration-300 select-none ${
                   isSelected
                     ? "bg-primary border-primary text-white"
                     : "hover:bg-primary hover:border-primary bg-card text-slate-600 hover:text-white dark:border-slate-800 dark:text-slate-400"

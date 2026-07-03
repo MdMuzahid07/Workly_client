@@ -103,8 +103,8 @@ const SidebarFilter = ({
 
   return (
     <div className={className}>
-      <Card className="bg-background h-fit rounded-3xl">
-        <CardHeader className="py-5 xl:px-0">
+      <Card className="bg-background h-fit rounded-2xl">
+        <CardHeader className="px-5 py-5 sm:px-6">
           <div className="flex items-center justify-between">
             <CardTitle className="text-foreground text-base font-bold tracking-tight uppercase">
               Refined By
@@ -120,7 +120,7 @@ const SidebarFilter = ({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6 pb-8 xl:px-0">
+        <CardContent className="space-y-6 px-5 pb-8 sm:px-6">
           <FilterSearch updateFilters={updateFilters} filters={filters} />
 
           <Separator className="bg-gray-100 dark:bg-slate-800" />

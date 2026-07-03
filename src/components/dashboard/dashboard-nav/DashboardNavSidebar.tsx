@@ -253,9 +253,9 @@ const DashboardSidebar = () => {
           <Button
             variant="outline"
             size="icon"
-            className="border-sidebar-border bg-sidebar fixed top-4 left-4 z-50 shadow-lg"
+            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-50 flex h-9 w-9 items-center justify-center rounded-md border transition-all sm:top-6 sm:right-6"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="text-primary h-5 w-5" />
             <span className="sr-only">Open sidebar</span>
           </Button>
         </SheetTrigger>

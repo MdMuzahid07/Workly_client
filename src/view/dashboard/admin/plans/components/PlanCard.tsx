@@ -189,7 +189,7 @@ export function PlanCard({ plan, onEdit, onToggleStatus }: PlanCardProps) {
           </Badge>
         </div>
         <Button
-          className={`h-11 w-full rounded-full font-bold tracking-widest uppercase transition-all ${
+          className={`h-11 w-full rounded-xl font-bold tracking-widest uppercase transition-all ${
             plan.featured
               ? "bg-primary hover:bg-primary/90 shadow-sm"
               : "bg-background hover:bg-muted text-foreground border-2"

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -7,8 +6,10 @@ import {
   ArrowUpRight,
   BadgeCheck,
   Briefcase,
+  Building2,
   Crown,
   MapPin,
+  Rocket,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
@@ -16,121 +17,84 @@ import "swiper/css";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useGetCompaniesQuery } from "../../redux/feature/company/companyApi";
+import type { CompanyListing, DisplayCompany } from "@/types/company";
 
-const premiumCompanies = [
-  {
-    name: "Workly Tech Solutions",
-    industry: "Software & IT Services",
-    location: "San Francisco, CA (Remote)",
-    jobsCount: "15 active jobs",
-    initial: "W",
-    logoBg: "bg-primary/10 text-primary",
-    tagline: "Building next-gen enterprise tools.",
-  },
-  {
-    name: "Vertex Creative Labs",
-    industry: "Design & Agency",
-    location: "Austin, TX (Hybrid)",
-    jobsCount: "8 active jobs",
-    initial: "V",
-    logoBg: "bg-accent/10 text-accent",
-    tagline: "Crafting beautiful digital experiences.",
-  },
-  {
-    name: "Novus Health Systems",
-    industry: "Healthcare & Biotech",
-    location: "Boston, MA (On-site)",
-    jobsCount: "12 active jobs",
-    initial: "N",
-    logoBg: "bg-blue-600/10 text-blue-600",
-    tagline: "Empowering patient-centric healthcare.",
-  },
-  {
-    name: "Quantum Fintech Group",
-    industry: "Financial Technology",
-    location: "New York, NY (Remote)",
-    jobsCount: "6 active jobs",
-    initial: "Q",
-    logoBg: "bg-purple-600/10 text-purple-600",
-    tagline: "Decentralizing future asset transfers.",
-  },
-  {
-    name: "Apex Global Systems",
-    industry: "Cloud & DevOps",
-    location: "Seattle, WA (Remote)",
-    jobsCount: "10 active jobs",
-    initial: "A",
-    logoBg: "bg-orange-500/10 text-orange-500",
-    tagline: "Scaling global cloud infrastructure.",
-  },
-  {
-    name: "Stripe Payments Corp",
-    industry: "Fintech & Payments",
-    location: "Miami, FL (Hybrid)",
-    jobsCount: "5 active jobs",
-    initial: "S",
-    logoBg: "bg-indigo-600/10 text-indigo-600",
-    tagline: "Providing secure global payment APIs.",
-  },
-];
+const logoBgOptions = [
+  "bg-primary/10 text-primary",
+  "bg-accent/10 text-accent",
+  "bg-blue-600/10 text-blue-600",
+  "bg-purple-600/10 text-purple-600",
+  "bg-orange-500/10 text-orange-500",
+  "bg-indigo-600/10 text-indigo-600",
+] as const;
 
-const LandingFeaturedCompanies = () => {
-  const router = useRouter();
-  const { data: companiesData } = useGetCompaniesQuery({ limit: 10 });
+const getIndustryName = (industry: CompanyListing["industry"]): string => {
+  if (!industry) return "Technology";
+  if (typeof industry === "string") return industry;
+  return industry.name;
+};
 
-  const fetchedCompanies =
-    companiesData?.data?.result || companiesData?.data || [];
-
-  const displayCompanies =
-    fetchedCompanies?.length > 0
-      ? fetchedCompanies.slice(0, 8).map((comp: any) => {
-          const logoBgOptions = [
-            "bg-primary/10 text-primary",
-            "bg-accent/10 text-accent",
-            "bg-blue-600/10 text-blue-600",
-            "bg-purple-600/10 text-purple-600",
-            "bg-orange-500/10 text-orange-500",
-            "bg-indigo-600/10 text-indigo-600",
-          ];
-          const randomBg =
-            logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
-          return {
-            name: comp.name,
-            slug: comp.slug || comp.id,
-            industry: comp.industry?.name || comp.industry || "Technology",
-            location: comp.location || "Remote",
-            jobsCount:
-              comp.openJobs !== undefined
-                ? `${comp.openJobs} active jobs`
-                : "Hiring actively",
-            initial: comp.name ? comp.name[0].toUpperCase() : "C",
-            logoBg: randomBg,
-            tagline: comp.description
-              ? comp.description.slice(0, 75) + "..."
-              : "Building elite digital solutions.",
-            isReal: true,
-          };
-        })
-      : premiumCompanies;
-
-  const handleCompanyClick = (company: any) => {
-    if (company.isReal) {
-      router.push(`/companies/${company.slug}`);
-    } else {
-      router.push(`/jobs?search=${encodeURIComponent(company.name)}`);
-    }
+const mapCompanyToDisplay = (comp: CompanyListing): DisplayCompany => {
+  const randomBg =
+    logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
+  return {
+    name: comp.name,
+    slug: comp.slug || comp.id,
+    industry: getIndustryName(comp.industry),
+    location: comp.location || "Remote",
+    jobsCount:
+      comp.openJobs !== undefined
+        ? `${comp.openJobs} active jobs`
+        : "Hiring actively",
+    initial: comp.name ? comp.name[0].toUpperCase() : "C",
+    logoBg: randomBg,
+    tagline: comp.description
+      ? comp.description.slice(0, 75) + "..."
+      : "Building elite digital solutions.",
+    isReal: true,
   };
+};
 
+const LandingFeaturedCompaniesSkeleton = () => {
   return (
-    <section className="bg-background border-border/40 relative overflow-hidden border-b py-24 sm:py-32">
-      {/* Background Atmosphere */}
+    <section className="bg-background border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center sm:mb-16 lg:mb-20">
+          <div className="bg-muted mx-auto mb-4 h-9 w-44 animate-pulse rounded-full" />
+          <div className="bg-muted mx-auto h-10 w-96 animate-pulse rounded-md" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, index) => (
+            <Card
+              key={index}
+              className="border-border/40 bg-card/50 animate-pulse rounded-2xl p-6"
+            >
+              <div className="space-y-4">
+                <div className="bg-muted h-12 w-12 rounded-xl" />
+                <div className="bg-muted h-6 w-3/4 rounded" />
+                <div className="bg-muted h-4 w-1/2 rounded" />
+                <div className="bg-muted bg-muted/80 h-10 w-full animate-pulse rounded-xl" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/** Empty state shown when no companies have signed up yet */
+const LandingFeaturedCompaniesEmpty = () => {
+  const router = useRouter();
+  return (
+    <section className="bg-background border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-primary/5 absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full blur-[120px]" />
+        <div className="bg-accent/5 absolute bottom-1/4 left-1/4 h-[300px] w-[300px] rounded-full blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="mb-16 text-center sm:mb-20">
+        <div className="mb-10 text-center sm:mb-16 lg:mb-20">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -138,8 +102,8 @@ const LandingFeaturedCompanies = () => {
             transition={{ duration: 0.5 }}
             className="mb-4 inline-flex"
           >
-            <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
-              <BadgeCheck className="h-4 w-4" />
+            <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-1.5 border px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm transition-all sm:px-4 sm:py-2 sm:text-sm">
+              <BadgeCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Verified Premium Partners
             </Badge>
           </motion.div>
@@ -149,7 +113,7 @@ const LandingFeaturedCompanies = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.6 }}
-            className="text-foreground text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
+            className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
           >
             Top Featured{" "}
             <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
@@ -162,7 +126,121 @@ const LandingFeaturedCompanies = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-muted-foreground mx-auto mt-4 max-w-2xl text-base sm:text-lg"
+            className="text-muted-foreground mx-auto mt-3 max-w-2xl text-xs sm:text-lg"
+          >
+            Be the first verified employer on Workly and connect with thousands
+            of skilled professionals today.
+          </motion.p>
+        </div>
+
+        {/* CTA card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="mx-auto max-w-2xl"
+        >
+          <Card className="group border-primary/20 bg-card/50 hover:border-primary relative overflow-hidden rounded-2xl border p-10 text-center backdrop-blur-md transition-all duration-500">
+            <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="relative z-10">
+              <div className="from-primary/10 to-accent/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br">
+                <Building2 className="text-primary h-10 w-10" />
+              </div>
+              <h3 className="text-foreground mb-3 text-2xl font-bold">
+                Be a Pioneer Employer
+              </h3>
+              <p className="text-muted-foreground mb-8 text-base leading-relaxed">
+                Post jobs, review applicants, and hire top talent — all from one
+                seamless platform.
+              </p>
+              <button
+                onClick={() => router.push("/employer/register")}
+                className="bg-primary hover:bg-primary/90 shadow-primary/20 hover:shadow-primary/30 inline-flex cursor-pointer items-center gap-2 rounded-xl px-8 py-4 text-sm font-bold text-white shadow-lg transition-all"
+              >
+                <Rocket className="h-4 w-4" />
+                Post Your First Job
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
+            </div>
+          </Card>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+const LandingFeaturedCompanies = () => {
+  const router = useRouter();
+  const { data: companiesData, isLoading: companiesLoading } =
+    useGetCompaniesQuery({ limit: 10 });
+
+  const fetchedCompanies: CompanyListing[] =
+    companiesData?.data?.result || companiesData?.data || [];
+
+  const displayCompanies: DisplayCompany[] =
+    fetchedCompanies.length > 0
+      ? fetchedCompanies.slice(0, 8).map(mapCompanyToDisplay)
+      : [];
+
+  const handleCompanyClick = (company: DisplayCompany) => {
+    if (company.isReal) {
+      router.push(`/companies/${company.slug}`);
+    } else {
+      router.push(`/jobs?search=${encodeURIComponent(company.name)}`);
+    }
+  };
+
+  if (companiesLoading || !companiesData) {
+    return <LandingFeaturedCompaniesSkeleton />;
+  }
+
+  if (displayCompanies.length === 0) {
+    return <LandingFeaturedCompaniesEmpty />;
+  }
+
+  return (
+    <section className="bg-background border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
+      {/* Background Atmosphere */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="bg-primary/5 absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full blur-[120px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="mb-10 text-center sm:mb-16 lg:mb-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-4 inline-flex"
+          >
+            <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-1.5 border px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm transition-all sm:px-4 sm:py-2 sm:text-sm">
+              <BadgeCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              Verified Premium Partners
+            </Badge>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
+          >
+            Top Featured{" "}
+            <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
+              Employers
+            </span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-muted-foreground mx-auto mt-3 max-w-2xl text-xs sm:text-lg"
           >
             Explore verified enterprise brands and premium hiring firms
             currently looking for talent.
@@ -188,9 +266,9 @@ const LandingFeaturedCompanies = () => {
             }}
             className="premium-employers-slider w-full py-4"
           >
-            {displayCompanies.map((company: any, index: number) => (
+            {displayCompanies.map((company: DisplayCompany, index: number) => (
               <SwiperSlide key={index} className="h-auto">
-                <Card className="group border-border/40 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-primary/5 relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500 hover:shadow-lg">
+                <Card className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-500">
                   {/* Dynamic Gradient Overlay */}
                   <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
@@ -203,7 +281,7 @@ const LandingFeaturedCompanies = () => {
                         {company.initial}
                       </div>
 
-                      {/* Redesigned Premium Badge */}
+                      {/* Premium Badge */}
                       <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-600 uppercase shadow-sm shadow-amber-500/5 dark:text-amber-500">
                         <Crown className="h-3.5 w-3.5 fill-amber-500/20 text-amber-500" />
                         PRO Member

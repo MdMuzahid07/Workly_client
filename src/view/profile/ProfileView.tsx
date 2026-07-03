@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import DashboardProfileHeader from "@/components/dashboard/dashboard-nav/header/DashboardProfileHeader";
 import { AdditionalInfo } from "@/components/main/profile/AdditionalInfo";
 import EducationList from "@/components/main/profile/EducationList";
 import ExperienceList from "@/components/main/profile/ExperienceList";
@@ -8,27 +9,33 @@ import { ProjectList } from "@/components/main/profile/ProjectList";
 import { SectionCard } from "@/components/main/profile/SectionCard";
 import { SkillsManager } from "@/components/main/profile/SkillsManager";
 import { VolunteerSection } from "@/components/main/profile/VolunteerSection";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/profile/profileApi";
+import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import {
   Briefcase,
+  Camera,
+  Check,
   CheckCircle2,
   GraduationCap,
   Info,
   LayoutGrid,
   Loader2,
+  Star,
   User,
+  Zap,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import JobPreference from "../../components/main/profile/JobPreference";
 import ProfileSkeleton from "../../skeleton/profile/overview/ProfileSkeleton";
-import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 
 import { BasicInfoForm } from "@/components/dashboard/profile-tabs/forms/BasicInfoForm";
 import { CertificationForm } from "@/components/dashboard/profile-tabs/forms/CertificationForm";
@@ -37,6 +44,7 @@ import { ExperienceForm } from "@/components/dashboard/profile-tabs/forms/Experi
 import { ProjectForm } from "@/components/dashboard/profile-tabs/forms/ProjectForm";
 import { SocialLinksForm } from "@/components/dashboard/profile-tabs/forms/SocialLinksForm";
 import { VideoResumeForm } from "@/components/dashboard/profile-tabs/forms/VideoResumeForm";
+import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +61,6 @@ import { ReferenceForm } from "../../components/dashboard/profile-tabs/forms/Ref
 import { SoftSkillsForm } from "../../components/dashboard/profile-tabs/forms/SoftSkillsForm";
 import { VolunteerForm } from "../../components/dashboard/profile-tabs/forms/VolunteerForm";
 import { Button } from "../../components/ui/button";
-import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
 
 const createLocalProfile = (userData: any) => {
   const profile = userData.profile || {};
@@ -122,6 +129,36 @@ const ProfileView = () => {
   const user = data?.data;
 
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [uploadSingleFile, { isLoading: isUploadingAvatar }] =
+    useUploadSingleFileMutation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadSingleFile(formData).unwrap();
+      if (res.success && res.data?.url) {
+        const newAvatarUrl = res.data.url;
+        setLocalProfile((prev: any) => ({ ...prev, avatarUrl: newAvatarUrl }));
+        toast.success("Image uploaded! Click 'Save Changes' to apply.");
+      }
+    } catch (err: any) {
+      console.error("Failed to upload avatar:", err);
+      toast.error(err?.data?.message || "Failed to upload profile picture");
+    } finally {
+      if (e.target) e.target.value = "";
+    }
+  };
 
   // Local state to track all changes before global save
   const [localProfile, setLocalProfile] = useState<any>(null);
@@ -268,102 +305,273 @@ const ProfileView = () => {
   }
 
   return (
-    <div className="bg-background mt-16 min-h-screen pt-8 pb-20">
-      <div className="space-y-8 px-4 md:px-6">
-        {/* Header Section */}
-        <div className="space-y-6">
-          <div className="flex flex-col items-center gap-4 sm:flex-row">
-            <div className="border-primary/20 relative h-32 w-32 overflow-hidden rounded-full border-2 sm:h-16 sm:w-16">
-              {user?.profile?.avatarUrl ? (
-                <Image
-                  src={user?.profile?.avatarUrl || "/placeholder.svg"}
-                  alt="User"
-                  width={64}
-                  height={64}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center">
-                  <User className="h-8 w-8" />
-                </div>
-              )}
+    <div className="bg-background min-h-screen">
+      <DashboardProfileHeader />
+      <div className="space-y-4 px-3 sm:space-y-6 sm:px-6 lg:space-y-8 lg:px-8">
+        {/* Hidden File Input for Avatar Upload */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleAvatarUpload}
+          className="hidden"
+          accept="image/*"
+        />
+
+        {/* Header Profile Card */}
+        <Card className="border-border bg-card/60 relative gap-0 overflow-hidden rounded-2xl border p-0 backdrop-blur-xl transition-all duration-300">
+          {/* Cover Banner (Waves on mobile, delicate gradient on desktop) */}
+          <div className="relative h-32 w-full overflow-hidden sm:h-20">
+            {/* Mobile Unsplash Banner */}
+            <div className="absolute inset-0 sm:hidden">
+              <Image
+                src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1000&auto=format&fit=crop&q=80"
+                alt="Cover Banner Mobile"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
-            <div>
-              <h1 className="text-foreground text-2xl font-bold">
-                Complete Your Profile Now!
-              </h1>
-              <p className="text-muted-foreground">
-                {user?.fullName}
-                {user?.profile?.headline || "MERN Stack Developer"}
-              </p>
-            </div>
-            <div className="ml-auto flex items-center gap-3">
+            {/* Desktop Gradient Banner */}
+            <div className="from-primary/15 via-primary/10 to-primary/5 absolute inset-0 hidden bg-linear-to-r sm:block" />
+
+            {/* Progress Bar overlay (only for mobile, since desktop has it below) */}
+            <Progress
+              value={progress}
+              className="absolute right-0 bottom-0 left-0 h-1.5 rounded-none bg-black/10 sm:hidden"
+            />
+
+            {/* Save Changes button positioned absolute top-right of cover banner on Mobile only */}
+            <div className="absolute top-3 right-3 z-10 sm:hidden">
               <Button
                 onClick={handleGlobalSave}
                 disabled={!hasUnsavedChanges || isUpdating}
-                className="rounded-full px-8 font-bold shadow-lg transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                size="sm"
+                className="bg-background/80 hover:bg-background/95 text-foreground border-border/40 h-8 rounded-full border px-4 text-xs font-semibold backdrop-blur-md transition-all active:scale-95 disabled:opacity-50"
               >
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
+                {isUpdating ? "Saving..." : "Save Changes"}
               </Button>
-              <div className="text-primary text-right text-xl font-bold">
-                {progress}%
-              </div>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <Progress value={progress} className="h-3" />
-            <div
-              className={`flex items-center gap-2 rounded-md p-3 text-sm ${progress >= 80 ? "border border-emerald-200 bg-emerald-50 text-emerald-800" : "border border-blue-200 bg-blue-50 text-blue-800"}`}
-            >
-              {progress >= 80 ? (
-                <CheckCircle2 className="h-4 w-4" />
-              ) : (
-                <Info className="h-4 w-4" />
-              )}
-              {progress >= 80
-                ? "Excellent! Your profile meets our standards - ready to apply!"
-                : "New requirement: We've raised our standards! 80% profile completion is now required."}
+          <CardContent className="relative p-3 sm:p-4 md:p-6">
+            {/* --- Mobile View (Centered Layout) --- */}
+            <div className="flex flex-col items-center text-center sm:hidden">
+              {/* Centered Overlapping Avatar */}
+              <div className="relative -mt-14 mb-4 shrink-0">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group bg-background border-background relative h-24 w-24 cursor-pointer overflow-hidden rounded-full border-[3px] ring-[3px] ring-emerald-500/90 transition-transform duration-300 hover:scale-102 dark:ring-emerald-400/90"
+                >
+                  {localProfile?.avatarUrl || user?.profile?.avatarUrl ? (
+                    <Image
+                      src={
+                        localProfile?.avatarUrl ||
+                        user?.profile?.avatarUrl ||
+                        "/placeholder.svg"
+                      }
+                      alt="User"
+                      width={96}
+                      height={96}
+                      className="h-full w-full object-cover"
+                      priority
+                    />
+                  ) : (
+                    <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center">
+                      <User className="h-12 w-12" />
+                    </div>
+                  )}
+                  {/* Camera Hover Overlay */}
+                  <div
+                    className={`absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white transition-opacity duration-200 ${
+                      isUploadingAvatar
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  >
+                    {isUploadingAvatar ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Camera className="h-6 w-6 text-white" />
+                        <span className="mt-0.5 text-[9px] font-bold tracking-wider uppercase">
+                          Upload
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {/* Check Overlay badge */}
+                <div className="border-background pointer-events-none absolute right-1 bottom-1 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-emerald-500 text-white">
+                  <Check className="h-3 w-3 stroke-[3.5] font-extrabold text-white" />
+                </div>
+              </div>
+
+              {/* Name & Headline */}
+              <div className="max-w-xl space-y-1">
+                <h2 className="text-foreground text-lg font-bold tracking-tight">
+                  {user?.fullName || "Muzahid Seeker"}
+                </h2>
+                <p className="text-muted-foreground mx-auto max-w-xs text-xs leading-relaxed font-medium">
+                  {user?.profile?.headline || "MERN Stack Developer"}
+                </p>
+              </div>
+
+              {/* Centered Badges Row */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                {/* Strength Badge */}
+                <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-500/15 dark:text-emerald-400">
+                  <Zap className="h-3.5 w-3.5 fill-emerald-500/10 text-emerald-600 dark:text-emerald-400" />
+                  <span>{progress}% Strength</span>
+                </div>
+
+                {/* Star Candidate Badge */}
+                {progress >= 80 && (
+                  <div className="flex items-center gap-1.5 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-emerald-600">
+                    <Star className="h-3.5 w-3.5 fill-white text-white" />
+                    <span>Top Candidate</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
+
+            {/* --- Tablet/Desktop View (Inline/Previous Layout) --- */}
+            <div className="-mt-10 mb-0 hidden sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+              <div className="flex min-w-0 items-center gap-4">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group border-background bg-muted relative h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-full border-4 shadow-sm"
+                >
+                  {localProfile?.avatarUrl || user?.profile?.avatarUrl ? (
+                    <Image
+                      src={
+                        localProfile?.avatarUrl ||
+                        user?.profile?.avatarUrl ||
+                        "/placeholder.svg"
+                      }
+                      alt="User"
+                      width={80}
+                      height={80}
+                      className="h-full w-full object-cover"
+                      priority
+                    />
+                  ) : (
+                    <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center">
+                      <User className="h-10 sm:h-10" />
+                    </div>
+                  )}
+                  {/* Camera Hover Overlay */}
+                  <div
+                    className={`absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white transition-opacity duration-200 ${
+                      isUploadingAvatar
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  >
+                    {isUploadingAvatar ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Camera className="h-5 w-5 text-white" />
+                        <span className="mt-0.5 text-[8px] font-bold tracking-wider uppercase">
+                          Upload
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="min-w-0 pt-2">
+                  <h2 className="text-foreground truncate text-lg font-bold tracking-tight md:text-xl">
+                    {user?.fullName || "Job Seeker"}
+                  </h2>
+                  <p className="text-muted-foreground mt-0.5 line-clamp-1 text-xs font-medium sm:text-sm">
+                    {user?.profile?.headline || "MERN Stack Developer"}
+                  </p>
+                </div>
+              </div>
+
+              {/* CTA & Strength on Desktop */}
+              <div className="flex shrink-0 items-center gap-3">
+                <div className="bg-muted/60 border-border/50 flex items-center gap-1.5 rounded-full border px-3 py-1">
+                  <span className="text-muted-foreground text-xs font-semibold">
+                    Profile Strength:
+                  </span>
+                  <div className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-extrabold">
+                    {progress}%
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleGlobalSave}
+                  disabled={!hasUnsavedChanges || isUpdating}
+                  size="sm"
+                  className="h-8 rounded-full px-5 text-xs font-bold shadow-sm transition-all active:scale-95"
+                >
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Progress bar and Alert banner for Tablet/Desktop below the row */}
+            <div className="border-border/50 mt-4 hidden space-y-3 border-t pt-4 sm:block">
+              <Progress value={progress} className="h-1.5" />
+              <div
+                className={`flex items-center gap-2 rounded-lg p-2.5 text-xs ${progress >= 80 ? "border border-emerald-100/50 bg-emerald-50/50 text-emerald-800 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-300" : "border border-blue-100/50 bg-blue-50/50 text-blue-800 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-300"}`}
+              >
+                {progress >= 80 ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                ) : (
+                  <Info className="h-3.5 w-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                )}
+                <span className="leading-none font-medium">
+                  {progress >= 80
+                    ? "Excellent! Your profile meets our standards - ready to apply!"
+                    : "Complete 80% profile strength to start applying for jobs."}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Tabs Navigation */}
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="mb-6 h-10 w-full justify-start overflow-x-auto border border-b bg-transparent p-0">
-            <TabsTrigger
-              value="personal"
-              className="data-[state=active]:bg-primary/10 py-3"
-            >
-              <User className="mr-2 h-4 w-4" /> Personal & Portfolio
-            </TabsTrigger>
-            <TabsTrigger
-              value="professional"
-              className="data-[state=active]:bg-primary/10 py-3"
-            >
-              <Briefcase className="mr-2 h-4 w-4" /> Professional
-            </TabsTrigger>
-            <TabsTrigger
-              value="education"
-              className="data-[state=active]:bg-primary/10 py-3"
-            >
-              <GraduationCap className="mr-2 h-4 w-4" /> Education & Growth
-            </TabsTrigger>
-            <TabsTrigger
-              value="skills"
-              className="data-[state=active]:bg-primary/10 py-3"
-            >
-              <LayoutGrid className="mr-2 h-4 w-4" /> Skills & Preferences
-            </TabsTrigger>
-          </TabsList>
+          <div className="scrollbar-none mb-4 w-full overflow-x-auto sm:mb-6">
+            <TabsList className="bg-muted/30 border-border/50 flex h-10 w-full min-w-max gap-1 rounded-full border p-1 whitespace-nowrap lg:grid lg:h-12 lg:min-w-0 lg:grid-cols-4 lg:whitespace-normal">
+              <TabsTrigger
+                value="personal"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
+              >
+                <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Personal &
+                Portfolio
+              </TabsTrigger>
+              <TabsTrigger
+                value="professional"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
+              >
+                <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Professional
+              </TabsTrigger>
+              <TabsTrigger
+                value="education"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
+              >
+                <GraduationCap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />{" "}
+                Education & Growth
+              </TabsTrigger>
+              <TabsTrigger
+                value="skills"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground inline-flex h-full w-full shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all lg:w-full lg:shrink lg:px-5 lg:text-sm"
+              >
+                <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Skills &
+                Preferences
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/*  Personal & Portfolio Tab */}
           <TabsContent

@@ -35,13 +35,14 @@ const Sidebar = ({ onFiltersChange }: MobileFilterDrawerProps) => {
       <SheetTrigger asChild>
         <Button
           variant="outline"
-          className="rounded-full bg-transparent md:hidden"
+          size="sm"
+          className="border-border flex h-7.5 cursor-pointer items-center rounded-md bg-white px-2 text-[11px] shadow-xs hover:bg-slate-50 sm:h-8.5 sm:px-2.5 sm:text-xs dark:bg-slate-900 dark:hover:bg-slate-800"
         >
-          <Filter className="mr-2 h-4 w-4" />
-          Filters
+          <Filter className="text-primary mr-1 h-3 w-3 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
+          <span className="font-semibold">Filters</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-full p-0">
+      <SheetContent side="left" className="w-full p-0 sm:max-w-md">
         <SheetHeader className="p-6 pb-0">
           <SheetTitle>Filter Jobs</SheetTitle>
         </SheetHeader>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -16,6 +15,26 @@ import {
 } from "@/utils/company-profile-utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+
+/** Typed payload for the company update API call */
+interface UpdateCompanyPayload {
+  companyId: string;
+  name: string;
+  description: string;
+  location: string;
+  websiteUrl: string;
+  contactEmail: string;
+  contactPhone: string;
+  founded: string | number | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  size: string | null;
+  mission: string | null;
+  values: string[];
+  socialLinks: { id?: string; platform: string; url: string }[];
+  benefits: CompanyBenefit[];
+  industryId?: string;
+}
 
 /**
  * Custom hook for managing company profile state and operations
@@ -85,7 +104,8 @@ export const useCompanyProfile = () => {
       const benefitsData = prepareBenefitsForApi(benefits);
 
       // Prepare update payload
-      const updatePayload: any = {
+      const updatePayload: UpdateCompanyPayload = {
+        companyId,
         name: editedProfile.name,
         description: editedProfile.description,
         location: editedProfile.location,
@@ -96,35 +116,37 @@ export const useCompanyProfile = () => {
         logoUrl: editedProfile.logoUrl,
         coverUrl: editedProfile.coverUrl,
         size: editedProfile.size,
-        mission: editedProfile.mission,
-        values: editedProfile.values || [],
+        mission: editedProfile.mission ?? null,
+        values: editedProfile.values ?? [],
         socialLinks: socialLinksData,
         benefits: benefitsData,
+        industryId: undefined,
       };
 
-      // Add industry ID if present
+      // Resolve industry
       const industryId = extractIndustryId(editedProfile.industry);
       if (industryId) {
         updatePayload.industryId = industryId;
       }
 
       // Update company
-      await updateCompany({
-        companyId,
-        ...updatePayload,
-      }).unwrap();
+      await updateCompany(updatePayload).unwrap();
 
       // Refetch to get updated data
       await refetchCompany();
 
       toast.success("Company profile updated successfully");
       setIsEditing(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Update error:", error);
+      const err = error as {
+        data?: { message?: string; errorSources?: { message?: string } };
+        message?: string;
+      };
       toast.error(
-        error?.data?.message ||
-          error?.data?.errorSources?.message ||
-          error?.message ||
+        err?.data?.message ||
+          err?.data?.errorSources?.message ||
+          err?.message ||
           "Failed to update company profile",
       );
     }
@@ -152,15 +174,21 @@ export const useCompanyProfile = () => {
   /**
    * Updates a specific field in the edited profile
    */
-  const updateField = useCallback((field: keyof CompanyProfile, value: any) => {
-    setEditedProfile((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        [field]: value,
-      } as CompanyProfile;
-    });
-  }, []);
+  const updateField = useCallback(
+    (
+      field: keyof CompanyProfile,
+      value: CompanyProfile[keyof CompanyProfile],
+    ) => {
+      setEditedProfile((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          [field]: value,
+        } as CompanyProfile;
+      });
+    },
+    [],
+  );
 
   /**
    * Updates the company mission statement

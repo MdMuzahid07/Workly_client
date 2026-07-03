@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { PRICING_FAQ } from "@/constants/pricing";
 import { HelpCircle } from "lucide-react";
 
@@ -39,9 +40,12 @@ export default function PricingFAQ() {
           Our support team is always here to help. Contact us for a custom
           walkthrough.
         </p>
-        <button className="text-primary mt-6 cursor-pointer font-bold hover:underline">
+        <Button
+          variant="outline"
+          className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground mt-6 rounded-full font-bold transition-all"
+        >
           Chat with Support →
-        </button>
+        </Button>
       </div>
     </div>
   );

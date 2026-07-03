@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -21,11 +20,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import React, { useMemo } from "react";
+import type { Message } from "@/types/message";
 
 interface MediaGalleryProps {
   isOpen: boolean;
   onClose: () => void;
-  messages: any[];
+  messages: Message[];
   participantName: string;
   onImageClick?: (index: number) => void;
 }
@@ -53,7 +53,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
         m.status !== "DELETED",
     );
 
-    const filterFn = (m: any) =>
+    const filterFn = (m: Message) =>
       (m.fileName || m.content || "")
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
@@ -141,7 +141,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
           <ScrollArea className="flex-1 p-6">
             <TabsContent value="media" className="m-0 focus-visible:ring-0">
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {filteredItems.media.map((item: any, idx: number) => (
+                {filteredItems.media.map((item: Message, idx: number) => (
                   <div
                     key={item.id}
                     onClick={() => onImageClick && onImageClick(idx)}
@@ -169,7 +169,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                           KB
                         </span>
                         <a
-                          href={item.fileUrl}
+                          href={item.fileUrl ?? undefined}
                           download
                           className="rounded-lg bg-white/20 p-1.5 backdrop-blur-md transition-colors hover:bg-white/40"
                           onClick={(e) => e.stopPropagation()}
@@ -190,7 +190,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
 
             <TabsContent value="docs" className="m-0 focus-visible:ring-0">
               <div className="space-y-3">
-                {filteredItems.docs.map((item: any) => (
+                {filteredItems.docs.map((item: Message) => (
                   <div
                     key={item.id}
                     className="group bg-muted/20 hover:bg-muted/40 border-border/40 flex items-center justify-between rounded-2xl border p-4 transition-all hover:translate-x-1"
@@ -219,7 +219,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                     </div>
                     <div className="flex items-center gap-2">
                       <a
-                        href={item.fileUrl}
+                        href={item.fileUrl ?? undefined}
                         download
                         className="bg-background hover:bg-primary hover:text-primary-foreground border-border/50 flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold shadow-sm transition-all"
                       >
@@ -239,7 +239,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
 
             <TabsContent value="links" className="m-0 focus-visible:ring-0">
               <div className="space-y-3">
-                {filteredItems.links.map((item: any) => {
+                {filteredItems.links.map((item: Message) => {
                   const urlMatch = item.content.match(/https?:\/\/[^\s]+/);
                   const url = urlMatch ? urlMatch[0] : "#";
                   return (

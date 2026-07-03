@@ -21,8 +21,8 @@ import { useEffect, useMemo, useState } from "react";
 import JobCard from "../../components/main/jobs/JobCard";
 import StatsCards from "../../components/main/saved-jobs/StatsCards";
 
-import SavedJobsViewSkeleton from "@/skeleton/saved-jobs/SavedJobsViewSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
+import SavedJobsViewSkeleton from "@/skeleton/saved-jobs/SavedJobsViewSkeleton";
 
 const SavedJobsView = () => {
   // Query States
@@ -102,26 +102,26 @@ const SavedJobsView = () => {
   }
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardSavedJobsHeader />
 
-      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
         <StatsCards totalSaved={stats.total} expiringSoon={stats.expiring} />
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-xl border">
-          <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
-            <div className="group relative max-w-md flex-1">
+        <Card className="bg-card rounded-2xl border">
+          <CardContent className="flex flex-col gap-3 p-3.5 sm:p-4 md:flex-row md:items-center md:justify-between">
+            <div className="group relative w-full max-w-md flex-1">
               <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
               <Input
                 placeholder="Search job title or company..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
+                className="bg-muted/20 border-border focus:bg-background h-9 rounded-full pl-9 text-xs transition-all sm:h-10 sm:text-sm"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <Select
                 value={selectedCompany}
                 onValueChange={(val) => {
@@ -129,7 +129,7 @@ const SavedJobsView = () => {
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="border-border h-10 w-[180px] cursor-pointer rounded-full font-semibold">
+                <SelectTrigger className="border-border h-8 w-auto cursor-pointer rounded-full text-xs font-semibold sm:h-10 sm:text-sm">
                   <SelectValue placeholder="All Companies" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -149,7 +149,7 @@ const SavedJobsView = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearFilters}
-                className="hover:bg-destructive/5 hover:text-destructive h-10 cursor-pointer rounded-full px-4 font-bold transition-colors"
+                className="hover:bg-destructive/5 hover:text-destructive h-8 cursor-pointer rounded-full px-3 text-xs font-bold transition-colors sm:h-10 sm:px-4 sm:text-sm"
                 disabled={searchTerm === "" && selectedCompany === "all"}
               >
                 Clear Filters

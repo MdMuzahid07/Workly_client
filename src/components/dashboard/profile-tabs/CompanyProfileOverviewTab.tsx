@@ -75,23 +75,23 @@ const CompanyProfileOverviewTab = ({
   return (
     <TabsContent value="overview" className="space-y-10 focus:outline-none">
       {/* Premium Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <div
             key={index}
-            className={`bg-card relative overflow-hidden rounded-xl border p-6 backdrop-blur-md`}
+            className={`bg-card relative overflow-hidden rounded-xl border p-4 shadow-xs backdrop-blur-md sm:p-6`}
           >
-            <div className="relative z-10 flex flex-col gap-3">
+            <div className="relative z-10 flex flex-col gap-2 sm:gap-3">
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-xl border bg-white/80 backdrop-blur-sm dark:bg-black/20`}
+                className={`flex h-10 w-10 items-center justify-center rounded-xl border bg-white/80 backdrop-blur-sm sm:h-12 sm:w-12 dark:bg-black/20`}
               >
-                <stat.icon className="h-6 w-6" />
+                <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                <p className="text-muted-foreground truncate text-[11px] font-semibold tracking-wider uppercase sm:text-xs">
                   {stat.label}
                 </p>
-                <h4 className="text-foreground mt-1 text-3xl font-bold tracking-tight">
+                <h4 className="text-foreground mt-0.5 text-xl font-bold tracking-tight sm:text-3xl">
                   {stat.value.toLocaleString()}
                 </h4>
               </div>

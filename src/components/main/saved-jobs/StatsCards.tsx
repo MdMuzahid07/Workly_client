@@ -23,7 +23,7 @@ const StatsCards = ({
   expiringSoon: number;
 }) => {
   return (
-    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6">
+    <div className="mb-6 grid grid-cols-2 gap-2.5 sm:mb-8 sm:gap-4 lg:gap-6">
       <StatItem
         label="Total Saved Jobs"
         value={totalSaved}
@@ -60,28 +60,30 @@ const StatItem = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.4, delay }}
   >
-    <Card className="bg-card relative overflow-hidden border transition-all">
-      <CardContent>
-        <div className="flex items-start justify-between">
+    <Card className="bg-card relative overflow-hidden rounded-2xl border transition-all hover:shadow-sm">
+      <CardContent className="p-3.5 sm:p-4 lg:p-5 xl:p-6">
+        <div className="flex items-center justify-between">
           <div
             className={cn(
-              "flex items-center justify-center rounded-xl p-3 transition-transform hover:scale-105",
+              "flex items-center justify-center rounded-xl p-2 transition-transform hover:scale-105 sm:p-2.5 lg:p-3",
               iconBg,
             )}
           >
-            <Icon className={cn("h-6 w-6", iconColor)} />
+            <Icon
+              className={cn("h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6", iconColor)}
+            />
           </div>
           {trend && (
-            <div className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+            <div className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase sm:text-[10px]">
               {trend}
             </div>
           )}
         </div>
-        <div className="mt-6">
-          <h3 className="text-primary text-xl font-bold sm:text-2xl">
+        <div className="mt-3 sm:mt-4 lg:mt-5">
+          <h3 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl">
             {value}
           </h3>
-          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+          <p className="text-muted-foreground mt-1 truncate text-[11px] leading-tight font-semibold sm:text-xs lg:text-sm">
             {label}
           </p>
         </div>

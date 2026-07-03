@@ -2,12 +2,22 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowUpRight, Award, BadgeCheck, Clock, MapPin } from "lucide-react";
+import {
+  ArrowUpRight,
+  Award,
+  BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  MapPin,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import "swiper/css";
-import { Autoplay } from "swiper/modules";
+import "swiper/css/navigation";
+import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 interface FeaturedJobsSliderProps {
@@ -24,13 +34,19 @@ const FeaturedJobsSliderSkeleton = () => {
   return (
     <div className="relative mt-12 overflow-hidden">
       {/* Clean Minimalist Header Skeleton */}
-      <div className="mb-6 flex items-center gap-2">
-        <Skeleton className="h-6 w-6 rounded-full" />
-        <Skeleton className="h-6 w-44 rounded-md" />
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-6 w-6 rounded-full" />
+          <Skeleton className="h-6 w-44 rounded-md" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
       </div>
 
-      <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
-        {[1, 2].map((i) => (
+      <div className="grid w-full grid-cols-1 gap-6 py-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
           <Card
             key={i}
             className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
@@ -106,7 +122,7 @@ const FeaturedJobsSlider = ({ jobs, isLoading }: FeaturedJobsSliderProps) => {
     return (
       <Card
         onClick={() => handleJobClick(job)}
-        className="group hover:border-primary/50 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+        className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
       >
         <div className="relative z-10 flex-1 space-y-4">
           {/* Header Row */}
@@ -181,42 +197,63 @@ const FeaturedJobsSlider = ({ jobs, isLoading }: FeaturedJobsSliderProps) => {
   return (
     <div className="relative mt-12 overflow-hidden">
       {/* Clean Minimalist Header with Icon */}
-      <div className="mb-6 flex items-center gap-2">
-        <Award className="text-primary h-5.5 w-5.5 shrink-0" />
-        <h2 className="text-foreground text-xl font-bold tracking-tight">
-          Featured Positions
-        </h2>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Award className="text-primary h-5.5 w-5.5 shrink-0" />
+          <h2 className="text-foreground text-xl font-bold tracking-tight">
+            Featured Positions
+          </h2>
+        </div>
+
+        {/* Custom Navigation Buttons */}
+        {jobs.length > 1 && (
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="icon"
+              className="featured-jobs-prev border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="featured-jobs-next border-border/40 hover:bg-primary/5 hover:text-primary h-8 w-8 cursor-pointer rounded-full p-0 transition-colors"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
-      {jobs.length < 2 ? (
-        <div className="grid w-full grid-cols-1 gap-5 py-4 md:grid-cols-2">
-          {jobs.map((job: any, index: number) => renderCard(job, index))}
-        </div>
-      ) : (
-        /* Swiper JS Featured Jobs Slider - Showing Exactly 2 Cards in Desktop View */
-        <Swiper
-          modules={[Autoplay]}
-          spaceBetween={20}
-          slidesPerView={1}
-          loop={jobs.length > 2}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }}
-          breakpoints={{
-            640: { slidesPerView: 1.5 },
-            1024: { slidesPerView: 2 },
-          }}
-          className="w-full py-4"
-        >
-          {jobs.map((job: any, index: number) => (
-            <SwiperSlide key={index} className="h-auto">
-              {renderCard(job, index)}
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      )}
+      <Swiper
+        modules={[Autoplay, Navigation]}
+        spaceBetween={24}
+        slidesPerView={1}
+        speed={800}
+        grabCursor={true}
+        loop={jobs.length > 3}
+        autoplay={{
+          delay: 4000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        navigation={{
+          nextEl: ".featured-jobs-next",
+          prevEl: ".featured-jobs-prev",
+        }}
+        breakpoints={{
+          640: { slidesPerView: 2, spaceBetween: 20 },
+          1024: { slidesPerView: 3, spaceBetween: 24 },
+        }}
+        className="w-full py-4"
+      >
+        {jobs.map((job: any, index: number) => (
+          <SwiperSlide key={index} className="h-auto">
+            {renderCard(job, index)}
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 };

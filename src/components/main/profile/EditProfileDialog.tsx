@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import WKCheckbox from "@/components/form/WKCheckbox";
 import WkForm from "@/components/form/WkForm";
@@ -190,7 +189,7 @@ const EditProfileDialog = ({
       }
 
       //==================== helper function to convert empty string to null ================>
-      const sanitizeValue = (value: any) => {
+      const sanitizeValue = (value: unknown) => {
         if (value === "" || value === undefined) return null;
         return value;
       };
@@ -497,8 +496,6 @@ const EditProfileDialog = ({
                     name="jobType"
                     label="Preferred Job Type"
                     placeholder="Select job type"
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
                     options={JOB_TYPE_OPTIONS}
                   />
                   <WKInput
@@ -513,8 +510,6 @@ const EditProfileDialog = ({
                     name="workExperience"
                     label="Experience Level"
                     placeholder="Select experience level"
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
                     options={EXPERIENCE_OPTIONS}
                   />
                 </div>

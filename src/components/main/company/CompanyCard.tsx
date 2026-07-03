@@ -68,7 +68,7 @@ export function CompanyCard({
   // Grid View Card
   if (viewType === "grid") {
     return (
-      <Card className="group hover:border-primary/50 bg-card relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 p-5 transition-all duration-300 dark:border-slate-800">
+      <Card className="group hover:border-primary/50 bg-card relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 p-5 transition-all duration-300 dark:border-slate-800">
         <Link
           href={`/companies/${company.slug}`}
           className="relative flex h-full flex-col"
@@ -76,14 +76,14 @@ export function CompanyCard({
         >
           {/* Top section: Logo, Title, Featured */}
           <div className="mb-4 flex gap-3">
-            <div className="border-border/30 relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm dark:bg-slate-800">
+            <div className="border-border/30 relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-slate-800">
               {company.logo ? (
                 <Image
                   src={company.logo}
                   alt={`${company.name} logo`}
                   fill
                   sizes="56px"
-                  className="object-contain p-2"
+                  className="rounded-xl object-cover"
                   loading="lazy"
                 />
               ) : (
@@ -101,7 +101,7 @@ export function CompanyCard({
                   </h3>
                 </div>
                 {company.featured && (
-                  <Badge className="bg-primary shrink-0 text-xs whitespace-nowrap text-white">
+                  <Badge className="bg-primary shrink-0 rounded-md text-xs whitespace-nowrap text-white">
                     Featured
                   </Badge>
                 )}
@@ -164,14 +164,14 @@ export function CompanyCard({
   }
 
   return (
-    <Card className="group hover:border-primary/50 bg-card relative overflow-hidden rounded-3xl border border-gray-100 transition-all duration-300 dark:border-slate-800">
+    <Card className="group hover:border-primary/50 bg-card relative overflow-hidden rounded-2xl border border-gray-100 transition-all duration-300 dark:border-slate-800">
       <div className="relative flex items-start justify-between gap-3 p-3 sm:gap-5 sm:p-5">
         {/* Left section */}
         <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-4">
           {/* Logo */}
           <Link
             href={`/companies/${company.slug}`}
-            className="border-border/20 relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm sm:h-16 sm:w-16 dark:bg-slate-800"
+            className="border-border/20 relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border bg-white shadow-sm sm:h-16 sm:w-16 dark:bg-slate-800"
             prefetch={false}
           >
             {company.logo ? (
@@ -180,7 +180,7 @@ export function CompanyCard({
                 alt={`${company.name} logo`}
                 fill
                 sizes="(max-width: 640px) 40px, 64px"
-                className="object-contain p-1 sm:p-1.5"
+                className="rounded-xl object-cover"
                 loading="lazy"
               />
             ) : (
@@ -205,7 +205,7 @@ export function CompanyCard({
                 </Link>
               </div>
               {company.featured && (
-                <Badge className="bg-primary shrink-0 text-[9px] whitespace-nowrap text-white sm:text-xs">
+                <Badge className="bg-primary shrink-0 rounded-md text-[9px] whitespace-nowrap text-white sm:text-xs">
                   Featured
                 </Badge>
               )}

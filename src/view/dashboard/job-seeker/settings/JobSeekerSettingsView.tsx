@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import DashboardSettingsHeader from "@/components/dashboard/dashboard-nav/header/DashboardSettingsHeader";
@@ -13,6 +12,7 @@ import {
   useUpdateUserSettingsMutation,
 } from "@/redux/feature/profile/profileApi";
 import { useAppDispatch } from "@/redux/hooks";
+import JobSeekerSettingsSkeleton from "@/skeleton/dashboard/job-seeker/settings/JobSeekerSettingsSkeleton";
 import JobSeekerPersonalInformationView from "@/view/dashboard/job-seeker/personal-information/JobSeekerPersonalInformationView";
 import JobSeekerSecurityView from "@/view/dashboard/job-seeker/security/JobSeekerSecurityView";
 import {
@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import JobSeekerSettingsSkeleton from "@/skeleton/dashboard/job-seeker/settings/JobSeekerSettingsSkeleton";
 
 interface SettingItem {
   id: string;
@@ -149,16 +148,16 @@ export default function JobSeekerSettingsView() {
 
   const handleSaveSettings = async () => {
     try {
-      const mergedSettings: any = {
-        ...notifications.reduce((acc: any, item) => {
-          acc[item.id] = item.enabled;
+      const mergedSettings: Record<string, boolean | string> = {
+        ...notifications.reduce<Record<string, boolean>>((acc, item) => {
+          acc[item.id] = !!item.enabled;
           return acc;
         }, {}),
-        ...privacy.reduce((acc: any, item) => {
+        ...privacy.reduce<Record<string, boolean | string>>((acc, item) => {
           if (item.id === "profileVisibility") {
             acc.profileVisibility = item.enabled ? "PUBLIC" : "PRIVATE";
           } else {
-            acc[item.id] = item.enabled;
+            acc[item.id] = !!item.enabled;
           }
           return acc;
         }, {}),
@@ -166,15 +165,14 @@ export default function JobSeekerSettingsView() {
 
       await updateSettings(mergedSettings).unwrap();
       toast.success("Settings updated successfully");
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
       toast.error(err?.data?.message || "Failed to update settings");
     }
   };
 
   const handleSignOut = async () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
       await logoutUser().unwrap();
     } catch {
       // ignore
@@ -197,7 +195,7 @@ export default function JobSeekerSettingsView() {
   }
 
   return (
-    <div className="min-h-screen pt-16 lg:pt-20">
+    <div className="min-h-screen pt-8">
       <DashboardSettingsHeader
         isSaving={isSaving}
         onSave={handleSaveSettings}

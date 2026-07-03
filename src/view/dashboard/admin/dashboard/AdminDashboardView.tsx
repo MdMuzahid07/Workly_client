@@ -90,7 +90,7 @@ const AdminDashboardView = () => {
 
       <div className="space-y-6 px-4 pb-8 sm:px-6 sm:pt-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-2 xl:grid-cols-4 xl:gap-6">
           {stats.map((stat, idx) => (
             <StatCard
               key={idx}
@@ -131,7 +131,7 @@ const AdminDashboardView = () => {
                 },
                 {
                   icon: Activity,
-                  label: "System Logs",
+                  label: "System Settings",
                   href: "/admin/settings",
                   color: "text-amber-500 bg-amber-500/10",
                 },

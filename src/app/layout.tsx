@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
-import { Barlow } from "next/font/google";
 import { Toaster } from "sonner";
+import ThemeChangeNotification from "../components/shared/ThemeChangeNotification";
 import ReduxProvider from "../provider/ReduxProvider";
-import ThemeProvider from "../provider/ThemeProvider";
 import SocketProvider from "../provider/SocketProvider";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
+import ThemeProvider from "../provider/ThemeProvider";
 import "./globals.css";
-
-const barlow = Barlow({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
-  variable: "--font-barlow",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -25,6 +17,9 @@ export const metadata: Metadata = {
   },
 };
 
+import MaintenanceModeProvider from "../provider/MaintenanceModeProvider";
+import ContentProtection from "@/components/shared/ContentProtection";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,27 +31,28 @@ export default function RootLayout({
       // fix theme style mismatch
       suppressHydrationWarning
     >
-      <body
-        className={` ${barlow.variable} antialiased`}
-        suppressHydrationWarning
-      >
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange={false}
+          disableTransitionOnChange
           storageKey="workly-theme"
         >
           <ReduxProvider>
-            <SocketProvider>{children}</SocketProvider>
+            <SocketProvider>
+              <MaintenanceModeProvider>{children}</MaintenanceModeProvider>
+            </SocketProvider>
           </ReduxProvider>
+          <ThemeChangeNotification />
+          <ContentProtection />
         </ThemeProvider>
         <Toaster
           position="top-center"
           expand={true}
           richColors
           closeButton
-          theme="light"
+          theme="system"
           duration={3000}
         />
       </body>

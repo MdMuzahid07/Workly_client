@@ -2,13 +2,12 @@
 "use client";
 
 import DashboardEmployerPricingHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerPricingHeader";
-import FeatureComparisonTable from "@/components/dashboard/pricing/FeatureComparisonTable";
 import PricingFAQ from "@/components/dashboard/pricing/PricingFAQ";
 import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
 import SubscriptionStatusCard from "@/components/dashboard/pricing/SubscriptionStatusCard";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
 import { useGetMySubscriptionQuery } from "@/redux/feature/subscription/subscriptionApi";
-import { Loader2, Package, Shield, Zap } from "lucide-react";
+import { Loader2, Package, Shield, ShieldCheck, Zap } from "lucide-react";
 
 export default function EmployerPricingView() {
   const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
@@ -62,13 +61,46 @@ export default function EmployerPricingView() {
     }
 
     let parsedFeatures: string[] = [];
-    if (Array.isArray(plan.features)) {
+    if (Array.isArray(plan.features) && plan.features.length > 0) {
       parsedFeatures = plan.features;
     } else if (typeof plan.features === "string") {
       try {
         parsedFeatures = JSON.parse(plan.features);
       } catch {
         parsedFeatures = [];
+      }
+    }
+
+    if (!parsedFeatures || parsedFeatures.length === 0) {
+      if (nameLower.includes("free")) {
+        parsedFeatures = [
+          "1 active job posting (30 days live)",
+          "Standard candidate applicant tracking",
+          "Basic company profile visibility",
+          "Standard email notifications",
+          "Community support",
+        ];
+      } else if (nameLower.includes("growth") || nameLower.includes("pro")) {
+        parsedFeatures = [
+          "10 active job postings (60 days live)",
+          "Priority candidate matching & AI score",
+          "Advanced applicant filters & bulk actions",
+          "Featured company branding badge",
+          "Real-time analytics dashboard",
+          "Priority support (24/7 assistance)",
+        ];
+      } else if (
+        nameLower.includes("enterprise") ||
+        nameLower.includes("ultimate")
+      ) {
+        parsedFeatures = [
+          "Unlimited active job postings",
+          "Dedicated account manager",
+          "AI-powered automated talent matching",
+          "Custom ATS integration & API access",
+          "Full team permission controls",
+          "Custom branded career portal",
+        ];
       }
     }
 
@@ -118,19 +150,25 @@ export default function EmployerPricingView() {
               renewalDate={getRenewalDateString()}
             />
 
-            <div className="space-y-8 pt-6">
-              <div className="text-center">
-                <h2 className="text-foreground text-3xl font-black tracking-tight sm:text-4xl">
-                  Ready to scale your hiring?
-                </h2>
-                <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
-                  Choose the plan that fits your current needs. You can always
-                  upgrade as you grow.
-                </p>
+            <div className="space-y-8 pt-4">
+              <div className="space-y-6 text-center">
+                <div className="bg-primary/10 border-primary/20 text-primary inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-bold shadow-xs">
+                  <ShieldCheck className="h-4 w-4" />
+                  Flexible & Transparent Plans
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-foreground text-2xl font-black tracking-tight sm:text-4xl">
+                    Ready to scale your hiring?
+                  </h2>
+                  <p className="text-muted-foreground mx-auto max-w-2xl text-sm sm:text-base">
+                    Choose the plan that fits your current needs. You can always
+                    upgrade as you grow.
+                  </p>
+                </div>
               </div>
 
               {/* Pricing Tiers Grid */}
-              <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2 lg:grid-cols-3">
                 {plans.map((plan: any) => {
                   const cardProps = mapDbPlanToCardProps(plan);
                   const isActive =
@@ -146,9 +184,6 @@ export default function EmployerPricingView() {
                 })}
               </div>
             </div>
-
-            {/* Feature Comparison */}
-            <FeatureComparisonTable />
 
             {/* FAQ Section */}
             <PricingFAQ />

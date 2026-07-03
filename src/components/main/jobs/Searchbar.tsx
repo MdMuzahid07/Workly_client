@@ -56,37 +56,39 @@ const Searchbar = ({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-3 rounded-3xl border bg-white p-2 sm:flex-row sm:gap-0 sm:rounded-full dark:border-slate-800 dark:bg-slate-900/90"
+        className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200/40 bg-white/80 p-2.5 shadow-xl backdrop-blur-md transition-shadow hover:shadow-2xl md:flex-row md:gap-0 md:rounded-full dark:border-slate-800/40 dark:bg-slate-950/80"
       >
         {/* Job Title Field */}
-        <div className="relative w-full flex-[1.5] border-b border-gray-100 sm:border-r sm:border-b-0 dark:border-slate-800">
+        <div className="relative w-full flex-[1.5] md:border-r md:border-slate-200/40 dark:md:border-slate-800/40">
           <Input
             placeholder={placeholder.search}
             value={searchData.search}
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, search: e.target.value }))
             }
-            className="h-14 rounded-xl border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:rounded-l-full sm:rounded-r-none"
+            className="text-foreground placeholder:text-muted-foreground/60 h-14 rounded-xl border-0 border-none bg-transparent pr-4 pl-12 text-sm shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 md:rounded-l-full md:rounded-r-none md:text-base dark:border-none dark:bg-transparent"
           />
-          <Search className="text-primary absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 opacity-60" />
+          <Search className="text-primary absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 opacity-70" />
         </div>
 
+        <div className="my-1 block h-px w-full bg-slate-200/40 md:hidden dark:bg-slate-800/40" />
+
         {/* Location Field */}
-        <div className="relative w-full flex-1 border-b border-gray-100 sm:border-b-0 dark:border-slate-800">
+        <div className="relative w-full flex-1">
           <Input
             placeholder={placeholder.location}
             value={searchData.location}
             onChange={(e) =>
               setSearchData((prev) => ({ ...prev, location: e.target.value }))
             }
-            className="h-14 rounded-xl border-0 bg-transparent pr-10 text-base focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 sm:rounded-full sm:rounded-l-none"
+            className="text-foreground placeholder:text-muted-foreground/60 h-14 rounded-xl border-0 border-none bg-transparent pr-4 pl-12 text-sm shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 md:rounded-none md:text-base dark:border-none dark:bg-transparent"
           />
-          <MapPin className="text-primary absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 opacity-60" />
+          <MapPin className="text-primary absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 opacity-70" />
         </div>
 
         <Button
           size="lg"
-          className="bg-primary/20 text-primary sm:bg-primary hover:bg-primary/90 text-md h-14 w-full cursor-pointer rounded-xl px-8 font-bold transition-transform active:scale-95 sm:ml-4 sm:w-auto sm:rounded-full sm:text-base sm:text-white"
+          className="bg-primary hover:bg-primary/95 h-14 w-full cursor-pointer rounded-xl px-8 text-sm font-bold text-white shadow-sm transition-all hover:shadow active:scale-98 md:ml-4 md:w-auto md:rounded-full md:text-base"
         >
           {buttonLabel}
         </Button>

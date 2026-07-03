@@ -76,7 +76,7 @@ export function EmployerRecentTeamMembers({
           </ul>
         )}
         <Link href={EMPLOYER_ROUTES.teamMembers}>
-          <Button variant="outline" className="w-full rounded-full font-bold">
+          <Button variant="outline" className="w-full rounded-xl font-bold">
             <Users className="mr-2 h-4 w-4" aria-hidden />
             View all team members
           </Button>

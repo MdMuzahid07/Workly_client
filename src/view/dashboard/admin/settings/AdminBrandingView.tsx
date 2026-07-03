@@ -18,7 +18,16 @@ import {
   useUpdateSystemSettingsMutation,
 } from "@/redux/feature/admin/adminApi";
 import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
-import { ArrowLeft, Briefcase, Camera, Globe, Mail } from "lucide-react";
+import {
+  ArrowLeft,
+  Briefcase,
+  Camera,
+  Globe,
+  Mail,
+  Plus,
+  Trash2,
+  Smartphone,
+} from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -40,6 +49,8 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
     siteSlogan: "",
     supportEmail: "",
     siteLogo: "",
+    qrCodeUrl: "",
+    footerSocials: [] as { platform: string; url: string }[],
   });
 
   useEffect(() => {
@@ -50,9 +61,45 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
         siteSlogan: data.siteSlogan || "",
         supportEmail: data.supportEmail || "",
         siteLogo: data.siteLogo || "",
+        qrCodeUrl: data.qrCodeUrl || "",
+        footerSocials: Array.isArray(data.footerSocials)
+          ? data.footerSocials
+          : [],
       });
     }
   }, [settingsData]);
+
+  const handleAddSocial = () => {
+    setFormData((prev) => ({
+      ...prev,
+      footerSocials: [...prev.footerSocials, { platform: "linkedin", url: "" }],
+    }));
+  };
+
+  const handleRemoveSocial = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      footerSocials: prev.footerSocials.filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const handleSocialPlatformChange = (index: number, platform: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      footerSocials: prev.footerSocials.map((item, idx) =>
+        idx === index ? { ...item, platform } : item,
+      ),
+    }));
+  };
+
+  const handleSocialUrlChange = (index: number, url: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      footerSocials: prev.footerSocials.map((item, idx) =>
+        idx === index ? { ...item, url } : item,
+      ),
+    }));
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,6 +297,107 @@ export default function AdminBrandingView({ onBack }: AdminBrandingViewProps) {
                     placeholder="support@workly.com"
                     className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* QR Code and Social Links Card */}
+          <Card className="overflow-hidden rounded-xl border shadow-sm">
+            <CardHeader className="bg-muted/10 border-b pb-6">
+              <CardTitle className="font-bold">
+                App & Social Integration
+              </CardTitle>
+              <CardDescription className="font-medium">
+                Manage your mobile app download QR target and footer social
+                profiles.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              {/* QR Code URL */}
+              <div className="grid gap-2">
+                <Label
+                  htmlFor="qrCodeUrl"
+                  className="text-xs font-bold tracking-widest uppercase opacity-60"
+                >
+                  Mobile App QR Target URL
+                </Label>
+                <div className="relative">
+                  <Smartphone className="text-muted-foreground absolute top-3 left-4 h-4 w-4" />
+                  <Input
+                    id="qrCodeUrl"
+                    value={formData.qrCodeUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, qrCodeUrl: e.target.value })
+                    }
+                    placeholder="https://mdmuzahid.vercel.app"
+                    className="bg-muted/30 focus-visible:ring-primary/20 h-11 rounded-xl border-none pl-11 font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* Social Links List */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold tracking-widest uppercase opacity-60">
+                    Footer Social Links
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 cursor-pointer gap-1 rounded-lg text-xs font-bold"
+                    onClick={handleAddSocial}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Link
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {formData.footerSocials.length === 0 ? (
+                    <div className="text-muted-foreground bg-muted/10 rounded-xl border border-dashed py-4 text-center text-xs font-medium">
+                      No social links added yet. Add one to display it in the
+                      footer.
+                    </div>
+                  ) : (
+                    formData.footerSocials.map((social, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <select
+                          value={social.platform}
+                          onChange={(e) =>
+                            handleSocialPlatformChange(index, e.target.value)
+                          }
+                          className="bg-muted/40 focus:ring-primary/20 h-11 w-36 cursor-pointer rounded-xl border-none px-3 text-sm font-semibold select-none focus:ring-1 focus:outline-hidden"
+                        >
+                          <option value="linkedin">LinkedIn</option>
+                          <option value="facebook">Facebook</option>
+                          <option value="twitter">Twitter / X</option>
+                          <option value="github">GitHub</option>
+                          <option value="instagram">Instagram</option>
+                          <option value="youtube">YouTube</option>
+                          <option value="globe">Website</option>
+                        </select>
+                        <Input
+                          value={social.url}
+                          onChange={(e) =>
+                            handleSocialUrlChange(index, e.target.value)
+                          }
+                          placeholder="Profile or Website URL"
+                          className="bg-muted/30 focus-visible:ring-primary/20 h-11 flex-1 rounded-xl border-none px-4 font-bold"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveSocial(index)}
+                          className="text-destructive hover:bg-destructive/10 h-11 w-11 cursor-pointer rounded-xl"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </CardContent>

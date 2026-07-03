@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -31,17 +31,17 @@ export default function AdminPlansSkeleton({
 
       <div className="mx-auto max-w-full space-y-10 px-4 py-8 pb-20 sm:px-6 lg:px-8">
         {/* Stats Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, idx) => (
-            <Card key={idx} className="bg-card rounded-xl border shadow-none">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <Skeleton className="h-4 w-28 uppercase" />
-                <Skeleton className="h-4 w-4 rounded-full" />
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Skeleton className="h-8 w-24 font-bold" />
-                <Skeleton className="h-3 w-16" />
-              </CardContent>
+            <Card
+              key={idx}
+              className="bg-card space-y-2 rounded-xl border p-3.5 shadow-none sm:p-6"
+            >
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-3 w-20 uppercase sm:w-28" />
+                <Skeleton className="h-3.5 w-3.5 rounded-full" />
+              </div>
+              <Skeleton className="h-6 w-16 font-bold sm:h-8 sm:w-24" />
             </Card>
           ))}
         </div>

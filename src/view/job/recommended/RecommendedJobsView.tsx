@@ -98,7 +98,7 @@ const RecommendedJobsView = () => {
 
   if (!isPremium) {
     return (
-      <div className="min-h-screen pt-16">
+      <div className="min-h-screen pt-8">
         <DashboardRecommendedJobsHeader />
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-20">
           <motion.div
@@ -196,30 +196,32 @@ const RecommendedJobsView = () => {
     <div className="min-h-screen pt-16">
       <DashboardRecommendedJobsHeader />
 
-      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
         {/* Intro Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="from-primary/10 via-background relative overflow-hidden rounded-xl border bg-linear-to-br to-amber-500/5 p-6 sm:p-8"
+          className="from-primary/10 via-background relative overflow-hidden rounded-2xl border bg-linear-to-br to-amber-500/5 p-4 sm:p-8"
         >
-          <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
-            <div className="space-y-3">
-              <div className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase">
+          <div className="relative z-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+            <div className="space-y-2 sm:space-y-3">
+              <div className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-2 rounded-full border px-2.5 py-0.5 text-[10px] font-black tracking-widest uppercase">
                 Smart Matching
               </div>
-              <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+              <h2 className="text-xl font-black tracking-tight sm:text-3xl">
                 Tailored just for you.
               </h2>
-              <p className="text-muted-foreground max-w-md text-sm font-medium opacity-80">
+              <p className="text-muted-foreground max-w-md text-xs font-medium opacity-80 sm:text-sm">
                 Our system analyzes your skills, preferences, and career path to
                 surface the most relevant opportunities.
               </p>
             </div>
             <div className="flex gap-4">
-              <div className="bg-card/50 flex min-w-[100px] flex-col items-center rounded-xl border p-4 backdrop-blur-sm">
-                <span className="text-primary text-2xl font-black">98%</span>
-                <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">
+              <div className="bg-card/50 flex min-w-[90px] flex-col items-center rounded-xl border p-3 backdrop-blur-sm sm:p-4">
+                <span className="text-primary text-xl font-black sm:text-2xl">
+                  98%
+                </span>
+                <span className="text-muted-foreground text-[9px] font-bold tracking-widest uppercase sm:text-[10px]">
                   Top Match
                 </span>
               </div>
@@ -231,15 +233,15 @@ const RecommendedJobsView = () => {
         </motion.div>
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-xl border">
-          <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+        <Card className="bg-card rounded-2xl border">
+          <CardContent className="flex flex-col gap-3 p-3.5 sm:p-4 md:flex-row md:items-center md:justify-between">
             <div className="group relative max-w-md flex-1">
               <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
               <Input
                 placeholder="Search recommended roles..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
+                className="bg-muted/20 border-border focus:bg-background h-9 rounded-full pl-9 text-xs transition-all sm:h-11 sm:text-sm"
               />
             </div>
 
@@ -248,7 +250,7 @@ const RecommendedJobsView = () => {
                 Show:
               </span>
               <Select value={limit} onValueChange={setLimit}>
-                <SelectTrigger className="w-20px bg-muted/20 border-border h-10 cursor-pointer rounded-full font-bold">
+                <SelectTrigger className="bg-muted/20 border-border h-8 cursor-pointer rounded-full text-xs font-bold sm:h-10 sm:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -265,7 +267,7 @@ const RecommendedJobsView = () => {
         </Card>
 
         {/* Jobs List */}
-        <div className="grid grid-cols-1 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 gap-3 sm:gap-6">
           <AnimatePresence mode="popLayout">
             {jobs.length > 0 ? (
               jobs.map((job: RecommendedJob, idx: number) => (
@@ -279,11 +281,11 @@ const RecommendedJobsView = () => {
                 </motion.div>
               ))
             ) : (
-              <div className="bg-card flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
-                <div className="bg-muted/20 rounded-full p-6">
-                  <Search className="text-muted-foreground/20 h-10 w-10" />
+              <div className="bg-card flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed py-16 text-center">
+                <div className="bg-muted/20 rounded-full p-5">
+                  <Search className="text-muted-foreground/20 h-8 w-8 sm:h-10 sm:w-10" />
                 </div>
-                <p className="text-muted-foreground text-sm font-bold italic">
+                <p className="text-muted-foreground text-xs font-bold italic sm:text-sm">
                   No recommendations match your search.
                 </p>
               </div>
@@ -302,95 +304,96 @@ const RecommendedJobsView = () => {
 };
 
 const RecommendedJobCard = ({ job }: { job: RecommendedJob }) => (
-  <Card className="group bg-card relative overflow-hidden rounded-xl border transition-all">
-    <CardContent className="p-5 sm:p-6 md:p-8">
-      <div className="flex flex-col gap-6 md:flex-row md:items-center">
-        {/* Company Logo */}
-        <div className="bg-muted/30 ring-border/50 relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl p-3 ring-1 md:h-20 md:w-20">
-          {job.company.logo ? (
-            <Image
-              src={job.company.logo}
-              alt={job.company.name}
-              width={64}
-              height={64}
-              className="object-contain"
-            />
-          ) : (
-            <Briefcase className="text-muted-foreground/40 h-8 w-8" />
-          )}
-          {job.matchScore >= 95 && (
-            <div className="ring-background absolute -top-1.5 -right-1.5 animate-pulse rounded-full bg-amber-500 p-1 shadow-lg ring-2"></div>
-          )}
-        </div>
+  <Card className="group bg-card relative overflow-hidden rounded-2xl border transition-all hover:shadow-sm">
+    <CardContent className="p-3.5 sm:p-6 md:p-8">
+      <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center">
+        {/* Company Logo & Basic info */}
+        <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
+          <div className="bg-background ring-border/50 relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full p-2 shadow-2xs ring-1 sm:h-16 sm:w-16 md:h-20 md:w-20">
+            {job.company.logo ? (
+              <Image
+                src={job.company.logo}
+                alt={job.company.name}
+                width={64}
+                height={64}
+                className="rounded-full object-contain"
+              />
+            ) : (
+              <Briefcase className="text-muted-foreground/40 h-6 w-6 sm:h-8 sm:w-8" />
+            )}
+            {job.matchScore >= 95 && (
+              <div className="ring-background absolute -top-1 -right-1 animate-pulse rounded-full bg-amber-500 p-1 shadow-lg ring-2 sm:-top-1.5 sm:-right-1.5"></div>
+            )}
+          </div>
 
-        {/* Info */}
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Link
-                href={`/jobs/${job.id}`}
-                className="hover:text-primary transition-colors"
-              >
-                <h3 className="truncate text-lg font-bold tracking-tight md:text-xl">
-                  {job.title}
-                </h3>
-              </Link>
-              {job.isFeatured && (
-                <Badge
-                  variant="default"
-                  className="border-none bg-amber-500/10 py-0 text-[9px] font-black tracking-widest text-amber-600 uppercase"
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="space-y-0.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/jobs/${job.id}`}
+                  className="hover:text-primary transition-colors"
                 >
-                  Featured
-                </Badge>
-              )}
+                  <h3 className="truncate text-base font-bold tracking-tight sm:text-lg md:text-xl">
+                    {job.title}
+                  </h3>
+                </Link>
+                {job.isFeatured && (
+                  <Badge
+                    variant="default"
+                    className="border-none bg-amber-500/10 px-2 py-0.5 text-[9px] font-black tracking-widest text-amber-600 uppercase"
+                  >
+                    Featured
+                  </Badge>
+                )}
+              </div>
+              <p className="text-muted-foreground flex items-center gap-1.5 truncate text-xs font-semibold sm:text-sm">
+                {job.company.name}
+                <span className="bg-border h-1 w-1 rounded-full" />
+                {job.location}
+              </p>
             </div>
-            <p className="text-muted-foreground flex items-center gap-2 truncate text-sm font-semibold">
-              {job.company.name}
-              <span className="bg-border h-1 w-1 rounded-full" />
-              {job.location}
-            </p>
-          </div>
 
-          <div className="flex flex-wrap gap-2">
-            {job.JobSkill.map((skill: JobSkill) => (
-              <Badge
-                key={skill.id}
-                variant="secondary"
-                className="bg-primary/5 text-primary rounded-lg border-none px-2 py-0.5 text-[10px] font-bold tracking-tight"
-              >
-                {skill.skillName}
-              </Badge>
-            ))}
-          </div>
+            <div className="flex flex-wrap gap-1.5">
+              {job.JobSkill.map((skill: JobSkill) => (
+                <Badge
+                  key={skill.id}
+                  variant="secondary"
+                  className="bg-primary/5 text-primary rounded-lg border-none px-2 py-0.5 text-[9px] font-bold tracking-tight sm:text-[10px]"
+                >
+                  {skill.skillName}
+                </Badge>
+              ))}
+            </div>
 
-          <div className="text-muted-foreground/70 flex items-center gap-4 text-[11px] font-bold tracking-tight">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 opacity-70" />
-              {job.isRemote ? "Remote Friendly" : "On-site"}
-            </span>
-            <span className="flex items-center gap-1.5 tracking-tighter uppercase">
-              <Briefcase className="h-3.5 w-3.5 opacity-70" />
-              {job.jobType.replace("_", " ")}
-            </span>
+            <div className="text-muted-foreground/70 flex items-center gap-3 text-[10px] font-bold tracking-tight sm:text-[11px]">
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3 opacity-70" />
+                {job.isRemote ? "Remote Friendly" : "On-site"}
+              </span>
+              <span className="flex items-center gap-1 tracking-tighter uppercase">
+                <Briefcase className="h-3 w-3 opacity-70" />
+                {job.jobType.replace("_", " ")}
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Match Score & Actions */}
-        <div className="border-border/30 flex flex-col items-start gap-5 border-t pt-5 pl-0 md:items-end md:border-t-0 md:border-l md:pt-0 md:pl-8">
+        <div className="border-border/30 flex flex-row items-center justify-between gap-4 border-t pt-3.5 md:flex-col md:items-end md:border-t-0 md:border-l md:pt-0 md:pl-8">
           <div className="space-y-0.5 text-left md:text-right">
-            <p className="text-muted-foreground/50 text-[10px] font-black tracking-[0.2em] uppercase">
+            <p className="text-muted-foreground/50 text-[9px] font-black tracking-[0.2em] uppercase sm:text-[10px]">
               Match Accuracy
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span
-                className={`text-3xl font-black ${job.matchScore >= 90 ? "text-primary" : "text-amber-500"}`}
+                className={`text-2xl font-black sm:text-3xl ${job.matchScore >= 90 ? "text-primary" : "text-amber-500"}`}
               >
                 {job.matchScore}%
               </span>
             </div>
           </div>
-          <div className="flex w-full items-center gap-2 md:w-auto">
-            <Button className="shadow-primary/10 h-11 flex-1 rounded-xl px-6 font-bold shadow-lg md:flex-none">
+          <div className="flex items-center gap-2 md:w-auto">
+            <Button className="shadow-primary/10 h-8 rounded-xl px-4 text-xs font-bold shadow-md sm:h-10 sm:px-6">
               Apply now
             </Button>
           </div>
@@ -398,9 +401,9 @@ const RecommendedJobCard = ({ job }: { job: RecommendedJob }) => (
       </div>
 
       {/* Reason Pill */}
-      <div className="bg-muted/30 border-border/20 mt-6 flex items-start gap-3 rounded-xl border px-4 py-3">
-        <Target className="text-muted-foreground/60 mt-0.5 h-4 w-4 opacity-70" />
-        <p className="text-muted-foreground/80 text-[11px] leading-relaxed font-medium italic">
+      <div className="bg-muted/30 border-border/20 mt-3.5 flex items-start gap-2.5 rounded-xl border px-3 py-2 sm:px-4 sm:py-3">
+        <Target className="text-muted-foreground/60 mt-0.5 h-3.5 w-3.5 shrink-0 opacity-70" />
+        <p className="text-muted-foreground/80 text-[10px] leading-relaxed font-medium italic sm:text-[11px]">
           {job.matchReason}
         </p>
       </div>

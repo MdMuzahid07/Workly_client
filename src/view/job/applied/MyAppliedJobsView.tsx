@@ -5,6 +5,16 @@ import { ApplicationRow } from "@/components/main/jobs/myAppliedJobs/Application
 import { ApplicationStats } from "@/components/main/jobs/myAppliedJobs/ApplicationStats";
 import ErrorState from "@/components/main/jobs/myAppliedJobs/ErrorState";
 import PaginationBar from "@/components/shared/PaginationBar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,16 +42,6 @@ import {
 import { ApplicationStatus, MyAppliedJob } from "@/types/application";
 import debounce from "debounce";
 import { AnimatePresence } from "framer-motion";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { AlertTriangle, FilterX, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -207,28 +207,28 @@ const MyAppliedJobsView = () => {
   }
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-8">
       <DashboardAppliedJobsHeader />
 
-      <div className="space-y-6 px-4 sm:px-6 sm:py-8">
+      <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
         <ApplicationStats stats={stats} />
 
         {/* Filter Bar */}
-        <Card className="bg-card rounded-xl border">
-          <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
-            <div className="group relative max-w-md flex-1">
+        <Card className="bg-card rounded-2xl border">
+          <CardContent className="flex flex-col gap-3 p-3.5 sm:p-4 md:flex-row md:items-center md:justify-between">
+            <div className="group relative w-full max-w-md flex-1">
               <Search className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
               <Input
                 placeholder="Search job title or company..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="bg-muted/20 border-border focus:bg-background h-11 rounded-full pl-9 transition-all"
+                className="bg-muted/20 border-border focus:bg-background h-9 rounded-full pl-9 text-xs transition-all sm:h-10 sm:text-sm"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <Select value={dateFilter} onValueChange={handleDateFilterChange}>
-                <SelectTrigger className="h-10 w-40 cursor-pointer rounded-full font-semibold">
+                <SelectTrigger className="h-8 w-auto cursor-pointer rounded-full text-xs font-semibold sm:h-10 sm:text-sm">
                   <SelectValue placeholder="All Time" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -257,7 +257,7 @@ const MyAppliedJobsView = () => {
               </Select>
 
               <Select value={statusFilter} onValueChange={handleStatusChange}>
-                <SelectTrigger className="h-10 w-[170px] cursor-pointer rounded-full font-semibold">
+                <SelectTrigger className="h-8 w-auto cursor-pointer rounded-full text-xs font-semibold sm:h-10 sm:text-sm">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -319,7 +319,7 @@ const MyAppliedJobsView = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearFilters}
-                className="hover:bg-destructive/5 hover:text-destructive h-10 rounded-full px-4 font-bold transition-colors"
+                className="hover:bg-destructive/5 hover:text-destructive h-8 rounded-full px-3 text-xs font-bold transition-colors sm:h-10 sm:px-4 sm:text-sm"
                 disabled={!hasActiveFilters}
               >
                 Clear Filters
@@ -330,17 +330,17 @@ const MyAppliedJobsView = () => {
 
         {/* Results Table Section */}
         <Card className="bg-card overflow-hidden rounded-xl border">
-          <CardHeader className="bg-muted/5 border-b px-6 py-5">
-            <div className="flex items-center justify-between">
+          <CardHeader className="bg-muted/5 border-b px-4 py-4 sm:px-6 sm:py-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
-                <CardTitle className="text-lg font-black tracking-tight">
+                <CardTitle className="text-base font-black tracking-tight sm:text-lg">
                   Applications List
                 </CardTitle>
                 <p className="text-muted-foreground text-[10px] font-black tracking-[0.2em] uppercase opacity-60">
                   Manage your active job journey
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between gap-3 sm:justify-end sm:gap-4">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
                     Show:
@@ -373,7 +373,7 @@ const MyAppliedJobsView = () => {
                 </div>
                 <Badge
                   variant="secondary"
-                  className="bg-primary/5 text-primary border-primary/10 rounded-full border px-3 py-2 text-[10px] font-black tracking-widest uppercase"
+                  className="bg-primary/5 text-primary border-primary/10 rounded-full border px-3 py-1.5 text-[10px] font-black tracking-widest uppercase"
                 >
                   {totalResults} Applied
                 </Badge>
@@ -382,22 +382,22 @@ const MyAppliedJobsView = () => {
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-[480px] md:min-w-full">
                 <TableHeader className="bg-muted/10">
                   <TableRow className="border-b hover:bg-transparent">
-                    <TableHead className="text-muted-foreground/70 py-4 pl-6 text-[10px] font-black tracking-[0.2em] uppercase">
+                    <TableHead className="text-muted-foreground/70 py-3 pl-3 text-[10px] font-black tracking-[0.2em] uppercase sm:py-4 sm:pl-6">
                       Company & Role
                     </TableHead>
                     <TableHead className="text-muted-foreground/70 hidden py-4 text-[10px] font-black tracking-[0.2em] uppercase md:table-cell">
                       Location
                     </TableHead>
-                    <TableHead className="text-muted-foreground/70 py-4 text-center text-[10px] font-black tracking-[0.2em] uppercase">
+                    <TableHead className="text-muted-foreground/70 px-2 py-3 text-center text-[10px] font-black tracking-[0.2em] uppercase sm:py-4">
                       Status
                     </TableHead>
                     <TableHead className="text-muted-foreground/70 hidden py-4 text-right text-[10px] font-black tracking-[0.2em] uppercase md:table-cell">
                       Date Applied
                     </TableHead>
-                    <TableHead className="text-muted-foreground/70 py-4 pr-6 text-right text-[10px] font-black tracking-[0.2em] uppercase">
+                    <TableHead className="text-muted-foreground/70 py-3 pr-3 text-right text-[10px] font-black tracking-[0.2em] uppercase sm:py-4 sm:pr-6">
                       Actions
                     </TableHead>
                   </TableRow>

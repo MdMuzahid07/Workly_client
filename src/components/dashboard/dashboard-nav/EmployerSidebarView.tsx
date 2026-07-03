@@ -275,8 +275,6 @@ export default function EmployerSidebarView({
 
   const handleConfirmSignOut = async () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
       await logoutUser().unwrap();
     } catch (error) {
       console.log(error);
@@ -371,7 +369,7 @@ export default function EmployerSidebarView({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-full border transition-all sm:top-4"
+            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-md border transition-all sm:top-6 sm:right-6"
             aria-label="Open sidebar"
           >
             <Menu className="text-primary h-5 w-5" />
