@@ -74,12 +74,12 @@ export const ApplicationRow = ({
     <TableRow className="group hover:bg-muted/40 border-none transition-colors">
       <TableCell className="py-3 pl-3 sm:py-4 sm:pl-6">
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="bg-muted text-muted-foreground group-hover:bg-background relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border p-1.5 text-[10px] font-semibold transition-colors sm:h-10 sm:w-10">
+          <div className="bg-muted text-muted-foreground group-hover:bg-background relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border p-0 text-[10px] font-semibold transition-colors sm:h-10 sm:w-10">
             {app.job.company.logoUrl ? (
               <Image
                 src={app.job.company.logoUrl}
                 alt={app.job.company.name}
-                className="h-full w-full object-contain"
+                className="h-full w-full rounded-lg object-cover"
                 fill
               />
             ) : (

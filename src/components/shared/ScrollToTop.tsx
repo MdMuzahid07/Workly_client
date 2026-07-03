@@ -35,7 +35,7 @@ const ScrollToTop = () => {
           initial={{ opacity: 0, scale: 0.5, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
-          className="fixed right-6 bottom-6 z-50 sm:right-8 sm:bottom-8"
+          className="fixed right-4 bottom-[88px] z-50 sm:right-6 sm:bottom-[84px] md:right-8 md:bottom-8"
         >
           <Button
             size="icon"

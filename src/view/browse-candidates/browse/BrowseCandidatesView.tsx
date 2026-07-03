@@ -321,7 +321,7 @@ const BrowseCandidatesView = () => {
           { label: "Home", href: "/" },
           { label: "Browse Candidates" },
         ]}
-        backgroundImage="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400&auto=format&fit=crop"
+        backgroundImage="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400&auto=format&fit=crop"
       />
 
       {/* ==================== Main Content Area ==================== */}
@@ -468,7 +468,7 @@ const BrowseCandidatesView = () => {
                 endMessage={
                   <p className="text-muted-foreground py-8 text-center font-medium italic">
                     {allCandidates.length > 0
-                      ? "You've seen all available candidates"
+                      ? "You've reached the end of the list"
                       : ""}
                   </p>
                 }

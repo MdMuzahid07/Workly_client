@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { ChevronRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -12,6 +9,7 @@ import JobCard from "../../../components/main/jobs/JobCard";
 import Searchbar from "../../../components/main/jobs/Searchbar";
 import Sidebar from "../../../components/main/jobs/Sidebar";
 import SidebarFilter from "../../../components/main/jobs/filter/SidebarFilter";
+import PageHero from "../../../components/shared/PageHero";
 import ViewToggle from "../../../components/shared/ViewToggle";
 import { useGetCategoriesQuery } from "../../../redux/feature/category/categoryApi";
 import { useGetJobsQuery } from "../../../redux/feature/job/jobApi";
@@ -207,35 +205,11 @@ const JobView = () => {
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[220px] w-full overflow-hidden bg-slate-950 sm:h-[250px] md:h-[280px] lg:h-80">
-        {/* Background glow orbs */}
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
-            alt="Office background"
-            className="h-full w-full object-cover opacity-25 grayscale"
-            fill
-            priority
-          />
-          <div className="to-primary/15 absolute inset-0 bg-linear-to-tr from-slate-950 via-slate-900/95" />
-          <div className="bg-primary/5 absolute -top-40 -right-40 h-[450px] w-[450px] rounded-full blur-[110px]" />
-          <div className="bg-primary/5 absolute -bottom-40 -left-40 h-[450px] w-[450px] rounded-full blur-[110px]" />
-        </div>
-
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center gap-3 px-4 text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-            Find Your Next Job
-          </h1>
-
-          <nav className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 backdrop-blur-xs">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="h-3 w-3 text-slate-500" />
-            <span className="text-white">Find Jobs</span>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        title="Find Your Next Job"
+        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Find Jobs" }]}
+        backgroundImage="https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
+      />
 
       {/* Main Content Area */}
       <div className="relative z-20 mx-auto -mt-8 max-w-7xl px-4 pb-20 sm:-mt-10 md:-mt-12 lg:-mt-14">

@@ -13,7 +13,6 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -24,6 +23,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import CompanyCard from "../../../components/main/company/CompanyCard";
 import CompanyFilter from "../../../components/main/company/CompanyFilter";
 import Searchbar from "../../../components/main/jobs/Searchbar";
+import PageHero from "../../../components/shared/PageHero";
 import ViewToggle from "../../../components/shared/ViewToggle";
 import { useGetCompaniesQuery } from "../../../redux/feature/company/companyApi";
 import CompanyCardSkeleton from "../../../skeleton/company/browse/CompanyCardSkeleton";
@@ -183,36 +183,11 @@ const CompanyView = ({
   return (
     <div className="bg-background min-h-screen">
       {/* ==================== Hero Section ==================== */}
-      <div className="relative h-[200px] w-full overflow-hidden bg-slate-950 sm:h-60 md:h-[280px] lg:h-80">
-        {/* Background */}
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
-            alt="Commercial buildings"
-            className="h-full w-full object-cover opacity-20 grayscale"
-            width={1440}
-            height={320}
-            priority
-          />
-          <div className="to-primary/10 absolute inset-0 bg-linear-to-tr from-slate-950 via-slate-900/95" />
-          <div className="bg-primary/6 absolute -top-40 -right-40 h-[400px] w-[400px] rounded-full blur-[110px]" />
-          <div className="bg-primary/6 absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full blur-[110px]" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center gap-3 px-4 text-center">
-          <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-            Explore Top Companies
-          </h1>
-          <nav className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300 backdrop-blur-xs">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="h-3 w-3 text-slate-500" />
-            <span className="text-white">Companies</span>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        title="Explore Top Companies"
+        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Companies" }]}
+        backgroundImage="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
+      />
 
       {/* ==================== Main Content ==================== */}
       <div className="relative z-20 mx-auto -mt-7 max-w-7xl px-4 pb-16 sm:-mt-9 sm:px-6 md:-mt-11 lg:-mt-13 lg:px-8">
@@ -312,13 +287,13 @@ const CompanyView = ({
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2.5">
                               {company.logoUrl ? (
-                                <div className="border-border/30 relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border bg-white p-1 shadow-xs sm:h-11 sm:w-11 dark:bg-slate-800">
+                                <div className="border-border/30 relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border bg-white shadow-xs sm:h-11 sm:w-11 dark:bg-slate-800">
                                   <Image
                                     src={company.logoUrl}
                                     alt={`${company.name} logo`}
                                     fill
                                     sizes="44px"
-                                    className="object-contain p-1"
+                                    className="rounded-xl object-cover"
                                     loading="lazy"
                                   />
                                 </div>
@@ -433,6 +408,13 @@ const CompanyView = ({
                   ))}
                 </div>
               }
+              endMessage={
+                <p className="text-muted-foreground py-8 text-center font-medium italic">
+                  {allCompanies.length > 0
+                    ? "You've reached the end of the list"
+                    : ""}
+                </p>
+              }
               scrollThreshold={0.8}
               style={{ overflow: "visible" }}
             >
@@ -465,19 +447,6 @@ const CompanyView = ({
                 )}
               </div>
             </InfiniteScroll>
-
-            {hasMoreCompanies && (
-              <div className="mt-10 border-t border-gray-100 pt-8 text-center sm:mt-12 sm:pt-10 dark:border-slate-800">
-                <Button
-                  variant="default"
-                  size="lg"
-                  className="shadow-primary/20 rounded-full px-10 font-bold shadow-xl transition-all hover:scale-105 sm:px-12"
-                  onClick={loadMoreCompanies}
-                >
-                  Load More Companies
-                </Button>
-              </div>
-            )}
           </main>
         </section>
       </div>

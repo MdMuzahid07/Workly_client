@@ -70,12 +70,12 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
         <CardContent className="flex flex-1 flex-col p-0">
           {/* Top row: logo + bookmark */}
           <div className="mb-3 flex items-start justify-between sm:mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 p-1.5 sm:h-11 sm:w-11 sm:p-2 dark:bg-slate-800">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-gray-50 p-0 sm:h-11 sm:w-11 dark:bg-slate-800">
               {job?.company?.logo ? (
                 <Image
                   src={job.company.logo}
                   alt={job.company.name}
-                  className="h-full w-full object-contain"
+                  className="h-full w-full rounded-lg object-cover"
                   width={44}
                   height={44}
                 />
@@ -202,7 +202,7 @@ const JobCard = ({ job, viewType = "list", inDashboard = false }: JobProps) => {
                   alt={job.company.name}
                   fill
                   sizes="(max-width: 640px) 40px, 56px"
-                  className="object-contain p-1.5"
+                  className="rounded-xl object-cover"
                   loading="lazy"
                 />
               ) : (

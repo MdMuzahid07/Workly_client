@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
-import ReduxProvider from "../provider/ReduxProvider";
-import ThemeProvider from "../provider/ThemeProvider";
-import SocketProvider from "../provider/SocketProvider";
 import ThemeChangeNotification from "../components/shared/ThemeChangeNotification";
+import ReduxProvider from "../provider/ReduxProvider";
+import SocketProvider from "../provider/SocketProvider";
+import ThemeProvider from "../provider/ThemeProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import MaintenanceModeProvider from "../provider/MaintenanceModeProvider";
+import ContentProtection from "@/components/shared/ContentProtection";
 
 export default function RootLayout({
   children,
@@ -44,6 +45,7 @@ export default function RootLayout({
             </SocketProvider>
           </ReduxProvider>
           <ThemeChangeNotification />
+          <ContentProtection />
         </ThemeProvider>
         <Toaster
           position="top-center"

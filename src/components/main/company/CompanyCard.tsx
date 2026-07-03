@@ -83,7 +83,7 @@ export function CompanyCard({
                   alt={`${company.name} logo`}
                   fill
                   sizes="56px"
-                  className="object-contain p-2"
+                  className="rounded-xl object-cover"
                   loading="lazy"
                 />
               ) : (
@@ -180,7 +180,7 @@ export function CompanyCard({
                 alt={`${company.name} logo`}
                 fill
                 sizes="(max-width: 640px) 40px, 64px"
-                className="object-contain p-1 sm:p-1.5"
+                className="rounded-xl object-cover"
                 loading="lazy"
               />
             ) : (
