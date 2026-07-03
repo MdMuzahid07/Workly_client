@@ -122,6 +122,7 @@ const SignInForm = () => {
               name="email"
               label="Email Address"
               type="email"
+              placeholder="Enter your email address"
               required
               className="form-input rounded-full transition-all duration-200"
             />
@@ -131,6 +132,7 @@ const SignInForm = () => {
                 name="password"
                 label="Password"
                 type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
                 required
                 className="form-input rounded-full pr-10 transition-all duration-200"
               />

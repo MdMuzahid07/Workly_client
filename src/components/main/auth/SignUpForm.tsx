@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { useRegisterUserMutation } from "../../../redux/feature/auth/authApi";
@@ -14,6 +14,7 @@ import { useAppDispatch } from "../../../redux/hooks";
 import WkForm from "../../form/WkForm";
 import WKInput from "../../form/WkInput";
 import { GoogleLoginButton } from "./GoogleLoginButton";
+import ParticlesBg from "./ParticlesBg";
 
 interface SignUpFormData {
   fullName: string;
@@ -51,10 +52,30 @@ const SignUpForm = () => {
   const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
-    "JOB_SEEKER",
-  );
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryRole = searchParams.get("role");
+
+  const [selectedRole, setSelectedRole] = useState<"EMPLOYER" | "JOB_SEEKER">(
+    queryRole === "employer" ? "EMPLOYER" : "JOB_SEEKER",
+  );
+
+  useEffect(() => {
+    if (queryRole === "employer") {
+      setSelectedRole("EMPLOYER");
+    } else {
+      setSelectedRole("JOB_SEEKER");
+    }
+  }, [queryRole]);
+
+  const handleRoleChange = (role: "EMPLOYER" | "JOB_SEEKER") => {
+    setSelectedRole(role);
+    if (role === "EMPLOYER") {
+      router.push("/register?role=employer");
+    } else {
+      router.push("/register");
+    }
+  };
 
   const defaultValues: SignUpFormData = {
     fullName: "",
@@ -121,8 +142,22 @@ const SignUpForm = () => {
     }
   };
 
+  const isEmployer = selectedRole === "EMPLOYER";
+
   return (
     <>
+      {/* High-Tech Animated Particles Background for Employer Role */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-white transition-colors duration-1000">
+        {/* Soft backdrop color transition */}
+        <div
+          className="absolute inset-0 bg-gradient-to-tr from-slate-50/50 via-emerald-50/15 to-teal-50/15 transition-opacity duration-1000"
+          style={{ opacity: isEmployer ? 1 : 0 }}
+        />
+
+        {/* Connection node particle mesh */}
+        <ParticlesBg active={isEmployer} />
+      </div>
+
       <div className="mb-8 space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Join Workly_job</h1>
         <p className="text-muted-foreground text-sm">
@@ -141,6 +176,7 @@ const SignUpForm = () => {
               name="fullName"
               label="Full Name"
               type="text"
+              placeholder="Enter your full name"
               required
               className="form-input rounded-full transition-all duration-200"
             />
@@ -149,6 +185,7 @@ const SignUpForm = () => {
               name="email"
               label="Email Address"
               type="email"
+              placeholder="Enter your email address"
               required
               className="form-input rounded-full transition-all duration-200"
             />
@@ -158,6 +195,7 @@ const SignUpForm = () => {
                 name="password"
                 label="Password"
                 type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
                 required
                 className="form-input rounded-full pr-10 transition-all duration-200"
               />
@@ -181,6 +219,7 @@ const SignUpForm = () => {
                 name="confirmPassword"
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
                 required
                 className="form-input rounded-full pr-10 transition-all duration-200"
               />
@@ -208,7 +247,7 @@ const SignUpForm = () => {
                     ? "bg-primary border-primary text-white"
                     : "border-border text-muted-foreground hover:text-white"
                 }`}
-                onClick={() => setSelectedRole("EMPLOYER")}
+                onClick={() => handleRoleChange("EMPLOYER")}
               >
                 Employer
               </Button>
@@ -221,7 +260,7 @@ const SignUpForm = () => {
                     ? "bg-primary border-primary text-white"
                     : "border-border text-muted-foreground hover:text-white"
                 }`}
-                onClick={() => setSelectedRole("JOB_SEEKER")}
+                onClick={() => handleRoleChange("JOB_SEEKER")}
               >
                 Job Seeker
               </Button>

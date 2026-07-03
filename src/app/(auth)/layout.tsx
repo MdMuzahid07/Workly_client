@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
 import { CheckCircle2, MoveLeft, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function AuthLayout({
   children,
@@ -14,11 +14,14 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: jobsData } = useGetJobsQuery({ limit: 1 });
 
   const totalActiveJobs =
     jobsData?.meta?.total ||
     (Array.isArray(jobsData?.data) ? jobsData.data.length : 0);
+
+  const isEmployerRole = searchParams.get("role") === "employer";
 
   const getPageContent = () => {
     if (pathname.includes("/login")) {
@@ -33,6 +36,17 @@ export default function AuthLayout({
       };
     }
     if (pathname.includes("/register")) {
+      if (isEmployerRole) {
+        return {
+          image:
+            "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1400&q=80",
+          badge: "Enterprise Recruiter",
+          headline: "Find the visionaries your team needs.",
+          sub: "Post jobs, search verified professional candidate profiles, and manage your pipeline in one secure workspace.",
+          statLabel: "Talent Pool",
+          statValue: "100% Verified",
+        };
+      }
       return {
         image:
           "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1400&q=80",

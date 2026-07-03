@@ -129,6 +129,7 @@ const ResetPasswordView = () => {
                 name="password"
                 label="New Password"
                 type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
                 required
                 className="form-input rounded-full transition-all duration-200"
               />
@@ -152,6 +153,7 @@ const ResetPasswordView = () => {
                 name="confirmPassword"
                 label="Confirm New Password"
                 type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
                 required
                 className="form-input rounded-full transition-all duration-200"
               />
