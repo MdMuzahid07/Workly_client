@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import ReduxProvider from "../provider/ReduxProvider";
 import ThemeProvider from "../provider/ThemeProvider";
 import SocketProvider from "../provider/SocketProvider";
+import ThemeChangeNotification from "../components/shared/ThemeChangeNotification";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange={false}
+          disableTransitionOnChange
           storageKey="workly-theme"
         >
           <ReduxProvider>
@@ -42,13 +43,14 @@ export default function RootLayout({
               <MaintenanceModeProvider>{children}</MaintenanceModeProvider>
             </SocketProvider>
           </ReduxProvider>
+          <ThemeChangeNotification />
         </ThemeProvider>
         <Toaster
           position="top-center"
           expand={true}
           richColors
           closeButton
-          theme="light"
+          theme="system"
           duration={3000}
         />
       </body>

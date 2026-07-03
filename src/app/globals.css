@@ -2,7 +2,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -328,8 +328,13 @@
     --tw-ring-color: hsl(var(--primary));
   }
 
-  /* Smooth transitions for theme switching */
-  * {
+  /* Smooth transitions for theme switching.
+   * NOTE: Do NOT apply transitions on the global * selector — that causes every
+   * DOM node to animate simultaneously during a theme toggle, creating a massive
+   * Recalculate Style + Paint flush that freezes the UI for 200ms+.
+   * Use the .theme-transition utility class only on specific interactive elements
+   * that benefit from animated color changes (e.g. buttons, cards). */
+  .theme-transition {
     transition:
       background-color 0.2s ease-in-out,
       border-color 0.2s ease-in-out,

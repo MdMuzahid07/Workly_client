@@ -169,11 +169,10 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden items-center gap-4 md:flex">
-              {/* <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
-                  <Search className="h-5 w-5" />
-               </Button> */}
-              <NotificationDropdown />
+            <div className="flex items-center gap-2">
+              {/* Notification — all devices, logged-in only */}
+              {user?.email && isVerified && <NotificationDropdown />}
+              {/* Theme switcher — all devices, always visible */}
               <ThemeSwitcher />
             </div>
 
