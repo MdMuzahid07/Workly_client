@@ -231,12 +231,9 @@ export default function ParticlesBg({ active }: ParticlesBgProps) {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Track mouse hover events on canvas parent
-    const parent = canvas.parentElement;
-    if (parent) {
-      parent.addEventListener("mousemove", handleMouseMove);
-      parent.addEventListener("mouseleave", handleMouseLeave);
-    }
+    // Track mouse events globally on the window to bypass pointer-events-none on wrapper div
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
 
     if (active) {
       lastTime = performance.now();
@@ -245,10 +242,8 @@ export default function ParticlesBg({ active }: ParticlesBgProps) {
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
-      if (parent) {
-        parent.removeEventListener("mousemove", handleMouseMove);
-        parent.removeEventListener("mouseleave", handleMouseLeave);
-      }
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
   }, [active]);

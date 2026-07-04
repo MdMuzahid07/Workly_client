@@ -3,11 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
+import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
+import { useAppSelector } from "@/redux/hooks";
 import {
   ArrowRight,
   Bookmark,
@@ -25,9 +28,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
-import { useAppSelector } from "@/redux/hooks";
-import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
 import { toast } from "sonner";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
@@ -313,7 +313,7 @@ const JobDetailsSidebar = ({
             <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
               <DialogContent className="max-w-md overflow-hidden rounded-2xl border-0 p-0 shadow-2xl">
                 {/* Gradient Header */}
-                <div className="relative bg-gradient-to-br from-amber-500 via-amber-400 to-yellow-300 p-8 text-center">
+                <div className="relative bg-linear-to-br from-amber-500 via-amber-400 to-yellow-300 p-8 text-center">
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 shadow-lg backdrop-blur-sm">
                     <Crown className="h-8 w-8 text-white drop-shadow" />
                   </div>
@@ -351,7 +351,7 @@ const JobDetailsSidebar = ({
 
                   <div className="flex flex-col gap-2 pt-2">
                     <Button
-                      className="h-12 w-full rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-base font-black text-white shadow-lg transition-all hover:scale-[1.02] hover:from-amber-600 hover:to-yellow-500"
+                      className="h-12 w-full rounded-xl bg-linear-to-r from-amber-500 to-yellow-400 text-base font-black text-white shadow-lg transition-all hover:scale-[1.02] hover:from-amber-600 hover:to-yellow-500"
                       onClick={() => {
                         setShowPremiumModal(false);
                         router.push("/dashboard/pricing");
