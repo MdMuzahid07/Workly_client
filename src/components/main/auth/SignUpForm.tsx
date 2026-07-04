@@ -147,10 +147,10 @@ const SignUpForm = () => {
   return (
     <>
       {/* High-Tech Animated Particles Background for Employer Role */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-white transition-colors duration-1000">
+      <div className="bg-background pointer-events-none absolute inset-0 -z-10 overflow-hidden transition-colors duration-1000">
         {/* Soft backdrop color transition */}
         <div
-          className="absolute inset-0 bg-gradient-to-tr from-slate-50/50 via-emerald-50/15 to-teal-50/15 transition-opacity duration-1000"
+          className="from-muted/30 absolute inset-0 bg-gradient-to-tr via-emerald-500/5 to-teal-500/5 transition-opacity duration-1000"
           style={{ opacity: isEmployer ? 1 : 0 }}
         />
 

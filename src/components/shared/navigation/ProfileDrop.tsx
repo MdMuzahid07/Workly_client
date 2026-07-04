@@ -3,15 +3,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import {
+  Bookmark,
   Briefcase,
   Building2,
   ChevronDown,
   FileText,
-  Bookmark,
   LogOut,
-  User,
   Settings,
   ShieldCheck,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -113,7 +113,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           },
         ]
       : []),
-    { icon: Settings, label: "Settings", href: "/settings" },
+    { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 
   return (

@@ -1,18 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
+  ArrowRight,
   Bookmark,
   Building2,
   Calendar,
+  CheckCircle2,
+  Crown,
   Eye,
   FileText,
+  Loader2,
+  MessageSquare,
+  Sparkles,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
+import { useAppSelector } from "@/redux/hooks";
+import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
+import { toast } from "sonner";
 import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
 
 interface Company {
@@ -40,6 +56,13 @@ interface Job {
   salaryMin?: number;
   salaryMax?: number;
   location?: string;
+  postedById?: string;
+  postedBy?: {
+    id: string;
+    fullName?: string;
+    avatarUrl?: string;
+    email?: string;
+  };
 }
 
 interface JobDetailsSidebarProps {
@@ -110,6 +133,58 @@ const JobDetailsSidebar = ({
   onViewCompany,
 }: JobDetailsSidebarProps) => {
   const router = useRouter();
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const [createConversation, { isLoading: isCreatingChat }] =
+    useCreateConversationMutation();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  const isJobSeeker = currentUser?.role === "JOB_SEEKER";
+  const isPremium = currentUser?.isPremium === true;
+  const recruiterId = job.postedById || job.postedBy?.id;
+  const isNotOwnJob = recruiterId && recruiterId !== currentUser?.id;
+
+  // Show the button to ALL job seekers who are not the job poster.
+  // Free users see it but get an upsell modal; premium users get the real chat flow.
+  const showMessageButton = isJobSeeker && isNotOwnJob;
+
+  const handleMessageButtonClick = () => {
+    if (!isPremium) {
+      setShowPremiumModal(true);
+      return;
+    }
+    handleMessageRecruiter();
+  };
+
+  const handleMessageRecruiter = async () => {
+    if (!recruiterId) {
+      toast.error("Recruiter details not available");
+      return;
+    }
+
+    try {
+      toast.loading("Starting conversation...", { id: "create_chat" });
+      const response = await createConversation({
+        participantId: recruiterId,
+      }).unwrap();
+
+      if (response.success && response.data?.id) {
+        toast.success("Conversation started!", { id: "create_chat" });
+        router.push(`/dashboard/messages?active=${response.data.id}`);
+      } else {
+        toast.error("Failed to start conversation", { id: "create_chat" });
+      }
+    } catch (err: unknown) {
+      const error = err as { data?: { message?: string }; message?: string };
+      toast.error(
+        error?.data?.message ||
+          error?.message ||
+          "Failed to start conversation",
+        { id: "create_chat" },
+      );
+      console.error("Failed to start conversation:", err);
+    }
+  };
+
   const companyName = job.company?.name || "Unknown Company";
   const industry =
     job.industry?.name || job.company?.industry?.name || "Not specified";
@@ -206,6 +281,96 @@ const JobDetailsSidebar = ({
               />
               {isSaving ? "Saving..." : job.isSaved ? "Saved" : "Save Job"}
             </Button>
+            {showMessageButton && (
+              <Button
+                variant="outline"
+                className={cn(
+                  "relative flex h-12 w-full items-center justify-center gap-2 border text-base font-bold transition-all",
+                  isPremium
+                    ? "bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:text-primary"
+                    : "border-amber-300/60 bg-amber-50/50 text-amber-700 hover:border-amber-400 hover:bg-amber-50 dark:border-amber-700/50 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-950/30",
+                )}
+                onClick={handleMessageButtonClick}
+                disabled={isCreatingChat}
+              >
+                {isCreatingChat ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isPremium ? (
+                  <MessageSquare className="h-5 w-5" />
+                ) : (
+                  <Crown className="h-4 w-4" />
+                )}
+                <span>Message Recruiter</span>
+                {!isPremium && (
+                  <span className="ml-auto rounded-full bg-amber-200/80 px-1.5 py-0.5 text-[10px] font-black tracking-wide text-amber-800 uppercase dark:bg-amber-800/50 dark:text-amber-300">
+                    PRO
+                  </span>
+                )}
+              </Button>
+            )}
+
+            {/* Premium Upsell Modal for free job seekers */}
+            <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
+              <DialogContent className="max-w-md overflow-hidden rounded-2xl border-0 p-0 shadow-2xl">
+                {/* Gradient Header */}
+                <div className="relative bg-gradient-to-br from-amber-500 via-amber-400 to-yellow-300 p-8 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 shadow-lg backdrop-blur-sm">
+                    <Crown className="h-8 w-8 text-white drop-shadow" />
+                  </div>
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-black text-white drop-shadow-sm">
+                      Unlock Direct Messaging
+                    </DialogTitle>
+                    <DialogDescription className="mt-1 text-sm font-semibold text-amber-100">
+                      Talk directly to recruiters & HR — skip the queue.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Sparkles className="absolute top-4 right-5 h-5 w-5 text-white/40" />
+                  <Sparkles className="absolute bottom-5 left-4 h-4 w-4 text-white/30" />
+                </div>
+
+                {/* Body */}
+                <div className="space-y-5 p-6">
+                  <ul className="space-y-3">
+                    {[
+                      "Direct 1-on-1 messages with recruiters & HR",
+                      "Real-time chat with typing indicators",
+                      "Share your CV, portfolio or cover letter in-chat",
+                      "Stand out — most applicants can't do this",
+                    ].map((feature) => (
+                      <li key={feature} className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <span className="text-foreground text-sm leading-snug font-medium">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex flex-col gap-2 pt-2">
+                    <Button
+                      className="h-12 w-full rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-base font-black text-white shadow-lg transition-all hover:scale-[1.02] hover:from-amber-600 hover:to-yellow-500"
+                      onClick={() => {
+                        setShowPremiumModal(false);
+                        router.push("/dashboard/pricing");
+                      }}
+                    >
+                      Upgrade to Premium
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="text-muted-foreground hover:text-foreground h-10 w-full rounded-xl text-sm font-semibold"
+                      onClick={() => setShowPremiumModal(false)}
+                    >
+                      Maybe later
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardContent>
       </Card>

@@ -91,7 +91,13 @@ const profileApi = baseApi.injectEndpoints({
         method: "POST",
         body: { jobId },
       }),
-      invalidatesTags: ["profile"],
+      // Invalidate both the profile cache AND the specific job's cache entry.
+      // This causes `getJobById(jobId)` to re-fetch, updating the `isSaved`
+      // flag on the job details page without requiring a manual page refresh.
+      invalidatesTags: (result, error, jobId) => [
+        "profile",
+        { type: "jobs", id: jobId },
+      ],
     }),
 
     getSavedJobs: builder.query<

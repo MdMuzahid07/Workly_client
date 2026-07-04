@@ -484,11 +484,13 @@ const MessageView = () => {
     <div className="min-h-screen px-3.5 sm:px-6">
       {showMobileChat && (
         <style>{`
-          button[aria-label="Open sidebar"] {
-            display: none !important;
-          }
-          header.dashboard-header {
-            display: none !important;
+          @media (max-width: 1023px) {
+            button[aria-label="Open sidebar"] {
+              display: none !important;
+            }
+            header.dashboard-header {
+              display: none !important;
+            }
           }
         `}</style>
       )}

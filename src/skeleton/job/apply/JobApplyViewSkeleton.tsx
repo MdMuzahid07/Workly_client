@@ -4,38 +4,47 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const JobApplyViewSkeleton = () => {
   return (
-    <div className="bg-background min-h-screen pb-20">
-      <div className="mx-auto px-4 py-6 sm:px-6 md:mt-10 lg:px-8">
+    <div className="bg-background min-h-screen pt-10 pb-20">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:mt-10 lg:px-8">
         {/* Header Skeleton */}
-        <div className="border-border/50 bg-card flex flex-col justify-between gap-6 rounded-xl border p-4 sm:p-6 md:flex-row md:items-center lg:p-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <Skeleton className="h-16 w-16 shrink-0 rounded-xl" />
-            <div className="space-y-3">
-              <Skeleton className="h-8 w-64 md:w-80" />
-              <div className="flex flex-wrap gap-4">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-32" />
-              </div>
+        <div className="bg-card animate-pulse rounded-xl border p-4 sm:p-6">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <Skeleton className="h-10 w-10 shrink-0 rounded-full sm:h-12 sm:w-12" />
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-32 rounded sm:h-7" />
+              <Skeleton className="h-4 w-48 rounded sm:w-64" />
             </div>
           </div>
-          <div className="mt-4 flex w-full items-center gap-3 md:mt-0 md:w-auto">
-            <Skeleton className="h-10 w-full rounded-xl md:w-28" />
-            <Skeleton className="h-10 w-full rounded-xl md:w-10" />
+        </div>
+
+        {/* Application Limit Warning Skeleton */}
+        <div className="mt-6 flex animate-pulse flex-col justify-between gap-4 rounded-2xl border border-amber-200/50 bg-amber-50/30 p-4 md:flex-row md:items-center">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9 shrink-0 rounded-xl bg-amber-200/50" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-40 rounded bg-amber-200/50" />
+              <Skeleton className="h-3 w-64 rounded bg-amber-200/50 sm:w-80" />
+            </div>
           </div>
+          <Skeleton className="h-9 w-full rounded-xl bg-amber-200/50 md:w-32" />
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
           <div className="space-y-6 lg:col-span-2">
             {/* Summary Card Skeleton */}
             <Card className="bg-card rounded-xl border p-2 shadow-none sm:p-4">
-              <CardContent className="space-y-4 p-0">
-                <Skeleton className="h-6 w-64" />
-                <Skeleton className="h-4 w-32" />
-                <div className="flex gap-2">
+              <CardContent className="animate-pulse space-y-4 p-4 sm:p-6">
+                <div>
+                  <Skeleton className="h-7 w-64 rounded sm:w-80" />
+                  <div className="mt-3 flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 shrink-0 rounded-full" />
+                    <Skeleton className="h-4 w-32 rounded" />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <Skeleton className="h-6 w-28 rounded-full" />
                   <Skeleton className="h-6 w-20 rounded-full" />
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                  <Skeleton className="h-6 w-20 rounded-full" />
+                  <Skeleton className="h-6 w-24 rounded-full" />
                 </div>
               </CardContent>
             </Card>
@@ -43,21 +52,21 @@ const JobApplyViewSkeleton = () => {
             {/* Info Cards Skeleton */}
             <div className="grid gap-3 sm:grid-cols-2">
               <Card className="bg-card rounded-xl border shadow-none">
-                <CardContent className="flex items-start gap-4 p-5">
+                <CardContent className="flex animate-pulse items-start gap-4 p-5">
                   <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
-                  <div className="w-full space-y-2">
-                    <Skeleton className="h-3 w-24" />
-                    <Skeleton className="h-4 w-32" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16 rounded" />
+                    <Skeleton className="h-4 w-32 rounded" />
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-card rounded-xl border shadow-none">
-                <CardContent className="flex items-start gap-4 p-5">
+                <CardContent className="flex animate-pulse items-start gap-4 p-5">
                   <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
-                  <div className="w-full space-y-2">
-                    <Skeleton className="h-3 w-28" />
-                    <Skeleton className="h-4 w-36" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-20 rounded" />
+                    <Skeleton className="h-4 w-36 rounded" />
                   </div>
                 </CardContent>
               </Card>
@@ -65,31 +74,31 @@ const JobApplyViewSkeleton = () => {
 
             {/* Form Skeleton */}
             <Card className="bg-card rounded-2xl border shadow-none">
-              <div className="border-border/50 space-y-2 border-b p-6 sm:px-8">
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-4 w-64" />
+              <div className="border-border/50 animate-pulse space-y-2 border-b p-6 sm:px-8">
+                <Skeleton className="h-6 w-48 rounded" />
+                <Skeleton className="mt-2 h-4 w-64 rounded" />
               </div>
-              <CardContent className="space-y-6 p-6 sm:p-8">
+              <CardContent className="animate-pulse space-y-6 p-6 sm:p-8">
                 {/* Personal Info */}
                 <div className="space-y-4">
-                  <Skeleton className="h-5 w-40" />
+                  <Skeleton className="h-5 w-40 rounded" />
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-24 rounded" />
                       <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                     <div className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-24 rounded" />
                       <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-4 w-28 rounded" />
                       <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                     <div className="space-y-2">
-                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-4 w-28 rounded" />
                       <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                   </div>
@@ -99,19 +108,19 @@ const JobApplyViewSkeleton = () => {
 
                 {/* Professional Info */}
                 <div className="space-y-4">
-                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-5 w-48 rounded" />
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-32 rounded" />
                       <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                     <div className="space-y-2">
-                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-32 rounded" />
                       <Skeleton className="h-10 w-full rounded-md" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-40 rounded" />
                     <Skeleton className="h-10 w-full rounded-md" />
                   </div>
                 </div>
@@ -120,16 +129,16 @@ const JobApplyViewSkeleton = () => {
 
                 {/* Resume section */}
                 <div className="space-y-4">
-                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-5 w-32 rounded" />
                   <div className="space-y-2">
-                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-4 w-28 rounded" />
                     <Skeleton className="h-24 w-full rounded-xl" />
                   </div>
                   <div className="space-y-2 pt-4">
                     <div className="flex items-center justify-center py-2">
                       <Skeleton className="h-px w-full" />
                     </div>
-                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-40 rounded" />
                     <Skeleton className="h-10 w-full rounded-md" />
                   </div>
                 </div>
@@ -138,9 +147,9 @@ const JobApplyViewSkeleton = () => {
 
                 {/* Cover Letter */}
                 <div className="space-y-4">
-                  <Skeleton className="h-5 w-28" />
+                  <Skeleton className="h-5 w-28 rounded" />
                   <div className="space-y-2">
-                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-4 w-64 rounded" />
                     <Skeleton className="h-32 w-full rounded-md" />
                   </div>
                 </div>
@@ -148,7 +157,7 @@ const JobApplyViewSkeleton = () => {
                 {/* Checkbox and Submit */}
                 <div className="flex items-center gap-3 pt-6">
                   <Skeleton className="h-5 w-5 shrink-0 rounded" />
-                  <Skeleton className="h-4 w-3/4 sm:w-1/2" />
+                  <Skeleton className="h-4 w-3/4 rounded sm:w-1/2" />
                 </div>
                 <Skeleton className="mt-4 h-12 w-full rounded-xl" />
               </CardContent>
@@ -156,35 +165,40 @@ const JobApplyViewSkeleton = () => {
           </div>
 
           <aside className="space-y-6">
-            {/* Sidebar Skeletons */}
-            <Card className="bg-card rounded-xl border shadow-none">
-              <div className="flex flex-row items-center gap-3 p-4 pb-2 sm:p-6 sm:pb-4">
-                <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
-                <Skeleton className="h-5 w-32" />
+            {/* Requirements Skeleton */}
+            <Card className="border-primary/10 bg-background/60 shadow-primary/5 rounded-2xl border shadow-lg backdrop-blur-xl">
+              <div className="border-border/50 animate-pulse border-b px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+                  <Skeleton className="h-5 w-32 rounded" />
+                </div>
               </div>
-              <CardContent className="space-y-4 p-4 pt-0 sm:p-6">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex gap-3">
-                    <Skeleton className="mt-2 h-2 w-2 shrink-0 rounded-full" />
-                    <div className="grow space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      {i % 2 === 0 && <Skeleton className="h-4 w-4/5" />}
+              <CardContent className="animate-pulse space-y-5 p-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <Skeleton className="h-5 w-5 shrink-0 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-full rounded" />
+                      <Skeleton className="h-4 w-5/6 rounded" />
                     </div>
                   </div>
                 ))}
               </CardContent>
             </Card>
 
-            <Card className="bg-card rounded-xl border shadow-none">
-              <div className="flex flex-row items-center gap-3 p-4 pb-2 sm:p-6 sm:pb-4">
-                <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
-                <Skeleton className="h-5 w-36" />
+            {/* Benefits & Perks Skeleton */}
+            <Card className="border-primary/10 bg-background/60 shadow-primary/5 rounded-2xl border shadow-lg backdrop-blur-xl">
+              <div className="border-border/50 animate-pulse border-b px-6 py-4">
+                <Skeleton className="h-6 w-40 rounded" />
               </div>
-              <CardContent className="space-y-4 p-4 pt-0 sm:p-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="h-5 w-5 shrink-0 rounded" />
-                    <Skeleton className="h-4 w-full" />
+              <CardContent className="animate-pulse space-y-5 p-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <Skeleton className="h-5 w-5 shrink-0 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-full rounded" />
+                      {i % 2 === 0 && <Skeleton className="h-4 w-4/5" />}
+                    </div>
                   </div>
                 ))}
               </CardContent>

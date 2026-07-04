@@ -110,6 +110,17 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    // Confirm role for new Google OAuth users — called from the callback page
+    confirmGoogleRole: builder.mutation<
+      { data: IUser },
+      { role: "EMPLOYER" | "JOB_SEEKER" }
+    >({
+      query: (data) => ({
+        url: "/auth/confirm-google-role",
+        method: "PATCH",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -123,6 +134,7 @@ export const {
   useRefreshTokenMutation,
   useLogoutUserMutation,
   useChangePasswordMutation,
+  useConfirmGoogleRoleMutation,
 } = authApi;
 
 export default authApi;

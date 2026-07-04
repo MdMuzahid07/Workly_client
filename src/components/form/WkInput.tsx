@@ -57,7 +57,6 @@ const WKInput = ({
         placeholder={placeholder}
         disabled={disabled}
         className={cn(
-          "bg-white",
           sizeClasses[size],
           hasError && "border-destructive focus-visible:ring-destructive",
           className,
