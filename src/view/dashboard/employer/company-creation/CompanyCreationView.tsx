@@ -96,7 +96,7 @@ const CompanyCreationView = () => {
             companyId: result.data.id || "",
           }),
         );
-        router.push("/dashboard");
+        router.push("/employer");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

@@ -132,22 +132,50 @@ export function PlanCard({ plan, onEdit, onToggleStatus }: PlanCardProps) {
             Quotas & Limits:
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-muted/30 border-border/50 rounded-xl border p-3 text-center">
-              <p className="text-muted-foreground mb-1 text-[9px] font-bold tracking-widest uppercase opacity-60">
-                Active Jobs
-              </p>
-              <p className="text-lg font-bold">
-                {plan.maxActiveJobs === null ? "∞" : plan.maxActiveJobs}
-              </p>
-            </div>
-            <div className="bg-muted/30 border-border/50 rounded-xl border p-3 text-center">
-              <p className="text-muted-foreground mb-1 text-[9px] font-bold tracking-widest uppercase opacity-60">
-                Users
-              </p>
-              <p className="text-lg font-bold">
-                {plan.maxUsers === null ? "∞" : plan.maxUsers}
-              </p>
-            </div>
+            {plan.planType === "JOB_SEEKER" ? (
+              <>
+                <div className="bg-muted/30 border-border/50 rounded-xl border p-3 text-center">
+                  <p className="text-muted-foreground mb-1 text-[9px] font-bold tracking-widest uppercase opacity-60">
+                    Monthly Apps
+                  </p>
+                  <p className="text-lg font-bold">
+                    {plan.maxMonthlyApplications === null ||
+                    plan.maxMonthlyApplications >= 9999
+                      ? "∞"
+                      : plan.maxMonthlyApplications}
+                  </p>
+                </div>
+                <div className="bg-muted/30 border-border/50 rounded-xl border p-3 text-center">
+                  <p className="text-muted-foreground mb-1 text-[9px] font-bold tracking-widest uppercase opacity-60">
+                    CV Uploads
+                  </p>
+                  <p className="text-lg font-bold">
+                    {plan.maxResumes === null || plan.maxResumes >= 9999
+                      ? "∞"
+                      : plan.maxResumes}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-muted/30 border-border/50 rounded-xl border p-3 text-center">
+                  <p className="text-muted-foreground mb-1 text-[9px] font-bold tracking-widest uppercase opacity-60">
+                    Active Jobs
+                  </p>
+                  <p className="text-lg font-bold">
+                    {plan.maxActiveJobs === null ? "∞" : plan.maxActiveJobs}
+                  </p>
+                </div>
+                <div className="bg-muted/30 border-border/50 rounded-xl border p-3 text-center">
+                  <p className="text-muted-foreground mb-1 text-[9px] font-bold tracking-widest uppercase opacity-60">
+                    Users
+                  </p>
+                  <p className="text-lg font-bold">
+                    {plan.maxUsers === null ? "∞" : plan.maxUsers}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -189,6 +217,7 @@ export function PlanCard({ plan, onEdit, onToggleStatus }: PlanCardProps) {
           </Badge>
         </div>
         <Button
+          onClick={() => onEdit(plan)}
           className={`h-11 w-full rounded-xl font-bold tracking-widest uppercase transition-all ${
             plan.featured
               ? "bg-primary hover:bg-primary/90 shadow-sm"

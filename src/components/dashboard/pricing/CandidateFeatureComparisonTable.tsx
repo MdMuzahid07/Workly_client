@@ -13,7 +13,7 @@ export default function CandidateFeatureComparisonTable() {
           Compare Seeker features
         </h2>
         <p className="text-muted-foreground mt-4">
-          Detailed breakdown of what you get with each subscription plan.
+          Detailed breakdown of what you get with each subscription package.
         </p>
       </div>
 
@@ -26,13 +26,16 @@ export default function CandidateFeatureComparisonTable() {
                   Capabilities
                 </th>
                 <th className="text-muted-foreground px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
-                  Free Seeker
+                  Free
                 </th>
                 <th className="text-primary px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
-                  Pro Candidate
+                  Starter
                 </th>
                 <th className="text-muted-foreground px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
-                  Elite Seeker
+                  Pro
+                </th>
+                <th className="text-muted-foreground px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
+                  Premium
                 </th>
               </tr>
             </thead>
@@ -41,7 +44,7 @@ export default function CandidateFeatureComparisonTable() {
                 <React.Fragment key={sIdx}>
                   <tr className="bg-muted/10">
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       className="text-primary/60 px-6 py-3 text-xs font-black tracking-widest uppercase"
                     >
                       {section.category}
@@ -52,8 +55,9 @@ export default function CandidateFeatureComparisonTable() {
                       feature: {
                         name: string;
                         free: boolean | string;
+                        starter: boolean | string;
                         pro: boolean | string;
-                        elite: boolean | string;
+                        premium: boolean | string;
                       },
                       fIdx: number,
                     ) => (
@@ -70,10 +74,13 @@ export default function CandidateFeatureComparisonTable() {
                           <ComparisonCell value={feature.free} />
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <ComparisonCell value={feature.pro} isPro />
+                          <ComparisonCell value={feature.starter} isPrimary />
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <ComparisonCell value={feature.elite} />
+                          <ComparisonCell value={feature.pro} />
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <ComparisonCell value={feature.premium} />
                         </td>
                       </tr>
                     ),
@@ -90,17 +97,17 @@ export default function CandidateFeatureComparisonTable() {
 
 function ComparisonCell({
   value,
-  isPro,
+  isPrimary,
 }: {
   value: boolean | string | number;
-  isPro?: boolean;
+  isPrimary?: boolean;
 }) {
   if (value === true)
     return (
       <Check
         className={cn(
           "mx-auto h-5 w-5",
-          isPro ? "text-primary" : "text-emerald-500",
+          isPrimary ? "text-primary" : "text-emerald-500",
         )}
       />
     );
@@ -112,7 +119,7 @@ function ComparisonCell({
     <span
       className={cn(
         "text-sm font-semibold",
-        isPro ? "text-primary" : "text-foreground",
+        isPrimary ? "text-primary" : "text-foreground",
       )}
     >
       {value}

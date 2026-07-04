@@ -8,7 +8,7 @@ import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
 import { useGetMySubscriptionQuery } from "@/redux/feature/subscription/subscriptionApi";
 import JobSeekerPricingSkeleton from "@/skeleton/dashboard/job-seeker/pricing/JobSeekerPricingSkeleton";
-import { Package, Shield, ShieldCheck, Zap } from "lucide-react";
+import { Crown, Package, Shield, ShieldCheck, Zap } from "lucide-react";
 
 export default function JobSeekerPricingView() {
   const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
@@ -19,6 +19,11 @@ export default function JobSeekerPricingView() {
 
   const subData = subRes?.data;
   const activePlanName = subData?.planName || "Free";
+
+  const isFirstTimeBuyer =
+    activePlanName.toLowerCase() === "free" ||
+    !subData?.price ||
+    subData.price === 0;
 
   const getRenewalDateString = () => {
     if (!subData?.endDate) return "Never";
@@ -32,6 +37,7 @@ export default function JobSeekerPricingView() {
   const mapDbPlanToCardProps = (plan: any) => {
     const nameLower = plan.name.toLowerCase();
 
+    // ── Icon & colour scheme ────────────────────────────────────
     let icon = Package;
     let color = "text-slate-500";
     let borderColor = "border-slate-200 dark:border-slate-800";
@@ -40,24 +46,57 @@ export default function JobSeekerPricingView() {
     let popular = false;
     let cta = "Upgrade";
 
-    if (nameLower.includes("pro")) {
+    // ── Parse Plan features (discount percentages & details) ─────
+    const planFeatures = typeof plan.features === "object" ? plan.features : {};
+    const durationMonths = planFeatures?.durationMonths || null;
+    const discountPercent = Number(planFeatures?.firstTimeDiscountPercent || 0);
+    const basePrice = plan.price;
+
+    let displayPrice = `৳${basePrice.toLocaleString()}`;
+    let originalPrice: string | undefined;
+    let discountBadge: string | undefined;
+    let periodNote: string | undefined;
+
+    // Calculate dynamic discount for card display (only for first-time buyers)
+    if (discountPercent > 0 && isFirstTimeBuyer) {
+      originalPrice = `৳${basePrice.toLocaleString()}`;
+      // Calculate Math.floor to match backend perfectly (no fraction allowed)
+      const discountedValue = Math.floor(
+        basePrice - basePrice * (discountPercent / 100),
+      );
+      displayPrice = `৳${discountedValue}`;
+      discountBadge = `${discountPercent}% OFF · 1ST PURCHASE`;
+    }
+
+    if (nameLower === "free") {
+      cta = "Current Plan";
+    } else if (nameLower === "starter") {
       icon = Zap;
       color = "text-primary";
       borderColor = "border-primary/30";
       bgColor = "bg-primary/5";
       variant = "primary";
       popular = true;
-      cta = "Upgrade to Pro";
-    } else if (nameLower.includes("premium") || nameLower.includes("elite")) {
+      cta = "Get Starter";
+    } else if (nameLower === "pro") {
       icon = Shield;
+      color = "text-indigo-500";
+      borderColor = "border-indigo-200 dark:border-indigo-900/50";
+      bgColor = "bg-indigo-50/50 dark:bg-indigo-900/10";
+      cta = "Get Pro (2 Months)";
+      const effMonthly = Math.round(basePrice / (durationMonths || 2));
+      periodNote = `Effective ৳${effMonthly}/month`;
+    } else if (nameLower === "premium") {
+      icon = Crown;
       color = "text-violet-500";
       borderColor = "border-violet-200 dark:border-violet-900/50";
       bgColor = "bg-violet-50/50 dark:bg-violet-900/10";
-      cta = "Upgrade to Premium";
-    } else if (nameLower.includes("free")) {
-      cta = "Current Plan";
+      cta = "Get Premium (3 Months)";
+      const effMonthly = Math.round(basePrice / (durationMonths || 3));
+      periodNote = `Effective ৳${effMonthly}/month`;
     }
 
+    // ── Feature list fallback if DB returns none ────────────────
     let parsedFeatures: string[] = [];
     if (Array.isArray(plan.features) && plan.features.length > 0) {
       parsedFeatures = plan.features;
@@ -70,36 +109,52 @@ export default function JobSeekerPricingView() {
     }
 
     if (!parsedFeatures || parsedFeatures.length === 0) {
-      if (nameLower.includes("free")) {
+      if (nameLower === "free") {
         parsedFeatures = [
-          "40 job applications / month",
-          "Single active CV / resume upload",
-          "Standard candidate profile visibility",
-          "7 days profile views history (basic)",
+          "40 job applications per month",
+          "1 active CV / resume upload",
+          "Standard profile visibility",
+          "7-day profile view history (basic)",
           "In-app job alerts & notifications",
-          "Standard community support",
+          "Basic application status (Submitted / Pending)",
         ];
-      } else if (nameLower.includes("pro")) {
+      } else if (nameLower === "starter") {
         parsedFeatures = [
-          "120 job applications / month",
-          "Multiple active CVs / resumes upload",
-          "3x candidate profile visibility boost",
-          "Direct messaging to Hiring Managers",
-          "Full 'Who Viewed My Profile' tracker",
-          "Instant real-time email job alerts",
+          "200 job applications per month",
+          "5 active CV uploads",
+          "Direct messaging to HR & Recruiters",
+          "Full profile view history (30 days)",
+          "Priority real-time job alerts",
+          "Detailed application stage tracking",
         ];
-      } else if (nameLower.includes("premium") || nameLower.includes("elite")) {
+      } else if (nameLower === "pro") {
         parsedFeatures = [
-          "Unlimited job applications / month",
-          "Unlimited CV uploads & templates",
-          "5x Featured Candidate profile boost",
-          "Guaranteed HR application response tracking",
-          "1-on-1 expert monthly career counseling",
-          "Professional CV & resume expert review",
+          "300 job applications per month",
+          "10 active CV uploads",
+          "Direct messaging to HR & Recruiters",
+          "Full profile view history (30 days)",
+          "Priority real-time job alerts",
+          "Detailed application stage tracking",
+        ];
+      } else if (nameLower === "premium") {
+        parsedFeatures = [
+          "Unlimited job applications",
+          "Unlimited CV uploads",
+          "Direct messaging to HR & Recruiters",
+          "Featured Candidate profile (5× visibility boost)",
+          "Priority real-time job alerts",
+          "Full application stage & insights tracking",
         ];
       }
     }
 
+    // ── Duration period label ────────────────────────────────────
+    let periodLabel: string | undefined;
+    if (durationMonths === 1) periodLabel = "/ 1 month";
+    else if (durationMonths === 2) periodLabel = "/ 2 months";
+    else if (durationMonths === 3) periodLabel = "/ 3 months";
+
+    // ── Readable display name ────────────────────────────────────
     const readableName = plan.name
       .replace("emp_", "")
       .replace("cand_", "")
@@ -110,8 +165,12 @@ export default function JobSeekerPricingView() {
     return {
       id: plan.name,
       name: readableName,
-      price: plan.price === 0 ? "৳0" : `৳${plan.price.toLocaleString()}`,
-      period: "/month",
+      price: displayPrice,
+      period: periodLabel,
+      originalPrice,
+      discountBadge,
+      discountPercent,
+      periodNote,
       description: plan.description || "",
       features: parsedFeatures,
       cta,
@@ -126,6 +185,23 @@ export default function JobSeekerPricingView() {
 
   const plans = plansRes?.data || [];
   const isLoading = isSubLoading || isPlansLoading;
+
+  // Calculate starting price dynamically from plans data
+  const starterPlan = plans.find(
+    (p: any) => p.name.toLowerCase() === "starter",
+  );
+  let starterMinPrice = "৳49";
+  if (starterPlan) {
+    const planFeatures =
+      typeof starterPlan.features === "object" ? starterPlan.features : {};
+    const discountPercent = Number(planFeatures?.firstTimeDiscountPercent || 0);
+    const basePrice = starterPlan.price;
+    if (discountPercent > 0) {
+      starterMinPrice = `৳${Math.floor(basePrice - basePrice * (discountPercent / 100))}`;
+    } else {
+      starterMinPrice = `৳${basePrice}`;
+    }
+  }
 
   return (
     <div className="min-h-screen pt-8">
@@ -156,14 +232,18 @@ export default function JobSeekerPricingView() {
                     Land your dream job faster
                   </h2>
                   <p className="text-muted-foreground mx-auto max-w-2xl text-sm sm:text-base">
-                    Upgrade your search with high profile boosts, unlimited job
-                    applications, and expert 1-on-1 career assistance.
+                    Upgrade with direct HR messaging, enhanced profile
+                    visibility, and unlimited applications — starting from just{" "}
+                    <strong className="text-foreground">
+                      {starterMinPrice}
+                    </strong>{" "}
+                    for your first month.
                   </p>
                 </div>
               </div>
 
               {/* Pricing Tiers Grid */}
-              <div className="grid grid-cols-1 gap-8 pt-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 pt-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {plans.map((plan: any) => {
                   const cardProps = mapDbPlanToCardProps(plan);
                   const isActive =

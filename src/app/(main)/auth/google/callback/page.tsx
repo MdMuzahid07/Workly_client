@@ -120,7 +120,18 @@ export default function GoogleAuthCallbackPage() {
       router.replace("/verify-email");
     } else {
       toast.success("Logged in with Google!");
-      router.replace("/jobs");
+
+      const role = (userData.role as string) || decodedToken.role;
+      const companyId = (userData.companyId as string) || "";
+
+      let redirectUrl = "/jobs";
+      if (role === "EMPLOYER") {
+        redirectUrl = companyId ? "/employer" : "/create-company";
+      } else if (role === "ADMIN" || role === "SUPER_ADMIN") {
+        redirectUrl = "/admin";
+      }
+
+      router.replace(redirectUrl);
     }
   };
 

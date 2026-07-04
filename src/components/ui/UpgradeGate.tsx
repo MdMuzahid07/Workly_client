@@ -250,7 +250,7 @@ export default function UpgradeGate({
 
       {/* 
         Floating premium card container.
-        - Mobile: p-6, rounded-[32px], bg-card, border border-border/80.
+        - Mobile: p-5, rounded-[28px], bg-gradient, border border-border/80, backdrop-blur.
         - Desktop: border-2, rounded-[40px], bg-gradient-to-br, backdrop-blur.
       */}
       <motion.div
@@ -260,7 +260,7 @@ export default function UpgradeGate({
           duration: 0.5,
           ease: customEaseOut,
         }}
-        className="bg-card sm:via-card dark:sm:via-card border-border/80 relative z-10 w-full max-w-4xl overflow-hidden rounded-[32px] border p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] will-change-[transform,opacity] sm:rounded-[40px] sm:bg-gradient-to-br sm:from-emerald-50/40 sm:to-teal-50/20 sm:p-10 sm:shadow-none sm:backdrop-blur-md md:p-12 lg:p-16 dark:sm:from-emerald-950/10 dark:sm:to-teal-950/10"
+        className="border-border/80 from-card relative z-10 w-full max-w-4xl overflow-hidden rounded-[28px] border bg-gradient-to-br to-emerald-50/15 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] backdrop-blur-md will-change-[transform,opacity] select-none sm:rounded-[40px] sm:from-emerald-50/40 sm:to-teal-50/20 sm:p-10 sm:shadow-none md:p-12 lg:p-16 dark:to-teal-950/5 dark:sm:from-emerald-950/10 dark:sm:to-teal-950/10"
       >
         <motion.div
           variants={containerVariants}
@@ -269,23 +269,23 @@ export default function UpgradeGate({
           className="flex w-full flex-col items-center text-center"
         >
           {/* Green premium experience pill badge */}
-          <div className="mb-5 overflow-hidden sm:mb-8">
+          <div className="mb-4 overflow-hidden sm:mb-8">
             <motion.div
               variants={itemVariants}
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-100/80 bg-emerald-50/50 px-4 py-1.5 sm:px-5 sm:py-2 dark:border-emerald-950/30 dark:bg-emerald-950/20"
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100/80 bg-emerald-50/50 px-3.5 py-1 sm:gap-2 sm:px-5 sm:py-2 dark:border-emerald-950/30 dark:bg-emerald-950/20"
             >
-              <Crown className="h-3.5 w-3.5 text-emerald-600 sm:h-4 sm:w-4 dark:text-emerald-400" />
-              <span className="text-[9px] font-bold tracking-widest text-emerald-700 uppercase sm:text-[10px] dark:text-emerald-400">
+              <Crown className="h-3 w-3 text-emerald-600 sm:h-4 sm:w-4 dark:text-emerald-400" />
+              <span className="text-[8px] font-bold tracking-widest text-emerald-700 uppercase sm:text-[10px] dark:text-emerald-400">
                 {cfg.badge}
               </span>
             </motion.div>
           </div>
 
           {/* Headline */}
-          <div className="mb-3 overflow-hidden sm:mb-5">
+          <div className="mb-2.5 overflow-hidden sm:mb-5">
             <motion.h1
               variants={itemVariants}
-              className="text-foreground max-w-3xl text-2xl leading-tight font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-[44px]"
+              className="text-foreground max-w-3xl text-xl leading-tight font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-[44px]"
             >
               {title ? (
                 title
@@ -301,10 +301,10 @@ export default function UpgradeGate({
           </div>
 
           {/* Subtitle description */}
-          <div className="mb-6 overflow-hidden sm:mb-10">
+          <div className="mb-5 overflow-hidden sm:mb-10">
             <motion.p
               variants={itemVariants}
-              className="text-muted-foreground mx-auto max-w-2xl text-xs leading-relaxed sm:text-sm md:text-base"
+              className="text-muted-foreground xs:text-xs mx-auto max-w-2xl text-[11px] leading-relaxed sm:text-sm md:text-base"
             >
               {description || cfg.description}
             </motion.p>
@@ -314,7 +314,7 @@ export default function UpgradeGate({
           {limit > 0 && (
             <motion.div
               variants={itemVariants}
-              className="border-border bg-card/60 mx-auto mb-8 w-full max-w-xs rounded-xl border px-4 py-2.5 text-left"
+              className="border-border bg-card/60 mx-auto mb-6 w-full max-w-xs rounded-xl border px-4 py-2.5 text-left"
             >
               <div className="text-muted-foreground mb-1.5 flex justify-between text-xs font-semibold">
                 <span>Usage limit reached</span>
@@ -339,37 +339,38 @@ export default function UpgradeGate({
           */}
           <motion.div
             variants={itemVariants}
-            className="mb-8 grid w-full max-w-3xl grid-cols-3 gap-2 sm:mb-12 sm:gap-5"
+            className="mb-6 grid w-full max-w-3xl grid-cols-3 gap-1.5 sm:mb-12 sm:gap-5"
           >
             {cfg.cards.map(({ icon: Icon, title: cardTitle, subtitle }) => (
               <motion.div
                 key={cardTitle}
                 initial="initial"
                 whileHover="hover"
+                whileTap={{ scale: 0.95 }}
                 variants={{
                   initial: { y: 0 },
                   hover: {
-                    y: -6,
+                    y: -4,
                     borderColor: "rgba(16, 185, 129, 0.50)",
                   },
                 }}
                 transition={{
-                  duration: 0.3,
+                  duration: 0.25,
                   ease: "easeOut",
                 }}
-                className="bg-card border-border/50 flex cursor-pointer flex-col items-center rounded-2xl border p-2.5 text-center transition-colors duration-300 sm:p-6"
+                className="bg-card border-border/50 flex cursor-pointer flex-col items-center rounded-xl border p-2 text-center transition-colors duration-300 select-none active:bg-emerald-50/5 sm:rounded-2xl sm:p-6 dark:active:bg-emerald-950/5"
               >
                 {/* Compact icon container */}
                 <motion.div
                   variants={iconVariants}
-                  className="mb-2 flex h-9 w-9 animate-none items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 sm:mb-4 sm:h-12 sm:w-12 dark:border-emerald-900/30 dark:bg-emerald-950/20"
+                  className="mb-1.5 flex h-7.5 w-7.5 animate-none items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 sm:mb-4 sm:h-12 sm:w-12 dark:border-emerald-900/30 dark:bg-emerald-950/20"
                 >
-                  <Icon className="h-4.5 w-4.5 text-emerald-600 sm:h-5.5 sm:w-5.5 dark:text-emerald-400" />
+                  <Icon className="h-3.5 w-3.5 text-emerald-600 sm:h-5.5 sm:w-5.5 dark:text-emerald-400" />
                 </motion.div>
-                <p className="text-foreground mb-0.5 text-[10px] leading-tight font-bold sm:mb-1.5 sm:text-[13px]">
+                <p className="text-foreground mb-0.5 text-[9px] leading-tight font-extrabold sm:mb-1.5 sm:text-[13px]">
                   {cardTitle}
                 </p>
-                <p className="text-muted-foreground hidden text-[10px] leading-snug sm:block sm:text-[11px]">
+                <p className="text-muted-foreground text-[7.5px] leading-tight sm:text-[11px]">
                   {subtitle}
                 </p>
               </motion.div>
@@ -381,7 +382,7 @@ export default function UpgradeGate({
             variants={itemVariants}
             className="flex w-full flex-col items-center gap-4"
           >
-            <div className="flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6">
+            <div className="flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
               <Link href={pricingLink} className="w-full sm:w-auto">
                 <motion.div
                   whileHover={{ scale: 1.02, y: -1 }}
@@ -389,7 +390,7 @@ export default function UpgradeGate({
                   transition={{ duration: 0.2 }}
                   className="w-full"
                 >
-                  <Button className="animate-btn-shimmer h-11 w-full rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-8 text-xs font-bold text-white transition-all sm:h-12 sm:rounded-2xl sm:px-10 sm:text-sm">
+                  <Button className="animate-btn-shimmer h-10 w-full rounded-lg bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-6 text-xs font-bold text-white transition-all sm:h-12 sm:rounded-2xl sm:px-10 sm:text-sm">
                     Go Premium Now
                     <span className="ml-2 font-normal">→</span>
                   </Button>
@@ -400,7 +401,7 @@ export default function UpgradeGate({
                 <motion.span
                   whileHover={{ x: 2 }}
                   transition={{ duration: 0.2 }}
-                  className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center justify-center gap-1 py-2 text-[11px] font-bold transition-colors sm:text-xs"
+                  className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center justify-center gap-1 py-1 text-[10px] font-bold transition-colors sm:text-xs"
                 >
                   View all premium benefits
                   <span className="ml-1 font-normal">→</span>
@@ -409,8 +410,8 @@ export default function UpgradeGate({
             </div>
 
             {/* Risk Reversal */}
-            <div className="text-muted-foreground mt-1 flex flex-wrap items-center justify-center gap-1 text-[10px] font-semibold sm:mt-2 sm:gap-1.5 sm:text-[11px]">
-              <ShieldCheck className="h-4 w-4 text-emerald-600 sm:h-4.5 sm:w-4.5 dark:text-emerald-400" />
+            <div className="text-muted-foreground mt-1 flex flex-wrap items-center justify-center gap-1.5 text-[9px] font-semibold sm:mt-2 sm:text-[11px]">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 sm:h-4.5 sm:w-4.5 dark:text-emerald-400" />
               <span>14-Day Money-Back Guarantee</span>
               <span className="text-border mx-1 hidden sm:inline">•</span>
               <span>Cancel Anytime</span>
@@ -421,9 +422,9 @@ export default function UpgradeGate({
         {/* Footer social proof */}
         <motion.div
           variants={itemVariants}
-          className="border-border/40 mt-10 w-full border-t pt-5 text-center sm:mt-14 sm:pt-6"
+          className="border-border/40 mt-8 w-full border-t pt-4 text-center sm:mt-14 sm:pt-6"
         >
-          <p className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase sm:text-[11px]">
+          <p className="text-muted-foreground text-[9px] font-semibold tracking-wider uppercase sm:text-[11px]">
             {cfg.trust}
           </p>
         </motion.div>

@@ -82,8 +82,23 @@ const SignInForm = () => {
         }
 
         toast.success("Login successful!");
+
+        let targetUrl = callbackUrl;
+        if (callbackUrl === "/jobs") {
+          if (decodedToken.role === "EMPLOYER") {
+            targetUrl = decodedToken.companyId
+              ? "/employer"
+              : "/create-company";
+          } else if (
+            decodedToken.role === "ADMIN" ||
+            decodedToken.role === "SUPER_ADMIN"
+          ) {
+            targetUrl = "/admin";
+          }
+        }
+
         // Use replace so the login page is removed from browser history
-        router.replace(callbackUrl);
+        router.replace(targetUrl);
       }
     } catch (error) {
       interface ApiErrorData {

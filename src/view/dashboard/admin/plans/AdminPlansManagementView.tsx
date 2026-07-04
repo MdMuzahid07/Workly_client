@@ -6,19 +6,19 @@ import AdvancedPlanBuilderDialog from "@/components/dashboard/plans/AdvancedPlan
 import EditPlanDialog from "@/components/dashboard/plans/EditPlanDialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  useCreatePlanMutation,
+  useGetPlansQuery,
+  useTogglePlanStatusMutation,
+  useUpdatePlanMutation,
+} from "@/redux/feature/plan/planApi";
+import AdminPlansSkeleton from "@/skeleton/dashboard/admin/AdminPlansSkeleton";
 import { Cloud, Rocket, ShieldCheck } from "lucide-react";
 import { useState } from "react";
-import AdminPlansSkeleton from "@/skeleton/dashboard/admin/AdminPlansSkeleton";
+import { toast } from "sonner";
 import { CustomPlanBanner } from "./components/CustomPlanBanner";
 import { PlanCard } from "./components/PlanCard";
 import { PlanStatsGrid } from "./components/PlanStatsGrid";
-import {
-  useGetPlansQuery,
-  useCreatePlanMutation,
-  useUpdatePlanMutation,
-  useTogglePlanStatusMutation,
-} from "@/redux/feature/plan/planApi";
-import { toast } from "sonner";
 
 const AdminPlansManagementView = () => {
   const [activeTab, setActiveTab] = useState("employer");
@@ -61,6 +61,7 @@ const AdminPlansManagementView = () => {
         price: parseFloat(updatedPlan.price),
         description: updatedPlan.description,
         features: updatedPlan.features,
+        firstTimeDiscountPercent: updatedPlan.firstTimeDiscountPercent,
       }).unwrap();
       toast.success("Plan updated successfully!");
     } catch (err) {
@@ -115,15 +116,79 @@ const AdminPlansManagementView = () => {
     }
 
     let parsedFeatures: string[] = [];
-    if (Array.isArray(p.features)) {
-      parsedFeatures = p.features;
+    let planFeatures: any = {};
+    if (typeof p.features === "object" && p.features !== null) {
+      planFeatures = p.features;
     } else if (typeof p.features === "string") {
       try {
-        parsedFeatures = JSON.parse(p.features);
+        planFeatures = JSON.parse(p.features);
       } catch {
-        parsedFeatures = [];
+        planFeatures = {};
       }
     }
+
+    if (Array.isArray(planFeatures)) {
+      parsedFeatures = planFeatures;
+    } else if (Array.isArray(planFeatures.displayFeatures)) {
+      parsedFeatures = planFeatures.displayFeatures;
+    } else {
+      // Robust Fallback: dynamically generate readable feature list from plan keys!
+      parsedFeatures = [];
+      if (p.planType === "JOB_SEEKER") {
+        const apps = planFeatures.maxMonthlyApplications;
+        const resumes = planFeatures.maxResumes;
+        if (apps !== undefined && apps !== null) {
+          parsedFeatures.push(
+            apps >= 9999
+              ? "Unlimited job applications"
+              : `${apps} job applications per month`,
+          );
+        }
+        if (resumes !== undefined && resumes !== null) {
+          parsedFeatures.push(
+            resumes >= 9999
+              ? "Unlimited CV uploads"
+              : `${resumes} active CV uploads`,
+          );
+        }
+        if (planFeatures.canMessageEmployer) {
+          parsedFeatures.push("Direct messaging to HR");
+        }
+        if (planFeatures.isFeaturedProfile) {
+          parsedFeatures.push("Featured candidate profile");
+        }
+        if (planFeatures.canViewProfileAnalytics) {
+          parsedFeatures.push("Profile view analytics");
+        }
+      } else {
+        const jobs = planFeatures.maxActiveJobs ?? p.maxActiveJobs;
+        const usersCount = planFeatures.maxUsers ?? p.maxUsers;
+        if (jobs !== undefined && jobs !== null) {
+          parsedFeatures.push(
+            jobs >= 9999
+              ? "Unlimited active jobs"
+              : `${jobs} active job listings`,
+          );
+        }
+        if (usersCount !== undefined && usersCount !== null) {
+          parsedFeatures.push(
+            usersCount >= 9999
+              ? "Unlimited user accounts"
+              : `${usersCount} user accounts`,
+          );
+        }
+        if (planFeatures.canMessage) {
+          parsedFeatures.push("Direct candidate messaging");
+        }
+        if (planFeatures.canViewAnalytics) {
+          parsedFeatures.push("Advanced analytics dashboard");
+        }
+      }
+    }
+
+    const firstTimeDiscountPercent = Number(
+      planFeatures?.firstTimeDiscountPercent || 0,
+    );
 
     const readableName = p.name
       .replace("emp_", "")
@@ -143,11 +208,11 @@ const AdminPlansManagementView = () => {
       active: p.isActive,
       maxActiveJobs: p.maxActiveJobs,
       maxUsers: p.maxUsers,
-      subscriberCount: p.name.includes("free")
-        ? 842
-        : p.name.includes("starter")
-          ? 382
-          : 154,
+      planType: p.planType,
+      maxMonthlyApplications: planFeatures?.maxMonthlyApplications ?? null,
+      maxResumes: planFeatures?.maxResumes ?? null,
+      firstTimeDiscountPercent,
+      subscriberCount: p.subscriberCount ?? 0,
       color,
       icon,
       featured,
@@ -169,11 +234,11 @@ const AdminPlansManagementView = () => {
 
         {/* Stateful Tab Selector for Employer vs Candidate Packages */}
         <div className="border-border/50 flex justify-center border-b pt-4 pb-6">
-          <div className="bg-muted/50 flex items-center gap-1 rounded-2xl border p-1.5">
+          <div className="bg-card flex items-center gap-1 rounded-full border p-1.5">
             <Button
               onClick={() => setActiveTab("employer")}
               className={cn(
-                "h-auto gap-1.5 rounded-xl px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all",
+                "h-auto gap-1.5 rounded-full px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all",
                 activeTab === "employer"
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground bg-transparent",
@@ -184,7 +249,7 @@ const AdminPlansManagementView = () => {
             <Button
               onClick={() => setActiveTab("candidate")}
               className={cn(
-                "h-auto gap-1.5 rounded-xl px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all",
+                "h-auto gap-1.5 rounded-full px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all",
                 activeTab === "candidate"
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground bg-transparent",
