@@ -72,73 +72,73 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-background/95 flex h-[90vh] w-[95vw] max-w-7xl flex-col overflow-hidden border-none p-0 shadow-2xl backdrop-blur-xl md:min-w-[50vw]">
-        <DialogHeader className="p-6 pb-0">
-          <div className="mb-2 flex items-center justify-between">
-            <DialogTitle className="text-2xl font-black tracking-tight">
+      <DialogContent className="bg-background/95 sm:border-border/40 [&_[data-slot=dialog-close]]:border-border/60 [&_[data-slot=dialog-close]]:bg-muted/40 [&_[data-slot=dialog-close]]:hover:bg-muted/80 fixed top-0 left-0 flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-0 shadow-2xl backdrop-blur-xl sm:top-[50%] sm:left-[50%] sm:h-[85vh] sm:w-[90vw] sm:max-w-5xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border md:w-[85vw] lg:w-[70vw] xl:w-[60vw] [&_[data-slot=dialog-close]]:top-4 [&_[data-slot=dialog-close]]:right-4 [&_[data-slot=dialog-close]]:flex [&_[data-slot=dialog-close]]:h-8 [&_[data-slot=dialog-close]]:w-8 [&_[data-slot=dialog-close]]:items-center [&_[data-slot=dialog-close]]:justify-center [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border [&_[data-slot=dialog-close]]:transition-all">
+        <DialogHeader className="p-4 pb-0 sm:p-6 sm:pb-0">
+          <div className="mb-2 flex items-center justify-between pr-8 sm:pr-0">
+            <DialogTitle className="text-xl font-black tracking-tight sm:text-2xl">
               Shared Media
             </DialogTitle>
             <Badge
               variant="secondary"
-              className="bg-success/10 text-success border-success/20 px-3 py-1 font-bold"
+              className="bg-success/10 text-success border-success/20 mr-2 px-2 py-0.5 text-[10px] font-bold sm:mr-0 sm:px-3 sm:py-1 sm:text-xs"
             >
-              <DownloadIcon className="mr-1.5 h-3.5 w-3.5" />
+              <DownloadIcon className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
               {totalSize} MB
             </Badge>
           </div>
-          <p className="text-muted-foreground text-sm font-medium">
+          <p className="text-muted-foreground text-xs font-medium sm:text-sm">
             {participantName} • {messages.length} Items
           </p>
 
-          <div className="group relative mt-6">
-            <SearchIcon className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-4 h-4.5 w-4.5 -translate-y-1/2 transition-colors" />
+          <div className="group relative mt-4 sm:mt-6">
+            <SearchIcon className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors sm:left-4 sm:h-4.5 sm:w-4.5" />
             <Input
               placeholder="Search files, images, links..."
-              className="bg-muted/30 border-muted-foreground/10 focus-visible:ring-primary/20 h-12 rounded-xl pl-11"
+              className="bg-muted/30 border-muted-foreground/10 focus-visible:ring-primary/20 h-10 rounded-xl pl-10 text-xs sm:h-12 sm:pl-11 sm:text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <FilterIcon className="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 h-4.5 w-4.5 -translate-y-1/2 cursor-pointer transition-colors" />
+            <FilterIcon className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 cursor-pointer transition-colors sm:right-4 sm:h-4.5 sm:w-4.5" />
           </div>
         </DialogHeader>
 
         <Tabs
           defaultValue="media"
-          className="mt-6 flex flex-1 flex-col overflow-hidden"
+          className="mt-4 flex flex-1 flex-col overflow-hidden sm:mt-6"
         >
-          <div className="px-6">
-            <TabsList className="border-border/40 flex h-10 w-full justify-start gap-8 rounded-full border-b p-0">
+          <div className="px-4 sm:px-6">
+            <TabsList className="bg-muted/40 flex h-10 w-full justify-start gap-1 rounded-full p-1 sm:w-fit">
               <TabsTrigger
                 value="media"
-                className="text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary hover:text-foreground relative h-full rounded-full border-b-2 border-transparent bg-transparent px-2 text-sm font-bold transition-all data-[state=active]:shadow-none"
+                className="text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-1 rounded-full px-3 py-1 text-xs font-bold transition-all data-[state=active]:shadow-xs sm:flex-initial sm:px-4 sm:py-1.5 sm:text-sm"
               >
-                <div className="flex items-center gap-2">
-                  <ImageIcon className="h-4 w-4" />
-                  Media ({filteredItems.media.length})
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                  <ImageIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>Media ({filteredItems.media.length})</span>
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="docs"
-                className="text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary hover:text-foreground relative h-full rounded-full border-b-2 border-transparent bg-transparent px-2 text-sm font-bold transition-all data-[state=active]:shadow-none"
+                className="text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-1 rounded-full px-3 py-1 text-xs font-bold transition-all data-[state=active]:shadow-xs sm:flex-initial sm:px-4 sm:py-1.5 sm:text-sm"
               >
-                <div className="flex items-center gap-2">
-                  <FileIcon className="h-4 w-4" />
-                  Docs ({filteredItems.docs.length})
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                  <FileIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>Docs ({filteredItems.docs.length})</span>
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="links"
-                className="text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary hover:text-foreground relative h-full rounded-full border-b-2 border-transparent bg-transparent px-2 text-sm font-bold transition-all data-[state=active]:shadow-none"
+                className="text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-1 rounded-full px-3 py-1 text-xs font-bold transition-all data-[state=active]:shadow-xs sm:flex-initial sm:px-4 sm:py-1.5 sm:text-sm"
               >
-                <div className="flex items-center gap-2">
-                  <LinkIcon className="h-4 w-4" />
-                  Links ({filteredItems.links.length})
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                  <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>Links ({filteredItems.links.length})</span>
                 </div>
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <ScrollArea className="flex-1 p-6">
+          <ScrollArea className="flex-1 p-4 sm:p-6">
             <TabsContent value="media" className="m-0 focus-visible:ring-0">
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 {filteredItems.media.map((item: Message, idx: number) => (

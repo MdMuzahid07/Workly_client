@@ -482,6 +482,16 @@ const MessageView = () => {
 
   return (
     <div className="min-h-screen px-3.5 sm:px-6">
+      {showMobileChat && (
+        <style>{`
+          button[aria-label="Open sidebar"] {
+            display: none !important;
+          }
+          header.dashboard-header {
+            display: none !important;
+          }
+        `}</style>
+      )}
       {currentUser?.role === "EMPLOYER" ? (
         <DashboardEmployerMessagesHeader />
       ) : (
@@ -502,7 +512,7 @@ const MessageView = () => {
         <div
           className={`xl:col-span-8.5 h-full lg:col-span-8 ${
             showMobileChat
-              ? "bg-background fixed inset-0 z-[1000] h-screen w-screen lg:relative lg:inset-auto lg:z-0 lg:block lg:h-full lg:w-auto"
+              ? "bg-background fixed inset-0 z-40 h-screen w-screen lg:relative lg:inset-auto lg:z-0 lg:block lg:h-full lg:w-auto"
               : "hidden lg:block"
           }`}
         >
