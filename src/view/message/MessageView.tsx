@@ -1,6 +1,6 @@
 "use client";
-import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
 import DashboardEmployerMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerMessagesHeader";
+import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -501,18 +501,16 @@ const MessageView = () => {
         {/* Active Chat Panel */}
         <div
           className={`xl:col-span-8.5 h-full lg:col-span-8 ${
-            !showMobileChat && selectedConversation
-              ? "hidden lg:block"
-              : showMobileChat || !selectedConversation
-                ? "block"
-                : "hidden lg:block"
+            showMobileChat
+              ? "bg-background fixed inset-0 z-[1000] h-screen w-screen lg:relative lg:inset-auto lg:z-0 lg:block lg:h-full lg:w-auto"
+              : "hidden lg:block"
           }`}
         >
           {selectedConversation && currentConversation ? (
-            <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
+            <Card className="bg-card flex h-full flex-col overflow-hidden rounded-none border-0 shadow-none lg:rounded-2xl lg:border lg:shadow-xs">
               {/* Chat Header */}
-              <CardHeader className="border-border/40 bg-card/80 sticky top-0 z-10 border-b p-3.5 backdrop-blur-md sm:p-4">
-                <div className="flex items-center justify-between gap-3">
+              <CardHeader className="border-border/40 bg-card/80 sticky top-0 z-10 flex h-11 min-h-11 items-center border-b px-3.5 py-0 backdrop-blur-md sm:h-14 sm:min-h-14 sm:px-4 lg:h-16 lg:min-h-16 lg:px-4 lg:py-0">
+                <div className="flex w-full items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <Button
                       variant="ghost"
@@ -551,9 +549,27 @@ const MessageView = () => {
                         {currentConversation.participantName}
                       </h2>
                       <p className="text-muted-foreground truncate text-[11px] font-medium">
-                        {Object.values(typingUsers).some(Boolean)
-                          ? "Typing..."
-                          : currentConversation.participantRole || "Active Now"}
+                        {Object.values(typingUsers).some(Boolean) ? (
+                          "Typing..."
+                        ) : (
+                          <>
+                            <span className="lg:hidden">
+                              {currentConversation.participantRole
+                                ? currentConversation.participantRole.split(" ")
+                                    .length > 3
+                                  ? currentConversation.participantRole
+                                      .split(" ")
+                                      .slice(0, 3)
+                                      .join(" ") + "..."
+                                  : currentConversation.participantRole
+                                : "Active Now"}
+                            </span>
+                            <span className="hidden lg:inline">
+                              {currentConversation.participantRole ||
+                                "Active Now"}
+                            </span>
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
