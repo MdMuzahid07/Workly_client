@@ -21,7 +21,7 @@ const CandidateDetailsSkeleton = () => {
           <div className="space-y-6 lg:col-span-2">
             {/* Premium Header Card Skeleton */}
             <Card className="bg-background/60 overflow-hidden border backdrop-blur-xl">
-              <CardHeader className="p-8">
+              <CardHeader className="p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="bg-card relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-2xl md:h-32 md:w-32 dark:border-slate-800">
@@ -60,13 +60,13 @@ const CandidateDetailsSkeleton = () => {
 
             {/* Professional Summary Skeleton */}
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-5 w-5 rounded-md" />
                   <Skeleton className="h-6 w-48" />
                 </div>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2 p-4 pt-0 sm:p-6 sm:pt-0">
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-5/6" />
               </CardContent>
@@ -74,13 +74,13 @@ const CandidateDetailsSkeleton = () => {
 
             {/* Skills & Expertise Skeleton */}
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-5 w-5 rounded-md" />
                   <Skeleton className="h-6 w-40" />
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                 <div className="flex flex-wrap gap-3">
                   <Skeleton className="h-8 w-24 rounded-xl" />
                   <Skeleton className="h-8 w-28 rounded-xl" />
@@ -92,13 +92,13 @@ const CandidateDetailsSkeleton = () => {
 
             {/* Work Experience Skeleton */}
             <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-5 w-5 rounded-md" />
                   <Skeleton className="h-6 w-36" />
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 p-4 pt-0 sm:p-6 sm:pt-0">
                 {[1, 2].map((i) => (
                   <div key={i} className="relative pl-8">
                     {i === 1 && (
@@ -118,13 +118,13 @@ const CandidateDetailsSkeleton = () => {
 
             {/* Education Skeleton */}
             <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-5 w-5 rounded-md" />
                   <Skeleton className="h-6 w-24" />
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 p-4 pt-0 sm:p-6 sm:pt-0">
                 <div className="flex gap-4">
                   <div className="bg-primary/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
                     <Skeleton className="h-6 w-6 rounded-md" />
@@ -143,10 +143,10 @@ const CandidateDetailsSkeleton = () => {
           <div className="space-y-6">
             {/* Candidate Info Skeleton */}
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <Skeleton className="h-5 w-36" />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
@@ -161,10 +161,10 @@ const CandidateDetailsSkeleton = () => {
 
             {/* Links Skeleton */}
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <Skeleton className="h-5 w-16" />
               </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1">
+              <CardContent className="grid grid-cols-1 gap-3 p-4 pt-0 sm:grid-cols-2 sm:p-6 sm:pt-0 md:grid-cols-3 lg:grid-cols-1">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
@@ -185,7 +185,7 @@ const CandidateDetailsSkeleton = () => {
 
             {/* Verified Skeleton Card */}
             <Card className="bg-card overflow-hidden border">
-              <div className="space-y-4 p-6 text-center">
+              <div className="space-y-4 p-4 text-center sm:p-6">
                 <Skeleton className="mx-auto h-12 w-12 rounded-full" />
                 <Skeleton className="mx-auto h-6 w-36" />
                 <Skeleton className="mx-auto h-4 w-full" />

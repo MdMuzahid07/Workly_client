@@ -214,7 +214,7 @@ const JobDetailsView = () => {
           <div className="space-y-6 lg:col-span-2">
             {/* Premium Header Card */}
             <Card className="border-primary/10 bg-background/60 overflow-hidden border backdrop-blur-xl">
-              <CardHeader className="p-8">
+              <CardHeader className="p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="bg-card border-primary/10 relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border p-2 shadow-2xl md:h-24 md:w-24">
@@ -299,7 +299,7 @@ const JobDetailsView = () => {
                   </div>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 gap-4 border-t border-gray-100 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-6 grid grid-cols-1 gap-4 border-t border-gray-100 pt-6 sm:mt-8 sm:grid-cols-2 sm:pt-8 lg:grid-cols-3">
                   <div className="bg-primary/5 flex items-center gap-3 rounded-2xl p-4">
                     <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
                       <DollarSign className="text-primary h-5 w-5" />
@@ -353,13 +353,13 @@ const JobDetailsView = () => {
             <div className="space-y-6">
               {/* Description */}
               <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="text-primary h-5 w-5" />
                     Job Description
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                   <div className="text-foreground/80 leading-relaxed wrap-break-word whitespace-pre-line">
                     {job.description}
                   </div>
@@ -369,13 +369,13 @@ const JobDetailsView = () => {
               {/* Requirements */}
               {job.requirements && job.requirements.length > 0 && (
                 <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                  <CardHeader>
+                  <CardHeader className="p-4 sm:p-6">
                     <CardTitle className="flex items-center gap-2">
                       <Shield className="text-primary h-5 w-5" />
                       Requirements & Responsibilities
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                     <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {job.requirements.map((req: string, index: number) => (
                         <li
@@ -396,13 +396,13 @@ const JobDetailsView = () => {
               {/* Required Skills */}
               {job.JobSkill && job.JobSkill.length > 0 && (
                 <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                  <CardHeader>
+                  <CardHeader className="p-4 sm:p-6">
                     <CardTitle className="flex items-center gap-2">
                       <Target className="text-primary h-5 w-5" />
                       Required Skills
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                     <div className="flex flex-wrap gap-3">
                       {job.JobSkill.map((skill: any) => (
                         <div
@@ -434,13 +434,13 @@ const JobDetailsView = () => {
               {/* Benefits & Perks */}
               {(job.Benefits?.length > 0 || job.benefits?.length > 0) && (
                 <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                  <CardHeader>
+                  <CardHeader className="p-4 sm:p-6">
                     <CardTitle className="flex items-center gap-2">
                       <Award className="text-primary h-5 w-5" />
                       Benefits & Perks
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {job.Benefits?.length > 0
                         ? job.Benefits.map((benefit: any) => {
@@ -486,13 +486,13 @@ const JobDetailsView = () => {
 
               {/* About Company Summary */}
               <Card className="border-primary/10 bg-background/50 overflow-hidden border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <Building className="text-primary h-5 w-5" />
                     About the Company
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
                   <p className="text-foreground/80 line-clamp-3 leading-relaxed wrap-break-word">
                     {job.company?.description ||
                       "High-growth company looking for exceptional talent."}

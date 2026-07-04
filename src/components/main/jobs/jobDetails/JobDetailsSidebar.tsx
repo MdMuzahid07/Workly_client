@@ -177,7 +177,7 @@ const JobDetailsSidebar = ({
   return (
     <aside className="space-y-6">
       <Card className="border-primary/10 bg-background/50 sticky top-24 border backdrop-blur-sm">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
             <Link href={`/jobs/${job?.id}/apply`} className="block w-full">
               <Button
@@ -211,7 +211,7 @@ const JobDetailsSidebar = ({
       </Card>
 
       <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-        <CardHeader className="pb-4">
+        <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
               <Building2 className="text-primary h-4 w-4" />
@@ -219,7 +219,7 @@ const JobDetailsSidebar = ({
             About {companyName}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
           <CompanyInfoItem label="Industry" value={industry} />
           <CompanyInfoItem label="Company Size" value={companySize} />
           <CompanyInfoItem label="Job Type" value={jobType} />
@@ -236,10 +236,10 @@ const JobDetailsSidebar = ({
       </Card>
 
       <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-        <CardHeader className="pb-4">
+        <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
           <CardTitle className="text-lg">Job Statistics</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
           {stats.map((stat, index) => (
             <StatItem
               key={index}
@@ -252,10 +252,10 @@ const JobDetailsSidebar = ({
       </Card>
 
       <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-        <CardHeader className="pb-4">
+        <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
           <CardTitle className="text-lg">Similar Jobs</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
           {similarLoading ? (
             [1, 2, 3].map((i) => (
               <div

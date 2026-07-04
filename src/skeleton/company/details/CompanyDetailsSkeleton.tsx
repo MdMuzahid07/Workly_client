@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const HeaderSkeleton = () => (
   <Card className="border-primary/10 bg-background/50 animate-pulse overflow-hidden border backdrop-blur-sm">
-    <CardHeader className="p-8">
+    <CardHeader className="p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div className="flex flex-1 flex-col gap-6 md:flex-row">
           <div className="bg-card border-primary/10 relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border p-2 shadow-2xl sm:h-32 sm:w-32">
@@ -44,13 +44,13 @@ const HeaderSkeleton = () => (
 
 const AboutCompanySkeleton = () => (
   <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
-    <CardHeader>
+    <CardHeader className="p-4 sm:p-6">
       <div className="flex items-center gap-2">
         <Skeleton className="h-5 w-5 rounded" />
         <Skeleton className="h-6 w-48 rounded" />
       </div>
     </CardHeader>
-    <CardContent className="space-y-8">
+    <CardContent className="space-y-6 p-4 pt-0 sm:space-y-8 sm:p-6 sm:pt-0">
       <div>
         <Skeleton className="mb-3 h-4 w-36 rounded" />
         <div className="space-y-2">
@@ -73,14 +73,14 @@ const AboutCompanySkeleton = () => (
 
 const CoreValuesSkeleton = () => (
   <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
-    <CardHeader>
+    <CardHeader className="p-4 sm:p-6">
       <div className="flex items-center gap-2">
         <Skeleton className="h-5 w-5 rounded-full" />
         <Skeleton className="h-6 w-32 rounded" />
       </div>
       <Skeleton className="mt-1.5 h-4 w-72 rounded" />
     </CardHeader>
-    <CardContent>
+    <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
       <div className="grid grid-cols-1 gap-4">
         {[1, 2, 3].map((i) => (
           <div
@@ -101,13 +101,13 @@ const CoreValuesSkeleton = () => (
 
 const BenefitsSkeleton = () => (
   <Card className="border-primary/10 bg-background/50 animate-pulse border backdrop-blur-sm">
-    <CardHeader>
+    <CardHeader className="p-4 sm:p-6">
       <div className="flex items-center gap-2">
         <Skeleton className="h-5 w-5 rounded" />
         <Skeleton className="h-6 w-40 rounded" />
       </div>
     </CardHeader>
-    <CardContent>
+    <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[1, 2, 3, 4].map((i) => (
           <div
@@ -131,18 +131,18 @@ const BenefitsSkeleton = () => (
 
 const OpenPositionsSkeleton = () => (
   <Card className="border-primary/10 bg-background/50 animate-pulse scroll-mt-24 border backdrop-blur-sm">
-    <CardHeader>
+    <CardHeader className="p-4 sm:p-6">
       <div className="flex items-center gap-2">
         <Skeleton className="h-5 w-5 rounded" />
         <Skeleton className="h-6 w-48 rounded" />
       </div>
     </CardHeader>
-    <CardContent>
+    <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
       <div className="space-y-4">
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="border-primary/10 space-y-3 rounded-2xl border p-5"
+            className="border-primary/10 space-y-3 rounded-2xl border p-4 sm:p-5"
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1 space-y-2.5">
@@ -169,17 +169,17 @@ const OpenPositionsSkeleton = () => (
 const SidebarSkeleton = () => (
   <div className="animate-pulse space-y-6">
     <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-      <CardContent className="space-y-3 p-6">
+      <CardContent className="space-y-3 p-4 sm:p-6">
         <Skeleton className="h-11 w-full rounded-xl" />
         <Skeleton className="h-11 w-full rounded-xl" />
       </CardContent>
     </Card>
 
     <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
         <Skeleton className="h-6 w-36 rounded" />
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="space-y-3">
             <div className="flex items-center justify-between">
@@ -193,10 +193,10 @@ const SidebarSkeleton = () => (
     </Card>
 
     <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
         <Skeleton className="h-6 w-44 rounded" />
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
         {[1, 2].map((i) => (
           <div key={i} className="flex items-center gap-3">
             <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
@@ -210,10 +210,10 @@ const SidebarSkeleton = () => (
     </Card>
 
     <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
         <Skeleton className="h-6 w-36 rounded" />
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 p-4 pt-0 sm:p-6 sm:pt-0">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
@@ -228,10 +228,10 @@ const SidebarSkeleton = () => (
     </Card>
 
     <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
         <Skeleton className="h-6 w-40 rounded" />
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
         {[1, 2, 3].map((i) => (
           <div
             key={i}

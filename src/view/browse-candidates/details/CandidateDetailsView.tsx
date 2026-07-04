@@ -170,7 +170,7 @@ const CandidateDetailsView = () => {
           <div className="space-y-6 lg:col-span-2">
             {/* Premium Header Card */}
             <Card className="bg-background/60 overflow-hidden border backdrop-blur-xl">
-              <CardHeader className="p-8">
+              <CardHeader className="p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="bg-card relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-2xl md:h-32 md:w-32 dark:border-slate-800">
@@ -276,13 +276,13 @@ const CandidateDetailsView = () => {
 
             {/* About / Bio */}
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="flex items-center gap-2">
                   <User className="text-primary h-5 w-5" />
                   Professional Summary
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                 <p className="text-foreground/80 leading-relaxed whitespace-pre-line">
                   {profile.bio || "No biography provided."}
                 </p>
@@ -292,13 +292,13 @@ const CandidateDetailsView = () => {
             {/* Video Resume */}
             {profile.videoResumeUrl && (
               <Card className="bg-background/50 overflow-hidden border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <Video className="text-primary h-5 w-5" />
                     Video Resume / Introduction
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex justify-center bg-black/5 p-6">
+                <CardContent className="flex justify-center bg-black/5 p-4 sm:p-6">
                   <div className="relative aspect-video w-full max-w-3xl overflow-hidden rounded-xl border bg-black shadow-md">
                     <video
                       src={profile.videoResumeUrl}
@@ -316,13 +316,13 @@ const CandidateDetailsView = () => {
             {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
               <Card className="bg-background/50 border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <Shield className="text-primary h-5 w-5" />
                     Skills & Expertise
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                   <div className="flex flex-wrap gap-3">
                     {profile.skills.map((skill: any) => (
                       <div
@@ -345,13 +345,13 @@ const CandidateDetailsView = () => {
             {/* Work Experience */}
             {profile.workExperiences && profile.workExperiences.length > 0 && (
               <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <Briefcase className="text-primary h-5 w-5" />
                     Work Experience
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 p-4 pt-0 sm:p-6 sm:pt-0">
                   {profile.workExperiences.map((exp: any, index: number) => (
                     <div key={exp.id} className="relative pl-8">
                       {index !== profile.workExperiences.length - 1 && (
@@ -384,13 +384,13 @@ const CandidateDetailsView = () => {
             {/* Education */}
             {profile.education && profile.education.length > 0 && (
               <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <GraduationCap className="text-primary h-5 w-5" />
                     Education
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 p-4 pt-0 sm:p-6 sm:pt-0">
                   {profile.education.map((edu: any) => (
                     <div key={edu.id} className="flex gap-4">
                       <div className="bg-primary/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
@@ -423,12 +423,12 @@ const CandidateDetailsView = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base tracking-wider uppercase">
                   Candidate Info
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Expected Salary</span>
                   <span className="text-foreground font-bold">
@@ -457,12 +457,12 @@ const CandidateDetailsView = () => {
             </Card>
 
             <Card className="bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base tracking-wider uppercase">
                   Links
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1">
+              <CardContent className="grid grid-cols-1 gap-3 p-4 pt-0 sm:grid-cols-2 sm:p-6 sm:pt-0 md:grid-cols-3 lg:grid-cols-1">
                 {profile.linkedInUrl && (
                   <a
                     href={profile.linkedInUrl}
@@ -582,7 +582,7 @@ const CandidateDetailsView = () => {
             </Card>
 
             <Card className="bg-card overflow-hidden border">
-              <div className="space-y-4 p-6 text-center">
+              <div className="space-y-4 p-4 text-center sm:p-6">
                 <Award className="text-primary mx-auto h-12 w-12 opacity-20" />
                 <h3 className="text-lg font-bold">Workly Verified</h3>
                 <p className="text-muted-foreground text-xs">
