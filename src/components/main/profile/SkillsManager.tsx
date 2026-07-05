@@ -51,6 +51,7 @@ export const SkillsManager = ({
 }: SkillsManagerProps) => {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [experience, setExperience] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   interface TaxonomySkill {
     id: string;
@@ -66,17 +67,27 @@ export const SkillsManager = ({
 
   const { data: categoriesResponse } = useGetCategoriesQuery(undefined);
 
-  const dynamicSkills = useMemo(() => {
-    const categories = (categoriesResponse?.data || []) as CategoryWithSkills[];
-    const allSkills = categories.flatMap((cat) =>
-      (cat.taxonomySkills || []).map((s) => s.name),
-    );
-    return Array.from(new Set(allSkills)) as string[];
+  const categoriesList = useMemo(() => {
+    return (categoriesResponse?.data || []) as CategoryWithSkills[];
   }, [categoriesResponse]);
 
   const skillsList = useMemo(() => {
-    return dynamicSkills.length > 0 ? dynamicSkills : AVAILABLE_SKILLS;
-  }, [dynamicSkills]);
+    if (selectedCategory === "all") {
+      const allSkills = categoriesList.flatMap((cat) =>
+        (cat.taxonomySkills || []).map((s) => s.name),
+      );
+      const uniqueSkills = Array.from(new Set(allSkills)) as string[];
+      return uniqueSkills.length > 0 ? uniqueSkills : AVAILABLE_SKILLS;
+    } else {
+      const targetCategory = categoriesList.find(
+        (cat) => cat.id === selectedCategory,
+      );
+      const catSkills = (targetCategory?.taxonomySkills || []).map(
+        (s) => s.name,
+      );
+      return catSkills;
+    }
+  }, [categoriesList, selectedCategory]);
 
   const technicalSkills = skills.filter((skill) => skill?.type !== "SOFT");
   const softSkills = skills.filter((skill) => skill?.type === "SOFT");
@@ -118,6 +129,36 @@ export const SkillsManager = ({
       >
         <div className="space-y-6">
           <div className="bg-muted/20 flex flex-col items-end gap-4 rounded-lg border p-4 md:flex-row">
+            <div className="w-full space-y-2 md:flex-1">
+              <label className="text-muted-foreground text-xs font-medium uppercase">
+                Category
+              </label>
+              <Select
+                value={selectedCategory}
+                onValueChange={(val) => {
+                  setSelectedCategory(val);
+                  setSelectedSkill("");
+                }}
+              >
+                <SelectTrigger className="bg-background border-border cursor-pointer rounded-full">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem className="cursor-pointer" value="all">
+                    All Categories
+                  </SelectItem>
+                  {categoriesList.map((cat) => (
+                    <SelectItem
+                      className="cursor-pointer"
+                      key={cat.id}
+                      value={cat.id}
+                    >
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="w-full space-y-2 md:flex-1">
               <label className="text-muted-foreground text-xs font-medium uppercase">
                 Skill <span className="text-destructive">*</span>
