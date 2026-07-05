@@ -1259,6 +1259,15 @@ const ProfileView = () => {
             {activeModal === "language" && (
               <LanguageForm
                 onSubmit={(data) => {
+                  const exists = (localProfile?.languages || []).some(
+                    (lang: any) =>
+                      (lang.language || "").toLowerCase() ===
+                      data.language.toLowerCase(),
+                  );
+                  if (exists) {
+                    toast.error("This language has already been added.");
+                    return;
+                  }
                   const newLangs = [...(localProfile?.languages || []), data];
                   updateLocalSection("languages", newLangs);
                 }}

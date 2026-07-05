@@ -12,6 +12,7 @@ import { useGetCategoriesQuery } from "@/redux/feature/category/categoryApi";
 import type { Language, Skill } from "@/types/profile";
 import { X } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 
 // Mock skills list for dropdown fallback
 const AVAILABLE_SKILLS = [
@@ -109,6 +110,15 @@ export const SkillsManager = ({
 
   const handleAdd = () => {
     if (selectedSkill && experience && onAddTechnicalSkill) {
+      const exists = skills.some(
+        (s) =>
+          (s.skillName || s.skill || "").toLowerCase() ===
+            selectedSkill.toLowerCase() && s.type !== "SOFT",
+      );
+      if (exists) {
+        toast.error("This skill has already been added.");
+        return;
+      }
       onAddTechnicalSkill({
         skillName: selectedSkill,
         experienceYears: experienceToYears[experience] ?? 1,
