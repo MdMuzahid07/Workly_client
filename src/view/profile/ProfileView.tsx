@@ -893,7 +893,7 @@ const ProfileView = () => {
           }
         }}
       >
-        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto md:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
               {activeModal === "basic" && "Edit Basic Information"}
