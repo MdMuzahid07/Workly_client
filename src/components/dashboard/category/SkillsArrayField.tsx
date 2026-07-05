@@ -1,21 +1,21 @@
 "use client";
 
-import { LayoutGrid, Plus, Trash2 } from "lucide-react";
+import { Award, Plus, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
-interface SubcategoriesArrayFieldProps {
+interface SkillsArrayFieldProps {
   name: string;
   label?: string;
   placeholder?: string;
 }
 
-const SubcategoriesArrayField = ({
+const SkillsArrayField = ({
   name,
-  label = "Sub-categories",
-  placeholder = "Enter subcategory name...",
-}: SubcategoriesArrayFieldProps) => {
+  label = "Skills",
+  placeholder = "Enter skill name...",
+}: SkillsArrayFieldProps) => {
   const { watch, setValue } = useFormContext();
   const items = watch(name) || [];
 
@@ -38,7 +38,7 @@ const SubcategoriesArrayField = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between border-b pb-2">
         <h3 className="text-muted-foreground flex items-center gap-1.5 text-sm font-bold tracking-wider uppercase">
-          <LayoutGrid className="text-primary h-4 w-4" />
+          <Award className="text-primary h-4 w-4" />
           {label}
         </h3>
         <Button
@@ -49,14 +49,13 @@ const SubcategoriesArrayField = ({
           className="border-primary/25 hover:bg-primary/5 hover:text-primary h-8 rounded-full text-xs font-bold transition-all"
         >
           <Plus className="mr-1 h-3.5 w-3.5" />
-          Add Subcategory
+          Add Skill
         </Button>
       </div>
 
       {items.length === 0 ? (
         <div className="text-muted-foreground bg-muted/20 border-muted-foreground/20 rounded-xl border border-dashed p-6 text-center text-sm font-medium">
-          No subcategories added yet. Click &quot;Add Subcategory&quot; to get
-          started.
+          No skills added yet. Click &quot;Add Skill&quot; to get started.
         </div>
       ) : (
         <div className="scrollbar-thin grid max-h-[220px] grid-cols-1 gap-2 overflow-y-auto pr-1.5">
@@ -89,4 +88,4 @@ const SubcategoriesArrayField = ({
   );
 };
 
-export default SubcategoriesArrayField;
+export default SkillsArrayField;

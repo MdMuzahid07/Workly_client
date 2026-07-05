@@ -1,5 +1,6 @@
 "use client";
 import WKCheckbox from "@/components/form/WKCheckbox";
+import WKDatePicker from "@/components/form/WKDatePicker";
 import WkForm from "@/components/form/WkForm";
 import WKInput from "@/components/form/WkInput";
 import WKSelect from "@/components/form/WkSelect";
@@ -60,13 +61,7 @@ export const EducationForm = ({
           />
         </div>
 
-        <WKInput
-          name="year"
-          label="Year of Passing"
-          placeholder="e.g. 2024"
-          type="number"
-          required
-        />
+        <WKDatePicker name="year" label="Year of Passing" required />
         <WKInput
           name="result"
           label="Result / GPA"

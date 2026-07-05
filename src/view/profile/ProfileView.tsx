@@ -961,7 +961,11 @@ const ProfileView = () => {
                         level: editingEdu.level || "",
                         degree: editingEdu.degree || "",
                         institute: editingEdu.institute || "",
-                        year: editingEdu.year ? String(editingEdu.year) : "",
+                        year: editingEdu.year
+                          ? editingEdu.year.includes("-")
+                            ? editingEdu.year
+                            : `${editingEdu.year}-01-01`
+                          : "",
                         result: editingEdu.result || "",
                         currentlyStudying:
                           editingEdu.currentlyStudying ||
@@ -972,6 +976,12 @@ const ProfileView = () => {
                 }
                 onSubmit={async (data) => {
                   let newEdu;
+                  const normalizedData = {
+                    ...data,
+                    year: data.year.includes("-")
+                      ? data.year.split("-")[0]
+                      : data.year,
+                  };
                   if (
                     editingEduIndex !== null &&
                     editingEduIndex !== undefined
@@ -981,12 +991,15 @@ const ProfileView = () => {
                     ];
                     const updatedItem = {
                       ...existing,
-                      ...data,
+                      ...normalizedData,
                     };
                     newEdu = [...(localProfile?.education || [])];
                     newEdu[editingEduIndex] = updatedItem;
                   } else {
-                    newEdu = [...(localProfile?.education || []), data];
+                    newEdu = [
+                      ...(localProfile?.education || []),
+                      normalizedData,
+                    ];
                   }
                   updateLocalSection("education", newEdu);
                   setEditingEdu(null);

@@ -2,6 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { getNestedValue } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 
 interface WKTextAreaProps {
@@ -35,7 +36,8 @@ const WKTextArea = ({
     lg: "min-h-[100px]",
   };
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
     <div className="space-y-2">
@@ -57,7 +59,7 @@ const WKTextArea = ({
       />
       {hasError && (
         <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
+          {fieldError?.message as string}
         </p>
       )}
     </div>

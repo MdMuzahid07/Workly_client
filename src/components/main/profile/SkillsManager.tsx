@@ -8,11 +8,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetCategoriesQuery } from "@/redux/feature/category/categoryApi";
 import type { Language, Skill } from "@/types/profile";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
-// Mock skills list for dropdown
+// Mock skills list for dropdown fallback
 const AVAILABLE_SKILLS = [
   "React.js",
   "Node.js",
@@ -50,6 +51,32 @@ export const SkillsManager = ({
 }: SkillsManagerProps) => {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [experience, setExperience] = useState("");
+
+  interface TaxonomySkill {
+    id: string;
+    name: string;
+    active: boolean;
+  }
+
+  interface CategoryWithSkills {
+    id: string;
+    name: string;
+    taxonomySkills?: TaxonomySkill[];
+  }
+
+  const { data: categoriesResponse } = useGetCategoriesQuery(undefined);
+
+  const dynamicSkills = useMemo(() => {
+    const categories = (categoriesResponse?.data || []) as CategoryWithSkills[];
+    const allSkills = categories.flatMap((cat) =>
+      (cat.taxonomySkills || []).map((s) => s.name),
+    );
+    return Array.from(new Set(allSkills)) as string[];
+  }, [categoriesResponse]);
+
+  const skillsList = useMemo(() => {
+    return dynamicSkills.length > 0 ? dynamicSkills : AVAILABLE_SKILLS;
+  }, [dynamicSkills]);
 
   const technicalSkills = skills.filter((skill) => skill?.type !== "SOFT");
   const softSkills = skills.filter((skill) => skill?.type === "SOFT");
@@ -100,7 +127,7 @@ export const SkillsManager = ({
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AVAILABLE_SKILLS.map((skill) => (
+                  {skillsList.map((skill) => (
                     <SelectItem
                       className="cursor-pointer"
                       key={skill}

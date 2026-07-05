@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn, getNestedValue } from "@/lib/utils";
 import { Controller, useFormContext } from "react-hook-form";
 
 interface WKDatePickerProps {
@@ -29,7 +29,8 @@ const WKDatePicker = ({
     formState: { errors },
   } = useFormContext();
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
     <div className="space-y-2">
@@ -59,7 +60,7 @@ const WKDatePicker = ({
       />
       {hasError && (
         <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
+          {fieldError?.message as string}
         </p>
       )}
     </div>

@@ -3,6 +3,8 @@
 
 import AddCategoryDialog from "@/components/dashboard/categories/AddCategoryDialog";
 import AddSubcategoryDialog from "@/components/dashboard/categories/AddSubcategoryDialog";
+import AddSkillDialog from "@/components/dashboard/categories/AddSkillDialog";
+import EditCategoryModal from "@/components/dashboard/category/EditCategoryModal";
 import DashboardAdminCategoriesHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminCategoriesHeader";
 import { Button } from "@/components/ui/button";
 import debounce from "debounce";
@@ -23,7 +25,9 @@ const AdminCategoriesManagementView = () => {
 
   // Modal States
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
   const [isAddSubcategoryOpen, setIsAddSubcategoryOpen] = useState(false);
+  const [isAddSkillOpen, setIsAddSkillOpen] = useState(false);
   const [selectedParent, setSelectedParent] = useState<any>(null);
 
   // 300ms debounce — prevents API call on every keystroke
@@ -110,6 +114,14 @@ const AdminCategoriesManagementView = () => {
             setSelectedParent(cat);
             setIsAddSubcategoryOpen(true);
           }}
+          onAddSkill={(cat) => {
+            setSelectedParent(cat);
+            setIsAddSkillOpen(true);
+          }}
+          onEdit={(cat) => {
+            setSelectedParent(cat);
+            setIsEditCategoryOpen(true);
+          }}
         />
       </div>
 
@@ -119,9 +131,20 @@ const AdminCategoriesManagementView = () => {
         onOpenChange={setIsAddCategoryOpen}
         onSuccess={() => {}} // RTK Query handles invalidation
       />
+      <EditCategoryModal
+        open={isEditCategoryOpen}
+        onOpenChange={setIsEditCategoryOpen}
+        category={selectedParent}
+      />
       <AddSubcategoryDialog
         open={isAddSubcategoryOpen}
         onOpenChange={setIsAddSubcategoryOpen}
+        onSuccess={() => {}} // RTK Query handles invalidation
+        parentCategory={selectedParent}
+      />
+      <AddSkillDialog
+        open={isAddSkillOpen}
+        onOpenChange={setIsAddSkillOpen}
         onSuccess={() => {}} // RTK Query handles invalidation
         parentCategory={selectedParent}
       />
