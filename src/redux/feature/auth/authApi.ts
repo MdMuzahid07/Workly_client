@@ -121,6 +121,12 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    deleteMe: builder.mutation<void, void>({
+      query: () => ({
+        url: "/users/me",
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -135,6 +141,7 @@ export const {
   useLogoutUserMutation,
   useChangePasswordMutation,
   useConfirmGoogleRoleMutation,
+  useDeleteMeMutation,
 } = authApi;
 
 export default authApi;

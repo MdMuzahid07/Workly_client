@@ -40,12 +40,12 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
           <div>
             <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                <div className="bg-background relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border p-1.5 shadow-2xs sm:h-16 sm:w-16 sm:rounded-2xl">
+                <div className="bg-background relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border shadow-2xs sm:h-16 sm:w-16 sm:rounded-2xl">
                   <Image
                     src={company.logo}
                     alt={company.name}
                     fill
-                    className="rounded-lg object-contain p-1 sm:p-1.5"
+                    className="object-cover"
                   />
                 </div>
                 <div className="min-w-0 flex-1">

@@ -74,13 +74,13 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-background/95 sm:border-border/40 [&_[data-slot=dialog-close]]:border-border/60 [&_[data-slot=dialog-close]]:bg-muted/40 [&_[data-slot=dialog-close]]:hover:bg-muted/80 fixed top-0 left-0 flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-0 shadow-2xl backdrop-blur-xl sm:top-[50%] sm:left-[50%] sm:h-[85vh] sm:w-[90vw] sm:max-w-5xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border md:w-[85vw] lg:w-[70vw] xl:w-[60vw] [&_[data-slot=dialog-close]]:top-4 [&_[data-slot=dialog-close]]:right-4 [&_[data-slot=dialog-close]]:flex [&_[data-slot=dialog-close]]:h-8 [&_[data-slot=dialog-close]]:w-8 [&_[data-slot=dialog-close]]:items-center [&_[data-slot=dialog-close]]:justify-center [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border [&_[data-slot=dialog-close]]:transition-all">
         <DialogHeader className="p-4 pb-0 sm:p-6 sm:pb-0">
-          <div className="mb-2 flex items-center justify-between pr-8 sm:pr-0">
+          <div className="mb-2 flex flex-wrap items-center gap-2 pr-12 sm:pr-0">
             <DialogTitle className="text-xl font-black tracking-tight sm:text-2xl">
               Shared Media
             </DialogTitle>
             <Badge
               variant="secondary"
-              className="bg-success/10 text-success border-success/20 mr-2 px-2 py-0.5 text-[10px] font-bold sm:mr-0 sm:px-3 sm:py-1 sm:text-xs"
+              className="bg-success/10 text-success border-success/20 shrink-0 px-2 py-0.5 text-[10px] font-bold sm:px-3 sm:py-1 sm:text-xs"
             >
               <DownloadIcon className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
               {totalSize} MB

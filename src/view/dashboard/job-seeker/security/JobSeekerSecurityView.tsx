@@ -129,7 +129,7 @@ export default function JobSeekerSecurityView({
             </CardContent>
           </Card>
 
-          <div className="rounded-xl border p-4">
+          <div className="bg-card rounded-xl border p-4">
             <div className="flex items-start gap-3">
               <AlertCircle className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div className="space-y-1">

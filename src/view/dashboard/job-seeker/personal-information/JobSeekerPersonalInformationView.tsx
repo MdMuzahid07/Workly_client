@@ -162,7 +162,7 @@ export default function JobSeekerPersonalInformationView({
               This will be displayed on your profile.
             </p>
           </div>
-          <div className="flex flex-col items-center gap-4 rounded-xl border p-6 text-center">
+          <div className="bg-card flex flex-col items-center gap-4 rounded-xl border p-6 text-center">
             <div className="relative">
               <Avatar className="h-32 w-32 border-4 border-white outline-1">
                 <AvatarImage

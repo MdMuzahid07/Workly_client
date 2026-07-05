@@ -540,7 +540,7 @@ const ProfileView = () => {
         </Card>
 
         {/* Tabs Navigation */}
-        <Tabs defaultValue="personal" className="w-full">
+        <Tabs defaultValue="personal" className="w-full pb-10">
           <div className="scrollbar-none mb-4 w-full overflow-x-auto sm:mb-6">
             <TabsList className="bg-muted/30 border-border/50 flex h-10 w-full min-w-max gap-1 rounded-full border p-1 whitespace-nowrap lg:grid lg:h-12 lg:min-w-0 lg:grid-cols-4 lg:whitespace-normal">
               <TabsTrigger

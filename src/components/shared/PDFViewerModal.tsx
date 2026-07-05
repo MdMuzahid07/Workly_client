@@ -160,11 +160,69 @@ const PDFViewerModal = ({
         >
           <div className="mx-auto w-fit max-w-full rounded-sm border bg-white shadow-2xl">
             {isLoading && (
-              <div className="flex flex-col items-center justify-center gap-4 p-20">
-                <Loader2 className="text-primary h-10 w-10 animate-spin" />
-                <p className="text-muted-foreground text-sm font-bold">
-                  Preparing your resume...
-                </p>
+              <div className="relative flex aspect-[1/1.414] w-[800px] max-w-full flex-col gap-8 overflow-hidden bg-white p-8 sm:p-12">
+                {/* Header Skeleton */}
+                <div className="flex animate-pulse flex-col gap-3">
+                  <div className="bg-muted h-8 w-1/3 rounded-md" />
+                  <div className="bg-muted h-4 w-1/4 rounded-md" />
+                  <div className="bg-muted mt-1 h-3 w-1/2 rounded-md" />
+                </div>
+
+                {/* Divider */}
+                <div className="bg-muted h-px animate-pulse" />
+
+                {/* Body Content Skeletons */}
+                <div className="flex flex-1 animate-pulse flex-col gap-6">
+                  {/* Summary Section */}
+                  <div className="space-y-2">
+                    <div className="bg-muted mb-3 h-5 w-24 rounded-md" />
+                    <div className="bg-muted h-3.5 w-full rounded-md" />
+                    <div className="bg-muted h-3.5 w-[92%] rounded-md" />
+                    <div className="bg-muted h-3.5 w-[85%] rounded-md" />
+                  </div>
+
+                  {/* Experience Section */}
+                  <div className="space-y-4">
+                    <div className="bg-muted mb-3 h-5 w-32 rounded-md" />
+                    {[1, 2].map((i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="flex justify-between">
+                          <div className="bg-muted h-4 w-40 rounded-md" />
+                          <div className="bg-muted h-3 w-20 rounded-md" />
+                        </div>
+                        <div className="bg-muted h-3.5 w-full rounded-md" />
+                        <div className="bg-muted h-3.5 w-[96%] rounded-md" />
+                        <div className="bg-muted h-3.5 w-[90%] rounded-md" />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Skills Section */}
+                  <div className="space-y-2">
+                    <div className="bg-muted mb-3 h-5 w-20 rounded-md" />
+                    <div className="flex flex-wrap gap-2">
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div
+                          key={i}
+                          className="bg-muted h-7 w-16 rounded-full"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Centered Premium Overlay Loader */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/70 backdrop-blur-xs">
+                  <div className="flex min-w-[240px] flex-col items-center gap-3.5 rounded-2xl border bg-white/90 p-6 shadow-md">
+                    <div className="relative flex items-center justify-center">
+                      <div className="border-primary/20 absolute h-8 w-8 rounded-full border-2" />
+                      <Loader2 className="text-primary h-8 w-8 animate-spin" />
+                    </div>
+                    <span className="text-foreground text-sm font-bold tracking-tight">
+                      Preparing your resume...
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -206,8 +264,8 @@ const PDFViewerModal = ({
                       <Page
                         pageNumber={page}
                         scale={scale}
-                        renderAnnotationLayer={false}
-                        renderTextLayer={false}
+                        renderAnnotationLayer={true}
+                        renderTextLayer={true}
                         className="max-w-full"
                         width={containerWidth}
                       />
