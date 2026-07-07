@@ -2,8 +2,11 @@ import { ImageIcon, Mail, Phone, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { toast } from "sonner";
-import { useUploadMultipleFilesMutation } from "../../../../redux/feature/upload/uploadApi";
+import {
+  useUploadLogoMutation,
+  useUploadCoverMutation,
+} from "../../../../redux/feature/upload/uploadApi";
+import { useCompressedUpload } from "@/hooks/useCompressedUpload";
 import { CompanyFormData } from "../../../../view/dashboard/employer/company-creation/CompanyCreationView";
 import WKInput from "../../../form/WkInput";
 import { Button } from "../../../ui/button";
@@ -17,8 +20,16 @@ import {
 
 const MediaContactStep = () => {
   const { watch, setValue } = useFormContext<CompanyFormData>();
-  const [uploadMultipleFiles, { isLoading }] = useUploadMultipleFilesMutation();
   const formData = watch();
+  const [uploadLogo] = useUploadLogoMutation();
+  const [uploadCover] = useUploadCoverMutation();
+  const { upload: uploadLogoCompressed, isProcessing: compressingLogo } =
+    useCompressedUpload("logo");
+  const { upload: uploadCoverCompressed, isProcessing: compressingCover } =
+    useCompressedUpload("cover");
+
+  const uploadingLogo = compressingLogo;
+  const uploadingCover = compressingCover;
 
   const [logoPreview, setLogoPreview] = useState<string | null>(
     watch("logoUrl") || null,
@@ -26,64 +37,59 @@ const MediaContactStep = () => {
   const [coverPreview, setCoverPreview] = useState<string | null>(
     watch("coverUrl") || null,
   );
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [uploadingCover, setUploadingCover] = useState(false);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (
-    file: File,
-    fieldName: "logoUrl" | "coverUrl",
-    setPreview: (preview: string | null) => void,
-    setUploading: (uploading: boolean) => void,
-    maxSize: number,
-  ) => {
+  const handleLogoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size
-    if (file.size > maxSize * 1024 * 1024) {
-      toast.error(`File size must be less than ${maxSize}MB`);
-      return;
-    }
 
     // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPreview(reader.result as string);
+      setLogoPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
 
-    setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("files", file);
-      const response = await uploadMultipleFiles(formData).unwrap();
-
-      if (response.success && response.data.urls?.[0]) {
-        setValue(fieldName, response.data.urls[0]);
-        toast.success("File uploaded successfully");
+      const res = await uploadLogoCompressed(
+        file,
+        (formData) => uploadLogo(formData).unwrap(),
+        "Logo uploaded successfully",
+      );
+      if (res.success && res.data?.url) {
+        setValue("logoUrl", res.data.url);
       }
     } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload file");
-      setPreview(null);
-    } finally {
-      setUploading(false);
+      console.error("Upload logo error:", error);
+      setLogoPreview(null);
     }
   };
 
-  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      handleFileUpload(file, "logoUrl", setLogoPreview, setUploadingLogo, 2);
-    }
-  };
+    if (!file) return;
 
-  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileUpload(file, "coverUrl", setCoverPreview, setUploadingCover, 5);
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoverPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      const res = await uploadCoverCompressed(
+        file,
+        (formData) => uploadCover(formData).unwrap(),
+        "Cover image uploaded successfully",
+      );
+      if (res.success && res.data?.url) {
+        setValue("coverUrl", res.data.url);
+      }
+    } catch (error) {
+      console.error("Upload cover error:", error);
+      setCoverPreview(null);
     }
   };
 
@@ -150,7 +156,7 @@ const MediaContactStep = () => {
             {logoPreview ? (
               <div className="relative">
                 <div className="border-border overflow-hidden rounded-lg border">
-                  {isLoading ? (
+                  {uploadingLogo ? (
                     <div className="bg-primary/20 flex h-32 w-full animate-pulse items-center justify-center">
                       <Upload className="text-muted-foreground h-6 w-6 animate-bounce" />
                     </div>
@@ -219,7 +225,7 @@ const MediaContactStep = () => {
             {coverPreview ? (
               <div className="relative">
                 <div className="border-border overflow-hidden rounded-lg border">
-                  {isLoading ? (
+                  {uploadingCover ? (
                     <div className="bg-primary/20 flex h-32 w-full animate-pulse items-center justify-center">
                       <Upload className="text-muted-foreground h-6 w-6 animate-bounce" />
                     </div>

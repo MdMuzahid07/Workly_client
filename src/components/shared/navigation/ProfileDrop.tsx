@@ -34,7 +34,9 @@ interface UserProfile {
   fullName: string;
   email: string;
   avatar?: string;
-  initials: string;
+  profilePicture?: string;
+  avatarUrl?: string;
+  initials?: string;
   role?: string;
   companyId?: string | number;
 }
@@ -89,11 +91,17 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
     Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
 
   const menuItems: MenuItem[] = [
-    {
-      icon: User,
-      label: "Profile",
-      href: isEmployer ? "/profile" : "/dashboard/profile",
-    },
+    ...(!isAdmin && !isSuperAdmin
+      ? [
+          {
+            icon: User,
+            label: "Profile",
+            href: isEmployer
+              ? "/employer/company-profile"
+              : "/dashboard/profile",
+          },
+        ]
+      : []),
     ...(isAdmin || isSuperAdmin
       ? [{ icon: ShieldCheck, label: "Admin", href: "/admin" }]
       : []),
@@ -113,7 +121,15 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
           },
         ]
       : []),
-    { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+    {
+      icon: Settings,
+      label: "Settings",
+      href: isEmployer
+        ? "/employer/settings"
+        : isAdmin || isSuperAdmin
+          ? "/admin/settings"
+          : "/dashboard/settings",
+    },
   ];
 
   return (
@@ -123,9 +139,11 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({
         className="group flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80"
       >
         <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 dark:border-slate-800">
-          {user?.avatar ? (
+          {user?.avatar || user?.profilePicture || user?.avatarUrl ? (
             <Image
-              src={user?.avatar}
+              src={
+                user?.avatar || user?.profilePicture || user?.avatarUrl || ""
+              }
               alt={user?.fullName}
               fill
               className="object-cover"

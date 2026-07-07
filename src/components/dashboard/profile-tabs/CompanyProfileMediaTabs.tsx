@@ -1,6 +1,10 @@
 "use client";
 import { SectionCard } from "@/components/main/profile/SectionCard";
-import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+import {
+  useUploadLogoMutation,
+  useUploadCoverMutation,
+} from "@/redux/feature/upload/uploadApi";
+import { useCompressedUpload } from "@/hooks/useCompressedUpload";
 import { TabsContent } from "@radix-ui/react-tabs";
 import {
   Camera,
@@ -14,7 +18,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
-import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { CardDescription } from "../../ui/card";
 
@@ -31,8 +34,14 @@ const CompanyProfileMediaTabs = ({
   updateField: (field: string, value: unknown) => void;
   editedProfile: Partial<CompanyProfile>;
 }) => {
-  const [uploadFile, { isLoading: isUploading }] =
-    useUploadSingleFileMutation();
+  const [uploadLogo] = useUploadLogoMutation();
+  const [uploadCover] = useUploadCoverMutation();
+  const { upload: uploadLogoCompressed, isProcessing: isUploadingLogo } =
+    useCompressedUpload("logo");
+  const { upload: uploadCoverCompressed, isProcessing: isUploadingCover } =
+    useCompressedUpload("cover");
+  const isUploading = isUploadingLogo || isUploadingCover;
+
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,33 +52,33 @@ const CompanyProfileMediaTabs = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size should be less than 5MB");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Only image files are allowed");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await uploadFile(formData).unwrap();
-      if (res.success && res.data?.url) {
-        updateField(field, res.data.url);
-        toast.success(
-          `${field === "logoUrl" ? "Logo" : "Cover image"} updated`,
+      let res;
+      if (field === "logoUrl") {
+        res = await uploadLogoCompressed(
+          file,
+          (formData) => uploadLogo(formData).unwrap(),
+          "Logo updated",
+          {
+            description: "Changes will be permanent once you save the profile.",
+          },
+        );
+      } else {
+        res = await uploadCoverCompressed(
+          file,
+          (formData) => uploadCover(formData).unwrap(),
+          "Cover image updated",
           {
             description: "Changes will be permanent once you save the profile.",
           },
         );
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+      if (res.success && res.data?.url) {
+        updateField(field, res.data.url);
+      }
     } catch (error) {
-      toast.error("Upload failed. Please try again.");
+      console.error("Upload error:", error);
     }
   };
 

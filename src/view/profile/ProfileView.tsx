@@ -16,7 +16,8 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/profile/profileApi";
-import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+import { useUploadAvatarMutation } from "@/redux/feature/upload/uploadApi";
+import { useCompressedUpload } from "@/hooks/useCompressedUpload";
 import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import {
   Briefcase,
@@ -129,32 +130,27 @@ const ProfileView = () => {
   const user = data?.data;
 
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  const [uploadSingleFile, { isLoading: isUploadingAvatar }] =
-    useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadAvatarMutation();
+  const { upload: uploadCompressedImage, isProcessing: isUploadingAvatar } =
+    useCompressedUpload("avatar");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size must be less than 5MB");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await uploadSingleFile(formData).unwrap();
+      const res = await uploadCompressedImage(
+        file,
+        (formData) => uploadSingleFile(formData).unwrap(),
+        "Avatar uploaded! Click 'Save Changes' to apply.",
+      );
       if (res.success && res.data?.url) {
         const newAvatarUrl = res.data.url;
         setLocalProfile((prev: any) => ({ ...prev, avatarUrl: newAvatarUrl }));
-        toast.success("Image uploaded! Click 'Save Changes' to apply.");
       }
     } catch (err: any) {
       console.error("Failed to upload avatar:", err);
-      toast.error(err?.data?.message || "Failed to upload profile picture");
     } finally {
       if (e.target) e.target.value = "";
     }
