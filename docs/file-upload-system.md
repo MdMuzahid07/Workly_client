@@ -97,3 +97,28 @@ const { upload: uploadCoverCompressed, isProcessing: isUploadingCover } = useCom
 
 const isUploading = isUploadingLogo || isUploadingCover;
 ```
+
+### C. Chatbox Attachments & Resumes (Uncompressed / Raw Uploads)
+
+Documents, video resumes, and file attachments shared in the chatbox must not be resized or compressed to protect original data (e.g. PDFs, Word documents, raw images, or video clips). These bypass the compression hook and utilize the standard mutation directly:
+
+```typescript
+import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+
+// Inside chat inputs, resume uploaders, or document managers:
+const [uploadSingleFile, { isLoading }] = useUploadSingleFileMutation();
+
+const handleRawUpload = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file); // Appends the raw, original file
+
+  try {
+    const res = await uploadSingleFile(formData).unwrap();
+    if (res.success && res.data?.url) {
+      // send message with attachment link, or save resume URL...
+    }
+  } catch (error) {
+    console.error("Upload failed:", error);
+  }
+};
+```
