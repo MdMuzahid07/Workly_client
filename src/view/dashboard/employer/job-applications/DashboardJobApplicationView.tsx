@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import PaginationBar from "@/components/shared/PaginationBar";
@@ -29,14 +28,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -52,17 +43,14 @@ import {
   useUpdateApplicationStatusMutation,
 } from "@/redux/feature/application/applicationApi";
 import { useGetMyJobsQuery } from "@/redux/feature/job/jobApi";
-import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
+
 import { ApplicationStatus, EmployerApplication } from "@/types/application";
 import debounce from "debounce";
 import {
   CheckCircle,
   Eye,
   FileText,
-  Mail,
-  MessageSquare,
   MoreVertical,
-  Phone,
   XCircle,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -134,6 +122,7 @@ const getApplicantName = (application: EmployerApplication) =>
 const getApplicantEmail = (application: EmployerApplication) =>
   application.email || application.applicant.email;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getApplicantPhone = (application: EmployerApplication) =>
   application.phone || application.applicant.phone;
 
@@ -177,8 +166,6 @@ const DashboardJobApplicationView = () => {
   >("all");
   const [activeTab, setActiveTab] = useState<ApplicationStatus | "all">("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedApplication, setSelectedApplication] =
-    useState<EmployerApplication | null>(null);
   const [updatingApplicationId, setUpdatingApplicationId] = useState<
     string | null
   >(null);
@@ -236,8 +223,6 @@ const DashboardJobApplicationView = () => {
     sortOrder: "desc",
   });
   const [updateApplicationStatus] = useUpdateApplicationStatusMutation();
-  const [createConversation, { isLoading: isCreatingChat }] =
-    useCreateConversationMutation();
   const router = useRouter();
 
   const applications = (applicationsResponse?.data ||
@@ -339,26 +324,6 @@ const DashboardJobApplicationView = () => {
     );
     setRejectModalOpen(false);
     setApplicationToReject(null);
-  };
-
-  const handleStartChat = async (application: EmployerApplication) => {
-    try {
-      toast.loading("Starting conversation...", { id: "create_chat" });
-      const res = await createConversation({
-        participantId: application.applicant.id,
-        applicationId: application.id,
-      }).unwrap();
-
-      if (res.success) {
-        toast.success("Conversation started!", { id: "create_chat" });
-        router.push("/employer/messages");
-      }
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to start conversation", {
-        id: "create_chat",
-      });
-      console.error(err);
-    }
   };
 
   const hasActiveFilters =
@@ -558,7 +523,9 @@ const DashboardJobApplicationView = () => {
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuItem
                                         onClick={() =>
-                                          setSelectedApplication(application)
+                                          router.push(
+                                            `/employer/applications/${application.id}`,
+                                          )
                                         }
                                       >
                                         <Eye className="mr-2 h-4 w-4" />
@@ -641,167 +608,6 @@ const DashboardJobApplicationView = () => {
           </Tabs>
         </div>
       </div>
-
-      <Sheet
-        open={!!selectedApplication}
-        onOpenChange={(open) => !open && setSelectedApplication(null)}
-      >
-        <SheetContent side="right" className="w-full p-0 sm:max-w-2xl">
-          <ScrollArea className="h-full px-6 py-6">
-            {selectedApplication && (
-              <>
-                <SheetHeader className="mb-6">
-                  <SheetTitle>
-                    {getApplicantName(selectedApplication)}
-                  </SheetTitle>
-                  <SheetDescription>
-                    Application for {selectedApplication.job.title}
-                  </SheetDescription>
-                </SheetHeader>
-
-                <div className="space-y-5">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Badge
-                      variant="outline"
-                      className={getStatusColor(selectedApplication.status)}
-                    >
-                      {statusLabels[selectedApplication.status]}
-                    </Badge>
-                    <span className="text-muted-foreground text-sm">
-                      Applied{" "}
-                      {new Date(
-                        selectedApplication.createdAt,
-                      ).toLocaleDateString(undefined, {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-xl border p-4">
-                      <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
-                        <Mail className="h-4 w-4" />
-                        Email
-                      </div>
-                      <p className="mt-2 text-sm font-medium">
-                        {getApplicantEmail(selectedApplication)}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border p-4">
-                      <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold uppercase">
-                        <Phone className="h-4 w-4" />
-                        Phone
-                      </div>
-                      <p className="mt-2 text-sm font-medium">
-                        {getApplicantPhone(selectedApplication) ||
-                          "Not provided"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-xl border p-4">
-                      <p className="text-muted-foreground text-xs font-bold uppercase">
-                        Current Location
-                      </p>
-                      <p className="mt-2 text-sm font-medium">
-                        {selectedApplication.currentLocation ||
-                          selectedApplication.applicant.profile?.location ||
-                          "Not provided"}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border p-4">
-                      <p className="text-muted-foreground text-xs font-bold uppercase">
-                        Experience
-                      </p>
-                      <p className="mt-2 text-sm font-medium">
-                        {selectedApplication.yearsOfExperience ?? 0} years
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border p-4">
-                    <p className="text-muted-foreground text-xs font-bold uppercase">
-                      Cover Letter
-                    </p>
-                    <p className="mt-3 text-sm leading-6 whitespace-pre-wrap">
-                      {selectedApplication.coverLetter ||
-                        "No cover letter provided."}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    {selectedApplication.resumeUrl && (
-                      <Button
-                        className="rounded-xl"
-                        onClick={() => {
-                          setApplicationForResume(selectedApplication);
-                          setResumeSheetOpen(true);
-                        }}
-                      >
-                        <FileText className="mr-2 h-4 w-4" />
-                        View Resume
-                      </Button>
-                    )}
-                    {NEXT_STATUS[selectedApplication.status] && (
-                      <Button
-                        variant="outline"
-                        className="rounded-xl"
-                        disabled={
-                          updatingApplicationId === selectedApplication.id
-                        }
-                        onClick={() =>
-                          handleUpdateStatus(
-                            selectedApplication,
-                            NEXT_STATUS[
-                              selectedApplication.status
-                            ] as ApplicationStatus,
-                          )
-                        }
-                      >
-                        Move to{" "}
-                        {
-                          statusLabels[
-                            NEXT_STATUS[
-                              selectedApplication.status
-                            ] as ApplicationStatus
-                          ]
-                        }
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      className="rounded-xl"
-                      disabled={isCreatingChat}
-                      onClick={() => handleStartChat(selectedApplication)}
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Message
-                    </Button>
-                    {selectedApplication.status !== "REJECTED" &&
-                      selectedApplication.status !== "WITHDRAWN" && (
-                        <Button
-                          variant="outline"
-                          className="text-destructive hover:text-destructive rounded-xl"
-                          disabled={
-                            updatingApplicationId === selectedApplication.id
-                          }
-                          onClick={() =>
-                            handleUpdateStatus(selectedApplication, "REJECTED")
-                          }
-                        >
-                          Reject
-                        </Button>
-                      )}
-                  </div>
-                </div>
-              </>
-            )}
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
 
       <AlertDialog open={rejectModalOpen} onOpenChange={setRejectModalOpen}>
         <AlertDialogContent>

@@ -27,9 +27,9 @@ const ConversationSidebar = ({
     <div
       className={`xl:col-span-3.5 lg:col-span-4 ${
         showMobileChat ? "hidden lg:block" : "block"
-      } h-full`}
+      } h-full min-h-0`}
     >
-      <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
+      <Card className="bg-card flex h-full flex-col gap-0 overflow-hidden rounded-2xl border p-0 shadow-xs">
         {/* Sidebar Header - Compact & Clean */}
         <CardHeader className="border-border/40 border-b p-3.5 sm:p-4">
           <div className="group relative flex items-center">

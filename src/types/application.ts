@@ -47,6 +47,8 @@ export interface ApplicationSummary {
   byStatus: Record<ApplicationStatus, number>;
 }
 
+import { Skill, Education, WorkExperience } from "./profile";
+
 export interface EmployerApplication {
   id: string;
   status: ApplicationStatus;
@@ -78,6 +80,9 @@ export interface EmployerApplication {
       avatarUrl?: string | null;
       headline?: string | null;
       location?: string | null;
+      education?: Education[] | null;
+      workExperiences?: WorkExperience[] | null;
+      skills?: Skill[] | null;
     } | null;
   };
 }

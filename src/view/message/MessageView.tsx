@@ -13,16 +13,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -36,7 +36,8 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
 import MediaGallery from "../../components/main/message/MediaGallery";
@@ -57,6 +58,7 @@ import MessageViewSkeleton from "../../skeleton/message/inbox/MessageViewSkeleto
 
 interface Message {
   id: string;
+  clientKey?: string;
   senderId: string;
   content: string;
   messageType: "TEXT" | "IMAGE" | "FILE" | "LINK" | "AUDIO" | "VIDEO";
@@ -74,16 +76,26 @@ interface Message {
   } | null;
 }
 
-const MessageView = () => {
+const MessageViewContent = () => {
   const { socket } = useSocket();
   const { data: profileData } = useGetProfileQuery(undefined);
   const currentUser = useAppSelector((state) => state.auth.user);
   const isPremium =
     profileData?.data?.isPremium || currentUser?.isPremium || false;
 
+  const searchParams = useSearchParams();
+  const queryConversationId = searchParams.get("conversationId");
+
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
+
+  useEffect(() => {
+    if (queryConversationId) {
+      setSelectedConversation(queryConversationId);
+      setShowMobileChat(true);
+    }
+  }, [queryConversationId]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
@@ -96,6 +108,7 @@ const MessageView = () => {
     isOpen: false,
     index: 0,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showDeleteConvModal, setShowDeleteConvModal] = useState(false);
@@ -115,8 +128,31 @@ const MessageView = () => {
   const [deleteMessage] = useDeleteMessageMutation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialLoad = useRef(true);
   const [isUploading, setIsUploading] = useState(false);
   const [allMessages, setAllMessages] = useState<Message[]>([]);
+
+  // Reset initial load state when active conversation changes
+  useEffect(() => {
+    isInitialLoad.current = true;
+  }, [selectedConversation]);
+
+  // Scroll to bottom when messages are updated or loaded
+  useEffect(() => {
+    if (allMessages.length === 0) return;
+
+    // Small timeout to let DOM render before scrolling
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: isInitialLoad.current ? "auto" : "smooth",
+      });
+      isInitialLoad.current = false;
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [allMessages]);
 
   // Sync messages from query and clear on switch
   useEffect(() => {
@@ -136,6 +172,26 @@ const MessageView = () => {
         setAllMessages((prev) => {
           const exists = prev.some((m) => m.id === message.id);
           if (exists) return prev;
+
+          // If the message is from the current user, replace the optimistic one!
+          if (message.senderId === currentUser?.id) {
+            const optIndex = prev.findIndex(
+              (m) =>
+                m.senderId === currentUser?.id &&
+                m.id.length < 15 &&
+                (m.content === message.content ||
+                  (m.fileName && m.fileName === message.fileName)),
+            );
+            if (optIndex !== -1) {
+              const next = [...prev];
+              next[optIndex] = {
+                ...message,
+                clientKey: prev[optIndex].id, // Keep the tempId as the stable React key
+              };
+              return next;
+            }
+          }
+
           return [...prev, message];
         });
         markAsRead(selectedConversation);
@@ -266,6 +322,9 @@ const MessageView = () => {
 
       try {
         setNewMessage("");
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
         const tempId = Date.now().toString();
         const optimisticMessage: Message = {
           id: tempId,
@@ -407,8 +466,12 @@ const MessageView = () => {
     }
   };
 
-  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewMessage(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 128)}px`;
+    }
     if (socket && selectedConversation) {
       socket.emit("typing", {
         conversationId: selectedConversation,
@@ -499,7 +562,7 @@ const MessageView = () => {
       ) : (
         <DashboardMessagesHeader />
       )}
-      <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
+      <div className="grid h-[calc(100vh-130px)] grid-cols-1 gap-4 sm:h-[calc(100vh-120px)] lg:grid-cols-12">
         {/* Conversations Sidebar */}
         <ConversationSidebar
           showMobileChat={showMobileChat}
@@ -512,16 +575,16 @@ const MessageView = () => {
 
         {/* Active Chat Panel */}
         <div
-          className={`xl:col-span-8.5 h-full lg:col-span-8 ${
+          className={`xl:col-span-8.5 h-full min-h-0 rounded-2xl lg:col-span-8 ${
             showMobileChat
               ? "bg-background fixed inset-0 z-40 h-screen w-screen lg:relative lg:inset-auto lg:z-0 lg:block lg:h-full lg:w-auto"
               : "hidden lg:block"
           }`}
         >
           {selectedConversation && currentConversation ? (
-            <Card className="bg-card flex h-full flex-col overflow-hidden rounded-none border-0 shadow-none lg:rounded-2xl lg:border lg:shadow-xs">
+            <Card className="bg-card flex h-full flex-col gap-0 overflow-hidden rounded-none border-0 p-0 shadow-none lg:rounded-2xl lg:border lg:shadow-xs">
               {/* Chat Header */}
-              <CardHeader className="border-border/40 bg-card/80 sticky top-0 z-10 flex h-11 min-h-11 items-center border-b px-3.5 py-0 backdrop-blur-md sm:h-14 sm:min-h-14 sm:px-4 lg:h-16 lg:min-h-16 lg:px-4 lg:py-0">
+              <div className="border-border/40 bg-card/80 sticky top-0 z-10 flex h-11 min-h-11 items-center border-b px-3.5 py-0 backdrop-blur-md sm:h-14 sm:min-h-14 sm:px-4 lg:h-16 lg:min-h-16 lg:rounded-t-2xl lg:px-4 lg:py-0">
                 <div className="flex w-full items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <Button
@@ -541,7 +604,7 @@ const MessageView = () => {
                           }
                           className="object-cover"
                         />
-                        <AvatarFallback className="bg-primary/10 text-primary rounded-xl text-xs font-bold">
+                        <AvatarFallback className="bg-primary/10 text-primary rounded-xl text-xs font-black sm:text-sm">
                           {currentConversation.participantName
                             .split(" ")
                             .map((n: string) => n[0])
@@ -549,66 +612,48 @@ const MessageView = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div
-                        className={`border-background absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rounded-full border-2 shadow-2xs ${
+                        className={`border-background absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 shadow-2xs ${
                           currentConversation.isOnline
                             ? "bg-emerald-500"
                             : "bg-muted-foreground/40"
                         }`}
                       />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h2 className="text-foreground truncate text-xs font-bold tracking-tight sm:text-sm">
+                    <div className="min-w-0">
+                      <h2 className="text-foreground truncate text-xs font-bold sm:text-sm">
                         {currentConversation.participantName}
                       </h2>
-                      <p className="text-muted-foreground truncate text-[11px] font-medium">
-                        {Object.values(typingUsers).some(Boolean) ? (
-                          "Typing..."
-                        ) : (
-                          <>
-                            <span className="lg:hidden">
-                              {currentConversation.participantRole
-                                ? currentConversation.participantRole.split(" ")
-                                    .length > 3
-                                  ? currentConversation.participantRole
-                                      .split(" ")
-                                      .slice(0, 3)
-                                      .join(" ") + "..."
-                                  : currentConversation.participantRole
-                                : "Active Now"}
-                            </span>
-                            <span className="hidden lg:inline">
-                              {currentConversation.participantRole ||
-                                "Active Now"}
-                            </span>
-                          </>
-                        )}
-                      </p>
+                      {currentConversation.participantRole && (
+                        <p className="text-muted-foreground truncate text-[10px] font-semibold sm:text-xs">
+                          {currentConversation.participantRole}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       onClick={() => setShowMediaGallery(true)}
-                      className="border-border/60 h-8 w-8 rounded-full sm:h-9 sm:w-9"
-                      title="Shared Files"
+                      className="hover:bg-muted text-muted-foreground h-9 w-9 shrink-0 rounded-full"
                     >
-                      <Paperclip className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <Paperclip className="h-4 w-4" />
                     </Button>
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
-                          className="border-border/60 h-8 w-8 rounded-full sm:h-9 sm:w-9"
+                          className="hover:bg-muted text-muted-foreground h-9 w-9 shrink-0 rounded-full"
                         >
-                          <MoreVertical className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-48 rounded-xl p-2"
+                        className="border-border/60 min-w-40 rounded-xl p-1"
                       >
                         <DropdownMenuItem
                           className="cursor-pointer rounded-lg text-xs font-medium"
@@ -637,10 +682,10 @@ const MessageView = () => {
                     </DropdownMenu>
                   </div>
                 </div>
-              </CardHeader>
+              </div>
 
               {/* Messages Body */}
-              <CardContent className="bg-muted/5 flex-1 overflow-hidden p-0">
+              <CardContent className="bg-muted/5 min-h-0 flex-1 overflow-hidden p-0">
                 <ScrollArea className="h-full p-4 sm:p-6">
                   <div className="flex flex-col space-y-4 pb-4">
                     <div className="relative my-4 flex items-center justify-center">
@@ -666,8 +711,11 @@ const MessageView = () => {
                         nextMessage.senderId !== message.senderId;
 
                       return (
-                        <div
-                          key={message.id}
+                        <motion.div
+                          key={message.clientKey || message.id}
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ duration: 0.22, ease: "easeOut" }}
                           className={`flex w-full ${
                             isCurrentUser ? "justify-end" : "justify-start"
                           } ${isNewGroup ? "pt-2" : "pt-0.5"}`}
@@ -796,7 +844,7 @@ const MessageView = () => {
                                     </a>
                                   </div>
                                 ) : (
-                                  <p className="text-xs leading-relaxed font-medium break-words whitespace-pre-wrap sm:text-sm">
+                                  <p className="text-xs leading-relaxed font-medium wrap-break-word whitespace-pre-wrap sm:text-sm">
                                     {message.content}
                                   </p>
                                 )}
@@ -815,15 +863,16 @@ const MessageView = () => {
                               )}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
+                    <div ref={messagesEndRef} />
                   </div>
                 </ScrollArea>
               </CardContent>
 
               {/* Input Bar */}
-              <div className="border-border/40 bg-card/90 sticky bottom-0 z-10 border-t p-2.5 backdrop-blur-md sm:p-3">
+              <div className="border-border/40 bg-card/90 sticky bottom-0 z-10 border-t p-2.5 backdrop-blur-md sm:p-3 lg:rounded-b-2xl">
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
@@ -842,12 +891,19 @@ const MessageView = () => {
                       className={`h-4 w-4 ${isUploading ? "animate-spin" : ""}`}
                     />
                   </Button>
-                  <Input
+                  <textarea
+                    ref={textareaRef}
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={handleTyping}
-                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                    className="bg-muted/30 focus-visible:ring-primary/20 border-border/60 h-10 flex-1 rounded-full border px-4 text-xs font-medium focus-visible:ring-2 sm:text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    rows={1}
+                    className="bg-muted/30 focus-visible:ring-primary/20 border-border/60 max-h-32 min-h-10 flex-1 resize-none overflow-y-auto rounded-2xl border px-4 py-2.5 text-xs font-medium focus-visible:ring-2 focus-visible:outline-hidden sm:text-sm"
                   />
                   <Button
                     onClick={() => handleSendMessage()}
@@ -981,6 +1037,22 @@ const MessageView = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+};
+
+const MessageView = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <div className="text-muted-foreground text-sm font-semibold">
+            Loading conversations...
+          </div>
+        </div>
+      }
+    >
+      <MessageViewContent />
+    </Suspense>
   );
 };
 

@@ -1,17 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
 
 const ConversationSidebarSkeleton = () => (
-  <div className="xl:col-span-3.5 h-full lg:col-span-4">
-    <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
-      <CardHeader className="border-border/40 border-b p-3.5 sm:p-4">
+  <div className="xl:col-span-3.5 h-full min-h-0 lg:col-span-4">
+    <Card className="bg-card flex h-full flex-col gap-0 overflow-hidden rounded-2xl border p-0 shadow-xs">
+      <div className="border-border/40 border-b p-3.5 sm:p-4">
         <Skeleton className="h-10 w-full rounded-full" />
-      </CardHeader>
+      </div>
 
-      <CardContent className="flex-1 p-2">
+      <CardContent className="min-h-0 flex-1 overflow-hidden p-2">
         <div className="space-y-2">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 rounded-xl p-3">
@@ -29,10 +29,11 @@ const ConversationSidebarSkeleton = () => (
 );
 
 const ChatAreaSkeleton = () => (
-  <div className="xl:col-span-8.5 hidden h-full flex-col lg:col-span-8 lg:flex">
-    <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
-      <CardHeader className="border-border/40 border-b p-3.5 sm:p-4">
-        <div className="flex items-center justify-between">
+  <div className="xl:col-span-8.5 hidden h-full min-h-0 flex-col lg:col-span-8 lg:flex">
+    <Card className="bg-card flex h-full flex-col gap-0 overflow-hidden rounded-none border-0 p-0 shadow-none lg:rounded-2xl lg:border lg:shadow-xs">
+      {/* Chat Header */}
+      <div className="border-border/40 bg-card/80 sticky top-0 z-10 flex h-11 min-h-11 items-center border-b px-3.5 py-0 backdrop-blur-md sm:h-14 sm:min-h-14 sm:px-4 lg:h-16 lg:min-h-16 lg:rounded-t-2xl lg:px-4 lg:py-0">
+        <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
             <Skeleton className="h-10 w-10 rounded-xl sm:h-11 sm:w-11" />
             <div className="space-y-1.5">
@@ -45,9 +46,9 @@ const ChatAreaSkeleton = () => (
             <Skeleton className="h-8 w-8 rounded-full" />
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="bg-muted/5 flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
+      <CardContent className="bg-muted/5 min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
         {[...Array(5)].map((_, i) => (
           <div
             key={i}
@@ -72,7 +73,7 @@ const ChatAreaSkeleton = () => (
         ))}
       </CardContent>
 
-      <div className="border-border/40 flex items-center gap-2 border-t p-2.5 sm:p-3">
+      <div className="border-border/40 bg-card/90 sticky bottom-0 z-10 flex items-center gap-2 border-t p-2.5 backdrop-blur-md sm:p-3 lg:rounded-b-2xl">
         <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
         <Skeleton className="h-10 flex-1 rounded-full" />
         <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
@@ -83,13 +84,11 @@ const ChatAreaSkeleton = () => (
 
 const MessageViewSkeleton = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen px-3.5 sm:px-6">
       <DashboardMessagesHeader />
-      <div className="space-y-4 px-3.5 py-4 sm:space-y-6 sm:px-6 sm:py-8">
-        <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
-          <ConversationSidebarSkeleton />
-          <ChatAreaSkeleton />
-        </div>
+      <div className="grid h-[calc(100vh-130px)] grid-cols-1 gap-4 sm:h-[calc(100vh-120px)] lg:grid-cols-12">
+        <ConversationSidebarSkeleton />
+        <ChatAreaSkeleton />
       </div>
     </div>
   );

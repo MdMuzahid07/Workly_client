@@ -42,8 +42,16 @@ const applicationApi = baseApi.injectEndpoints({
       providesTags: ["applications"],
     }),
     getMyCompanyApplicationSummary: builder.query({
-      query: () => ({
+      query: (jobId?: string) => ({
         url: "/application/my-company-summary",
+        method: "GET",
+        params: jobId && jobId !== "all" ? { jobId } : undefined,
+      }),
+      providesTags: ["applications"],
+    }),
+    getApplicationById: builder.query({
+      query: (id: string) => ({
+        url: `/application/${id}`,
         method: "GET",
       }),
       providesTags: ["applications"],
@@ -74,6 +82,7 @@ export const {
   useGetApplicationStatsQuery,
   useGetMyCompanyApplicationsQuery,
   useGetMyCompanyApplicationSummaryQuery,
+  useGetApplicationByIdQuery,
   useUpdateApplicationStatusMutation,
   useWithdrawApplicationMutation,
 } = applicationApi;
