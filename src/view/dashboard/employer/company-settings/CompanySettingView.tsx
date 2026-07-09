@@ -5,7 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
+import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  useLogoutUserMutation,
+  useDeleteMeMutation,
+} from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import {
@@ -98,9 +111,13 @@ const privacySettingsSeed: SettingItem[] = [
 const CompanySettingsView = () => {
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
+  const [deleteMe, { isLoading: isDeleting }] = useDeleteMeMutation();
   const [activeSection, setActiveSection] = useState<
     "main" | "personal" | "security"
   >("main");
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const { data: companyData, isLoading: isLoadingCompany } =
     useGetMyCompanyQuery(undefined);
@@ -181,6 +198,28 @@ const CompanySettingsView = () => {
     } finally {
       dispatch(logout());
       window.location.href = "/";
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    setDeleteConfirmText("");
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmText !== "DELETE") {
+      toast.error("Please type DELETE to confirm");
+      return;
+    }
+    try {
+      await deleteMe().unwrap();
+      toast.success("Company account deleted successfully");
+      setIsDeleteOpen(false);
+      dispatch(logout());
+      window.location.href = "/";
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Failed to delete company account");
     }
   };
 
@@ -412,6 +451,7 @@ const CompanySettingsView = () => {
                     </div>
                   </div>
                   <Button
+                    onClick={handleDeleteAccount}
                     variant="destructive"
                     className="w-full font-bold sm:w-auto"
                   >
@@ -423,6 +463,47 @@ const CompanySettingsView = () => {
           </section>
         </div>
       </div>
+
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent className="bg-card max-w-md rounded-2xl border p-6 shadow-2xl">
+          <AlertDialogHeader className="space-y-3">
+            <AlertDialogTitle className="text-destructive text-xl font-black tracking-tight">
+              Delete Company Account
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed font-medium">
+              This action is permanent and cannot be undone. All your company
+              details, job posts, and candidate applications will be permanently
+              deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="my-4 space-y-2">
+            <label className="text-foreground text-xs font-bold tracking-wider uppercase">
+              Type <span className="text-destructive">DELETE</span> to confirm
+            </label>
+            <Input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="bg-muted/30 focus-visible:ring-destructive/20 text-destructive placeholder:text-muted-foreground/40 h-10 border-red-200/50 text-sm font-bold placeholder:font-normal"
+            />
+          </div>
+
+          <AlertDialogFooter className="mt-6 flex gap-2">
+            <AlertDialogCancel className="h-10 rounded-full font-bold">
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              onClick={handleConfirmDelete}
+              disabled={isDeleting || deleteConfirmText !== "DELETE"}
+              variant="destructive"
+              className="shadow-destructive/10 h-10 rounded-full font-bold shadow-lg"
+            >
+              {isDeleting ? "Deleting..." : "Delete Account"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

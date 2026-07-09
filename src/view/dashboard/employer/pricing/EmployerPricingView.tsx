@@ -7,7 +7,8 @@ import PricingTierCard from "@/components/dashboard/pricing/PricingTierCard";
 import SubscriptionStatusCard from "@/components/dashboard/pricing/SubscriptionStatusCard";
 import { useGetPlansQuery } from "@/redux/feature/plan/planApi";
 import { useGetMySubscriptionQuery } from "@/redux/feature/subscription/subscriptionApi";
-import { Loader2, Package, Shield, ShieldCheck, Zap } from "lucide-react";
+import EmployerPricingSkeleton from "@/skeleton/dashboard/employer/pricing/EmployerPricingSkeleton";
+import { Package, Shield, ShieldCheck, Zap } from "lucide-react";
 
 export default function EmployerPricingView() {
   const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
@@ -30,6 +31,29 @@ export default function EmployerPricingView() {
 
   const mapDbPlanToCardProps = (plan: any) => {
     const nameLower = plan.name.toLowerCase();
+
+    const planFeatures =
+      typeof plan.features === "object" && plan.features !== null
+        ? plan.features
+        : {};
+    const discountPercent = Number(planFeatures?.firstTimeDiscountPercent || 0);
+    const basePrice = plan.price;
+
+    let displayPrice =
+      plan.price === 0 ? "৳0" : `৳${plan.price.toLocaleString()}`;
+    let originalPrice: string | undefined;
+    let discountBadge: string | undefined;
+
+    // Calculate dynamic discount for card display
+    if (discountPercent > 0 && basePrice > 0) {
+      originalPrice = `৳${basePrice.toLocaleString()}`;
+      // Calculate Math.floor to match backend perfectly (no fraction allowed)
+      const discountedValue = Math.floor(
+        basePrice - basePrice * (discountPercent / 100),
+      );
+      displayPrice = `৳${discountedValue}`;
+      discountBadge = `${discountPercent}% OFF · 1ST PURCHASE`;
+    }
 
     let icon = Package;
     let color = "text-slate-500";
@@ -115,8 +139,11 @@ export default function EmployerPricingView() {
     return {
       id: plan.name,
       name: readableName,
-      price: plan.price === 0 ? "৳0" : `৳${plan.price.toLocaleString()}`,
+      price: displayPrice,
       period: "/month",
+      originalPrice,
+      discountBadge,
+      discountPercent,
       description: plan.description || "",
       features: parsedFeatures,
       cta,
@@ -137,9 +164,7 @@ export default function EmployerPricingView() {
       <DashboardEmployerPricingHeader />
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         {isLoading ? (
-          <div className="flex h-60 items-center justify-center">
-            <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          </div>
+          <EmployerPricingSkeleton />
         ) : (
           <div className="space-y-10">
             {/* Current Subscription Status */}

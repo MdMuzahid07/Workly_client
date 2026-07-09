@@ -1,8 +1,13 @@
 "use client";
+import ThemeToggleButtonCompact from "@/components/shared/ThemeToggleButtonCompact";
+import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
+import { ChevronRight } from "lucide-react";
 import { ReactNode, useEffect, useRef } from "react";
 
 const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
   const headerRef = useRef<HTMLDivElement>(null);
+  const { state, isMobile, toggleSidebar } = useSidebar();
 
   useEffect(() => {
     const updateParentPadding = () => {
@@ -41,10 +46,33 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
       `}</style>
       <header
         ref={headerRef}
-        className="dashboard-header border-border bg-card/95 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-sm lg:left-64"
+        style={{
+          left: isMobile
+            ? 0
+            : state === "collapsed"
+              ? "var(--sidebar-width-icon)"
+              : "var(--sidebar-width)",
+        }}
+        className="dashboard-header border-border bg-card/95 ease-apple fixed top-0 right-0 z-50 border-b backdrop-blur-sm transition-[left] duration-300"
       >
-        <div className="mx-auto flex h-auto min-h-12 shrink-0 items-center justify-between gap-3 py-3 pr-16 pl-4 sm:h-auto sm:min-h-14 sm:py-4 sm:pr-16 sm:pl-6 lg:h-auto lg:min-h-16 lg:px-8 lg:py-0 lg:pr-8">
+        <div className="mx-auto flex h-auto min-h-12 shrink-0 items-center justify-between gap-3 py-3 pr-16 pl-4 sm:h-auto sm:min-h-14 sm:py-4 sm:pr-16 sm:pl-6 md:h-auto md:min-h-16 md:px-8 md:py-0 md:pr-8">
+          {!isMobile && state === "collapsed" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="text-muted-foreground hover:bg-muted hidden h-8 w-8 shrink-0 rounded-md md:flex"
+              aria-label="Expand sidebar"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
           <div className="min-w-0 flex-1">{children}</div>
+          {!isMobile && state === "collapsed" && (
+            <div className="ml-2 hidden shrink-0 items-center md:flex">
+              <ThemeToggleButtonCompact />
+            </div>
+          )}
         </div>
       </header>
     </>

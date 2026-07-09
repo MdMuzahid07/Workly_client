@@ -12,8 +12,8 @@ export default function EmployerAnalyticsPage() {
   return (
     <UpgradeGate
       feature="canViewAnalytics"
-      title="Advanced Analytics Locked"
-      description="Access deep insights on candidate conversion funnels, job performance trends, and team metrics. Upgrade to Growth or Enterprise to unlock."
+      title="Performance Analytics on Growth Plan"
+      description="Detailed hiring metrics, candidate pipeline insights, and job performance reports are available on Growth and Enterprise plans."
     >
       <AnalyticsView />
     </UpgradeGate>

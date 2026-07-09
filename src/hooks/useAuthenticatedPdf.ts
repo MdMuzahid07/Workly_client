@@ -12,6 +12,7 @@ export const useAuthenticatedPdf = (options: {
   pdfUrl: string;
   applicationId?: string;
   resumeId?: string;
+  messageId?: string;
   enabled: boolean;
 }) => {
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
@@ -22,6 +23,7 @@ export const useAuthenticatedPdf = (options: {
     options.pdfUrl,
     options.applicationId ?? "",
     options.resumeId ?? "",
+    options.messageId ?? "",
     options.enabled ? "1" : "0",
   ].join("|");
 
@@ -55,6 +57,7 @@ export const useAuthenticatedPdf = (options: {
           pdfUrl: options.pdfUrl,
           applicationId: options.applicationId,
           resumeId: options.resumeId,
+          messageId: options.messageId,
         });
 
         if (cancelled) return;

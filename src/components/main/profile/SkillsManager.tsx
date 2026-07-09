@@ -8,11 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetCategoriesQuery } from "@/redux/feature/category/categoryApi";
 import type { Language, Skill } from "@/types/profile";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { toast } from "sonner";
 
-// Mock skills list for dropdown
+// Mock skills list for dropdown fallback
 const AVAILABLE_SKILLS = [
   "React.js",
   "Node.js",
@@ -50,6 +52,43 @@ export const SkillsManager = ({
 }: SkillsManagerProps) => {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [experience, setExperience] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  interface TaxonomySkill {
+    id: string;
+    name: string;
+    active: boolean;
+  }
+
+  interface CategoryWithSkills {
+    id: string;
+    name: string;
+    taxonomySkills?: TaxonomySkill[];
+  }
+
+  const { data: categoriesResponse } = useGetCategoriesQuery(undefined);
+
+  const categoriesList = useMemo(() => {
+    return (categoriesResponse?.data || []) as CategoryWithSkills[];
+  }, [categoriesResponse]);
+
+  const skillsList = useMemo(() => {
+    if (selectedCategory === "all") {
+      const allSkills = categoriesList.flatMap((cat) =>
+        (cat.taxonomySkills || []).map((s) => s.name),
+      );
+      const uniqueSkills = Array.from(new Set(allSkills)) as string[];
+      return uniqueSkills.length > 0 ? uniqueSkills : AVAILABLE_SKILLS;
+    } else {
+      const targetCategory = categoriesList.find(
+        (cat) => cat.id === selectedCategory,
+      );
+      const catSkills = (targetCategory?.taxonomySkills || []).map(
+        (s) => s.name,
+      );
+      return catSkills;
+    }
+  }, [categoriesList, selectedCategory]);
 
   const technicalSkills = skills.filter((skill) => skill?.type !== "SOFT");
   const softSkills = skills.filter((skill) => skill?.type === "SOFT");
@@ -71,6 +110,15 @@ export const SkillsManager = ({
 
   const handleAdd = () => {
     if (selectedSkill && experience && onAddTechnicalSkill) {
+      const exists = skills.some(
+        (s) =>
+          (s.skillName || s.skill || "").toLowerCase() ===
+            selectedSkill.toLowerCase() && s.type !== "SOFT",
+      );
+      if (exists) {
+        toast.error("This skill has already been added.");
+        return;
+      }
       onAddTechnicalSkill({
         skillName: selectedSkill,
         experienceYears: experienceToYears[experience] ?? 1,
@@ -93,6 +141,36 @@ export const SkillsManager = ({
           <div className="bg-muted/20 flex flex-col items-end gap-4 rounded-lg border p-4 md:flex-row">
             <div className="w-full space-y-2 md:flex-1">
               <label className="text-muted-foreground text-xs font-medium uppercase">
+                Category
+              </label>
+              <Select
+                value={selectedCategory}
+                onValueChange={(val) => {
+                  setSelectedCategory(val);
+                  setSelectedSkill("");
+                }}
+              >
+                <SelectTrigger className="bg-background border-border cursor-pointer rounded-full">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem className="cursor-pointer" value="all">
+                    All Categories
+                  </SelectItem>
+                  {categoriesList.map((cat) => (
+                    <SelectItem
+                      className="cursor-pointer"
+                      key={cat.id}
+                      value={cat.id}
+                    >
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-full space-y-2 md:flex-1">
+              <label className="text-muted-foreground text-xs font-medium uppercase">
                 Skill <span className="text-destructive">*</span>
               </label>
               <Select value={selectedSkill} onValueChange={setSelectedSkill}>
@@ -100,7 +178,7 @@ export const SkillsManager = ({
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AVAILABLE_SKILLS.map((skill) => (
+                  {skillsList.map((skill) => (
                     <SelectItem
                       className="cursor-pointer"
                       key={skill}

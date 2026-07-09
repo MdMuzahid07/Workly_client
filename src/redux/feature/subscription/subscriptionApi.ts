@@ -20,6 +20,13 @@ export const subscriptionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["subscriptions"],
     }),
+    reactivateSubscription: builder.mutation<ApiResponse<null>, void>({
+      query: () => ({
+        url: "/subscriptions/reactivate",
+        method: "POST",
+      }),
+      invalidatesTags: ["subscriptions"],
+    }),
     adminAssignPlan: builder.mutation<
       ApiResponse<null>,
       { userId: string; planId: string }
@@ -37,6 +44,7 @@ export const subscriptionApi = baseApi.injectEndpoints({
 export const {
   useGetMySubscriptionQuery,
   useCancelSubscriptionMutation,
+  useReactivateSubscriptionMutation,
   useAdminAssignPlanMutation,
 } = subscriptionApi;
 export default subscriptionApi;

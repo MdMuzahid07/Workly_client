@@ -151,7 +151,7 @@ const SocialLinkSettingTab = ({
                   Add Link
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card mx-4 max-w-md">
+              <DialogContent className="bg-card sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Add Social Media Link</DialogTitle>
                   <DialogDescription>

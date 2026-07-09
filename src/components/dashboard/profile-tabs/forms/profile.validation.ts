@@ -40,7 +40,7 @@ export const educationSchema = z.object({
   level: z.string().min(1, "Level of education is required"),
   degree: z.string().min(1, "Degree title is required"),
   institute: z.string().min(1, "Institute name is required"),
-  year: z.string().regex(/^\d{4}$/, "Year must be a 4-digit number"),
+  year: z.string().min(1, "Year of passing is required"),
   result: z.string().min(1, "Result/GPA is required"),
   startDate: z.string().optional(),
   endDate: z.string().optional(),

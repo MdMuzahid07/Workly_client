@@ -5,7 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
+import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  useLogoutUserMutation,
+  useDeleteMeMutation,
+} from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
 import {
   useGetUserSettingsQuery,
@@ -98,10 +111,15 @@ const privacySettingsSeed: SettingItem[] = [
 export default function JobSeekerSettingsView() {
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
+  const [deleteMe, { isLoading: isDeleting }] = useDeleteMeMutation();
+
   const { data: settingsData, isLoading: isSettingsLoading } =
     useGetUserSettingsQuery(undefined);
   const [updateSettings, { isLoading: isSaving }] =
     useUpdateUserSettingsMutation();
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const [notifications, setNotifications] = useState(notificationSettingsSeed);
   const [privacy, setPrivacy] = useState(privacySettingsSeed);
@@ -179,6 +197,28 @@ export default function JobSeekerSettingsView() {
     } finally {
       dispatch(logout());
       window.location.href = "/";
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    setDeleteConfirmText("");
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmText !== "DELETE") {
+      toast.error("Please type DELETE to confirm");
+      return;
+    }
+    try {
+      await deleteMe().unwrap();
+      toast.success("Account deleted successfully");
+      setIsDeleteOpen(false);
+      dispatch(logout());
+      window.location.href = "/";
+    } catch (error) {
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Failed to delete account");
     }
   };
 
@@ -279,18 +319,12 @@ export default function JobSeekerSettingsView() {
 
               <div className="space-y-3">
                 {notifications.map((item) => {
-                  const Icon =
-                    item.id === "emailAlerts"
-                      ? Mail
-                      : item.id === "pushNotifications"
-                        ? Smartphone
-                        : BellRing;
                   return (
                     <Card key={item.id} className="border-border/60 p-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="bg-primary/10 text-primary rounded-xl p-3">
-                            <Icon className="h-5 w-5" />
+                          <div className="bg-primary/10 text-primary shrink-0 rounded-xl p-3">
+                            {item.icon}
                           </div>
                           <div>
                             <h3 className="text-foreground text-sm font-bold tracking-tight sm:text-base">
@@ -328,18 +362,12 @@ export default function JobSeekerSettingsView() {
 
               <div className="space-y-3">
                 {privacy.map((item) => {
-                  const Icon =
-                    item.id === "profileVisibility"
-                      ? Eye
-                      : item.id === "marketingEmails"
-                        ? Zap
-                        : ShieldCheck;
                   return (
                     <Card key={item.id} className="border-border/60 p-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="bg-primary/10 text-primary rounded-xl p-3">
-                            <Icon className="h-5 w-5" />
+                          <div className="bg-primary/10 text-primary shrink-0 rounded-xl p-3">
+                            {item.icon}
                           </div>
                           <div>
                             <h3 className="text-foreground text-sm font-bold tracking-tight sm:text-base">
@@ -417,6 +445,7 @@ export default function JobSeekerSettingsView() {
                       </div>
                     </div>
                     <Button
+                      onClick={handleDeleteAccount}
                       variant="destructive"
                       className="w-full font-bold sm:w-auto"
                     >
@@ -429,6 +458,47 @@ export default function JobSeekerSettingsView() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent className="bg-card max-w-md rounded-2xl border p-6 shadow-2xl">
+          <AlertDialogHeader className="space-y-3">
+            <AlertDialogTitle className="text-destructive text-xl font-black tracking-tight">
+              Delete Account
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed font-medium">
+              This action is permanent and cannot be undone. All your profile
+              details, documents, and job applications will be permanently
+              deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="my-4 space-y-2">
+            <label className="text-foreground text-xs font-bold tracking-wider uppercase">
+              Type <span className="text-destructive">DELETE</span> to confirm
+            </label>
+            <Input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="bg-muted/30 focus-visible:ring-destructive/20 text-destructive placeholder:text-muted-foreground/40 h-10 border-red-200/50 text-sm font-bold placeholder:font-normal"
+            />
+          </div>
+
+          <AlertDialogFooter className="mt-6 flex gap-2">
+            <AlertDialogCancel className="h-10 rounded-full font-bold">
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              onClick={handleConfirmDelete}
+              disabled={isDeleting || deleteConfirmText !== "DELETE"}
+              variant="destructive"
+              className="shadow-destructive/10 h-10 rounded-full font-bold shadow-lg"
+            >
+              {isDeleting ? "Deleting..." : "Delete Account"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -5,8 +5,8 @@ export default function DashboardMessagesPage() {
   return (
     <UpgradeGate
       feature="canMessageEmployer"
-      title="Direct Messaging Locked"
-      description="Initiate discussions directly with hiring managers. Upgrade your plan to Pro or Premium to unlock real-time direct messaging."
+      title="Messaging Available on Premium"
+      description="Send and receive direct messages with hiring managers and employers. Available on Pro and Premium plans."
     >
       <MessageView />
     </UpgradeGate>

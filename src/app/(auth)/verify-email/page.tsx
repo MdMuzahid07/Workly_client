@@ -56,7 +56,7 @@ const VerifyEmailPage = () => {
 
           const redirectUrl =
             data.user.role === "EMPLOYER"
-              ? "/employer/company-profile"
+              ? "/create-company"
               : "/dashboard/profile";
           setTargetRedirect(redirectUrl);
 

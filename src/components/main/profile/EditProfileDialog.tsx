@@ -16,7 +16,11 @@ import { Check, FileText, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useUploadSingleFileMutation } from "../../../redux/feature/upload/uploadApi";
+import {
+  useUploadSingleFileMutation,
+  useUploadAvatarMutation,
+} from "../../../redux/feature/upload/uploadApi";
+import { useCompressedUpload } from "@/hooks/useCompressedUpload";
 import WKSelect from "../../form/WkSelect";
 import WKTextArea from "../../form/WkTextArea";
 import ProfileSkillManagement from "./ProfileSkillManagement";
@@ -113,8 +117,10 @@ const EditProfileDialog = ({
     user?.profile?.resumeUrl || null,
   );
 
-  const [uploadSingleFile, { isLoading: isUploading }] =
-    useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadSingleFileMutation();
+  const [uploadAvatar] = useUploadAvatarMutation();
+  const { upload: uploadCompressedAvatar, isProcessing: isUploadingAvatar } =
+    useCompressedUpload("avatar");
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -125,16 +131,15 @@ const EditProfileDialog = ({
   const handleAvatarUpload = async (file: File | null) => {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const result = await uploadSingleFile(formData).unwrap();
+      const result = await uploadCompressedAvatar(
+        file,
+        (formData) => uploadAvatar(formData).unwrap(),
+        "Avatar uploaded successfully",
+      );
       setAvatar(result.data.url);
-      toast.success("Avatar uploaded successfully");
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload avatar. Please try again.");
     }
   };
 
@@ -286,7 +291,7 @@ const EditProfileDialog = ({
                       <Image
                         src={avatar || user.profile.avatarUrl!}
                         alt={`${user.fullName || "User"} avatar`}
-                        className={`h-16 w-16 rounded-full border object-cover ${isUploading ? "animate-pulse" : ""}`}
+                        className={`h-16 w-16 rounded-full border object-cover ${isUploadingAvatar ? "animate-pulse" : ""}`}
                         width={100}
                         height={100}
                       />

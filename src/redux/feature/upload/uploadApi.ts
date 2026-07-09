@@ -16,9 +16,35 @@ const uploadApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    uploadAvatar: builder.mutation({
+      query: (formData: FormData) => ({
+        url: "/upload/avatar",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    uploadLogo: builder.mutation({
+      query: (formData: FormData) => ({
+        url: "/upload/logo",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    uploadCover: builder.mutation({
+      query: (formData: FormData) => ({
+        url: "/upload/cover",
+        method: "POST",
+        body: formData,
+      }),
+    }),
   }),
 });
 
-export const { useUploadSingleFileMutation, useUploadMultipleFilesMutation } =
-  uploadApi;
+export const {
+  useUploadSingleFileMutation,
+  useUploadMultipleFilesMutation,
+  useUploadAvatarMutation,
+  useUploadLogoMutation,
+  useUploadCoverMutation,
+} = uploadApi;
 export default uploadApi;

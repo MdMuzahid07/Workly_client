@@ -16,7 +16,8 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/profile/profileApi";
-import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+import { useUploadAvatarMutation } from "@/redux/feature/upload/uploadApi";
+import { useCompressedUpload } from "@/hooks/useCompressedUpload";
 import { calculateJobSeekerProfileCompletion } from "@/utils/profile-utils";
 import {
   Briefcase,
@@ -129,32 +130,27 @@ const ProfileView = () => {
   const user = data?.data;
 
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  const [uploadSingleFile, { isLoading: isUploadingAvatar }] =
-    useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadAvatarMutation();
+  const { upload: uploadCompressedImage, isProcessing: isUploadingAvatar } =
+    useCompressedUpload("avatar");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size must be less than 5MB");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await uploadSingleFile(formData).unwrap();
+      const res = await uploadCompressedImage(
+        file,
+        (formData) => uploadSingleFile(formData).unwrap(),
+        "Avatar uploaded! Click 'Save Changes' to apply.",
+      );
       if (res.success && res.data?.url) {
         const newAvatarUrl = res.data.url;
         setLocalProfile((prev: any) => ({ ...prev, avatarUrl: newAvatarUrl }));
-        toast.success("Image uploaded! Click 'Save Changes' to apply.");
       }
     } catch (err: any) {
       console.error("Failed to upload avatar:", err);
-      toast.error(err?.data?.message || "Failed to upload profile picture");
     } finally {
       if (e.target) e.target.value = "";
     }
@@ -540,7 +536,7 @@ const ProfileView = () => {
         </Card>
 
         {/* Tabs Navigation */}
-        <Tabs defaultValue="personal" className="w-full">
+        <Tabs defaultValue="personal" className="w-full pb-10">
           <div className="scrollbar-none mb-4 w-full overflow-x-auto sm:mb-6">
             <TabsList className="bg-muted/30 border-border/50 flex h-10 w-full min-w-max gap-1 rounded-full border p-1 whitespace-nowrap lg:grid lg:h-12 lg:min-w-0 lg:grid-cols-4 lg:whitespace-normal">
               <TabsTrigger
@@ -893,7 +889,7 @@ const ProfileView = () => {
           }
         }}
       >
-        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto md:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
               {activeModal === "basic" && "Edit Basic Information"}
@@ -961,7 +957,11 @@ const ProfileView = () => {
                         level: editingEdu.level || "",
                         degree: editingEdu.degree || "",
                         institute: editingEdu.institute || "",
-                        year: editingEdu.year ? String(editingEdu.year) : "",
+                        year: editingEdu.year
+                          ? editingEdu.year.includes("-")
+                            ? editingEdu.year
+                            : `${editingEdu.year}-01-01`
+                          : "",
                         result: editingEdu.result || "",
                         currentlyStudying:
                           editingEdu.currentlyStudying ||
@@ -972,6 +972,12 @@ const ProfileView = () => {
                 }
                 onSubmit={async (data) => {
                   let newEdu;
+                  const normalizedData = {
+                    ...data,
+                    year: data.year.includes("-")
+                      ? data.year.split("-")[0]
+                      : data.year,
+                  };
                   if (
                     editingEduIndex !== null &&
                     editingEduIndex !== undefined
@@ -981,12 +987,15 @@ const ProfileView = () => {
                     ];
                     const updatedItem = {
                       ...existing,
-                      ...data,
+                      ...normalizedData,
                     };
                     newEdu = [...(localProfile?.education || [])];
                     newEdu[editingEduIndex] = updatedItem;
                   } else {
-                    newEdu = [...(localProfile?.education || []), data];
+                    newEdu = [
+                      ...(localProfile?.education || []),
+                      normalizedData,
+                    ];
                   }
                   updateLocalSection("education", newEdu);
                   setEditingEdu(null);
@@ -1246,6 +1255,15 @@ const ProfileView = () => {
             {activeModal === "language" && (
               <LanguageForm
                 onSubmit={(data) => {
+                  const exists = (localProfile?.languages || []).some(
+                    (lang: any) =>
+                      (lang.language || "").toLowerCase() ===
+                      data.language.toLowerCase(),
+                  );
+                  if (exists) {
+                    toast.error("This language has already been added.");
+                    return;
+                  }
                   const newLangs = [...(localProfile?.languages || []), data];
                   updateLocalSection("languages", newLangs);
                 }}

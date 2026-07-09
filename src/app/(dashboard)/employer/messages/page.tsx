@@ -5,8 +5,8 @@ export default function EmployerMessagesPage() {
   return (
     <UpgradeGate
       feature="canMessage"
-      title="Direct Messaging Locked"
-      description="Connect and chat directly with top talent. Upgrade your plan to Growth or Enterprise to unlock real-time direct messaging."
+      title="Messaging Available on Growth Plan"
+      description="Communicate directly with candidates and respond to job seeker enquiries. Available on Growth and Enterprise plans."
     >
       <MessageView />
     </UpgradeGate>

@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, getNestedValue } from "@/lib/utils";
 import { Controller, useFormContext } from "react-hook-form";
 
 interface WKSelectProps {
@@ -45,10 +45,11 @@ const WKSelect = ({
     lg: "h-10",
   };
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
-    <div className="space-y-2">
+    <div className="w-full space-y-2">
       {label && !hideLabel && (
         <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
           {label}
@@ -62,12 +63,13 @@ const WKSelect = ({
         render={({ field }) => (
           <Select
             onValueChange={field.onChange}
-            value={field.value}
+            value={field.value || undefined}
             disabled={disabled}
           >
             <SelectTrigger
               id={name}
               className={cn(
+                "w-full",
                 sizeClasses[size],
                 hasError && "border-destructive focus:ring-destructive",
                 className,
@@ -87,7 +89,7 @@ const WKSelect = ({
       />
       {hasError && (
         <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
+          {fieldError?.message as string}
         </p>
       )}
     </div>

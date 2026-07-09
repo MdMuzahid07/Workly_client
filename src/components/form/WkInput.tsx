@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn, getNestedValue } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 
 interface WKInputProps {
@@ -39,7 +39,8 @@ const WKInput = ({
     lg: "h-10",
   };
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
     <div className="w-full space-y-2">
@@ -57,7 +58,6 @@ const WKInput = ({
         placeholder={placeholder}
         disabled={disabled}
         className={cn(
-          "bg-white",
           sizeClasses[size],
           hasError && "border-destructive focus-visible:ring-destructive",
           className,
@@ -65,7 +65,7 @@ const WKInput = ({
       />
       {hasError && (
         <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
+          {fieldError?.message as string}
         </p>
       )}
     </div>

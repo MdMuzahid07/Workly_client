@@ -17,6 +17,7 @@ import { useInitiatePaymentMutation } from "@/redux/feature/payment/paymentApi";
 import {
   useCancelSubscriptionMutation,
   useGetMySubscriptionQuery,
+  useReactivateSubscriptionMutation,
 } from "@/redux/feature/subscription/subscriptionApi";
 import { useAppSelector } from "@/redux/hooks";
 import { Calendar, Crown, Loader2, ShieldCheck } from "lucide-react";
@@ -28,11 +29,13 @@ export default function JobSeekerBillingView() {
   const { data: subRes, isLoading: isSubLoading } = useGetMySubscriptionQuery();
   const [cancelSubscription, { isLoading: isCancelling }] =
     useCancelSubscriptionMutation();
+  const [reactivateSubscription, { isLoading: isReactivating }] =
+    useReactivateSubscriptionMutation();
   const [initiatePayment, { isLoading: isPaymentInitiating }] =
     useInitiatePaymentMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
 
-  const [selectedMethod, setSelectedMethod] = useState("bkash");
+  const [showPaymentOverride, setShowPaymentOverride] = useState(false);
 
   const subData = subRes?.data;
   const activePlanName = subData?.planName || "Free";
@@ -60,13 +63,31 @@ export default function JobSeekerBillingView() {
     try {
       const toastId = toast.loading("Processing subscription cancellation...");
       await cancelSubscription().unwrap();
-      toast.success("Subscription cancellation request updated successfully.", {
+      toast.success("Subscription scheduled for cancellation at period end.", {
         id: toastId,
       });
     } catch (err) {
       const error = err as { data?: { message?: string } };
       console.error(error);
       toast.error(error.data?.message || "Failed to cancel subscription.");
+    }
+  };
+
+  const handleReactivate = async () => {
+    if (isFreePlan) return;
+    try {
+      const toastId = toast.loading("Reactivating subscription...");
+      await reactivateSubscription().unwrap();
+      toast.success(
+        "Subscription reactivated! Renewal notifications re-enabled.",
+        {
+          id: toastId,
+        },
+      );
+    } catch (err) {
+      const error = err as { data?: { message?: string } };
+      console.error(error);
+      toast.error(error.data?.message || "Failed to reactivate subscription.");
     }
   };
 
@@ -109,49 +130,6 @@ export default function JobSeekerBillingView() {
       day: "numeric",
     });
   };
-
-  const paymentChannels = [
-    {
-      id: "bkash",
-      name: "bKash MFS",
-      type: "Mobile Banking",
-      logoText: "bKash",
-      colorClass: "bg-[#E2125D]",
-      textColor: "text-white",
-      shadowColor: "shadow-pink-500/10",
-      description: "Pay instantly via your bKash wallet account",
-    },
-    {
-      id: "nagad",
-      name: "Nagad MFS",
-      type: "Mobile Banking",
-      logoText: "Nagad",
-      colorClass: "bg-[#F57F20]",
-      textColor: "text-white",
-      shadowColor: "shadow-orange-500/10",
-      description: "Fastest checkout via Nagad mobile wallet",
-    },
-    {
-      id: "rocket",
-      name: "Rocket MFS",
-      type: "Mobile Banking",
-      logoText: "Rocket",
-      colorClass: "bg-[#8C3494]",
-      textColor: "text-white",
-      shadowColor: "shadow-purple-500/10",
-      description: "Pay securely using Rocket mobile account",
-    },
-    {
-      id: "cards",
-      name: "Debit/Credit Cards",
-      type: "Visa, Mastercard, Amex, Nexus",
-      logoText: "Cards",
-      colorClass: "bg-[#0F172A] dark:bg-[#1E293B]",
-      textColor: "text-white",
-      shadowColor: "shadow-slate-500/10",
-      description: "Supports local & international debit/credit cards",
-    },
-  ];
 
   if (isSubLoading) {
     return (
@@ -235,15 +213,17 @@ export default function JobSeekerBillingView() {
                       {isFreePlan
                         ? "Not applicable on Free tier"
                         : !subData?.cancelAtPeriodEnd
-                          ? "Receive email & SMS alerts 3 days prior"
-                          : "No alerts; account will degrade to Free on expiration"}
+                          ? "Receive email alerts 3 days prior to expiration"
+                          : "Cancelled — toggle to reactivate your subscription"}
                     </span>
                   </div>
                   <Switch
                     checked={!isFreePlan && !subData?.cancelAtPeriodEnd}
-                    disabled={isFreePlan || subData?.cancelAtPeriodEnd}
+                    disabled={isFreePlan || isCancelling || isReactivating}
                     onCheckedChange={(checked) => {
-                      if (!checked) {
+                      if (checked) {
+                        handleReactivate();
+                      } else {
                         handleCancel();
                       }
                     }}
@@ -252,26 +232,24 @@ export default function JobSeekerBillingView() {
                 </div>
 
                 <div className="pt-2">
-                  <Button
-                    onClick={handleCancel}
-                    disabled={
-                      isFreePlan || subData?.cancelAtPeriodEnd || isCancelling
-                    }
-                    variant="destructive"
-                    className="w-full rounded-xl py-5 font-bold shadow-xs"
-                  >
-                    {isCancelling
-                      ? "Processing..."
-                      : subData?.cancelAtPeriodEnd
-                        ? "Scheduled for Cancellation"
-                        : "Cancel Subscription"}
-                  </Button>
+                  {!isFreePlan && (
+                    <Button
+                      onClick={() => setShowPaymentOverride(true)}
+                      disabled={showPaymentOverride}
+                      variant="outline"
+                      className="w-full rounded-xl border-emerald-600/30 py-5 font-bold text-emerald-700 shadow-xs transition-colors hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/20"
+                    >
+                      {showPaymentOverride
+                        ? "Select Payment Channel Below"
+                        : "Renew / Extend Validity"}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
             {/* SSLCommerz Local Payments Card or Secure Active Panel */}
-            {!needsPayment && !isFreePlan ? (
+            {!needsPayment && !isFreePlan && !showPaymentOverride ? (
               <Card className="flex flex-col justify-between overflow-hidden border-emerald-500/20 bg-linear-to-br from-emerald-500/5 to-transparent lg:col-span-2">
                 <CardHeader className="border-b border-emerald-500/10 pb-4">
                   <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-500">
@@ -316,57 +294,45 @@ export default function JobSeekerBillingView() {
                       <CardTitle className="flex items-center gap-2 text-base font-bold">
                         Secure Checkout with SSLCommerz
                         <Badge className="border-none bg-emerald-500/10 text-[9px] font-bold tracking-wider text-emerald-600 uppercase">
-                          Local Payments
+                          Official Gateway
                         </Badge>
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Choose from popular Bangladeshi mobile wallets or
-                        debit/credit cards
+                        You will be redirected to the secure SSLCommerz gateway
+                        to choose your payment method
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6 p-6">
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {paymentChannels.map((method) => {
-                      const isSelected = selectedMethod === method.id;
-                      return (
-                        <div
-                          key={method.id}
-                          onClick={() => setSelectedMethod(method.id)}
-                          className={cn(
-                            "group border-border/80 relative cursor-pointer overflow-hidden rounded-2xl border bg-slate-50/50 p-5 transition-all duration-300 hover:-translate-y-0.5 dark:bg-slate-900/10",
-                            isSelected
-                              ? "border-primary from-primary/5 ring-primary/20 bg-linear-to-br to-transparent ring-4"
-                              : "hover:border-primary/30",
-                          )}
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="space-y-1">
-                              <h4 className="text-foreground text-sm font-bold sm:text-base">
-                                {method.name}
-                              </h4>
-                              <p className="text-muted-foreground text-[10px] font-semibold tracking-wide uppercase">
-                                {method.type}
-                              </p>
-                            </div>
-                            <div
-                              className={cn(
-                                "flex h-10 w-16 items-center justify-center rounded-xl text-xs font-black tracking-tight shadow-md sm:text-sm",
-                                method.colorClass,
-                                method.textColor,
-                                method.shadowColor,
-                              )}
-                            >
-                              {method.logoText}
-                            </div>
-                          </div>
-                          <p className="text-muted-foreground mt-4 text-xs leading-relaxed font-medium opacity-80">
-                            {method.description}
-                          </p>
-                        </div>
-                      );
-                    })}
+                  {/* Premium Invoice Summary Card */}
+                  <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-6 dark:bg-emerald-950/10">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm font-semibold">
+                          Plan Level
+                        </span>
+                        <span className="text-foreground text-sm font-bold">
+                          {activePlanName}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm font-semibold">
+                          Validity Period
+                        </span>
+                        <span className="text-foreground text-sm font-bold">
+                          30 Days (Prepaid)
+                        </span>
+                      </div>
+                      <div className="border-border/50 flex items-center justify-between border-t pt-4">
+                        <span className="text-foreground text-base font-bold">
+                          Total Payable Amount
+                        </span>
+                        <span className="text-primary font-mono text-xl font-extrabold">
+                          ৳{price.toLocaleString("en-BD")} BDT
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="border-border/50 flex flex-col gap-4 border-t pt-6 md:flex-row md:items-center md:justify-between">

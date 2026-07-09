@@ -101,16 +101,53 @@ const AddressFormContent = ({
   );
 };
 
+const normalizeSingleAddress = (
+  addr: Record<string, unknown> | null | undefined,
+) => {
+  return {
+    street: (addr?.street as string) || "",
+    city: (addr?.city as string) || "",
+    state: (addr?.state as string) || "",
+    zipCode: (addr?.zipCode as string) || "",
+    country: (addr?.country as string) || "",
+  };
+};
+
+const normalizeAddressData = (
+  data: Record<string, unknown> | null | undefined,
+): AddressDetailsFormData => {
+  if (!data) {
+    return {
+      presentAddress: normalizeSingleAddress(null),
+      permanentAddress: normalizeSingleAddress(null),
+      sameAsPresent: false,
+    };
+  }
+
+  const present =
+    (data.presentAddress as Record<string, unknown>) ||
+    (data.street ? data : null);
+  const permanent = (data.permanentAddress as Record<string, unknown>) || null;
+
+  return {
+    presentAddress: normalizeSingleAddress(present),
+    permanentAddress: normalizeSingleAddress(permanent),
+    sameAsPresent: (data.sameAsPresent as boolean) ?? false,
+  };
+};
+
 export const AddressForm = ({
   onSubmit,
   onCancel,
   defaultValues,
   isLoading,
 }: AddressFormProps) => {
+  const normalizedValues = normalizeAddressData(defaultValues);
+
   return (
     <WkForm<AddressDetailsFormData>
       onSubmit={onSubmit}
-      defaultValues={defaultValues as unknown as AddressDetailsFormData}
+      defaultValues={normalizedValues}
       resolver={zodResolver(addressDetailsSchema)}
     >
       <AddressFormContent onCancel={onCancel} isLoading={isLoading} />

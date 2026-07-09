@@ -42,6 +42,7 @@ const jobApi = baseApi.injectEndpoints({
         url: `/job/job/${id}`,
         method: "GET",
       }),
+      providesTags: (result, error, id) => [{ type: "jobs", id }],
     }),
 
     updateJob: builder.mutation({

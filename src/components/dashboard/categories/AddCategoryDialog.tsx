@@ -4,6 +4,7 @@ import WkForm from "@/components/form/WkForm";
 import WKIconPicker from "@/components/form/WKIconPicker";
 import WKInput from "@/components/form/WkInput";
 import WKTextArea from "@/components/form/WkTextArea";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,7 +14,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCreateCategoryMutation } from "@/redux/feature/category/categoryApi";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/types/api";
@@ -30,10 +32,46 @@ const AddCategoryDialog = ({
   onSuccess,
 }: AddCategoryDialogProps) => {
   const [createCategory, { isLoading }] = useCreateCategoryMutation();
+  const [skills, setSkills] = useState<string[]>([]);
+  const [inputVal, setInputVal] = useState("");
+
+  // Reset skills state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setSkills([]);
+      setInputVal("");
+    }
+  }, [open]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const val = inputVal.trim();
+      if (!val) return;
+
+      if (skills.map((s) => s.toLowerCase()).includes(val.toLowerCase())) {
+        toast.error("This skill has already been added to the list");
+        return;
+      }
+
+      setSkills((prev) => [...prev, val]);
+      setInputVal("");
+    } else if (e.key === "Backspace" && !inputVal && skills.length > 0) {
+      setSkills((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const removeSkill = (indexToRemove: number) => {
+    setSkills((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      await createCategory(data).unwrap();
+      await createCategory({
+        ...data,
+        skills,
+      }).unwrap();
+
       toast.success("Category created successfully");
       onSuccess(data);
       onOpenChange(false);
@@ -69,6 +107,48 @@ const AddCategoryDialog = ({
               required
             />
             <WKIconPicker name="icon" label="Category Icon" required />
+
+            {/* Fiverr-style Skills Tag Input */}
+            <div className="space-y-2">
+              <label className="text-muted-foreground text-xs font-semibold uppercase">
+                Initial Skills List
+              </label>
+              <div className="border-input bg-background ring-offset-background focus-within:ring-primary/20 focus-within:border-primary flex min-h-[80px] w-full flex-wrap content-start gap-2 rounded-xl border p-3 text-sm transition-all focus-within:ring-2 focus-within:ring-offset-1 focus-within:outline-none">
+                {skills.map((skill, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="bg-primary/10 text-primary hover:bg-primary/20 flex items-center gap-1.5 border-none px-2.5 py-1 text-xs font-bold transition-all"
+                  >
+                    {skill}
+                    <button
+                      type="button"
+                      onClick={() => removeSkill(index)}
+                      className="hover:text-destructive text-muted-foreground cursor-pointer transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </Badge>
+                ))}
+                <input
+                  type="text"
+                  value={inputVal}
+                  onChange={(e) => setInputVal(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={
+                    skills.length === 0
+                      ? "Type skill and press Enter..."
+                      : "Add more..."
+                  }
+                  className="placeholder:text-muted-foreground/60 min-w-[120px] flex-1 bg-transparent py-1 text-sm outline-none"
+                />
+              </div>
+              <p className="text-muted-foreground text-[10px] leading-relaxed opacity-80">
+                * Type a skill name and press <strong>Enter</strong> or{" "}
+                <strong>comma (,)</strong> to add it.
+              </p>
+            </div>
+
             <WKTextArea
               name="description"
               label="Description"
@@ -89,7 +169,7 @@ const AddCategoryDialog = ({
             <Button
               type="submit"
               disabled={isLoading}
-              className="rounded-full font-bold shadow-md"
+              className="bg-primary hover:bg-primary/95 rounded-full font-bold text-white shadow-md"
             >
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -23,12 +23,14 @@ interface EditPlanDialogProps {
     price: number | string;
     description: string;
     features?: string[];
+    firstTimeDiscountPercent?: number;
   } | null;
   onSuccess: (data: {
     name: string;
     price: number | string;
     description: string;
     features?: string[];
+    firstTimeDiscountPercent?: number;
   }) => void;
 }
 
@@ -62,10 +64,14 @@ const EditPlanDialog = ({
     name: string;
     price: string;
     description: string;
+    firstTimeDiscountPercent?: string;
   }) => {
     onSuccess({
       ...plan,
       ...data,
+      firstTimeDiscountPercent: data.firstTimeDiscountPercent
+        ? parseInt(data.firstTimeDiscountPercent, 10)
+        : 0,
       features,
     });
     onOpenChange(false);
@@ -89,6 +95,9 @@ const EditPlanDialog = ({
             name: plan.name,
             description: plan.description,
             price: plan.price.toString(),
+            firstTimeDiscountPercent: (
+              plan.firstTimeDiscountPercent ?? 0
+            ).toString(),
           }}
         >
           <div className="custom-scrollbar grid max-h-[60vh] gap-4 overflow-y-auto px-1 py-4">
@@ -98,6 +107,16 @@ const EditPlanDialog = ({
                 name="price"
                 label="Monthly Price ($)"
                 type="number"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <WkInput
+                name="firstTimeDiscountPercent"
+                label="First Time Discount (%)"
+                type="number"
+                placeholder="0"
                 required
               />
             </div>

@@ -4,13 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Sidebar, useSidebar } from "@/components/ui/sidebar";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
 import { logout } from "@/redux/feature/auth/authSlice";
@@ -23,8 +22,8 @@ import {
   Bookmark,
   Briefcase,
   Building2,
+  ChevronLeft,
   Clock,
-  Crown,
   Eye,
   FileText,
   LogOut,
@@ -36,9 +35,10 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { memo, useState } from "react";
+import React, { useState } from "react";
 import SignOutModal from "../../shared/SignOutModal";
 import ThemeToggleButtonCompact from "../../shared/ThemeToggleButtonCompact";
 import WJLogo from "../../shared/WJLogo";
@@ -56,7 +56,7 @@ interface SidebarGroupProps {
   items: SidebarItemProps[];
 }
 
-const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
+const JobSeekerSidebarItem = function JobSeekerSidebarItem({
   icon: Icon,
   label,
   href,
@@ -70,6 +70,9 @@ const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = state === "collapsed" && !isMobile;
+
   const normalizedPath = pathname ? pathname.replace(/\/$/, "") : "";
   const normalizedHref = href.replace(/\/$/, "");
   const isExact = normalizedPath === normalizedHref;
@@ -78,32 +81,8 @@ const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
     normalizedPath.startsWith(normalizedHref + "/");
   const isActive = isExact || isSection;
 
-  if (signOut) {
-    return (
-      <button
-        type="button"
-        onClick={onSignOut}
-        className={cn(
-          "text-muted-foreground hover:bg-destructive/5 hover:text-destructive active:bg-destructive/10 group flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none",
-        )}
-      >
-        <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-105" />
-        <span className="flex-1 truncate text-left">{label}</span>
-      </button>
-    );
-  }
-
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none",
-        isActive
-          ? "bg-primary/10 text-primary border-primary rounded-r-none border-r-2"
-          : "text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary rounded-r-none hover:border-r-2",
-      )}
-      onClick={onItemClick}
-    >
+  const innerContent = (
+    <>
       <Icon
         className={cn(
           "h-4 w-4 shrink-0 transition-transform group-hover:scale-105",
@@ -112,20 +91,93 @@ const JobSeekerSidebarItem = memo(function JobSeekerSidebarItem({
             : "text-muted-foreground/70 group-hover:text-primary",
         )}
       />
-      <span className="flex-1 truncate text-left">{label}</span>
+      <span
+        className={cn(
+          "ease-apple flex-1 origin-left truncate overflow-hidden text-left whitespace-nowrap transition-all duration-300",
+          isCollapsed
+            ? "pointer-events-none ml-0 max-w-0 opacity-0"
+            : "ml-3 max-w-[150px] opacity-100",
+        )}
+      >
+        {label}
+      </span>
       {badge != null && (
         <Badge
-          variant="secondary"
-          className="bg-muted text-muted-foreground shrink-0 px-1.5 py-0 text-[10px]"
+          variant={isActive ? "default" : "secondary"}
+          className={cn(
+            "ease-apple shrink-0 scale-90 transition-all duration-300",
+            isCollapsed
+              ? "pointer-events-none max-w-0 p-0 opacity-0"
+              : "bg-muted text-muted-foreground max-w-10 px-1.5 py-0 text-[10px] opacity-100",
+          )}
         >
           {badge}
         </Badge>
       )}
+    </>
+  );
+
+  const itemLink = signOut ? (
+    <button
+      type="button"
+      onClick={onSignOut}
+      className={cn(
+        "group ease-apple flex cursor-pointer items-center transition-all duration-300 outline-none",
+        isCollapsed
+          ? "mx-auto h-9 w-9 justify-center rounded-lg p-0"
+          : "w-full justify-start rounded-md px-3 py-2 text-sm font-medium",
+        "text-muted-foreground hover:bg-destructive/5 hover:text-destructive active:bg-destructive/10",
+      )}
+    >
+      {innerContent}
+    </button>
+  ) : (
+    <Link
+      href={href}
+      className={cn(
+        "group ease-apple flex items-center transition-all duration-300 outline-none",
+        isCollapsed
+          ? "mx-auto h-9 w-9 justify-center rounded-lg p-0"
+          : "w-full justify-start rounded-md px-3 py-2 text-sm font-medium",
+        isCollapsed
+          ? isActive
+            ? "bg-primary/10 text-primary"
+            : "text-muted-foreground hover:bg-primary/20 hover:text-primary"
+          : isActive
+            ? "bg-primary/10 text-primary border-primary rounded-r-none border-r-2"
+            : "text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary rounded-r-none hover:border-r-2",
+      )}
+      onClick={onItemClick}
+    >
+      {innerContent}
     </Link>
   );
-});
 
-const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{itemLink}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        className="text-xs font-semibold"
+        hidden={!isCollapsed}
+      >
+        <div className="flex items-center gap-1.5">
+          <span>{label}</span>
+          {badge != null && (
+            <Badge
+              variant="secondary"
+              className="bg-primary/10 text-primary px-1 py-0 text-[9px] font-black"
+            >
+              {badge}
+            </Badge>
+          )}
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
+const JobSeekerSidebarContent = function JobSeekerSidebarContent({
   navGroups,
   bottomItems,
   pathname,
@@ -157,25 +209,73 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
+  const { state, isMobile, toggleSidebar } = useSidebar();
+  const isCollapsed = state === "collapsed" && !isMobile;
+
   return (
-    <div className="bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
+    <div className="group bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex h-12 shrink-0 items-center justify-between px-4 sm:h-14 lg:h-16">
-        <WJLogo />
-        <span className="pr-10 lg:pr-0">
-          <ThemeToggleButtonCompact />
-        </span>
+      <div
+        className={cn(
+          "flex shrink-0 items-center transition-all duration-200",
+          isCollapsed ? "px-1.5" : "px-4",
+          isCollapsed
+            ? "h-16 justify-center pt-2"
+            : "h-12 justify-between sm:h-14 lg:h-16",
+        )}
+      >
+        {!isCollapsed ? (
+          <>
+            <WJLogo />
+            <div className="flex items-center gap-1">
+              <ThemeToggleButtonCompact />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                className="text-muted-foreground hover:bg-muted hidden h-8 w-8 rounded-md md:flex"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            </div>
+          </>
+        ) : (
+          <Link
+            href="/"
+            className="relative block h-5 w-8 shrink-0 overflow-hidden"
+          >
+            <Image
+              src="/logo/workly_job-logo.png"
+              alt="W"
+              className="absolute top-0 left-0 h-8 w-8 max-w-none"
+              height={100}
+              width={100}
+            />
+          </Link>
+        )}
       </div>
 
       <Separator className="shrink-0" />
 
       {/* Profile Section */}
-      <div className="shrink-0 px-4 py-6">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+      <div
+        className={cn(
+          "shrink-0 py-3 transition-all duration-200",
+          isCollapsed ? "flex justify-center px-1.5" : "px-4",
+        )}
+      >
+        {/* Profile Info */}
+        <div
+          className={cn(
+            "flex items-center transition-all duration-200",
+            isCollapsed ? "gap-0" : "gap-3 px-1 py-1",
+          )}
+        >
+          <Avatar className="border-border h-10 w-10 shrink-0 border">
             <AvatarImage
-              src={profile?.avatarUrl || user?.profilePicture}
-              alt={profileData?.data?.fullName || user?.fullName}
+              src={profile?.avatarUrl || user?.profilePicture || ""}
+              alt={user?.fullName || "User Avatar"}
+              className="object-cover"
             />
             <AvatarFallback className="bg-primary/10 text-primary font-semibold">
               {(profileData?.data?.fullName || user?.fullName)
@@ -186,17 +286,22 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
                 .slice(0, 2) || "U"}
             </AvatarFallback>
           </Avatar>
-          <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 items-center gap-1.5">
-              <p className="text-foreground truncate text-sm font-semibold">
-                {profileData?.data?.fullName || user?.fullName || "User"}
-              </p>
-              {(profileData?.data?.isPremium ||
-                (user as { isPremium?: boolean })?.isPremium) && (
-                <span className="inline-flex shrink-0 animate-pulse items-center gap-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-amber-500 uppercase shadow-xs">
-                  <Crown className="h-2.5 w-2.5 fill-amber-500" />
-                  Pro
-                </span>
+          <div
+            className={cn(
+              "min-w-0 flex-1 overflow-hidden whitespace-nowrap transition-all duration-200 ease-in-out",
+              isCollapsed
+                ? "pointer-events-none max-w-0 opacity-0"
+                : "max-w-[200px] opacity-100",
+            )}
+          >
+            <div className="flex items-center gap-1.5">
+              <span className="text-foreground truncate text-sm font-semibold">
+                {profileData?.data?.fullName || user?.fullName || "Job Seeker"}
+              </span>
+              {profileData?.data?.isPremium && (
+                <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground pointer-events-none origin-left scale-90 px-1 py-0 text-[9px] font-bold tracking-wider uppercase">
+                  PRO
+                </Badge>
               )}
             </div>
             <div className="mt-1.5 flex items-center gap-2">
@@ -216,14 +321,38 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
       </div>
 
       {/* Navigation */}
-      <div className="scrollbar-thin scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/40 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 py-2 [-webkit-overflow-scrolling:touch]">
+      <div
+        className={cn(
+          "min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain py-2 [-webkit-overflow-scrolling:touch]",
+          isCollapsed
+            ? "scrollbar-hover-visible px-1.5"
+            : "scrollbar-thin px-3",
+        )}
+      >
         <nav className="space-y-6 pb-2">
           {navGroups.map((group, index) => (
             <div key={index}>
               {group.title && (
-                <h4 className="text-muted-foreground mb-2 px-3 text-xs font-semibold tracking-wider uppercase opacity-70">
-                  {group.title}
-                </h4>
+                <div className="ease-apple relative overflow-hidden transition-all duration-300">
+                  <h4
+                    className={cn(
+                      "text-muted-foreground ease-apple overflow-hidden px-3 text-xs font-semibold tracking-wider whitespace-nowrap uppercase opacity-70 transition-all duration-300",
+                      isCollapsed
+                        ? "pointer-events-none mb-0 max-h-0 opacity-0"
+                        : "mb-2 max-h-8 opacity-70",
+                    )}
+                  >
+                    {group.title}
+                  </h4>
+                  <Separator
+                    className={cn(
+                      "ease-apple shrink-0 transition-all duration-300",
+                      isCollapsed
+                        ? "my-3 opacity-100"
+                        : "pointer-events-none my-0 h-0 opacity-0",
+                    )}
+                  />
+                </div>
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => (
@@ -242,7 +371,12 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
       </div>
 
       {/* Footer / Bottom Items */}
-      <div className="bg-sidebar border-border/40 mt-auto shrink-0 border-t p-3">
+      <div
+        className={cn(
+          "bg-sidebar border-border/40 mt-auto shrink-0 border-t py-3",
+          isCollapsed ? "px-1.5" : "p-3",
+        )}
+      >
         <nav className="space-y-1">
           {bottomItems.map((item) => (
             <JobSeekerSidebarItem
@@ -257,21 +391,12 @@ const JobSeekerSidebarContent = memo(function JobSeekerSidebarContent({
       </div>
     </div>
   );
-});
+};
 
-export default function JobSeekerSidebarView({
-  isOpen: controlledIsOpen,
-  onOpenChange,
-}: {
-  isOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-} = {}) {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
+export default function JobSeekerSidebarView() {
   const pathname = usePathname();
-
-  const isOpen =
-    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-  const setIsOpen = onOpenChange || setInternalIsOpen;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { toggleSidebar, openMobile, setOpenMobile } = useSidebar();
   const dispatch = useAppDispatch();
   const [logoutUser, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
@@ -302,8 +427,7 @@ export default function JobSeekerSidebarView({
 
   const handleItemClick = () => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      setIsOpen(false);
-      onOpenChange?.(false);
+      setOpenMobile(false);
     }
   };
 
@@ -380,59 +504,35 @@ export default function JobSeekerSidebarView({
   ];
 
   return (
-    <div className="relative">
+    <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:top-0 lg:bottom-0 lg:z-40 lg:flex lg:h-dvh lg:max-h-dvh lg:min-h-0 lg:w-64 lg:flex-col">
-        <div className="border-sidebar-border bg-sidebar flex h-full min-h-0 flex-1 flex-col overflow-hidden border-r shadow-sm">
-          <JobSeekerSidebarContent
-            navGroups={navGroups}
-            bottomItems={bottomItems}
-            pathname={pathname ?? ""}
-            user={user}
-            profile={profile}
-            profileData={profileData}
-            profileCompletion={profileCompletion}
-            onSignOut={handleSignOutClick}
-            onItemClick={handleItemClick}
-          />
-        </div>
-      </div>
+      <Sidebar
+        collapsible="icon"
+        className="border-sidebar-border bg-sidebar border-r"
+      >
+        <JobSeekerSidebarContent
+          navGroups={navGroups}
+          bottomItems={bottomItems}
+          pathname={pathname ?? ""}
+          user={user}
+          profile={profile}
+          profileData={profileData}
+          profileCompletion={profileCompletion}
+          onSignOut={handleSignOutClick}
+          onItemClick={handleItemClick}
+        />
+      </Sidebar>
 
-      {/* Mobile Sidebar */}
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild className="lg:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-md border transition-all sm:top-6 sm:right-6"
-            aria-label="Open sidebar"
-          >
-            <Menu className="text-primary h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent
-          side="left"
-          className="z-9999 flex h-dvh max-h-dvh min-h-0 w-[280px] max-w-[85vw] flex-col gap-0 overflow-hidden border-r p-0 sm:w-[320px]"
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Job Seeker Menu</SheetTitle>
-          </SheetHeader>
-          <JobSeekerSidebarContent
-            navGroups={navGroups}
-            bottomItems={bottomItems}
-            pathname={pathname ?? ""}
-            user={user}
-            profile={profile}
-            profileData={profileData}
-            profileCompletion={profileCompletion}
-            onSignOut={handleSignOutClick}
-            onItemClick={handleItemClick}
-          />
-        </SheetContent>
-      </Sheet>
-
-      {/* Spacer for desktop sidebar */}
-      <div className="hidden lg:block lg:w-64" />
+      {/* Mobile Sidebar Burger Button Trigger */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-md border transition-all sm:top-6 sm:right-6 md:hidden"
+        onClick={toggleSidebar}
+        aria-label="Open sidebar"
+      >
+        <Menu className="text-primary h-5 w-5" />
+      </Button>
 
       <SignOutModal
         open={isSignOutModalOpen}
@@ -440,6 +540,6 @@ export default function JobSeekerSidebarView({
         onConfirm={handleConfirmSignOut}
         isLoading={isLoggingOut}
       />
-    </div>
+    </>
   );
 }

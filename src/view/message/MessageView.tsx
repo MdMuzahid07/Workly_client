@@ -1,6 +1,6 @@
 "use client";
-import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
 import DashboardEmployerMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerMessagesHeader";
+import DashboardMessagesHeader from "@/components/dashboard/dashboard-nav/header/DashboardMessagesHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,16 +13,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -34,15 +34,25 @@ import {
   Send,
   ShieldAlert,
   Trash2,
+  Loader2,
+  X,
+  Eye,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import ConversationSidebar from "../../components/main/message/ConversationSidebar";
 import MediaGallery from "../../components/main/message/MediaGallery";
 import MediaLightbox from "../../components/main/message/MediaLightbox";
-import { useSocket } from "../../provider/SocketProvider";
+import { useCanAccess } from "../../hooks/useEntitlements";
 import {
+  normalizeCloudinaryPdfUrl,
+  downloadMessageAttachment,
+} from "@/lib/pdfSource";
+import { useSocket } from "../../provider/SocketProvider";
+import messageApi, {
   useBlockUserMutation,
   useDeleteConversationMutation,
   useDeleteMessageMutation,
@@ -51,12 +61,13 @@ import {
   useMarkAsReadMutation,
   useSendMessageMutation,
 } from "../../redux/feature/message/messageApi";
-import { useGetProfileQuery } from "../../redux/feature/profile/profileApi";
-import { useAppSelector } from "../../redux/hooks";
+import { useUploadSingleFileMutation } from "../../redux/feature/upload/uploadApi";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import MessageViewSkeleton from "../../skeleton/message/inbox/MessageViewSkeleton";
 
 interface Message {
   id: string;
+  clientKey?: string;
   senderId: string;
   content: string;
   messageType: "TEXT" | "IMAGE" | "FILE" | "LINK" | "AUDIO" | "VIDEO";
@@ -74,16 +85,39 @@ interface Message {
   } | null;
 }
 
-const MessageView = () => {
+const EmojiPickerButton = dynamic(
+  () => import("../../components/shared/EmojiPickerButton"),
+  { ssr: false },
+);
+
+const MessagePdfViewer = dynamic(
+  () => import("../../components/shared/MessagePdfViewer"),
+  { ssr: false },
+);
+
+const MessageViewContent = () => {
+  const dispatch = useAppDispatch();
   const { socket } = useSocket();
-  const { data: profileData } = useGetProfileQuery(undefined);
   const currentUser = useAppSelector((state) => state.auth.user);
+  const { hasAccess: canMessageEmployer } = useCanAccess("canMessageEmployer");
+  const { hasAccess: canMessage } = useCanAccess("canMessage");
   const isPremium =
-    profileData?.data?.isPremium || currentUser?.isPremium || false;
+    currentUser?.role === "EMPLOYER" ? canMessage : canMessageEmployer;
+
+  const searchParams = useSearchParams();
+  const queryConversationId =
+    searchParams.get("conversationId") || searchParams.get("active");
 
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
+
+  useEffect(() => {
+    if (queryConversationId) {
+      setSelectedConversation(queryConversationId);
+      setShowMobileChat(true);
+    }
+  }, [queryConversationId]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
@@ -96,9 +130,15 @@ const MessageView = () => {
     isOpen: false,
     index: 0,
   });
+
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showDeleteConvModal, setShowDeleteConvModal] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState<{
+    url: string;
+    name: string;
+    messageId?: string;
+  } | null>(null);
 
   // API Queries
   const { data: conversationsData, isLoading: isConversationsLoading } =
@@ -113,10 +153,25 @@ const MessageView = () => {
   const [blockUser] = useBlockUserMutation();
   const [deleteConversation] = useDeleteConversationMutation();
   const [deleteMessage] = useDeleteMessageMutation();
+  const [uploadSingleFile] = useUploadSingleFileMutation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialLoad = useRef(true);
   const [isUploading, setIsUploading] = useState(false);
   const [allMessages, setAllMessages] = useState<Message[]>([]);
+  const [attachedFile, setAttachedFile] = useState<{
+    url: string;
+    name: string;
+    size: number;
+    type: "IMAGE" | "FILE";
+  } | null>(null);
+
+  // Reset initial load state when active conversation changes
+  useEffect(() => {
+    isInitialLoad.current = true;
+  }, [selectedConversation]);
 
   // Sync messages from query and clear on switch
   useEffect(() => {
@@ -127,7 +182,23 @@ const MessageView = () => {
     }
   }, [messagesData, isMessagesLoading, selectedConversation]);
 
-  // Socket event listeners
+  // Global Socket event listeners (for sidebar/notifications)
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewConversationMessage = () => {
+      // Invalidate RTK query cache to pull fresh conversation previews
+      dispatch(messageApi.util.invalidateTags(["Conversations"]));
+    };
+
+    socket.on("new_conversation_message", handleNewConversationMessage);
+
+    return () => {
+      socket.off("new_conversation_message", handleNewConversationMessage);
+    };
+  }, [socket, dispatch]);
+
+  // Conversation-specific Socket event listeners
   useEffect(() => {
     if (!socket || !selectedConversation) return;
 
@@ -136,9 +207,30 @@ const MessageView = () => {
         setAllMessages((prev) => {
           const exists = prev.some((m) => m.id === message.id);
           if (exists) return prev;
+
+          // If the message is from the current user, replace the optimistic one!
+          if (message.senderId === currentUser?.id) {
+            const optIndex = prev.findIndex(
+              (m) =>
+                m.senderId === currentUser?.id &&
+                m.id.length < 15 &&
+                (m.content === message.content ||
+                  (m.fileName && m.fileName === message.fileName)),
+            );
+            if (optIndex !== -1) {
+              const next = [...prev];
+              next[optIndex] = {
+                ...message,
+                clientKey: prev[optIndex].id, // Keep the tempId as the stable React key
+              };
+              return next;
+            }
+          }
+
           return [...prev, message];
         });
         markAsRead(selectedConversation);
+        dispatch(messageApi.util.invalidateTags(["Conversations"]));
       }
     };
 
@@ -175,16 +267,40 @@ const MessageView = () => {
       }
     };
 
+    const handleMessagesRead = (data: {
+      conversationId: string;
+      userId: string;
+    }) => {
+      if (
+        data.conversationId === selectedConversation &&
+        data.userId !== currentUser?.id
+      ) {
+        setAllMessages((prev) =>
+          prev.map((m) =>
+            m.senderId === currentUser?.id && m.status !== "READ"
+              ? {
+                  ...m,
+                  status: "READ" as const,
+                  readAt: new Date().toISOString(),
+                }
+              : m,
+          ),
+        );
+      }
+    };
+
     socket.on("new_message", handleNewMessage);
     socket.on("user_typing", handleTyping);
     socket.on("message_deleted", handleMessageDeleted);
+    socket.on("messages_read", handleMessagesRead);
 
     return () => {
       socket.off("new_message", handleNewMessage);
       socket.off("user_typing", handleTyping);
       socket.off("message_deleted", handleMessageDeleted);
+      socket.off("messages_read", handleMessagesRead);
     };
-  }, [socket, selectedConversation, currentUser?.id, markAsRead]);
+  }, [socket, selectedConversation, currentUser?.id, markAsRead, dispatch]);
 
   // Join/Leave conversation room
   useEffect(() => {
@@ -253,6 +369,27 @@ const MessageView = () => {
     (conv: ConversationItem) => conv.id === selectedConversation,
   );
 
+  const isRecipientTyping = currentConversation?.recipientId
+    ? !!typingUsers[currentConversation.recipientId]
+    : false;
+  // Scroll to bottom when messages are updated or when the recipient starts typing
+  useEffect(() => {
+    if (allMessages.length === 0 && !isRecipientTyping) return;
+
+    const lastMessage = allMessages[allMessages.length - 1];
+    const isMyMessage = lastMessage?.senderId === currentUser?.id;
+    const shouldScrollInstantly = isInitialLoad.current || isMyMessage;
+
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: shouldScrollInstantly ? "auto" : "smooth",
+      });
+      isInitialLoad.current = false;
+    }, 10); // Reduced delay to 10ms for extreme responsiveness
+
+    return () => clearTimeout(timer);
+  }, [allMessages, isRecipientTyping, currentUser?.id]);
+
   const handleSendMessage = async (payloadOverride?: {
     content?: string;
     messageType?: "TEXT" | "IMAGE" | "FILE" | "LINK";
@@ -260,21 +397,41 @@ const MessageView = () => {
     fileName?: string;
     fileSize?: number;
   }) => {
-    if ((newMessage.trim() || payloadOverride) && selectedConversation) {
-      const messageContent = payloadOverride?.content || newMessage;
+    if (
+      (newMessage.trim() || attachedFile || payloadOverride) &&
+      selectedConversation
+    ) {
+      const messageContent =
+        payloadOverride?.content ||
+        newMessage.trim() ||
+        (attachedFile
+          ? attachedFile.type === "IMAGE"
+            ? "Shared an image"
+            : `Shared a file: ${attachedFile.name}`
+          : "");
       const recipientId = currentConversation?.recipientId;
+
+      const messageType =
+        payloadOverride?.messageType || attachedFile?.type || "TEXT";
+      const fileUrl = payloadOverride?.fileUrl || attachedFile?.url || null;
+      const fileName = payloadOverride?.fileName || attachedFile?.name || null;
+      const fileSize = payloadOverride?.fileSize || attachedFile?.size || null;
 
       try {
         setNewMessage("");
+        setAttachedFile(null); // Clear attachment on send
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
         const tempId = Date.now().toString();
         const optimisticMessage: Message = {
           id: tempId,
           senderId: currentUser?.id || "",
           content: messageContent,
-          messageType: payloadOverride?.messageType || "TEXT",
-          fileUrl: payloadOverride?.fileUrl,
-          fileName: payloadOverride?.fileName,
-          fileSize: payloadOverride?.fileSize,
+          messageType,
+          fileUrl,
+          fileName,
+          fileSize,
           createdAt: new Date().toISOString(),
           status: "SENT",
           sender: {
@@ -284,22 +441,63 @@ const MessageView = () => {
         };
         setAllMessages((prev) => [...prev, optimisticMessage]);
 
-        await sendMessage({
-          conversationId: selectedConversation,
-          content: messageContent,
-          recipientId,
-          ...payloadOverride,
-        }).unwrap();
-
+        // Stop typing indicator on message submission
         socket?.emit("typing", {
           conversationId: selectedConversation,
           userId: currentUser?.id,
           isTyping: false,
         });
+
+        // Use high-performance Socket.io sending when connected
+        if (socket && socket.connected) {
+          await new Promise<{
+            success: boolean;
+            data?: Message;
+            error?: string;
+          }>((resolve, reject) => {
+            socket.emit(
+              "send_message",
+              {
+                conversationId: selectedConversation,
+                content: messageContent,
+                recipientId,
+                messageType,
+                fileUrl,
+                fileName,
+                fileSize,
+              },
+              (response: {
+                success: boolean;
+                data?: Message;
+                error?: string;
+              }) => {
+                if (response && response.success) {
+                  resolve(response);
+                } else {
+                  reject(
+                    new Error(response?.error || "Failed to send message"),
+                  );
+                }
+              },
+            );
+          });
+        } else {
+          // Fallback to HTTP POST mutation when socket is not available
+          await sendMessage({
+            conversationId: selectedConversation,
+            content: messageContent,
+            recipientId,
+            messageType,
+            fileUrl: fileUrl || undefined,
+            fileName: fileName || undefined,
+            fileSize: fileSize || undefined,
+          }).unwrap();
+        }
       } catch (err: unknown) {
         console.error("Error sending message:", err);
         const e = err as { data?: { message?: string }; message?: string };
-        toast.error(e?.data?.message || "Failed to send message");
+        toast.error(e?.data?.message || e?.message || "Failed to send message");
+        // Remove optimistic message on error
         setAllMessages((prev) => prev.filter((m) => m.id.length > 15));
       }
     }
@@ -313,28 +511,29 @@ const MessageView = () => {
       setIsUploading(true);
       const isImage = file.type.startsWith("image/");
 
-      let fileUrl = "";
-      if (isImage) {
-        fileUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
-      } else {
-        fileUrl = URL.createObjectURL(file);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Secure upload directly to Cloudinary via server API
+      const response = await uploadSingleFile(formData).unwrap();
+      const fileUrl = response?.data?.url;
+
+      if (!fileUrl) {
+        throw new Error("Failed to get file URL from server response");
       }
 
-      await handleSendMessage({
-        content: isImage ? "Shared an image" : `Shared a file: ${file.name}`,
-        messageType: isImage ? "IMAGE" : "FILE",
-        fileUrl,
-        fileName: file.name,
-        fileSize: file.size,
+      setAttachedFile({
+        url: fileUrl,
+        name: file.name,
+        size: file.size,
+        type: isImage ? "IMAGE" : "FILE",
       });
 
-      toast.success("File uploaded successfully");
-    } catch {
-      toast.error("Failed to upload file");
+      toast.success("File attached successfully");
+    } catch (err: unknown) {
+      console.error("File upload error:", err);
+      const e = err as { data?: { message?: string }; message?: string };
+      toast.error(e?.data?.message || e?.message || "Failed to upload file");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -407,7 +606,18 @@ const MessageView = () => {
     }
   };
 
-  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Autogrow textarea height dynamically based on its content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    // Reset height to allow scrollHeight to shrink/re-calculate correctly
+    textarea.style.height = "auto";
+    // Set new height based on scrollHeight, capped at 128px (max-h-32 equivalent)
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`;
+  }, [newMessage, selectedConversation]);
+
+  const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewMessage(e.target.value);
     if (socket && selectedConversation) {
       socket.emit("typing", {
@@ -482,12 +692,24 @@ const MessageView = () => {
 
   return (
     <div className="min-h-screen px-3.5 sm:px-6">
+      {showMobileChat && (
+        <style>{`
+          @media (max-width: 1023px) {
+            button[aria-label="Open sidebar"] {
+              display: none !important;
+            }
+            header.dashboard-header {
+              display: none !important;
+            }
+          }
+        `}</style>
+      )}
       {currentUser?.role === "EMPLOYER" ? (
         <DashboardEmployerMessagesHeader />
       ) : (
         <DashboardMessagesHeader />
       )}
-      <div className="grid h-[calc(100vh-170px)] grid-cols-1 gap-4 sm:h-[calc(100vh-160px)] lg:grid-cols-12">
+      <div className="grid h-[calc(100vh-130px)] grid-cols-1 gap-4 sm:h-[calc(100vh-120px)] lg:grid-cols-12">
         {/* Conversations Sidebar */}
         <ConversationSidebar
           showMobileChat={showMobileChat}
@@ -500,19 +722,17 @@ const MessageView = () => {
 
         {/* Active Chat Panel */}
         <div
-          className={`xl:col-span-8.5 h-full lg:col-span-8 ${
-            !showMobileChat && selectedConversation
-              ? "hidden lg:block"
-              : showMobileChat || !selectedConversation
-                ? "block"
-                : "hidden lg:block"
+          className={`xl:col-span-8.5 h-full min-h-0 rounded-2xl lg:col-span-8 ${
+            showMobileChat
+              ? "bg-background fixed inset-0 z-40 h-screen w-screen lg:relative lg:inset-auto lg:z-0 lg:block lg:h-full lg:w-auto"
+              : "hidden lg:block"
           }`}
         >
           {selectedConversation && currentConversation ? (
-            <Card className="bg-card flex h-full flex-col overflow-hidden rounded-2xl border shadow-xs">
+            <Card className="bg-card flex h-full flex-col gap-0 overflow-hidden rounded-none border-0 p-0 shadow-none lg:rounded-2xl lg:border lg:shadow-xs">
               {/* Chat Header */}
-              <CardHeader className="border-border/40 bg-card/80 sticky top-0 z-10 border-b p-3.5 backdrop-blur-md sm:p-4">
-                <div className="flex items-center justify-between gap-3">
+              <div className="border-border/40 bg-card/80 sticky top-0 z-10 flex h-11 min-h-11 items-center border-b px-3.5 py-0 backdrop-blur-md sm:h-14 sm:min-h-14 sm:px-4 lg:h-16 lg:min-h-16 lg:rounded-t-2xl lg:px-4 lg:py-0">
+                <div className="flex w-full items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <Button
                       variant="ghost"
@@ -531,7 +751,7 @@ const MessageView = () => {
                           }
                           className="object-cover"
                         />
-                        <AvatarFallback className="bg-primary/10 text-primary rounded-xl text-xs font-bold">
+                        <AvatarFallback className="bg-primary/10 text-primary rounded-xl text-xs font-black sm:text-sm">
                           {currentConversation.participantName
                             .split(" ")
                             .map((n: string) => n[0])
@@ -539,48 +759,54 @@ const MessageView = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div
-                        className={`border-background absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rounded-full border-2 shadow-2xs ${
+                        className={`border-background absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 shadow-2xs ${
                           currentConversation.isOnline
                             ? "bg-emerald-500"
                             : "bg-muted-foreground/40"
                         }`}
                       />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h2 className="text-foreground truncate text-xs font-bold tracking-tight sm:text-sm">
+                    <div className="min-w-0">
+                      <h2 className="text-foreground truncate text-xs font-bold sm:text-sm">
                         {currentConversation.participantName}
                       </h2>
-                      <p className="text-muted-foreground truncate text-[11px] font-medium">
-                        {Object.values(typingUsers).some(Boolean)
-                          ? "Typing..."
-                          : currentConversation.participantRole || "Active Now"}
-                      </p>
+                      {isRecipientTyping ? (
+                        <p className="animate-pulse truncate text-[10px] font-bold text-emerald-500 sm:text-xs">
+                          typing...
+                        </p>
+                      ) : (
+                        currentConversation.participantRole && (
+                          <p className="text-muted-foreground truncate text-[10px] font-semibold sm:text-xs">
+                            {currentConversation.participantRole}
+                          </p>
+                        )
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       onClick={() => setShowMediaGallery(true)}
-                      className="border-border/60 h-8 w-8 rounded-full sm:h-9 sm:w-9"
-                      title="Shared Files"
+                      className="hover:bg-muted text-muted-foreground h-9 w-9 shrink-0 rounded-full"
                     >
-                      <Paperclip className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <Paperclip className="h-4 w-4" />
                     </Button>
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
-                          className="border-border/60 h-8 w-8 rounded-full sm:h-9 sm:w-9"
+                          className="hover:bg-muted text-muted-foreground h-9 w-9 shrink-0 rounded-full"
                         >
-                          <MoreVertical className="text-muted-foreground h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-48 rounded-xl p-2"
+                        className="border-border/60 min-w-40 rounded-xl p-1"
                       >
                         <DropdownMenuItem
                           className="cursor-pointer rounded-lg text-xs font-medium"
@@ -609,10 +835,10 @@ const MessageView = () => {
                     </DropdownMenu>
                   </div>
                 </div>
-              </CardHeader>
+              </div>
 
               {/* Messages Body */}
-              <CardContent className="bg-muted/5 flex-1 overflow-hidden p-0">
+              <CardContent className="bg-muted/5 min-h-0 flex-1 overflow-hidden p-0">
                 <ScrollArea className="h-full p-4 sm:p-6">
                   <div className="flex flex-col space-y-4 pb-4">
                     <div className="relative my-4 flex items-center justify-center">
@@ -638,8 +864,11 @@ const MessageView = () => {
                         nextMessage.senderId !== message.senderId;
 
                       return (
-                        <div
-                          key={message.id}
+                        <motion.div
+                          key={message.clientKey || message.id}
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ duration: 0.22, ease: "easeOut" }}
                           className={`flex w-full ${
                             isCurrentUser ? "justify-end" : "justify-start"
                           } ${isNewGroup ? "pt-2" : "pt-0.5"}`}
@@ -749,9 +978,41 @@ const MessageView = () => {
                                       <FileIcon className="h-4 w-4" />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                      <p className="max-w-[150px] truncate text-xs font-bold sm:max-w-[200px]">
-                                        {message.fileName}
-                                      </p>
+                                      {message.fileName
+                                        ?.toLowerCase()
+                                        .endsWith(".pdf") ? (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setSelectedPdf({
+                                              url: message.fileUrl
+                                                ? normalizeCloudinaryPdfUrl(
+                                                    message.fileUrl,
+                                                  )
+                                                : "",
+                                              name:
+                                                message.fileName ?? "Document",
+                                              messageId: message.id,
+                                            })
+                                          }
+                                          className="block max-w-[150px] cursor-pointer truncate text-left text-xs font-bold hover:underline sm:max-w-[200px]"
+                                        >
+                                          {message.fileName}
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            downloadMessageAttachment(
+                                              message.id,
+                                              message.fileName || "Document",
+                                            )
+                                          }
+                                          className="block max-w-[150px] cursor-pointer truncate text-left text-xs font-bold hover:underline sm:max-w-[200px]"
+                                        >
+                                          {message.fileName}
+                                        </button>
+                                      )}
                                       <p className="text-[10px] opacity-70">
                                         {message.fileSize
                                           ? (message.fileSize / 1024).toFixed(1)
@@ -759,16 +1020,47 @@ const MessageView = () => {
                                         KB
                                       </p>
                                     </div>
-                                    <a
-                                      href={message.fileUrl || "#"}
-                                      download
-                                      className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/20"
-                                    >
-                                      <DownloadIcon className="h-3.5 w-3.5" />
-                                    </a>
+                                    <div className="flex items-center gap-1">
+                                      {message.fileName
+                                        ?.toLowerCase()
+                                        .endsWith(".pdf") && (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setSelectedPdf({
+                                              url: message.fileUrl
+                                                ? normalizeCloudinaryPdfUrl(
+                                                    message.fileUrl,
+                                                  )
+                                                : "",
+                                              name:
+                                                message.fileName ?? "Document",
+                                              messageId: message.id,
+                                            })
+                                          }
+                                          className="shrink-0 cursor-pointer rounded-full p-1.5 transition-colors hover:bg-white/20"
+                                          title="View PDF"
+                                        >
+                                          <Eye className="h-3.5 w-3.5" />
+                                        </button>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          downloadMessageAttachment(
+                                            message.id,
+                                            message.fileName || "Document",
+                                          )
+                                        }
+                                        className="shrink-0 cursor-pointer rounded-full p-1.5 transition-colors hover:bg-white/20"
+                                        title="Download File"
+                                      >
+                                        <DownloadIcon className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
                                   </div>
                                 ) : (
-                                  <p className="text-xs leading-relaxed font-medium break-words whitespace-pre-wrap sm:text-sm">
+                                  <p className="text-xs leading-relaxed font-medium wrap-break-word whitespace-pre-wrap sm:text-sm">
                                     {message.content}
                                   </p>
                                 )}
@@ -787,46 +1079,140 @@ const MessageView = () => {
                               )}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
+                    {isRecipientTyping && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        className="flex w-full justify-start pt-2"
+                      >
+                        <div className="flex max-w-[85%] items-end gap-2 sm:max-w-[75%]">
+                          <div className="w-7 shrink-0">
+                            <Avatar className="h-7 w-7 rounded-lg border shadow-2xs">
+                              <AvatarImage
+                                src={
+                                  currentConversation.participantAvatar ||
+                                  "/placeholder.svg"
+                                }
+                              />
+                              <AvatarFallback className="text-[9px] font-bold">
+                                {currentConversation.participantName[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                          </div>
+                          <div className="bg-card border-border/60 text-foreground flex items-center gap-1 rounded-2xl rounded-bl-xs border px-4 py-3 shadow-2xs">
+                            <span className="bg-muted-foreground/60 h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]" />
+                            <span className="bg-muted-foreground/60 h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]" />
+                            <span className="bg-muted-foreground/60 h-2 w-2 animate-bounce rounded-full" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                    <div ref={messagesEndRef} />
                   </div>
                 </ScrollArea>
               </CardContent>
 
               {/* Input Bar */}
-              <div className="border-border/40 bg-card/90 sticky bottom-0 z-10 border-t p-2.5 backdrop-blur-md sm:p-3">
-                <div className="flex items-center gap-2">
+              <div className="border-border/40 bg-card/90 sticky bottom-0 z-10 border-t p-2.5 backdrop-blur-md sm:p-3 lg:rounded-b-2xl">
+                <div className="flex items-end gap-2">
                   <input
                     type="file"
                     className="hidden"
                     ref={fileInputRef}
                     onChange={handleFileUpload}
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isUploading}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="hover:bg-muted text-muted-foreground h-9 w-9 shrink-0 rounded-full"
-                  >
-                    <Paperclip
-                      className={`h-4 w-4 ${isUploading ? "animate-spin" : ""}`}
-                    />
-                  </Button>
-                  <Input
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={handleTyping}
-                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                    className="bg-muted/30 focus-visible:ring-primary/20 border-border/60 h-10 flex-1 rounded-full border px-4 text-xs font-medium focus-visible:ring-2 sm:text-sm"
-                  />
+
+                  {/* Unified Input Card Container */}
+                  <div className="bg-muted/40 hover:bg-muted/60 focus-within:bg-background border-border/80 focus-within:border-primary/60 focus-within:ring-primary/10 flex min-h-[44px] flex-1 flex-col gap-1.5 rounded-2xl border p-[3px] shadow-2xs transition-all duration-300 focus-within:ring-3">
+                    {/* Pending Attachment Preview */}
+                    {attachedFile && (
+                      <div className="px-2 pt-1.5 pb-0.5">
+                        <div className="bg-background border-border/60 group relative flex max-w-[280px] items-center gap-2 rounded-xl border p-2 shadow-2xs">
+                          {attachedFile.type === "IMAGE" ? (
+                            <div className="border-border/40 bg-muted relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border">
+                              <Image
+                                src={attachedFile.url}
+                                alt="Attachment preview"
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                          ) : (
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                              <FileIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1 pr-4">
+                            <p className="text-foreground truncate text-xs font-bold">
+                              {attachedFile.name}
+                            </p>
+                            <p className="text-muted-foreground text-[10px]">
+                              {(attachedFile.size / 1024).toFixed(1)} KB
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setAttachedFile(null)}
+                            className="bg-destructive hover:bg-destructive/95 text-destructive-foreground absolute -top-1.5 -right-1.5 cursor-pointer rounded-full p-0.5 opacity-90 shadow-xs transition-all hover:opacity-100"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex w-full items-end gap-1.5">
+                      <div className="flex items-center gap-0.5 self-center pl-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          disabled={isUploading}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="hover:bg-muted text-muted-foreground hover:text-foreground h-8 w-8 shrink-0 rounded-xl transition-all"
+                        >
+                          {isUploading ? (
+                            <Loader2 className="text-primary h-4 w-4 animate-spin" />
+                          ) : (
+                            <Paperclip className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <EmojiPickerButton
+                          className="hover:bg-muted text-muted-foreground hover:text-foreground h-8 w-8 shrink-0 rounded-xl transition-all"
+                          onEmojiSelect={(emoji) =>
+                            setNewMessage((prev) => prev + emoji)
+                          }
+                        />
+                      </div>
+
+                      <textarea
+                        ref={textareaRef}
+                        placeholder="Type a message..."
+                        value={newMessage}
+                        onChange={handleTyping}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                        rows={1}
+                        className="placeholder:text-muted-foreground/80 max-h-32 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-1.5 text-xs leading-relaxed font-medium outline-hidden [scrollbar-width:none] md:text-sm [&::-webkit-scrollbar]:hidden"
+                      />
+                    </div>
+                  </div>
+
                   <Button
                     onClick={() => handleSendMessage()}
-                    disabled={!newMessage.trim()}
-                    className="h-9 w-9 shrink-0 rounded-full p-0 shadow-xs"
+                    disabled={!newMessage.trim() && !attachedFile}
+                    className="h-11 w-11 shrink-0 rounded-2xl p-0 shadow-xs transition-all duration-300 hover:shadow-md active:scale-95 disabled:scale-100"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-4.5 w-4.5" />
                   </Button>
                 </div>
               </div>
@@ -952,7 +1338,34 @@ const MessageView = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Inline PDF viewer — triggered by Eye button on PDF attachment bubbles */}
+      {selectedPdf && (
+        <MessagePdfViewer
+          isOpen={!!selectedPdf}
+          onClose={() => setSelectedPdf(null)}
+          pdfUrl={selectedPdf.url}
+          messageId={selectedPdf.messageId}
+          title={selectedPdf.name}
+        />
+      )}
     </div>
+  );
+};
+
+const MessageView = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <div className="text-muted-foreground text-sm font-semibold">
+            Loading conversations...
+          </div>
+        </div>
+      }
+    >
+      <MessageViewContent />
+    </Suspense>
   );
 };
 

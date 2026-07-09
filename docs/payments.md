@@ -40,6 +40,8 @@ The upgrade/checkout CTA buttons inside the pricing tables are dynamically conne
 *   **Login Check**: Redirects unauthenticated users to `/auth/login`.
 *   **Custom Actions**: Opens default email queries if they trigger contact on Enterprise / custom plans.
 *   **Pricing Conversion**: Formats string pricing schemas (e.g. `৳4,999` BDT) into raw float numbers (e.g. `4999`) automatically for the API payload.
+*   **Active Subscription Lock**: If the card represents the user's currently active subscription (`isActivePlan === true`), the checkout button is disabled and its label is locked to `"Current Plan"` to prevent double purchasing.
+*   **Dynamic Discount Promotion**: Renders an absolute promotional banner (e.g. `"35% OFF · 1ST PURCHASE"`) at the top of the card and a strikethrough original price if `originalPrice` and `discountBadge` parameters are provided.
 *   **Redirection**: Once the API slice succeeds, it triggers secure redirection by updating `window.location.href` to the sandbox or live gateway url:
     ```typescript
     const res = await initiatePayment({
@@ -97,3 +99,5 @@ Displays all transaction history logs dynamically, including printable receipts.
 *   **Seeker Billing Details**: `src/app/(dashboard)/dashboard/billing-details/page.tsx`
 *   **Employer Billing Details**: `src/app/(dashboard)/employer/billing-details/page.tsx`
 *   **Employer Billing Overview**: Integrated the reusable ledger directly inside `src/view/dashboard/EmployerBillingView.tsx`.
+*   **Seeker Pricing Panel**: `src/view/dashboard/job-seeker/pricing/JobSeekerPricingView.tsx` (fetches, parses, and formats Job Seeker tiers dynamically).
+*   **Employer Pricing Panel**: `src/view/dashboard/employer/pricing/EmployerPricingView.tsx` (fetches, parses, and formats Employer tiers dynamically).

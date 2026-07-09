@@ -18,7 +18,8 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/profile/profileApi";
-import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
+import { useUploadAvatarMutation } from "@/redux/feature/upload/uploadApi";
+import { useCompressedUpload } from "@/hooks/useCompressedUpload";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { ArrowLeft, Camera, Mail, Phone, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -37,8 +38,9 @@ export default function CompanyPersonalInformationView({
   const userFullInfo = profileData?.data;
   const profile = userFullInfo?.profile;
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  const [uploadFile, { isLoading: isUploadingImage }] =
-    useUploadSingleFileMutation();
+  const [uploadFile] = useUploadAvatarMutation();
+  const { upload: uploadCompressedImage, isProcessing: isUploadingImage } =
+    useCompressedUpload("avatar");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -88,16 +90,12 @@ export default function CompanyPersonalInformationView({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 1024 * 1024) {
-      toast.error("File size must be less than 1MB");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await uploadFile(formData).unwrap();
+      const res = await uploadCompressedImage(
+        file,
+        (formData) => uploadFile(formData).unwrap(),
+        "Profile picture updated",
+      );
       if (res.success && res.data?.url) {
         const result = await updateProfile({
           profilePicture: res.data.url,
@@ -110,11 +108,9 @@ export default function CompanyPersonalInformationView({
             }),
           );
         }
-
-        toast.success("Profile picture updated");
       }
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to upload image");
+      console.error("Failed to upload image:", err);
     }
   };
 
@@ -159,7 +155,7 @@ export default function CompanyPersonalInformationView({
               Your personal profile picture used across the platform.
             </p>
           </div>
-          <div className="flex flex-col items-center gap-4 rounded-xl border p-6 text-center">
+          <div className="bg-card flex flex-col items-center gap-4 rounded-xl border p-6 text-center">
             <div className="relative">
               <Avatar className="h-32 w-32 border-4 border-white outline-1">
                 <AvatarImage

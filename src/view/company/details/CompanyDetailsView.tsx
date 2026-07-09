@@ -223,7 +223,7 @@ const CompanyDetailsView = () => {
           <div className="space-y-6 lg:col-span-2">
             {/* Premium Header Card */}
             <Card className="border-primary/10 bg-background/50 overflow-hidden border backdrop-blur-sm">
-              <CardHeader className="p-8">
+              <CardHeader className="p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="bg-card border-primary/10 relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border p-2 shadow-2xl sm:h-32 sm:w-32">
@@ -310,13 +310,13 @@ const CompanyDetailsView = () => {
 
             {/* About Company */}
             <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
                   About {companyDetails.name}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-8">
+              <CardContent className="space-y-6 p-4 pt-0 sm:space-y-8 sm:p-6 sm:pt-0">
                 {companyDetails.description && (
                   <div>
                     <h4 className="text-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
@@ -349,7 +349,7 @@ const CompanyDetailsView = () => {
             {/* Core Values */}
             {companyDetails.values && companyDetails.values.length > 0 && (
               <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Heart className="h-5 w-5 text-rose-500" />
@@ -366,7 +366,7 @@ const CompanyDetailsView = () => {
                     The beliefs that guide our {`team's`} conduct every day.
                   </p>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                   <div className="grid grid-cols-1 gap-4">
                     {companyDetails.values.map((val) => {
                       const meta = getValueMetadata(val);
@@ -401,13 +401,13 @@ const CompanyDetailsView = () => {
             {/* Benefits & Perks */}
             {companyDetails.benefits && companyDetails.benefits.length > 0 && (
               <Card className="border-primary/10 bg-background/50 border backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5" />
                     Benefits & Perks
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {companyDetails.benefits.map((benefit) => {
                       const { icon: BenefitIcon, color: iconBgColor } =
@@ -450,13 +450,13 @@ const CompanyDetailsView = () => {
               id="open-positions"
               className="border-primary/10 bg-background/50 scroll-mt-24 border backdrop-blur-sm"
             >
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="flex items-center gap-2">
                   <Briefcase className="text-primary h-5 w-5" />
                   Open Positions ({transformedJobs.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                 {transformedJobs.length > 0 ? (
                   <InfiniteScroll
                     dataLength={visibleJobs.length}
@@ -492,7 +492,7 @@ const CompanyDetailsView = () => {
                       {visibleJobs.map((job) => (
                         <div
                           key={job.id}
-                          className="hover:border-primary/30 border-primary/10 bg-card group/job rounded-2xl border p-5 transition-all duration-300"
+                          className="hover:border-primary/30 border-primary/10 bg-card group/job rounded-2xl border p-4 transition-all duration-300 sm:p-5"
                         >
                           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                             <div className="flex-1 space-y-2">

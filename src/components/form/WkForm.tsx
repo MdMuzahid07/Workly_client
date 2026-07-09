@@ -21,6 +21,7 @@ interface WkFormProps<T extends FieldValues> extends FormConfig<T> {
   children: React.ReactNode;
   onSubmit: SubmitHandler<T>;
   values?: T;
+  className?: string;
 }
 
 const WkForm = <T extends FieldValues>({
@@ -29,6 +30,7 @@ const WkForm = <T extends FieldValues>({
   defaultValues,
   resolver,
   values,
+  className,
 }: WkFormProps<T>) => {
   const formConfig: FormConfig<T> = {};
 
@@ -98,7 +100,10 @@ const WkForm = <T extends FieldValues>({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={submitHandler(onFormSubmit, onFormError)}>
+      <form
+        onSubmit={submitHandler(onFormSubmit, onFormError)}
+        className={className}
+      >
         {children}
       </form>
     </FormProvider>

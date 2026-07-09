@@ -279,7 +279,7 @@ const CompanyProfileBenefitsTab = ({
       </SectionCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               {editingBenefit ? "Refine Benefit" : "New Company Perk"}

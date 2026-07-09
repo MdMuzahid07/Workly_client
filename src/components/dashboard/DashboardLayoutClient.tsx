@@ -8,6 +8,7 @@ import AdminSidebar from "./dashboard-nav/AdminSidebar";
 import EmployerSidebar from "./dashboard-nav/EmployerSidebar";
 import JobSeekerSidebar from "./dashboard-nav/JobSeekerSidebar";
 import SubscriptionExpiryModal from "./SubscriptionExpiryModal";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export default function DashboardLayoutClient({
   children,
@@ -17,7 +18,6 @@ export default function DashboardLayoutClient({
   const pathname = usePathname();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, accessToken } = useAppSelector((state) => state.auth) || {};
 
   useEffect(() => {
@@ -132,16 +132,13 @@ export default function DashboardLayoutClient({
 
   if (isEmployerPath) {
     return (
-      <div className="bg-background min-h-screen">
-        <EmployerSidebar
-          isOpen={isSidebarOpen}
-          onOpenChange={setIsSidebarOpen}
-        />
-        <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
-          <main className="min-h-screen w-full min-w-0">{children}</main>
-        </div>
+      <SidebarProvider>
+        <EmployerSidebar />
+        <SidebarInset className="dark:bg-background min-h-screen w-full min-w-0 bg-slate-100">
+          {children}
+        </SidebarInset>
         <SubscriptionExpiryModal />
-      </div>
+      </SidebarProvider>
     );
   }
 
@@ -155,25 +152,22 @@ export default function DashboardLayoutClient({
     }
 
     return (
-      <div className="bg-background min-h-screen">
-        <AdminSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
-        <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
-          <main className="min-h-screen w-full min-w-0">{children}</main>
-        </div>
-      </div>
+      <SidebarProvider>
+        <AdminSidebar />
+        <SidebarInset className="dark:bg-background min-h-screen w-full min-w-0 bg-slate-100">
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <JobSeekerSidebar
-        isOpen={isSidebarOpen}
-        onOpenChange={setIsSidebarOpen}
-      />
-      <div className="dark:bg-background min-w-0 bg-slate-100 lg:pl-64">
-        <main className="min-h-screen w-full min-w-0">{children}</main>
-      </div>
+    <SidebarProvider>
+      <JobSeekerSidebar />
+      <SidebarInset className="dark:bg-background min-h-screen w-full min-w-0 bg-slate-100">
+        {children}
+      </SidebarInset>
       <SubscriptionExpiryModal />
-    </div>
+    </SidebarProvider>
   );
 }
