@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
 import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
+import { useCanAccess } from "@/hooks/useEntitlements";
 import { useAppSelector } from "@/redux/hooks";
 import {
   ArrowRight,
@@ -139,7 +140,8 @@ const JobDetailsSidebar = ({
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const isJobSeeker = currentUser?.role === "JOB_SEEKER";
-  const isPremium = currentUser?.isPremium === true;
+  // Use live subscription data — NOT the stale JWT flag — as the source of truth.
+  const { hasAccess: isPremium } = useCanAccess("canMessageEmployer");
   const recruiterId = job.postedById || job.postedBy?.id;
   const isNotOwnJob = recruiterId && recruiterId !== currentUser?.id;
 
@@ -169,7 +171,7 @@ const JobDetailsSidebar = ({
 
       if (response.success && response.data?.id) {
         toast.success("Conversation started!", { id: "create_chat" });
-        router.push(`/dashboard/messages?active=${response.data.id}`);
+        router.push(`/dashboard/messages?conversationId=${response.data.id}`);
       } else {
         toast.error("Failed to start conversation", { id: "create_chat" });
       }

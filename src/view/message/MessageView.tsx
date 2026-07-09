@@ -84,7 +84,8 @@ const MessageViewContent = () => {
     profileData?.data?.isPremium || currentUser?.isPremium || false;
 
   const searchParams = useSearchParams();
-  const queryConversationId = searchParams.get("conversationId");
+  const queryConversationId =
+    searchParams.get("conversationId") || searchParams.get("active");
 
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
