@@ -35,7 +35,7 @@ export const getAuthHeaders = (): Record<string, string> => {
   return { authorization: token };
 };
 
-const normalizeCloudinaryPdfUrl = (url: string) => {
+export const normalizeCloudinaryPdfUrl = (url: string) => {
   if (!url.includes("res.cloudinary.com")) return url;
   if (url.includes("/raw/upload/")) return url;
   return url.replace("/image/upload/", "/raw/upload/");
@@ -45,6 +45,7 @@ export const resolvePdfFetchUrl = (options: {
   pdfUrl: string;
   applicationId?: string;
   resumeId?: string;
+  messageId?: string;
 }): { url: string; requiresAuth: boolean } => {
   if (options.applicationId) {
     return {
@@ -56,6 +57,13 @@ export const resolvePdfFetchUrl = (options: {
   if (options.resumeId) {
     return {
       url: `${API_BASE}/resume/resumes/${options.resumeId}/file`,
+      requiresAuth: true,
+    };
+  }
+
+  if (options.messageId) {
+    return {
+      url: `${API_BASE}/message/file/${options.messageId}`,
       requiresAuth: true,
     };
   }
@@ -90,7 +98,7 @@ const refreshAccessToken = async (): Promise<boolean> => {
 const fetchWithAuth = async (url: string): Promise<Response> => {
   const headers = getAuthHeaders();
   if (!headers.authorization) {
-    throw new Error("You must be signed in to view this resume.");
+    throw new Error("You must be signed in to view this document.");
   }
 
   let response = await fetch(url, {
@@ -116,6 +124,7 @@ export const fetchPdfData = async (options: {
   pdfUrl: string;
   applicationId?: string;
   resumeId?: string;
+  messageId?: string;
 }): Promise<ArrayBuffer> => {
   const { url, requiresAuth } = resolvePdfFetchUrl(options);
 
@@ -137,6 +146,34 @@ export const fetchPdfData = async (options: {
   }
 
   return response.arrayBuffer();
+};
+
+/** Download a message attachment via the authenticated file stream endpoint. */
+export const downloadMessageAttachment = async (
+  messageId: string,
+  fileName: string,
+): Promise<void> => {
+  const url = `${API_BASE}/message/file/${messageId}`;
+  const response = await fetchWithAuth(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to download attachment (${response.status})`);
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    throw new Error("Server returned an error instead of the attachment file.");
+  }
+
+  const blob = await response.blob();
+  const objectUrl = window.URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = fileName;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.URL.revokeObjectURL(objectUrl);
 };
 
 /** Download a job seeker resume via the admin proxy endpoint. */
