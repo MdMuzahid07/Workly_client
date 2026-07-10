@@ -1,38 +1,32 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { Button } from '@/components/ui/button';
 import {
   AlertCircle,
+  Check,
   ChevronDown,
   ChevronRight,
   Copy,
-  Check,
-  RotateCw,
-  Home,
   HelpCircle,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+  Home,
+  RotateCw,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-const Error = ({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) => {
+const Error = ({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    console.error("Application Error Details:", error);
+    console.error('Application Error Details:', error);
   }, [error]);
 
   const copyErrorDetails = () => {
-    const details = `Error: ${error?.message || "Unknown Error"}
-Digest: ${error?.digest || "N/A"}
-Stack: ${error?.stack || "N/A"}`;
+    const details = `Error: ${error?.message || 'Unknown Error'}
+Digest: ${error?.digest || 'N/A'}
+Stack: ${error?.stack || 'N/A'}`;
     navigator.clipboard.writeText(details);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -49,7 +43,7 @@ Stack: ${error?.stack || "N/A"}`;
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         className="border-border bg-card relative z-10 w-full max-w-xl rounded-xl border p-6 sm:p-8"
       >
         {/* Error Header Icon */}
@@ -69,9 +63,9 @@ Stack: ${error?.stack || "N/A"}`;
 
         {/* Message */}
         <p className="text-muted-foreground mt-6 text-sm leading-relaxed">
-          We apologize for the interruption. The system encountered an issue
-          processing your request. Our engineering team has been automatically
-          notified and is looking into the cause.
+          We apologize for the interruption. The system encountered an issue processing your
+          request. Our engineering team has been automatically notified and is looking into the
+          cause.
         </p>
 
         {/* Action Buttons */}
@@ -112,9 +106,9 @@ Stack: ${error?.stack || "N/A"}`;
             {showDetails && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
+                animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
                 className="overflow-hidden"
               >
                 <div className="bg-muted/30 border-border text-foreground/80 relative mt-4 max-h-60 overflow-y-auto rounded-lg border p-4 font-mono text-[11px] leading-relaxed">
@@ -131,16 +125,12 @@ Stack: ${error?.stack || "N/A"}`;
                   </button>
                   <div className="space-y-2 pr-10">
                     <div>
-                      <span className="text-muted-foreground font-semibold">
-                        Message:
-                      </span>{" "}
-                      {error?.message || "Unknown error occurred"}
+                      <span className="text-muted-foreground font-semibold">Message:</span>{' '}
+                      {error?.message || 'Unknown error occurred'}
                     </div>
                     {error?.digest && (
                       <div>
-                        <span className="text-muted-foreground font-semibold">
-                          Digest:
-                        </span>{" "}
+                        <span className="text-muted-foreground font-semibold">Digest:</span>{' '}
                         {error.digest}
                       </div>
                     )}

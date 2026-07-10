@@ -1,32 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import DashboardEmployerSavedProfilesHeader from "@/components/dashboard/dashboard-nav/header/DashboardEmployerSavedProfilesHeader";
-import SavedProfileCard from "@/components/main/saved-profiles/SavedProfileCard";
-import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import DashboardEmployerSavedProfilesHeader from '@/components/dashboard/dashboard-nav/header/DashboardEmployerSavedProfilesHeader';
+import SavedProfileCard from '@/components/main/saved-profiles/SavedProfileCard';
+import DeleteConfirmationModal from '@/components/shared/DeleteConfirmationModal';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   useGetSavedCandidatesQuery,
   useToggleSaveCandidateMutation,
-} from "@/redux/feature/candidate/candidateApi";
-import SavedProfilesSkeleton from "@/skeleton/saved-profiles/SavedProfilesSkeleton";
-import { AnimatePresence } from "framer-motion";
-import { Bookmark, Search } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+} from '@/redux/feature/candidate/candidateApi';
+import SavedProfilesSkeleton from '@/skeleton/saved-profiles/SavedProfilesSkeleton';
+import { Bookmark, Search } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 const SavedProfilesView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [availabilityFilter, setAvailabilityFilter] = useState('all');
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [profileToRemove, setProfileToRemove] = useState<any>(null);
@@ -41,21 +41,14 @@ const SavedProfilesView = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const allSavedProfiles = savedData?.data || [];
 
-  const availabilityOptions = [
-    "all",
-    "immediate",
-    "2_weeks",
-    "1_month",
-    "not_available",
-  ];
+  const availabilityOptions = ['all', 'immediate', '2_weeks', '1_month', 'not_available'];
 
   const filteredProfiles = useMemo(() => {
     return allSavedProfiles.filter((profile: any) => {
-      const candidateName = profile.fullName || "";
-      const currentPosition = profile.profile?.headline || "";
+      const candidateName = profile.fullName || '';
+      const currentPosition = profile.profile?.headline || '';
       const skills = profile.profile?.skills || [];
-      const availability =
-        profile.profile?.preference?.availability || "immediate";
+      const availability = profile.profile?.preference?.availability || 'immediate';
 
       const matchesSearch =
         candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,7 +58,7 @@ const SavedProfilesView = () => {
         );
 
       const matchesAvailability =
-        availabilityFilter === "all" ||
+        availabilityFilter === 'all' ||
         availability.toLowerCase() === availabilityFilter.toLowerCase();
 
       return matchesSearch && matchesAvailability;
@@ -116,8 +109,7 @@ const SavedProfilesView = () => {
                   <p className="text-foreground mt-0.5 text-xl font-bold sm:text-2xl">
                     {
                       allSavedProfiles.filter(
-                        (p: any) =>
-                          p.profile?.preference?.availability === "immediate",
+                        (p: any) => p.profile?.preference?.availability === 'immediate',
                       ).length
                     }
                   </p>
@@ -169,10 +161,7 @@ const SavedProfilesView = () => {
                   <span className="text-muted-foreground/60 hidden text-[10px] font-black tracking-widest whitespace-nowrap uppercase sm:inline-block">
                     Availability:
                   </span>
-                  <Select
-                    value={availabilityFilter}
-                    onValueChange={setAvailabilityFilter}
-                  >
+                  <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
                     <SelectTrigger className="bg-muted/20 border-border h-9 w-full cursor-pointer rounded-full text-xs font-semibold sm:h-10 sm:text-sm md:w-48">
                       <SelectValue placeholder="All Candidates" />
                     </SelectTrigger>
@@ -183,15 +172,15 @@ const SavedProfilesView = () => {
                           className="cursor-pointer rounded-lg text-xs font-medium sm:text-sm"
                           value={option}
                         >
-                          {option === "all"
-                            ? "All Candidates"
-                            : option === "immediate"
-                              ? "Immediate"
-                              : option === "2_weeks"
-                                ? "2 Weeks"
-                                : option === "1_month"
-                                  ? "1 Month"
-                                  : "Not Available"}
+                          {option === 'all'
+                            ? 'All Candidates'
+                            : option === 'immediate'
+                              ? 'Immediate'
+                              : option === '2_weeks'
+                                ? '2 Weeks'
+                                : option === '1_month'
+                                  ? '1 Month'
+                                  : 'Not Available'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -200,10 +189,7 @@ const SavedProfilesView = () => {
 
                 <div className="shrink-0 md:hidden">
                   <Link href="/browse-candidates">
-                    <Button
-                      size="sm"
-                      className="h-9 rounded-full px-4 text-xs font-bold shadow-xs"
-                    >
+                    <Button size="sm" className="h-9 rounded-full px-4 text-xs font-bold shadow-xs">
                       Browse
                     </Button>
                   </Link>
@@ -236,9 +222,9 @@ const SavedProfilesView = () => {
                   }}
                   onShortlist={() => {
                     // Placeholder for future feature
-                    import("sonner").then((mod) =>
+                    import('sonner').then((mod) =>
                       mod.toast.info(
-                        "Select a job to shortlist this candidate for. (Feature coming soon)",
+                        'Select a job to shortlist this candidate for. (Feature coming soon)',
                       ),
                     );
                   }}
@@ -250,14 +236,12 @@ const SavedProfilesView = () => {
                   <Bookmark className="text-muted-foreground/20 h-10 w-10" />
                 </div>
                 <p className="text-muted-foreground text-sm font-bold italic">
-                  {searchTerm || availabilityFilter !== "all"
-                    ? "No profiles match your filters."
+                  {searchTerm || availabilityFilter !== 'all'
+                    ? 'No profiles match your filters.'
                     : "You haven't saved any candidate profiles yet."}
                 </p>
                 <Link href="/employer/talent-management">
-                  <Button className="mt-2 rounded-full font-bold">
-                    Browse Candidates
-                  </Button>
+                  <Button className="mt-2 rounded-full font-bold">Browse Candidates</Button>
                 </Link>
               </div>
             )}

@@ -1,19 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import {
-  Wrench,
-  RefreshCw,
-  Lock,
-  MapPin,
-  Settings2,
-  CheckCircle2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useGetPublicStatusQuery } from "@/redux/feature/system/systemApi";
+import { Button } from '@/components/ui/button';
+import { useGetPublicStatusQuery } from '@/redux/feature/system/systemApi';
+import { CheckCircle2, Lock, MapPin, RefreshCw, Settings2, Wrench } from 'lucide-react';
+import { motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function MaintenancePage() {
   const { data: statusData, isFetching, refetch } = useGetPublicStatusQuery();
@@ -50,10 +43,7 @@ export default function MaintenancePage() {
       const totalDurationMs = Math.max(1, endMs - startMs);
 
       const elapsedMs = Math.min(totalDurationMs, nowMs - startMs);
-      const percent = Math.min(
-        100,
-        Math.max(8, Math.round((elapsedMs / totalDurationMs) * 100)),
-      );
+      const percent = Math.min(100, Math.max(8, Math.round((elapsedMs / totalDurationMs) * 100)));
       setProgressPercent(percent);
 
       const totalSecs = Math.floor(remainingMs / 1000);
@@ -72,7 +62,7 @@ export default function MaintenancePage() {
 
   // Format digital countdown string including seconds with space padding (e.g. 14 : 13 : 45)
   const formatCountdownWithSeconds = () => {
-    const pad = (num: number) => String(num).padStart(2, "0");
+    const pad = (num: number) => String(num).padStart(2, '0');
     if (timeLeft.days > 0) {
       return `${timeLeft.days}d  ${pad(timeLeft.hours)} : ${pad(timeLeft.minutes)} : ${pad(timeLeft.seconds)}`;
     }
@@ -96,7 +86,7 @@ export default function MaintenancePage() {
           <motion.div
             initial={{ opacity: 0, rotate: -5, scale: 0.95 }}
             animate={{ opacity: 1, rotate: -2, scale: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
             className="flex justify-center lg:col-span-5"
           >
             <div className="hover:shadow-3xl relative w-full max-w-md rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xl shadow-slate-300/60 transition-all hover:rotate-0">
@@ -152,8 +142,8 @@ export default function MaintenancePage() {
 
             {/* Exact Requested Subtitle Text */}
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
-              Our head meowcanis is currently inspecting the server racks for
-              stray yarn and hairballs. Normal service will resume shortly.
+              Our head meowcanis is currently inspecting the server racks for stray yarn and
+              hairballs. Normal service will resume shortly.
             </p>
 
             {/* Dark Telemetry Countdown Box */}
@@ -177,9 +167,9 @@ export default function MaintenancePage() {
               <div className="relative mt-5 h-2.5 w-full overflow-hidden rounded-full bg-slate-800/80">
                 <motion.div
                   className="h-full rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
-                  initial={{ width: "0%" }}
+                  initial={{ width: '0%' }}
                   animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  transition={{ duration: 0.8, ease: 'easeInOut' }}
                 />
               </div>
             </div>
@@ -191,10 +181,8 @@ export default function MaintenancePage() {
                 disabled={isFetching}
                 className="h-12 w-full cursor-pointer rounded-xl bg-emerald-600 px-7 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition-all hover:bg-emerald-700 active:scale-95 sm:w-auto"
               >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
-                />
-                {isFetching ? "Checking Status..." : "Refresh Status"}
+                <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                {isFetching ? 'Checking Status...' : 'Refresh Status'}
               </Button>
 
               <Link href="/login" className="w-full sm:w-auto">

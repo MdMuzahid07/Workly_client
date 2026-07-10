@@ -11,7 +11,7 @@ try {
   console.log(chalk.dim('   Running lint-staged (eslint + prettier)...'));
   console.log();
 
-  execSync('yarn lint-staged', { stdio: 'inherit' });
+  execSync('pnpm exec lint-staged', { stdio: 'inherit' });
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log(

@@ -16,7 +16,7 @@ import {
 import { useAppSelector } from '@/redux/hooks';
 import type { NotificationType } from '@/types/notification';
 import { formatDistanceToNow } from 'date-fns';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   AlertCircle,
   Bell,

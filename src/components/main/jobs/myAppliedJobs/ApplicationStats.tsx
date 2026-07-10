@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { Briefcase, LucideIcon, Search, Trophy, Users } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Briefcase, LucideIcon, Search, Trophy, Users } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface StatItemProps {
   label: string;
@@ -62,14 +62,7 @@ export const ApplicationStats = ({
   );
 };
 
-const StatItem = ({
-  label,
-  value,
-  icon: Icon,
-  iconColor,
-  iconBg,
-  delay,
-}: StatItemProps) => (
+const StatItem = ({ label, value, icon: Icon, iconColor, iconBg, delay }: StatItemProps) => (
   <motion.div
     initial={{ opacity: 0, y: 15 }}
     animate={{ opacity: 1, y: 0 }}
@@ -80,13 +73,11 @@ const StatItem = ({
         <div className="flex items-center justify-between">
           <div
             className={cn(
-              "flex items-center justify-center rounded-xl p-2 transition-transform hover:scale-105 sm:p-2.5 lg:p-3",
+              'flex items-center justify-center rounded-xl p-2 transition-transform hover:scale-105 sm:p-2.5 lg:p-3',
               iconBg,
             )}
           >
-            <Icon
-              className={cn("h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6", iconColor)}
-            />
+            <Icon className={cn('h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6', iconColor)} />
           </div>
         </div>
         <div className="mt-3 sm:mt-4 lg:mt-5">

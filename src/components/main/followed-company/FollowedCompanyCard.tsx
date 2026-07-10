@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useUnfollowCompanyMutation } from "@/redux/feature/follow/followApi";
-import { DisplayFollowedCompany } from "@/view/followed-company/FollowedCompaniesView";
-import { motion } from "framer-motion";
-import { Building2, ExternalLink, Loader2, MapPin, Users2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { toast } from "sonner";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useUnfollowCompanyMutation } from '@/redux/feature/follow/followApi';
+import { DisplayFollowedCompany } from '@/view/followed-company/FollowedCompaniesView';
+import { Building2, ExternalLink, Loader2, MapPin, Users2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface FollowedCompanyCardProps {
   company: DisplayFollowedCompany;
@@ -16,8 +16,7 @@ interface FollowedCompanyCardProps {
 }
 
 const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
-  const [unfollowCompany, { isLoading: isUnfollowing }] =
-    useUnfollowCompanyMutation();
+  const [unfollowCompany, { isLoading: isUnfollowing }] = useUnfollowCompanyMutation();
 
   const handleUnfollow = async () => {
     try {
@@ -25,7 +24,7 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
       toast.success(`Unfollowed ${company.name}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to unfollow company");
+      toast.error(error?.data?.message || 'Failed to unfollow company');
     }
   };
 
@@ -41,12 +40,7 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
             <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                 <div className="bg-background relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border shadow-2xs sm:h-16 sm:w-16 sm:rounded-2xl">
-                  <Image
-                    src={company.logo}
-                    alt={company.name}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={company.logo} alt={company.name} fill className="object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="line-clamp-1 text-base font-bold tracking-tight sm:text-lg">
@@ -66,17 +60,13 @@ const FollowedCompanyCard = ({ company, index }: FollowedCompanyCardProps) => {
                 onClick={handleUnfollow}
                 className="text-destructive hover:bg-destructive hover:border-destructive/30 h-8 shrink-0 rounded-full border px-3 text-xs font-bold hover:text-white sm:px-4"
               >
-                {isUnfollowing ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  "Unfollow"
-                )}
+                {isUnfollowing ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Unfollow'}
               </Button>
             </div>
 
             <div className="mt-3 sm:mt-4">
               <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed font-medium opacity-80 sm:text-sm">
-                {company.description || "Leading industry organization."}
+                {company.description || 'Leading industry organization.'}
               </p>
             </div>
           </div>

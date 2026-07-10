@@ -8,7 +8,7 @@ import { useListResumesQuery, useUploadResumeMutation } from '@/redux/feature/re
 import { useAppSelector } from '@/redux/hooks';
 import CVManagerSkeleton from '@/skeleton/cv-manager/CVManagerSkeleton';
 import { Resume } from '@/types/profile';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ArrowRight, Crown, Loader2, Plus, ShieldCheck, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';

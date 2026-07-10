@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import DashboardJobViewHistoryHeader from "@/components/dashboard/dashboard-nav/header/DashboardJobViewHistoryHeader";
-import JobCard from "@/components/main/jobs/JobCard";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import DashboardJobViewHistoryHeader from '@/components/dashboard/dashboard-nav/header/DashboardJobViewHistoryHeader';
+import JobCard from '@/components/main/jobs/JobCard';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useGetJobViewHistoryQuery } from "@/redux/feature/jobView/jobViewApi";
-import JobViewHistorySkeleton from "@/skeleton/job-history/JobViewHistorySkeleton";
-import { AnimatePresence } from "framer-motion";
-import { Briefcase, Search } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+} from '@/components/ui/select';
+import { useGetJobViewHistoryQuery } from '@/redux/feature/jobView/jobViewApi';
+import JobViewHistorySkeleton from '@/skeleton/job-history/JobViewHistorySkeleton';
+import { Briefcase, Search } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
 const JobViewHistoryView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [jobTypeFilter, setJobTypeFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [jobTypeFilter, setJobTypeFilter] = useState('all');
 
   // Debounce search term to optimize backend query performance
   useEffect(() => {
@@ -35,12 +35,12 @@ const JobViewHistoryView = () => {
 
   const { data: response, isLoading } = useGetJobViewHistoryQuery({
     searchTerm: debouncedSearch || undefined,
-    jobType: jobTypeFilter !== "all" ? jobTypeFilter : undefined,
+    jobType: jobTypeFilter !== 'all' ? jobTypeFilter : undefined,
   });
 
-  console.log("[JobViewHistory] Response from server:", response);
+  console.log('[JobViewHistory] Response from server:', response);
 
-  const jobTypes = ["all", "FULL_TIME", "PART_TIME", "CONTRACT", "INTERNSHIP"];
+  const jobTypes = ['all', 'FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP'];
 
   const filteredJobs = useMemo(() => {
     const rawHistory = response?.data || [];
@@ -49,7 +49,7 @@ const JobViewHistoryView = () => {
       job: {
         ...item.job,
         company: {
-          name: item.job.company?.name || "",
+          name: item.job.company?.name || '',
           logo: item.job.company?.logoUrl || undefined,
         },
       },
@@ -84,10 +84,7 @@ const JobViewHistoryView = () => {
                     <span className="text-muted-foreground/60 hidden text-[10px] font-black tracking-widest uppercase sm:inline-block">
                       Type:
                     </span>
-                    <Select
-                      value={jobTypeFilter}
-                      onValueChange={setJobTypeFilter}
-                    >
+                    <Select value={jobTypeFilter} onValueChange={setJobTypeFilter}>
                       <SelectTrigger className="bg-muted/20 border-border h-8 w-full cursor-pointer rounded-full text-xs font-bold sm:h-10 sm:text-sm md:w-48">
                         <SelectValue placeholder="All types" />
                       </SelectTrigger>
@@ -98,9 +95,7 @@ const JobViewHistoryView = () => {
                             className="cursor-pointer rounded-lg text-xs font-medium sm:text-sm"
                             value={type}
                           >
-                            {type === "all"
-                              ? "All Types"
-                              : type.replace("_", " ")}
+                            {type === 'all' ? 'All Types' : type.replace('_', ' ')}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -130,14 +125,12 @@ const JobViewHistoryView = () => {
                     <Briefcase className="text-muted-foreground/20 h-10 w-10" />
                   </div>
                   <p className="text-muted-foreground text-sm font-bold italic">
-                    {searchTerm || jobTypeFilter !== "all"
-                      ? "No jobs match your search filters."
-                      : "Your viewing history is currently empty."}
+                    {searchTerm || jobTypeFilter !== 'all'
+                      ? 'No jobs match your search filters.'
+                      : 'Your viewing history is currently empty.'}
                   </p>
                   <Link href="/dashboard/find-jobs">
-                    <Button className="mt-2 rounded-full font-bold">
-                      Start exploring jobs
-                    </Button>
+                    <Button className="mt-2 rounded-full font-bold">Start exploring jobs</Button>
                   </Link>
                 </div>
               )}

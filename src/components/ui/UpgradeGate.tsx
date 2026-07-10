@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { useCanAccess } from "@/hooks/useEntitlements";
-import { useAppSelector } from "@/redux/hooks";
-import { PlanFeatureFlags } from "@/types/subscription";
-import { motion, Variants } from "framer-motion";
+import { Button } from '@/components/ui/button';
+import { useCanAccess } from '@/hooks/useEntitlements';
+import { useAppSelector } from '@/redux/hooks';
+import { PlanFeatureFlags } from '@/types/subscription';
 import {
   BarChart3,
   Crown,
+  LucideIcon,
   MessageSquare,
   Search,
+  ShieldCheck,
   Sparkles,
   TrendingUp,
   Users,
   Zap,
-  ShieldCheck,
-  LucideIcon,
-} from "lucide-react";
-import Link from "next/link";
-import React from "react";
-import ParticlesBg from "../main/auth/ParticlesBg";
+} from 'lucide-react';
+import { motion, Variants } from 'motion/react';
+import Link from 'next/link';
+import React from 'react';
+import ParticlesBg from '../main/auth/ParticlesBg';
 
 interface UpgradeGateProps {
   feature: keyof PlanFeatureFlags;
@@ -41,106 +41,106 @@ interface FeatureConfig {
 
 const FEATURE_CONFIG: Record<string, FeatureConfig> = {
   canViewAnalytics: {
-    badge: "PREMIUM EXPERIENCE",
-    headline: "Unlock Powerful Hiring",
-    highlightWord: "Analytics.",
+    badge: 'PREMIUM EXPERIENCE',
+    headline: 'Unlock Powerful Hiring',
+    highlightWord: 'Analytics.',
     description:
-      "Gain full visibility into your hiring funnel with detailed performance reports, candidate insights, and team metrics.",
+      'Gain full visibility into your hiring funnel with detailed performance reports, candidate insights, and team metrics.',
     cards: [
       {
         icon: BarChart3,
-        title: "Funnel Reports",
-        subtitle: "Conversion at every stage",
+        title: 'Funnel Reports',
+        subtitle: 'Conversion at every stage',
       },
       {
         icon: TrendingUp,
-        title: "Job Performance",
-        subtitle: "See which roles attract talent",
+        title: 'Job Performance',
+        subtitle: 'See which roles attract talent',
       },
       {
         icon: Users,
-        title: "Team Metrics",
-        subtitle: "Track recruiter activity",
+        title: 'Team Metrics',
+        subtitle: 'Track recruiter activity',
       },
     ],
-    primaryCta: "Go Premium Now",
-    trust: "Trusted by 12,000+ hiring teams worldwide",
+    primaryCta: 'Go Premium Now',
+    trust: 'Trusted by 12,000+ hiring teams worldwide',
   },
   canMessage: {
-    badge: "PREMIUM EXPERIENCE",
-    headline: "Connect Directly with",
-    highlightWord: "Top Candidates.",
+    badge: 'PREMIUM EXPERIENCE',
+    headline: 'Connect Directly with',
+    highlightWord: 'Top Candidates.',
     description:
-      "Send and receive real-time messages with job seekers. Build relationships with candidates before they apply elsewhere.",
+      'Send and receive real-time messages with job seekers. Build relationships with candidates before they apply elsewhere.',
     cards: [
       {
         icon: MessageSquare,
-        title: "Direct Messaging",
-        subtitle: "No email back-and-forth",
+        title: 'Direct Messaging',
+        subtitle: 'No email back-and-forth',
       },
       {
         icon: Zap,
-        title: "Real-time Chat",
-        subtitle: "Instant delivery & receipts",
+        title: 'Real-time Chat',
+        subtitle: 'Instant delivery & receipts',
       },
       {
         icon: Users,
-        title: "Unified Inbox",
-        subtitle: "All conversations in one place",
+        title: 'Unified Inbox',
+        subtitle: 'All conversations in one place',
       },
     ],
-    primaryCta: "Go Premium Now",
-    trust: "Trusted by 12,000+ hiring teams worldwide",
+    primaryCta: 'Go Premium Now',
+    trust: 'Trusted by 12,000+ hiring teams worldwide',
   },
   canMessageEmployer: {
-    badge: "PREMIUM EXPERIENCE",
-    headline: "Message Recruiters",
-    highlightWord: "Directly.",
+    badge: 'PREMIUM EXPERIENCE',
+    headline: 'Message Recruiters',
+    highlightWord: 'Directly.',
     description:
-      "Skip the queue and reach hiring managers directly. Follow up on applications and stand out from other candidates.",
+      'Skip the queue and reach hiring managers directly. Follow up on applications and stand out from other candidates.',
     cards: [
       {
         icon: MessageSquare,
-        title: "Direct Outreach",
-        subtitle: "Message any recruiter",
+        title: 'Direct Outreach',
+        subtitle: 'Message any recruiter',
       },
       {
         icon: Search,
-        title: "Application Follow-up",
-        subtitle: "Stay top of mind",
+        title: 'Application Follow-up',
+        subtitle: 'Stay top of mind',
       },
       {
         icon: Zap,
-        title: "Priority Delivery",
-        subtitle: "Messages delivered instantly",
+        title: 'Priority Delivery',
+        subtitle: 'Messages delivered instantly',
       },
     ],
-    primaryCta: "Go Premium Now",
-    trust: "Trusted by 50,000+ professionals worldwide",
+    primaryCta: 'Go Premium Now',
+    trust: 'Trusted by 50,000+ professionals worldwide',
   },
 };
 
 const DEFAULT_CONFIG: FeatureConfig = {
-  badge: "PREMIUM EXPERIENCE",
-  headline: "Unlock Advanced",
-  highlightWord: "Career Growth.",
+  badge: 'PREMIUM EXPERIENCE',
+  headline: 'Unlock Advanced',
+  highlightWord: 'Career Growth.',
   description:
-    "Get access to our advanced matching engine that surfaces the most relevant job opportunities tailored specifically to your expertise.",
+    'Get access to our advanced matching engine that surfaces the most relevant job opportunities tailored specifically to your expertise.',
   cards: [
     {
       icon: Sparkles,
-      title: "99% Precision Match",
-      subtitle: "Based on your exact skills",
+      title: '99% Precision Match',
+      subtitle: 'Based on your exact skills',
     },
-    { icon: Zap, title: "Smart Insights", subtitle: "Know why you're a fit" },
+    { icon: Zap, title: 'Smart Insights', subtitle: "Know why you're a fit" },
     {
       icon: TrendingUp,
-      title: "Priority Access",
-      subtitle: "See new jobs before others",
+      title: 'Priority Access',
+      subtitle: 'See new jobs before others',
     },
   ],
-  primaryCta: "Go Premium Now",
-  trust: "Trusted by 50,000+ professionals worldwide",
+  primaryCta: 'Go Premium Now',
+  trust: 'Trusted by 50,000+ professionals worldwide',
 };
 
 // Cinematic easeOut transition
@@ -176,7 +176,7 @@ const iconVariants: Variants = {
     rotate: [0, -5, 5, 0],
     transition: {
       duration: 0.35,
-      ease: "easeInOut",
+      ease: 'easeInOut',
     },
   },
 };
@@ -202,13 +202,13 @@ export default function UpgradeGate({
   if (hasAccess) return <>{children}</>;
   if (fallback) return <>{fallback}</>;
 
-  const isEmployer = user?.role === "EMPLOYER";
-  const pricingLink = isEmployer ? "/employer/pricing" : "/dashboard/pricing";
+  const isEmployer = user?.role === 'EMPLOYER';
+  const pricingLink = isEmployer ? '/employer/pricing' : '/dashboard/pricing';
   const cfg = FEATURE_CONFIG[feature] ?? DEFAULT_CONFIG;
 
   return (
     <div className="relative flex min-h-[calc(100vh-140px)] w-full items-center justify-center overflow-hidden px-4 py-6 sm:py-8">
-      {/* 
+      {/*
         ✨ PAGE BACKGROUND PARTICLES:
         Animates in the page background behind the card container.
         Using z-0 to render on top of the page background, but below the z-10 card container.
@@ -217,16 +217,16 @@ export default function UpgradeGate({
         <ParticlesBg active={true} />
       </div>
 
-      {/* 
+      {/*
         🧠 OPTIMIZED PREVIEW:
-        Render with a delayed fade-in (delay: 0.5s) to ensure the card's entry animation 
+        Render with a delayed fade-in (delay: 0.5s) to ensure the card's entry animation
         is processed at 120fps without GPU bottlenecks from CSS filters.
         Using z-0 to render behind the main card (z-10).
       */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.15 }}
-        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.6, delay: 0.5, ease: 'easeOut' }}
         className="pointer-events-none absolute inset-0 z-0 scale-[1.01] overflow-hidden blur-lg filter will-change-[filter,opacity] select-none"
       >
         {children}
@@ -248,7 +248,7 @@ export default function UpgradeGate({
         }
       `}</style>
 
-      {/* 
+      {/*
         Floating premium card container.
         - Mobile: p-5, rounded-[28px], bg-gradient, border border-border/80, backdrop-blur.
         - Desktop: border-2, rounded-[40px], bg-gradient-to-br, backdrop-blur.
@@ -291,7 +291,7 @@ export default function UpgradeGate({
                 title
               ) : (
                 <>
-                  {cfg.headline}{" "}
+                  {cfg.headline}{' '}
                   <span className="text-emerald-600 dark:text-emerald-400">
                     {cfg.highlightWord}
                   </span>
@@ -333,7 +333,7 @@ export default function UpgradeGate({
             </motion.div>
           )}
 
-          {/* 
+          {/*
             Row of clean cards (Always 3 columns)
             - Restored on mobile to display horizontally inside a grid.
           */}
@@ -351,12 +351,12 @@ export default function UpgradeGate({
                   initial: { y: 0 },
                   hover: {
                     y: -4,
-                    borderColor: "rgba(16, 185, 129, 0.50)",
+                    borderColor: 'rgba(16, 185, 129, 0.50)',
                   },
                 }}
                 transition={{
                   duration: 0.25,
-                  ease: "easeOut",
+                  ease: 'easeOut',
                 }}
                 className="bg-card border-border/50 flex cursor-pointer flex-col items-center rounded-xl border p-2 text-center transition-colors duration-300 select-none active:bg-emerald-50/5 sm:rounded-2xl sm:p-6 dark:active:bg-emerald-950/5"
               >
@@ -378,10 +378,7 @@ export default function UpgradeGate({
           </motion.div>
 
           {/* CTA & Trust Assurance Block */}
-          <motion.div
-            variants={itemVariants}
-            className="flex w-full flex-col items-center gap-4"
-          >
+          <motion.div variants={itemVariants} className="flex w-full flex-col items-center gap-4">
             <div className="flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
               <Link href={pricingLink} className="w-full sm:w-auto">
                 <motion.div

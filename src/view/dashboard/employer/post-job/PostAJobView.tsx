@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Lightbulb } from "lucide-react";
-import { useEffect, useState } from "react";
-import DashboardPostAJobHeader from "../../../../components/dashboard/dashboard-nav/header/DashboardPostAJobHeader";
-import CreateNewJobForm from "../../../../components/dashboard/job/create-job-form";
-import StepProgress from "../../../../components/dashboard/job/StepProgress";
-import JobSuccessScreen from "../../../../components/dashboard/job/JobSuccessScreen";
-import { AnimatePresence, motion } from "framer-motion";
-import UpgradeGate from "@/components/ui/UpgradeGate";
+import UpgradeGate from '@/components/ui/UpgradeGate';
+import { Lightbulb } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import DashboardPostAJobHeader from '../../../../components/dashboard/dashboard-nav/header/DashboardPostAJobHeader';
+import CreateNewJobForm from '../../../../components/dashboard/job/create-job-form';
+import JobSuccessScreen from '../../../../components/dashboard/job/JobSuccessScreen';
+import StepProgress from '../../../../components/dashboard/job/StepProgress';
 
 interface Step {
   id: number;
@@ -16,10 +16,10 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  { id: 1, title: "Basic Info", description: "Job details" },
-  { id: 2, title: "Job Details", description: "Description & skills" },
-  { id: 3, title: "Compensation", description: "Salary & benefits" },
-  { id: 4, title: "Final Settings", description: "Application details" },
+  { id: 1, title: 'Basic Info', description: 'Job details' },
+  { id: 2, title: 'Job Details', description: 'Description & skills' },
+  { id: 3, title: 'Compensation', description: 'Salary & benefits' },
+  { id: 4, title: 'Final Settings', description: 'Application details' },
 ];
 
 const PostAJobView = () => {
@@ -34,7 +34,7 @@ const PostAJobView = () => {
 
   // Load saved step on mount
   useEffect(() => {
-    const savedStep = localStorage.getItem("workly_post_job_step");
+    const savedStep = localStorage.getItem('workly_post_job_step');
     if (savedStep) {
       setCurrentStep(Number(savedStep));
     }
@@ -42,7 +42,7 @@ const PostAJobView = () => {
 
   const handleStepChange = (step: number) => {
     setCurrentStep(step);
-    localStorage.setItem("workly_post_job_step", String(step));
+    localStorage.setItem('workly_post_job_step', String(step));
   };
 
   const handleSuccess = (jobData: {
@@ -77,7 +77,7 @@ const PostAJobView = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.35, ease: "easeInOut" }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
                 className="bg-card relative overflow-hidden rounded-3xl border p-8 sm:p-16"
               >
                 <JobSuccessScreen jobData={successJob} onReset={handleReset} />
@@ -88,7 +88,7 @@ const PostAJobView = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.35, ease: "easeInOut" }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
                 className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8"
               >
                 {/* Left Split Pane: Stepper & Details Sidebar */}
@@ -111,9 +111,8 @@ const PostAJobView = () => {
                         </span>
                       </div>
                       <p className="text-muted-foreground/80 text-[11px] leading-relaxed font-medium">
-                        Detailed requirements and specific skills significantly
-                        increase candidate match accuracy and improve overall
-                        application quality.
+                        Detailed requirements and specific skills significantly increase candidate
+                        match accuracy and improve overall application quality.
                       </p>
                     </div>
                   </div>

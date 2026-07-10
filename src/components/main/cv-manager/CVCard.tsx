@@ -1,31 +1,24 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import {
   useDeleteResumeMutation,
   useSetDefaultResumeMutation,
-} from "@/redux/feature/resume/resumeApi";
-import { motion } from "framer-motion";
-import {
-  Download,
-  Eye,
-  FileText,
-  MoreVertical,
-  Star,
-  Trash2,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import PDFViewerModal from "../../shared/PDFViewerModal";
+} from '@/redux/feature/resume/resumeApi';
+import { Download, Eye, FileText, MoreVertical, Star, Trash2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import PDFViewerModal from '../../shared/PDFViewerModal';
 
 interface Resume {
   id: string;
@@ -45,41 +38,40 @@ interface CVCardProps {
 const CVCard = ({ resume, index }: CVCardProps) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [deleteResume, { isLoading: isDeleting }] = useDeleteResumeMutation();
-  const [setDefaultResume, { isLoading: isSettingDefault }] =
-    useSetDefaultResumeMutation();
+  const [setDefaultResume, { isLoading: isSettingDefault }] = useSetDefaultResumeMutation();
 
   const handleDelete = async () => {
     try {
-      toast.loading("Deleting resume...", { id: "delete-resume" });
+      toast.loading('Deleting resume...', { id: 'delete-resume' });
       await deleteResume(resume.id).unwrap();
-      toast.success("Resume deleted successfully", { id: "delete-resume" });
+      toast.success('Resume deleted successfully', { id: 'delete-resume' });
     } catch (error) {
       const err = error as { data?: { message?: string } };
-      toast.error(err?.data?.message || "Failed to delete resume", {
-        id: "delete-resume",
+      toast.error(err?.data?.message || 'Failed to delete resume', {
+        id: 'delete-resume',
       });
     }
   };
 
   const handleSetDefault = async () => {
     try {
-      toast.loading("Setting as primary...", { id: "set-default" });
+      toast.loading('Setting as primary...', { id: 'set-default' });
       await setDefaultResume(resume.id).unwrap();
-      toast.success("Primary resume updated", { id: "set-default" });
+      toast.success('Primary resume updated', { id: 'set-default' });
     } catch (error) {
       const err = error as { data?: { message?: string } };
-      toast.error(err?.data?.message || "Failed to set primary resume", {
-        id: "set-default",
+      toast.error(err?.data?.message || 'Failed to set primary resume', {
+        id: 'set-default',
       });
     }
   };
 
   const formatFileSize = (bytes: number) => {
-    if (!bytes) return "0 Bytes";
+    if (!bytes) return '0 Bytes';
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
@@ -90,10 +82,8 @@ const CVCard = ({ resume, index }: CVCardProps) => {
     >
       <Card
         className={cn(
-          "group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-sm",
-          resume.isDefault
-            ? "border-primary/50 ring-primary/20 ring-1"
-            : "border-border/50",
+          'group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-sm',
+          resume.isDefault ? 'border-primary/50 ring-primary/20 ring-1' : 'border-border/50',
         )}
       >
         <CardContent className="p-3.5 sm:p-6">
@@ -111,7 +101,7 @@ const CVCard = ({ resume, index }: CVCardProps) => {
                     variant="secondary"
                     className="bg-primary/10 text-primary rounded-lg border-none px-2 py-0.5 text-[9px] font-bold tracking-tight sm:text-[10px]"
                   >
-                    {resume.type || "PDF"}
+                    {resume.type || 'PDF'}
                   </Badge>
                   {resume.isDefault && (
                     <Badge
@@ -170,12 +160,7 @@ const CVCard = ({ resume, index }: CVCardProps) => {
               >
                 <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
-              <a
-                href={resume.fileUrl}
-                download={resume.fileName}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href={resume.fileUrl} download={resume.fileName} target="_blank" rel="noreferrer">
                 <Button
                   size="icon"
                   variant="outline"
