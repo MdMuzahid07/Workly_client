@@ -1,7 +1,8 @@
-"use client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShareButton } from '@/components/shared/ShareButton';
 import {
   ArrowUpRight,
   Award,
@@ -12,23 +13,23 @@ import {
   Heart,
   MapPin,
   Rocket,
-  Share2,
   Shield,
   Star,
   Target,
   Users,
   Zap,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { CompanyDetails } from "@/app/(main)/companies/[slug]/page";
-import CompanyDetailsSidebar from "../../../components/main/company/companyDetails/CompanyDetailsSidebar";
-import getIconComponent from "../../../helper/getIconComponent";
-import { useParams } from "next/navigation";
-import { useGetCompanyBySlugQuery } from "@/redux/feature/company/companyApi";
-import CompanyDetailsSkeleton from "@/skeleton/company/details/CompanyDetailsSkeleton";
+} from 'lucide-react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { CompanyDetails } from '@/app/(main)/companies/[slug]/page';
+import CompanyDetailsSidebar from '../../../components/main/company/companyDetails/CompanyDetailsSidebar';
+import getIconComponent from '../../../helper/getIconComponent';
+import { useParams } from 'next/navigation';
+import { useGetCompanyBySlugQuery } from '@/redux/feature/company/companyApi';
+import CompanyDetailsSkeleton from '@/skeleton/company/details/CompanyDetailsSkeleton';
 
 const CompanyDetailsView = () => {
   const params = useParams();
@@ -44,85 +45,82 @@ const CompanyDetailsView = () => {
 
   const companyDetails = response?.data as CompanyDetails | undefined;
 
-  console.log(companyDetails, "companyDetails");
+  console.log(companyDetails, 'companyDetails');
   //* infinite scroll state for jobs start here =============>
   const [visibleJobsCount, setVisibleJobsCount] = useState(4);
   const jobsPerLoad = 4;
   //* infinite scroll state for jobs end here =============<
 
   const { icon: CategoryIcon, color: iconBgColor } = getIconComponent(
-    companyDetails?.industry?.icon || "Briefcase",
+    companyDetails?.industry?.icon || 'Briefcase',
   );
 
   const VALUE_OPTIONS = [
     {
-      value: "Innovation",
+      value: 'Innovation',
       icon: Zap,
-      color: "text-blue-500",
-      bgColor: "bg-blue-50 dark:bg-blue-950/30",
-      borderColor: "border-blue-200 dark:border-blue-900/50",
+      color: 'text-blue-500',
+      bgColor: 'bg-blue-50 dark:bg-blue-950/30',
+      borderColor: 'border-blue-200 dark:border-blue-900/50',
     },
     {
-      value: "Collaboration",
+      value: 'Collaboration',
       icon: Users,
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-      borderColor: "border-emerald-200 dark:border-emerald-900/50",
+      color: 'text-emerald-500',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
+      borderColor: 'border-emerald-200 dark:border-emerald-900/50',
     },
     {
-      value: "Customer First",
+      value: 'Customer First',
       icon: Heart,
-      color: "text-rose-500",
-      bgColor: "bg-rose-50 dark:bg-rose-950/30",
-      borderColor: "border-rose-200 dark:border-rose-900/50",
+      color: 'text-rose-500',
+      bgColor: 'bg-rose-50 dark:bg-rose-950/30',
+      borderColor: 'border-rose-200 dark:border-rose-900/50',
     },
     {
-      value: "Excellence",
+      value: 'Excellence',
       icon: Star,
-      color: "text-amber-500",
-      bgColor: "bg-amber-50 dark:bg-amber-950/30",
-      borderColor: "border-amber-200 dark:border-amber-900/50",
+      color: 'text-amber-500',
+      bgColor: 'bg-amber-50 dark:bg-amber-950/30',
+      borderColor: 'border-amber-200 dark:border-amber-900/50',
     },
     {
-      value: "Integrity",
+      value: 'Integrity',
       icon: Shield,
-      color: "text-violet-500",
-      bgColor: "bg-violet-50 dark:bg-violet-950/30",
-      borderColor: "border-violet-200 dark:border-violet-900/50",
+      color: 'text-violet-500',
+      bgColor: 'bg-violet-50 dark:bg-violet-950/30',
+      borderColor: 'border-violet-200 dark:border-violet-900/50',
     },
     {
-      value: "Agility",
+      value: 'Agility',
       icon: Zap,
-      color: "text-cyan-500",
-      bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
-      borderColor: "border-cyan-200 dark:border-cyan-900/50",
+      color: 'text-cyan-500',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-950/30',
+      borderColor: 'border-cyan-200 dark:border-cyan-900/50',
     },
     {
-      value: "Impact",
+      value: 'Impact',
       icon: Target,
-      color: "text-orange-500",
-      bgColor: "bg-orange-50 dark:bg-orange-950/30",
-      borderColor: "border-orange-200 dark:border-orange-900/50",
+      color: 'text-orange-500',
+      bgColor: 'bg-orange-50 dark:bg-orange-950/30',
+      borderColor: 'border-orange-200 dark:border-orange-900/50',
     },
     {
-      value: "Growth",
+      value: 'Growth',
       icon: Rocket,
-      color: "text-indigo-500",
-      bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-      borderColor: "border-indigo-200 dark:border-indigo-900/50",
+      color: 'text-indigo-500',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-950/30',
+      borderColor: 'border-indigo-200 dark:border-indigo-900/50',
     },
   ] as const;
 
   const getValueMetadata = (valueName: string) => {
-    const option = VALUE_OPTIONS.find(
-      (opt) => opt.value.toLowerCase() === valueName.toLowerCase(),
-    );
+    const option = VALUE_OPTIONS.find((opt) => opt.value.toLowerCase() === valueName.toLowerCase());
     return {
       icon: option?.icon || Target,
-      color: option?.color || "text-emerald-500",
-      bgColor: option?.bgColor || "bg-emerald-50 dark:bg-emerald-950/30",
-      borderColor:
-        option?.borderColor || "border-emerald-200 dark:border-emerald-900/50",
+      color: option?.color || 'text-emerald-500',
+      bgColor: option?.bgColor || 'bg-emerald-50 dark:bg-emerald-950/30',
+      borderColor: option?.borderColor || 'border-emerald-200 dark:border-emerald-900/50',
     };
   };
 
@@ -144,7 +142,7 @@ const CompanyDetailsView = () => {
             <Button
               variant="default"
               className="rounded-xl px-6 font-bold"
-              onClick={() => (window.location.href = "/companies")}
+              onClick={() => (window.location.href = '/companies')}
             >
               Browse Companies
             </Button>
@@ -162,7 +160,7 @@ const CompanyDetailsView = () => {
   }
 
   // const foundedYear = new Date(companyDetails.createdAt).getFullYear();
-  const websiteDisplay = companyDetails.websiteUrl?.replace(/^https?:\/\//, "");
+  const websiteDisplay = companyDetails.websiteUrl?.replace(/^https?:\/\//, '');
 
   const transformedJobs =
     companyDetails.jobs?.map((job) => ({
@@ -179,9 +177,7 @@ const CompanyDetailsView = () => {
     })) || [];
 
   //* infinite scroll logic start ==========================>
-  const hasMoreJobs = companyDetails.jobs
-    ? visibleJobsCount < companyDetails.jobs.length
-    : false;
+  const hasMoreJobs = companyDetails.jobs ? visibleJobsCount < companyDetails.jobs.length : false;
 
   const loadMoreJobs = () => {
     setVisibleJobsCount((prev) => prev + jobsPerLoad);
@@ -208,7 +204,7 @@ const CompanyDetailsView = () => {
       {/* Dynamic Banner Section */}
       <div className="relative h-64 w-full overflow-hidden lg:h-80">
         <Image
-          src={companyDetails.coverUrl || "/placeholder-banner.jpg"}
+          src={companyDetails.coverUrl || '/placeholder-banner.jpg'}
           alt={`${companyDetails.name} banner`}
           fill
           className="object-cover"
@@ -228,7 +224,7 @@ const CompanyDetailsView = () => {
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="bg-card border-primary/10 relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border p-2 shadow-2xl sm:h-32 sm:w-32">
                       <Image
-                        src={companyDetails.logoUrl || "/placeholder-logo.png"}
+                        src={companyDetails.logoUrl || '/placeholder-logo.png'}
                         alt={`${companyDetails.name} logo`}
                         fill
                         className="rounded-2xl object-contain p-2"
@@ -248,7 +244,7 @@ const CompanyDetailsView = () => {
                         </div>
                         <p className="text-muted-foreground flex items-center gap-2 text-lg font-medium">
                           <CategoryIcon
-                            className={`h-5 w-5 ${iconBgColor.replace("bg-", "text-")}`}
+                            className={`h-5 w-5 ${iconBgColor.replace('bg-', 'text-')}`}
                           />
                           {companyDetails?.industry?.name}
                         </p>
@@ -261,15 +257,11 @@ const CompanyDetailsView = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4" />
-                          <span>
-                            {companyDetails._count?.employees || 0} team members
-                          </span>
+                          <span>{companyDetails._count?.employees || 0} team members</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          <span>
-                            Founded {companyDetails.founded || "Not specified"}
-                          </span>
+                          <span>Founded {companyDetails.founded || 'Not specified'}</span>
                         </div>
                         {companyDetails.websiteUrl && (
                           <div className="flex items-center gap-2">
@@ -296,13 +288,20 @@ const CompanyDetailsView = () => {
                     >
                       <Heart className="h-5 w-5 text-gray-400" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="hover:bg-primary/5 hover:text-primary rounded-xl border-gray-200 transition-colors duration-200 dark:border-slate-800"
-                    >
-                      <Share2 className="h-5 w-5 text-gray-400" />
-                    </Button>
+                    <ShareButton
+                      title={companyDetails?.name || ''}
+                      summary={
+                        companyDetails?.industry?.name
+                          ? `Learn more about ${companyDetails.name} working in ${companyDetails.industry.name}`
+                          : `Learn more about ${companyDetails.name}`
+                      }
+                      hashtags={[
+                        'WorklyJob',
+                        'Company',
+                        'Jobs',
+                        companyDetails?.industry?.name?.replace(/\s+/g, '') || 'Careers',
+                      ]}
+                    />
                   </div>
                 </div>
               </CardHeader>
@@ -386,8 +385,7 @@ const CompanyDetailsView = () => {
                               {val}
                             </h4>
                             <p className="text-muted-foreground text-sm">
-                              Fundamental principle driving our culture and how
-                              we build products.
+                              Fundamental principle driving our culture and how we build products.
                             </p>
                           </div>
                         </div>
@@ -410,8 +408,9 @@ const CompanyDetailsView = () => {
                 <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {companyDetails.benefits.map((benefit) => {
-                      const { icon: BenefitIcon, color: iconBgColor } =
-                        getIconComponent(benefit.icon);
+                      const { icon: BenefitIcon, color: iconBgColor } = getIconComponent(
+                        benefit.icon,
+                      );
                       return (
                         <div
                           key={benefit.id}
@@ -419,7 +418,7 @@ const CompanyDetailsView = () => {
                         >
                           <div className="flex items-center gap-4">
                             <div
-                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBgColor}/10 ${iconBgColor.replace("bg-", "text-")}`}
+                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBgColor}/10 ${iconBgColor.replace('bg-', 'text-')}`}
                             >
                               <BenefitIcon className="h-5 w-5" />
                             </div>
@@ -486,7 +485,7 @@ const CompanyDetailsView = () => {
                       )
                     }
                     scrollThreshold={0.8}
-                    style={{ overflow: "visible" }}
+                    style={{ overflow: 'visible' }}
                   >
                     <div className="space-y-4">
                       {visibleJobs.map((job) => (
@@ -504,7 +503,7 @@ const CompanyDetailsView = () => {
                                   variant="secondary"
                                   className="bg-primary/5 text-primary hover:bg-primary/10 border-none text-xs font-semibold capitalize"
                                 >
-                                  {job.type.replace("_", " ").toLowerCase()}
+                                  {job.type.replace('_', ' ').toLowerCase()}
                                 </Badge>
                               </div>
                               <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium">
@@ -515,9 +514,7 @@ const CompanyDetailsView = () => {
                                 <span className="hidden sm:inline">•</span>
                                 <span>{job.department}</span>
                                 <span className="hidden sm:inline">•</span>
-                                <span className="text-xs">
-                                  Posted {job.posted}
-                                </span>
+                                <span className="text-xs">Posted {job.posted}</span>
                               </div>
                               {job.salary && (
                                 <div className="flex items-center gap-1.5 pt-1 text-sm font-semibold text-emerald-600 dark:text-emerald-500">
@@ -527,10 +524,7 @@ const CompanyDetailsView = () => {
                                 </div>
                               )}
                             </div>
-                            <Link
-                              href={`/jobs/${job.id}`}
-                              className="sm:self-center"
-                            >
+                            <Link href={`/jobs/${job.id}`} className="sm:self-center">
                               <Button
                                 size="sm"
                                 className="bg-primary hover:bg-primary/90 flex w-full items-center gap-1.5 rounded-xl px-5 font-bold text-white shadow-sm transition-transform active:scale-95 sm:w-auto"
@@ -553,22 +547,19 @@ const CompanyDetailsView = () => {
                       No active openings right now
                     </h3>
                     <p className="text-muted-foreground mb-6 max-w-md text-sm leading-relaxed">
-                      {companyDetails.name} {`isn't`} hiring for any open roles
-                      at this moment. However, team needs expand quickly! Follow
-                      this company to receive immediate notifications when new
-                      positions are posted.
+                      {companyDetails.name} {`isn't`} hiring for any open roles at this moment.
+                      However, team needs expand quickly! Follow this company to receive immediate
+                      notifications when new positions are posted.
                     </p>
                     <div className="flex flex-wrap items-center gap-3">
                       <Button
                         className="bg-primary hover:bg-primary/95 rounded-xl px-6 font-bold text-white shadow-sm transition-all duration-300"
                         onClick={() => {
-                          const buttons = Array.from(
-                            document.querySelectorAll("button"),
-                          );
+                          const buttons = Array.from(document.querySelectorAll('button'));
                           const followBtnMain = buttons.find(
                             (b) =>
-                              b.textContent?.includes("Follow Company") ||
-                              b.textContent?.includes("Unfollow Company"),
+                              b.textContent?.includes('Follow Company') ||
+                              b.textContent?.includes('Unfollow Company'),
                           );
                           if (followBtnMain) {
                             followBtnMain.click();

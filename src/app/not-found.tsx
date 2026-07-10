@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { Briefcase, FileSearch, Home } from "lucide-react";
-import Link from "next/link";
+import { Button } from '@/components/ui/button';
+import { Briefcase, FileSearch, Home } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
 
 const NotFound = () => {
   return (
@@ -31,7 +31,7 @@ const NotFound = () => {
               transition={{
                 duration: 4,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
               className="bg-primary/10 relative z-20 flex h-24 w-24 items-center justify-center rounded-2xl shadow-sm"
             >
@@ -55,8 +55,8 @@ const NotFound = () => {
             Lost in Space?
           </h2>
           <p className="text-muted-foreground mb-8 max-w-[450px] px-2 text-base leading-relaxed sm:mb-10 sm:text-lg">
-            The page {`you're`} searching for seems to have vanished or never
-            existed. {`Let's`} get you back on track to your career journey.
+            The page {`you're`} searching for seems to have vanished or never existed. {`Let's`} get
+            you back on track to your career journey.
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row">

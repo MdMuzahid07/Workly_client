@@ -1,39 +1,39 @@
-"use client";
+'use client';
 
-import DashboardSavedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardSavedJobsHeader";
-import PaginationBar from "@/components/shared/PaginationBar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import DashboardSavedJobsHeader from '@/components/dashboard/dashboard-nav/header/DashboardSavedJobsHeader';
+import PaginationBar from '@/components/shared/PaginationBar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetSavedJobsQuery } from "@/redux/feature/profile/profileApi";
-import { AnimatePresence, motion } from "framer-motion";
-import { Bookmark, FilterX, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import JobCard from "../../components/main/jobs/JobCard";
-import StatsCards from "../../components/main/saved-jobs/StatsCards";
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGetSavedJobsQuery } from '@/redux/feature/profile/profileApi';
+import { Bookmark, FilterX, Search } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useMemo, useState } from 'react';
+import JobCard from '../../components/main/jobs/JobCard';
+import StatsCards from '../../components/main/saved-jobs/StatsCards';
 
 import SavedJobsViewSkeleton, {
   SavedJobCardSkeleton,
-} from "@/skeleton/saved-jobs/SavedJobsViewSkeleton";
+} from '@/skeleton/saved-jobs/SavedJobsViewSkeleton';
 
 const SavedJobsView = () => {
   // Query States
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState("10");
+  const [limit, setLimit] = useState('10');
 
-  const [activeTab, setActiveTab] = useState("ACTIVE");
+  const [activeTab, setActiveTab] = useState('ACTIVE');
 
   // Debounce search term to optimize backend query performance
   useEffect(() => {
@@ -50,7 +50,7 @@ const SavedJobsView = () => {
     page: currentPage,
     limit: parseInt(limit),
     searchTerm: debouncedSearch || undefined,
-    company: selectedCompany !== "all" ? selectedCompany : undefined,
+    company: selectedCompany !== 'all' ? selectedCompany : undefined,
     status: activeTab,
   });
 
@@ -75,7 +75,7 @@ const SavedJobsView = () => {
   }, [savedJobsRes?.data]);
 
   const companies = useMemo(() => {
-    return ["all", ...(meta.companies || [])];
+    return ['all', ...(meta.companies || [])];
   }, [meta.companies]);
 
   const paginationMeta = {
@@ -93,8 +93,8 @@ const SavedJobsView = () => {
   }, [meta.total, meta.expiringSoonCount]);
 
   const handleClearFilters = () => {
-    setSearchTerm("");
-    setSelectedCompany("all");
+    setSearchTerm('');
+    setSelectedCompany('all');
     setCurrentPage(1);
   };
 
@@ -135,12 +135,8 @@ const SavedJobsView = () => {
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   {companies.map((c) => (
-                    <SelectItem
-                      className="cursor-pointer rounded-lg"
-                      key={c}
-                      value={c}
-                    >
-                      {c === "all" ? "All Companies" : c}
+                    <SelectItem className="cursor-pointer rounded-lg" key={c} value={c}>
+                      {c === 'all' ? 'All Companies' : c}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -151,7 +147,7 @@ const SavedJobsView = () => {
                 size="sm"
                 onClick={handleClearFilters}
                 className="hover:bg-destructive/5 hover:text-destructive h-8 cursor-pointer rounded-full px-3 text-xs font-bold transition-colors sm:h-10 sm:px-4 sm:text-sm"
-                disabled={searchTerm === "" && selectedCompany === "all"}
+                disabled={searchTerm === '' && selectedCompany === 'all'}
               >
                 Clear Filters
               </Button>
@@ -176,11 +172,8 @@ const SavedJobsView = () => {
                 className="data-[state=active]:bg-primary/10 h-9 rounded-full px-6 font-bold"
               >
                 Active
-                <Badge
-                  variant="secondary"
-                  className="bg-primary/10 text-primary ml-2 border-none"
-                >
-                  {activeTab === "ACTIVE" ? meta.total : 0}
+                <Badge variant="secondary" className="bg-primary/10 text-primary ml-2 border-none">
+                  {activeTab === 'ACTIVE' ? meta.total : 0}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger
@@ -192,15 +185,13 @@ const SavedJobsView = () => {
                   variant="secondary"
                   className="bg-muted/50 text-muted-foreground ml-2 border-none text-[10px]"
                 >
-                  {activeTab === "CLOSED" ? meta.total : 0}
+                  {activeTab === 'CLOSED' ? meta.total : 0}
                 </Badge>
               </TabsTrigger>
             </TabsList>
 
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                Limit:
-              </span>
+              <span className="text-muted-foreground mt-1 text-xs leading-relaxed">Limit:</span>
               <Select
                 value={limit}
                 onValueChange={(val) => {
@@ -261,18 +252,12 @@ const SavedJobsView = () => {
                       <Bookmark className="text-muted-foreground/30 h-10 w-10" />
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xl font-black tracking-tight">
-                        No saved jobs here
-                      </p>
+                      <p className="text-xl font-black tracking-tight">No saved jobs here</p>
                       <p className="text-muted-foreground mx-auto max-w-xs text-xs font-medium">
-                        Start exploring and save jobs that catch your eye to
-                        keep track of them.
+                        Start exploring and save jobs that catch your eye to keep track of them.
                       </p>
                     </div>
-                    <Button
-                      variant="outline"
-                      className="h-11 rounded-xl px-6 font-bold"
-                    >
+                    <Button variant="outline" className="h-11 rounded-xl px-6 font-bold">
                       Browse Jobs
                     </Button>
                   </div>
@@ -282,10 +267,7 @@ const SavedJobsView = () => {
 
             {meta.totalPages > 1 && (
               <div className="mt-8 border-t pt-6">
-                <PaginationBar
-                  meta={paginationMeta}
-                  onPageChange={setCurrentPage}
-                />
+                <PaginationBar meta={paginationMeta} onPageChange={setCurrentPage} />
               </div>
             )}
           </TabsContent>

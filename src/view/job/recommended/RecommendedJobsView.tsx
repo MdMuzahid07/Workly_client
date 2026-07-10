@@ -1,35 +1,26 @@
-"use client";
+'use client';
 
-import DashboardRecommendedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardRecommendedJobsHeader";
-import PaginationBar from "@/components/shared/PaginationBar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import DashboardRecommendedJobsHeader from '@/components/dashboard/dashboard-nav/header/DashboardRecommendedJobsHeader';
+import PaginationBar from '@/components/shared/PaginationBar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useGetRecommendedJobsQuery } from "@/redux/feature/job/jobApi";
-import { useGetProfileQuery } from "@/redux/feature/profile/profileApi";
-import { useAppSelector } from "@/redux/hooks";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowRight,
-  Briefcase,
-  Crown,
-  Lightbulb,
-  MapPin,
-  Search,
-  Target,
-  Zap,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+} from '@/components/ui/select';
+import { useGetRecommendedJobsQuery } from '@/redux/feature/job/jobApi';
+import { useGetProfileQuery } from '@/redux/feature/profile/profileApi';
+import { useAppSelector } from '@/redux/hooks';
+import { ArrowRight, Briefcase, Crown, Lightbulb, MapPin, Search, Target, Zap } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface JobSkill {
   id: string;
@@ -64,10 +55,10 @@ interface RecommendedJob {
 }
 
 const RecommendedJobsView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState("10");
+  const [limit, setLimit] = useState('10');
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -122,27 +113,26 @@ const RecommendedJobsView = () => {
                 Career Growth.
               </h1>
               <p className="text-muted-foreground mx-auto mb-12 max-w-2xl text-lg leading-relaxed font-medium opacity-80 sm:text-xl">
-                Get access to our advanced matching engine that surfaces the
-                most relevant job opportunities tailored specifically to your
-                expertise.
+                Get access to our advanced matching engine that surfaces the most relevant job
+                opportunities tailored specifically to your expertise.
               </p>
 
               <div className="mx-auto mb-16 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-3">
                 {[
                   {
                     icon: Target,
-                    text: "99% Precision Match",
-                    desc: "Based on your exact skills",
+                    text: '99% Precision Match',
+                    desc: 'Based on your exact skills',
                   },
                   {
                     icon: Lightbulb,
-                    text: "Smart Insights",
+                    text: 'Smart Insights',
                     desc: "Know why you're a fit",
                   },
                   {
                     icon: Zap,
-                    text: "Priority Access",
-                    desc: "See new jobs before others",
+                    text: 'Priority Access',
+                    desc: 'See new jobs before others',
                   },
                 ].map((feature, i) => (
                   <div
@@ -212,15 +202,13 @@ const RecommendedJobsView = () => {
                 Tailored just for you.
               </h2>
               <p className="text-muted-foreground max-w-md text-xs font-medium opacity-80 sm:text-sm">
-                Our system analyzes your skills, preferences, and career path to
-                surface the most relevant opportunities.
+                Our system analyzes your skills, preferences, and career path to surface the most
+                relevant opportunities.
               </p>
             </div>
             <div className="flex gap-4">
               <div className="bg-card/50 flex min-w-[90px] flex-col items-center rounded-xl border p-3 backdrop-blur-sm sm:p-4">
-                <span className="text-primary text-xl font-black sm:text-2xl">
-                  98%
-                </span>
+                <span className="text-primary text-xl font-black sm:text-2xl">98%</span>
                 <span className="text-muted-foreground text-[9px] font-bold tracking-widest uppercase sm:text-[10px]">
                   Top Match
                 </span>
@@ -329,10 +317,7 @@ const RecommendedJobCard = ({ job }: { job: RecommendedJob }) => (
           <div className="min-w-0 flex-1 space-y-2">
             <div className="space-y-0.5">
               <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  href={`/jobs/${job.id}`}
-                  className="hover:text-primary transition-colors"
-                >
+                <Link href={`/jobs/${job.id}`} className="hover:text-primary transition-colors">
                   <h3 className="truncate text-base font-bold tracking-tight sm:text-lg md:text-xl">
                     {job.title}
                   </h3>
@@ -368,11 +353,11 @@ const RecommendedJobCard = ({ job }: { job: RecommendedJob }) => (
             <div className="text-muted-foreground/70 flex items-center gap-3 text-[10px] font-bold tracking-tight sm:text-[11px]">
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3 opacity-70" />
-                {job.isRemote ? "Remote Friendly" : "On-site"}
+                {job.isRemote ? 'Remote Friendly' : 'On-site'}
               </span>
               <span className="flex items-center gap-1 tracking-tighter uppercase">
                 <Briefcase className="h-3 w-3 opacity-70" />
-                {job.jobType.replace("_", " ")}
+                {job.jobType.replace('_', ' ')}
               </span>
             </div>
           </div>
@@ -386,7 +371,7 @@ const RecommendedJobCard = ({ job }: { job: RecommendedJob }) => (
             </p>
             <div className="flex items-center gap-1.5">
               <span
-                className={`text-2xl font-black sm:text-3xl ${job.matchScore >= 90 ? "text-primary" : "text-amber-500"}`}
+                className={`text-2xl font-black sm:text-3xl ${job.matchScore >= 90 ? 'text-primary' : 'text-amber-500'}`}
               >
                 {job.matchScore}%
               </span>

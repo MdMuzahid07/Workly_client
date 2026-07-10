@@ -1,30 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Loader2,
-  X,
-  ZoomIn,
-  ZoomOut,
-} from "lucide-react";
-import {
-  normalizeCloudinaryPdfUrl,
-  downloadMessageAttachment,
-} from "@/lib/pdfSource";
-import { useAuthenticatedPdf } from "@/hooks/useAuthenticatedPdf";
-import { useEffect, useRef, useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight, Download, Loader2, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { normalizeCloudinaryPdfUrl, downloadMessageAttachment } from '@/lib/pdfSource';
+import { useAuthenticatedPdf } from '@/hooks/useAuthenticatedPdf';
+import { useEffect, useRef, useState } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -46,7 +30,7 @@ const MessagePdfViewer = ({
   onClose,
   pdfUrl,
   messageId,
-  title = "Document",
+  title = 'Document',
 }: MessagePdfViewerProps) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -78,8 +62,8 @@ const MessagePdfViewer = ({
       }
     };
     update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, [isOpen]);
 
   function onDocumentLoadSuccess({ numPages: n }: { numPages: number }) {
@@ -88,34 +72,31 @@ const MessagePdfViewer = ({
   }
 
   function onDocumentLoadError(err: Error) {
-    console.error("PDF render error:", err.message);
+    console.error('PDF render error:', err.message);
   }
 
   const scrollToPage = (page: number) => {
     setPageNumber(page);
     document
       .getElementById(`msg-pdf-page-${page}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleDownload = async () => {
     try {
       if (messageId) {
-        await downloadMessageAttachment(
-          messageId,
-          title.endsWith(".pdf") ? title : `${title}.pdf`,
-        );
+        await downloadMessageAttachment(messageId, title.endsWith('.pdf') ? title : `${title}.pdf`);
       } else {
         const src = pdfBlobUrl ?? normalizeCloudinaryPdfUrl(pdfUrl);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = src;
-        a.download = title.endsWith(".pdf") ? title : `${title}.pdf`;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
+        a.download = title.endsWith('.pdf') ? title : `${title}.pdf`;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
         a.click();
       }
     } catch (err) {
-      console.error("Failed to download attachment:", err);
+      console.error('Failed to download attachment:', err);
     }
   };
 
@@ -137,7 +118,7 @@ const MessagePdfViewer = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 pr-9">
+          <div className="flex items-center gap-2 pr-14">
             {/* Zoom Controls */}
             <div className="bg-muted/30 flex items-center rounded-full border p-1">
               <Button
@@ -188,9 +169,7 @@ const MessagePdfViewer = ({
                 <div className="border-primary/20 absolute h-12 w-12 rounded-full border-2" />
                 <Loader2 className="text-primary h-12 w-12 animate-spin" />
               </div>
-              <p className="text-muted-foreground text-sm font-medium">
-                Loading document…
-              </p>
+              <p className="text-muted-foreground text-sm font-medium">Loading document…</p>
             </div>
           )}
 
@@ -201,12 +180,8 @@ const MessagePdfViewer = ({
                 <X className="text-destructive h-8 w-8" />
               </div>
               <div>
-                <p className="text-destructive text-sm font-bold">
-                  Failed to load PDF
-                </p>
-                <p className="text-muted-foreground mt-1 max-w-[260px] text-xs">
-                  {error}
-                </p>
+                <p className="text-destructive text-sm font-bold">Failed to load PDF</p>
+                <p className="text-muted-foreground mt-1 max-w-[260px] text-xs">{error}</p>
               </div>
             </div>
           )}

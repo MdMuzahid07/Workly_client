@@ -1,71 +1,65 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Crown, DollarSign, MapPin, ShieldCheck } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
-import ApplyJobHeader from "../../../components/main/jobs/applyJob/ApplyJobHeader";
-import ApplySuccessMessage from "../../../components/main/jobs/applyJob/ApplySuccessMessage";
-import JobApplyForm from "../../../components/main/jobs/applyJob/JobApplyForm";
-import JobInfoCard from "../../../components/main/jobs/applyJob/JobInfoCard";
-import JobRequirementsSidebar from "../../../components/main/jobs/applyJob/JobRequirementsSidebar";
-import JobSummaryCard from "../../../components/main/jobs/applyJob/JobSummaryCard";
-import { Button } from "../../../components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { useAppSelector } from "@/redux/hooks";
-import { useCanAccess, useEntitlements } from "@/hooks/useEntitlements";
+'use client';
+import { useCanAccess, useEntitlements } from '@/hooks/useEntitlements';
+import { cn } from '@/lib/utils';
+import { useAppSelector } from '@/redux/hooks';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Crown, DollarSign, MapPin, ShieldCheck } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+import ApplyJobHeader from '../../../components/main/jobs/applyJob/ApplyJobHeader';
+import ApplySuccessMessage from '../../../components/main/jobs/applyJob/ApplySuccessMessage';
+import JobApplyForm from '../../../components/main/jobs/applyJob/JobApplyForm';
+import JobInfoCard from '../../../components/main/jobs/applyJob/JobInfoCard';
+import JobRequirementsSidebar from '../../../components/main/jobs/applyJob/JobRequirementsSidebar';
+import JobSummaryCard from '../../../components/main/jobs/applyJob/JobSummaryCard';
+import { Button } from '../../../components/ui/button';
 import {
   useCreateApplicationMutation,
   useGetMyApplicationSummaryQuery,
-} from "../../../redux/feature/application/applicationApi";
-import { useGetJobByIdQuery } from "../../../redux/feature/job/jobApi";
-import { useGetProfileQuery } from "../../../redux/feature/profile/profileApi";
-import { useUploadResumeMutation } from "../../../redux/feature/resume/resumeApi";
-import JobApplyViewSkeleton from "../../../skeleton/job/apply/JobApplyViewSkeleton";
+} from '../../../redux/feature/application/applicationApi';
+import { useGetJobByIdQuery } from '../../../redux/feature/job/jobApi';
+import { useGetProfileQuery } from '../../../redux/feature/profile/profileApi';
+import { useUploadResumeMutation } from '../../../redux/feature/resume/resumeApi';
+import JobApplyViewSkeleton from '../../../skeleton/job/apply/JobApplyViewSkeleton';
 
 interface ApplyJobViewProps {
   jobId: string;
 }
 
 const EXPERIENCE_OPTIONS = [
-  { value: "0", label: "6 months plus" },
-  { value: "1", label: "1-2 years" },
-  { value: "3", label: "3-4 years" },
-  { value: "5", label: "5-6 years" },
-  { value: "7", label: "7-10 years" },
-  { value: "10", label: "10+ years" },
+  { value: '0', label: '6 months plus' },
+  { value: '1', label: '1-2 years' },
+  { value: '3', label: '3-4 years' },
+  { value: '5', label: '5-6 years' },
+  { value: '7', label: '7-10 years' },
+  { value: '10', label: '10+ years' },
 ];
 
 const applicationSchema = z
   .object({
-    fullName: z.string().min(2, "Full name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
-    location: z.string().min(2, "Location is required"),
-    currentRole: z.string().min(2, "Current role is required"),
-    experience: z.string().min(1, "Years of experience is required"),
-    portfolio: z
-      .string()
-      .url("Please enter a valid portfolio URL")
-      .optional()
-      .or(z.literal("")),
-    coverLetter: z
-      .string()
-      .min(20, "Cover letter must be at least 20 characters"),
+    fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+    email: z.string().email('Please enter a valid email'),
+    phone: z.string().min(10, 'Please enter a valid phone number'),
+    location: z.string().min(2, 'Location is required'),
+    currentRole: z.string().min(2, 'Current role is required'),
+    experience: z.string().min(1, 'Years of experience is required'),
+    portfolio: z.string().url('Please enter a valid portfolio URL').optional().or(z.literal('')),
+    coverLetter: z.string().min(20, 'Cover letter must be at least 20 characters'),
     resumeFile: z.instanceof(File).optional(),
-    resumeUrl: z.string().optional().or(z.literal("")),
+    resumeUrl: z.string().optional().or(z.literal('')),
     agreeTerms: z.boolean().refine((val) => val === true, {
-      message: "You must agree to the terms and conditions",
+      message: 'You must agree to the terms and conditions',
     }),
   })
   .refine((data) => data.resumeFile || data.resumeUrl, {
-    message: "Please upload a new resume or select an existing one",
-    path: ["resumeFile"],
+    message: 'Please upload a new resume or select an existing one',
+    path: ['resumeFile'],
   });
 
 type ApplicationFormData = z.infer<typeof applicationSchema>;
@@ -74,22 +68,20 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [uploadResume, { isLoading: isUploadingResume }] =
-    useUploadResumeMutation();
+  const [uploadResume, { isLoading: isUploadingResume }] = useUploadResumeMutation();
   const { data: summaryResponse } = useGetMyApplicationSummaryQuery({});
-  const [createApplication, { isLoading: isCreatingApplication }] =
-    useCreateApplicationMutation();
+  const [createApplication, { isLoading: isCreatingApplication }] = useCreateApplicationMutation();
 
   const user = useAppSelector((state) => state.auth.user);
-  const isJobSeeker = user?.role === "JOB_SEEKER";
+  const isJobSeeker = user?.role === 'JOB_SEEKER';
 
   const {
     limit,
     current: monthlyCount,
     isLoading: isLimitLoading,
-  } = useCanAccess("maxMonthlyApplications");
+  } = useCanAccess('maxMonthlyApplications');
   const { planName } = useEntitlements();
-  const isPremium = planName === "Premium";
+  const isPremium = planName === 'Premium';
 
   const limitReached = !isLimitLoading && monthlyCount >= limit;
   const closeToLimit = !isLimitLoading && monthlyCount >= limit - 5;
@@ -100,8 +92,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   } = useGetJobByIdQuery(jobId, {
     skip: !jobId,
   });
-  const { data: profileResponse, isLoading: isProfileLoading } =
-    useGetProfileQuery({});
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetProfileQuery({});
 
   const userProfile = profileResponse?.data;
   const existingResumes = userProfile?.resumes || [];
@@ -109,16 +100,16 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   const form = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      phone: "",
-      location: "",
-      currentRole: "",
-      experience: "3",
-      portfolio: "",
-      coverLetter: "",
+      fullName: '',
+      email: '',
+      phone: '',
+      location: '',
+      currentRole: '',
+      experience: '3',
+      portfolio: '',
+      coverLetter: '',
       resumeFile: undefined,
-      resumeUrl: "",
+      resumeUrl: '',
       agreeTerms: false,
     },
   });
@@ -127,18 +118,16 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   useEffect(() => {
     if (userProfile) {
       form.reset({
-        fullName: userProfile.fullName || "",
-        email: userProfile.email || "",
-        phone: userProfile.profile?.phone || "",
-        location: userProfile.profile?.location || "",
-        currentRole: userProfile.profile?.headline || "",
-        experience:
-          userProfile.profile?.totalExperienceYears?.toString() || "3",
-        portfolio: userProfile.profile?.websiteUrl || "",
-        coverLetter: "",
+        fullName: userProfile.fullName || '',
+        email: userProfile.email || '',
+        phone: userProfile.profile?.phone || '',
+        location: userProfile.profile?.location || '',
+        currentRole: userProfile.profile?.headline || '',
+        experience: userProfile.profile?.totalExperienceYears?.toString() || '3',
+        portfolio: userProfile.profile?.websiteUrl || '',
+        coverLetter: '',
         resumeFile: undefined,
-        resumeUrl:
-          userProfile.resumes?.find((r: any) => r.isDefault)?.fileUrl || "",
+        resumeUrl: userProfile.resumes?.find((r: any) => r.isDefault)?.fileUrl || '',
         agreeTerms: false,
       });
     }
@@ -147,23 +136,23 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
   const handleSubmit = async (data: ApplicationFormData) => {
     try {
       setIsSubmitting(true);
-      toast.loading("Submitting your application...", { id: "apply_job" });
+      toast.loading('Submitting your application...', { id: 'apply_job' });
 
-      let finalResumeUrl = "";
+      let finalResumeUrl = '';
 
       if (data.resumeFile) {
         const formData = new FormData();
-        formData.append("file", data.resumeFile);
+        formData.append('file', data.resumeFile);
         const resumeResponse = await uploadResume(formData).unwrap();
         if (resumeResponse.success) {
           finalResumeUrl = resumeResponse.data.fileUrl;
         } else {
-          throw new Error("Resume upload failed");
+          throw new Error('Resume upload failed');
         }
       } else if (data.resumeUrl) {
         finalResumeUrl = data.resumeUrl;
       } else {
-        toast.error("Please provide a resume", { id: "apply_job" });
+        toast.error('Please provide a resume', { id: 'apply_job' });
         setIsSubmitting(false);
         return;
       }
@@ -176,20 +165,20 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
 
       const response = await createApplication(payload).unwrap();
       if (response.success) {
-        toast.success("Application submitted successfully!", {
-          id: "apply_job",
+        toast.success('Application submitted successfully!', {
+          id: 'apply_job',
         });
         setSubmitted(true);
       }
     } catch (error: any) {
-      console.error("Failed to submit application:", error);
+      console.error('Failed to submit application:', error);
       const message =
         error?.data?.errorSources?.message ||
         error?.data?.message ||
         error?.message ||
-        "Failed to submit application";
+        'Failed to submit application';
 
-      toast.error(message, { id: "apply_job" });
+      toast.error(message, { id: 'apply_job' });
     } finally {
       setIsSubmitting(false);
     }
@@ -199,13 +188,13 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     const file = e.target.files?.[0];
     if (file) {
       setResumeFile(file);
-      form.setValue("resumeFile", file);
+      form.setValue('resumeFile', file);
     }
   };
 
   const handleRemoveFile = () => {
     setResumeFile(null);
-    form.setValue("resumeFile", undefined);
+    form.setValue('resumeFile', undefined);
   };
 
   const formatSalaryRange = (min: number, max: number) =>
@@ -225,9 +214,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center px-4 py-20">
         <div className="border-border bg-card max-w-md rounded-2xl border p-8 text-center shadow-sm">
-          <h1 className="text-foreground text-2xl font-bold">
-            Job unavailable
-          </h1>
+          <h1 className="text-foreground text-2xl font-bold">Job unavailable</h1>
           <p className="text-muted-foreground mt-3 text-sm leading-6">
             This job is no longer accepting applications or is not published.
           </p>
@@ -248,22 +235,22 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
         {!isPremium && isJobSeeker && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity: 1, height: 'auto' }}
             className="mt-6 overflow-hidden"
           >
             <div
               className={cn(
-                "flex flex-col justify-between gap-4 rounded-2xl border-2 p-4 transition-all md:flex-row md:items-center",
+                'flex flex-col justify-between gap-4 rounded-2xl border-2 p-4 transition-all md:flex-row md:items-center',
                 limitReached
-                  ? "border-red-200 bg-red-50 text-red-900"
-                  : "border-amber-200 bg-amber-50 text-amber-900",
+                  ? 'border-red-200 bg-red-50 text-red-900'
+                  : 'border-amber-200 bg-amber-50 text-amber-900',
               )}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={cn(
-                    "shrink-0 rounded-xl p-2",
-                    limitReached ? "bg-red-100" : "bg-amber-100",
+                    'shrink-0 rounded-xl p-2',
+                    limitReached ? 'bg-red-100' : 'bg-amber-100',
                   )}
                 >
                   {limitReached ? (
@@ -281,7 +268,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
                   <p className="text-xs font-medium opacity-80">
                     {limitReached
                       ? "You've used all your applications for this month. Upgrade to Premium for unlimited access."
-                      : "Free and Pro users have monthly application limits. Go Premium for unlimited applications."}
+                      : 'Free and Pro users have monthly application limits. Go Premium for unlimited applications.'}
                   </p>
                 </div>
               </div>
@@ -289,7 +276,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
                 <Button
                   asChild
                   size="sm"
-                  variant={limitReached ? "destructive" : "outline"}
+                  variant={limitReached ? 'destructive' : 'outline'}
                   className="rounded-xl font-bold"
                 >
                   <Link href="/dashboard/pricing">Upgrade to Premium</Link>
@@ -304,11 +291,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
             <JobSummaryCard job={jobData} />
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <JobInfoCard
-                icon={MapPin}
-                label="LOCATION"
-                value={jobData?.data.location}
-              />
+              <JobInfoCard icon={MapPin} label="LOCATION" value={jobData?.data.location} />
               <JobInfoCard
                 icon={DollarSign}
                 label="SALARY RANGE"
@@ -320,9 +303,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
             </div>
 
             {!submitted ? (
-              <div
-                className={cn(limitReached && "pointer-events-none opacity-50")}
-              >
+              <div className={cn(limitReached && 'pointer-events-none opacity-50')}>
                 <JobApplyForm
                   form={form}
                   EXPERIENCE_OPTIONS={EXPERIENCE_OPTIONS}
@@ -337,8 +318,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
                 {limitReached && (
                   <div className="mt-4 text-center">
                     <p className="text-sm font-bold text-red-600">
-                      You cannot apply for more jobs this month. Please upgrade
-                      your plan.
+                      You cannot apply for more jobs this month. Please upgrade your plan.
                     </p>
                   </div>
                 )}

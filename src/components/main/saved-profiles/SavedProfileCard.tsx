@@ -1,20 +1,22 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { motion } from "framer-motion";
+} from '@/components/ui/dropdown-menu';
+import type { Availability, Skill, UserProfileData } from '@/types/profile';
 import {
   Bookmark,
   BookmarkCheck,
   ExternalLink,
+  Facebook,
   FileText,
+  Github,
   Globe,
   Linkedin,
   Mail,
@@ -22,27 +24,25 @@ import {
   MoreVertical,
   Phone,
   Trash2,
-  User,
-  Github,
   Twitter,
-  Facebook,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import type { Availability, Skill, UserProfileData } from "@/types/profile";
+  User,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const availabilityLabels: Record<Availability, string> = {
-  immediate: "Immediate",
-  "2_weeks": "2 Weeks",
-  "1_month": "1 Month",
-  not_available: "Not Available",
+  immediate: 'Immediate',
+  '2_weeks': '2 Weeks',
+  '1_month': '1 Month',
+  not_available: 'Not Available',
 };
 
 const availabilityColors: Record<Availability, string> = {
-  immediate: "bg-success/10 text-success border-success/20",
-  "2_weeks": "bg-primary/10 text-primary border-primary/20",
-  "1_month": "bg-warning/10 text-warning border-warning/20",
-  not_available: "bg-muted text-muted-foreground border-border",
+  immediate: 'bg-success/10 text-success border-success/20',
+  '2_weeks': 'bg-primary/10 text-primary border-primary/20',
+  '1_month': 'bg-warning/10 text-warning border-warning/20',
+  not_available: 'bg-muted text-muted-foreground border-border',
 };
 
 interface SavedProfileCardProps {
@@ -63,8 +63,8 @@ const SavedProfileCard = ({
     id: rawProfile.id,
     candidateName: rawProfile.fullName,
     candidateAvatar: rawProfile.profile?.avatarUrl,
-    currentPosition: rawProfile.profile?.headline || "Professional Candidate",
-    location: rawProfile.profile?.location || "Not Specified",
+    currentPosition: rawProfile.profile?.headline || 'Professional Candidate',
+    location: rawProfile.profile?.location || 'Not Specified',
     experience: `${rawProfile.profile?.totalExperienceYears || 0} Years`,
     savedDate: rawProfile.savedAt || new Date().toISOString(),
     email: rawProfile.email,
@@ -72,8 +72,8 @@ const SavedProfileCard = ({
     skills: rawProfile.profile?.skills || [],
     education: rawProfile.profile?.education?.[0]
       ? `${rawProfile.profile.education[0].degree} - ${rawProfile.profile.education[0].institution ?? rawProfile.profile.education[0].institute}`
-      : "Not Specified",
-    summary: rawProfile.profile?.bio || "No biography provided.",
+      : 'Not Specified',
+    summary: rawProfile.profile?.bio || 'No biography provided.',
     resumeUrl: rawProfile.profile?.resumeUrl,
     videoResumeUrl: rawProfile.profile?.videoResumeUrl,
     linkedinUrl: rawProfile.profile?.linkedInUrl,
@@ -81,14 +81,13 @@ const SavedProfileCard = ({
     githubUrl: rawProfile.profile?.githubUrl,
     twitterUrl: rawProfile.profile?.twitterUrl,
     facebookUrl: rawProfile.profile?.facebookUrl,
-    availability:
-      ((rawProfile.profile?.preference?.availability?.toLowerCase() as Availability) ||
-        "immediate") satisfies Availability,
+    availability: ((rawProfile.profile?.preference?.availability?.toLowerCase() as Availability) ||
+      'immediate') satisfies Availability,
     salaryExpectation: rawProfile.profile?.preference?.expectedSalary
       ? {
           min: rawProfile.profile.preference.expectedSalary,
           max: rawProfile.profile.preference.expectedSalary,
-          currency: "$",
+          currency: '$',
         }
       : undefined,
     tags: rawProfile.profile?.preference?.tags || [],
@@ -145,11 +144,7 @@ const SavedProfileCard = ({
             {/* Actions Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-muted h-8 w-8 rounded-full"
-                >
+                <Button variant="ghost" size="icon" className="hover:bg-muted h-8 w-8 rounded-full">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -191,10 +186,7 @@ const SavedProfileCard = ({
               </Badge>
             ))}
             {profile.skills.length > 5 && (
-              <Badge
-                variant="outline"
-                className="rounded-lg px-2.5 py-1 text-xs font-bold"
-              >
+              <Badge variant="outline" className="rounded-lg px-2.5 py-1 text-xs font-bold">
                 +{profile.skills.length - 5} more
               </Badge>
             )}
@@ -223,9 +215,7 @@ const SavedProfileCard = ({
               <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
                 Education
               </span>
-              <p className="line-clamp-1 text-xs font-bold">
-                {profile.education}
-              </p>
+              <p className="line-clamp-1 text-xs font-bold">{profile.education}</p>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
@@ -247,7 +237,7 @@ const SavedProfileCard = ({
               </span>
               <p className="text-primary mt-1 text-sm font-bold">
                 {profile.salaryExpectation.currency}
-                {profile.salaryExpectation.min.toLocaleString()} -{" "}
+                {profile.salaryExpectation.min.toLocaleString()} -{' '}
                 {profile.salaryExpectation.currency}
                 {profile.salaryExpectation.max.toLocaleString()}
               </p>
@@ -340,17 +330,14 @@ const SavedProfileCard = ({
                   size="sm"
                   variant="outline"
                   className="h-9 rounded-full px-4 text-xs font-bold"
-                  onClick={() => window.open(profile.resumeUrl!, "_blank")}
+                  onClick={() => window.open(profile.resumeUrl!, '_blank')}
                 >
                   <FileText className="mr-1.5 h-3.5 w-3.5" />
                   View Resume
                 </Button>
               )}
               <Link href={`/browse-candidates/${profile.id}`}>
-                <Button
-                  size="sm"
-                  className="h-9 rounded-full px-4 text-xs font-bold shadow-sm"
-                >
+                <Button size="sm" className="h-9 rounded-full px-4 text-xs font-bold shadow-sm">
                   <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
                   View Full Profile
                 </Button>

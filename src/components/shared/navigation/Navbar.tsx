@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { navLinks } from "../../../constants";
-import { useLogoutUserMutation } from "../../../redux/feature/auth/authApi";
-import { logout } from "../../../redux/feature/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import ThemeSwitcher from "../ThemeSwitcher";
-import WJLogo from "../WJLogo";
-import MobileBottomNav from "./MobileBottomNav";
-import NotificationDropdown from "./NotificationDropdown";
-import ProfileDrop from "./ProfileDrop";
+import { Button } from '@/components/ui/button';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { navLinks } from '../../../constants';
+import { useLogoutUserMutation } from '../../../redux/feature/auth/authApi';
+import { logout } from '../../../redux/feature/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import ThemeSwitcher from '../ThemeSwitcher';
+import WJLogo from '../WJLogo';
+import MobileBottomNav from './MobileBottomNav';
+import NotificationDropdown from './NotificationDropdown';
+import ProfileDrop from './ProfileDrop';
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -29,30 +29,30 @@ const Navbar = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
+    if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
   };
 
   const handleLogout = async () => {
     try {
-      const loadingToast = toast.loading("Logging out...");
+      const loadingToast = toast.loading('Logging out...');
       await logoutUser(undefined).unwrap();
       localStorage.clear();
       dispatch(logout());
       toast.dismiss(loadingToast);
-      toast.success("Logged out successfully");
-      window.location.href = "/";
+      toast.success('Logged out successfully');
+      window.location.href = '/';
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error("Failed to logout. Please try again.");
+      toast.error('Failed to logout. Please try again.');
       localStorage.clear();
       dispatch(logout());
-      window.location.href = "/";
+      window.location.href = '/';
     }
   };
 
@@ -61,8 +61,8 @@ const Navbar = () => {
       <header
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? "border-b border-slate-200/40 bg-white/80 shadow-xs backdrop-blur-md dark:border-slate-800/40 dark:bg-slate-950/80"
-            : "bg-transparent"
+            ? 'border-b border-slate-200/40 bg-white/80 shadow-xs backdrop-blur-md dark:border-slate-800/40 dark:bg-slate-950/80'
+            : 'bg-transparent'
         }`}
       >
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:h-20 md:px-6">
@@ -82,9 +82,7 @@ const Navbar = () => {
                       key={item.name}
                       href={item.href}
                       className={`group relative text-[14px] font-semibold tracking-tight transition-colors ${
-                        active
-                          ? "text-primary"
-                          : "text-muted-foreground hover:text-primary"
+                        active ? 'text-primary' : 'text-muted-foreground hover:text-primary'
                       }`}
                     >
                       {item.name}

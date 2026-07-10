@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion, Variants } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { Briefcase, LayoutDashboard, Plus, ArrowRight } from "lucide-react";
-import { Button } from "../../ui/button";
+import { ArrowRight, Briefcase, LayoutDashboard, Plus } from 'lucide-react';
+import { motion, Variants } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import { Button } from '../../ui/button';
 
 interface JobSuccessScreenProps {
   jobData: {
@@ -16,10 +16,7 @@ interface JobSuccessScreenProps {
   onReset: () => void;
 }
 
-export default function JobSuccessScreen({
-  jobData,
-  onReset,
-}: JobSuccessScreenProps) {
+export default function JobSuccessScreen({ jobData, onReset }: JobSuccessScreenProps) {
   const router = useRouter();
 
   const containerVariants = {
@@ -38,14 +35,14 @@ export default function JobSuccessScreen({
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100, damping: 15 },
+      transition: { type: 'spring', stiffness: 100, damping: 15 },
     },
   };
 
   // Nice readable format for Job Type
   const formatJobType = (type: string) => {
     return type
-      .replace("_", " ")
+      .replace('_', ' ')
       .toLowerCase()
       .replace(/\b\w/g, (c) => c.toUpperCase());
   };
@@ -66,7 +63,7 @@ export default function JobSuccessScreen({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{
-            type: "spring",
+            type: 'spring',
             delay: 0.2,
             stiffness: 200,
             damping: 10,
@@ -86,7 +83,7 @@ export default function JobSuccessScreen({
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
-            transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
             d="M5 13l4 4L19 7"
           />
         </motion.svg>
@@ -96,15 +93,15 @@ export default function JobSuccessScreen({
       <motion.div variants={itemVariants} className="space-y-3">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-          {jobData.isUpdate ? "Changes Saved" : "Successfully Published"}
+          {jobData.isUpdate ? 'Changes Saved' : 'Successfully Published'}
         </span>
         <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          {jobData.isUpdate ? "Job Posting Updated!" : "Your Job is Live!"}
+          {jobData.isUpdate ? 'Job Posting Updated!' : 'Your Job is Live!'}
         </h2>
         <p className="text-muted-foreground mx-auto max-w-md text-sm leading-relaxed">
-          {jobData.status === "DRAFT"
+          {jobData.status === 'DRAFT'
             ? "Your draft has been updated. Candidates won't see this listing until you choose to publish it."
-            : "Your listing is active. We are now matching potential candidates with the required skills."}
+            : 'Your listing is active. We are now matching potential candidates with the required skills.'}
         </p>
       </motion.div>
 
@@ -122,7 +119,7 @@ export default function JobSuccessScreen({
                 Preview
               </span>
               <h3 className="text-foreground mt-2.5 text-lg font-bold">
-                {jobData.title || "Untitled Job Listing"}
+                {jobData.title || 'Untitled Job Listing'}
               </h3>
             </div>
             <span className="bg-muted border-border/60 text-muted-foreground shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium">
@@ -133,13 +130,11 @@ export default function JobSuccessScreen({
           <div className="border-border/40 text-muted-foreground flex flex-wrap items-center gap-x-6 gap-y-2 border-t pt-4 text-xs font-medium">
             <div className="flex items-center gap-1.5">
               <Briefcase className="h-3.5 w-3.5" />
-              <span>{jobData.location || "Anywhere"}</span>
+              <span>{jobData.location || 'Anywhere'}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span>
-                Status: {jobData.status === "ACTIVE" ? "Active" : "Draft"}
-              </span>
+              <span>Status: {jobData.status === 'ACTIVE' ? 'Active' : 'Draft'}</span>
             </div>
           </div>
         </div>
@@ -160,7 +155,7 @@ export default function JobSuccessScreen({
         </Button>
 
         <Button
-          onClick={() => router.push("/employer/jobs")}
+          onClick={() => router.push('/employer/jobs')}
           className="w-full gap-2 rounded-xl px-5 py-5 text-sm font-semibold sm:w-auto"
         >
           <LayoutDashboard className="h-4 w-4" />

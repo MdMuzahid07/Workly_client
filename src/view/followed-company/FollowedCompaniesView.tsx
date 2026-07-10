@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import DashboardFollowedCompaniesHeader from "@/components/dashboard/dashboard-nav/header/DashboardFollowedCompaniesHeader";
-import FollowedCompanyCard from "@/components/main/followed-company/FollowedCompanyCard";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import DashboardFollowedCompaniesHeader from '@/components/dashboard/dashboard-nav/header/DashboardFollowedCompaniesHeader';
+import FollowedCompanyCard from '@/components/main/followed-company/FollowedCompanyCard';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useGetFollowedCompaniesQuery } from "@/redux/feature/follow/followApi";
-import FollowedCompaniesSkeleton from "@/skeleton/followed-company/FollowedCompaniesSkeleton";
-import { AnimatePresence } from "framer-motion";
-import { Search } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+} from '@/components/ui/select';
+import { useGetFollowedCompaniesQuery } from '@/redux/feature/follow/followApi';
+import FollowedCompaniesSkeleton from '@/skeleton/followed-company/FollowedCompaniesSkeleton';
+import { Search } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface DisplayFollowedCompany {
   id: string;
@@ -58,9 +58,9 @@ interface FollowedCompanyItem {
 }
 
 const FollowedCompaniesView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -72,7 +72,7 @@ const FollowedCompaniesView = () => {
 
   const { data: followedData, isLoading } = useGetFollowedCompaniesQuery({
     search: debouncedSearch || undefined,
-    industry: categoryFilter !== "all" ? categoryFilter : undefined,
+    industry: categoryFilter !== 'all' ? categoryFilter : undefined,
   });
 
   const followedCompanies = useMemo(() => {
@@ -82,17 +82,17 @@ const FollowedCompaniesView = () => {
       id: follow.company.id,
       slug: follow.company.slug,
       name: follow.company.name,
-      logo: follow.company.logoUrl || "/placeholder-logo.png",
-      industry: follow.company.industry?.name || "Other",
-      description: follow.company.description || "",
-      location: follow.company.location || "Remote",
+      logo: follow.company.logoUrl || '/placeholder-logo.png',
+      industry: follow.company.industry?.name || 'Other',
+      description: follow.company.description || '',
+      location: follow.company.location || 'Remote',
       followedSince: follow.followedAt,
       openPositions: follow.company._count?.jobs || 0,
     }));
   }, [followedData]);
 
   const industries = useMemo(() => {
-    return ["all", ...(followedData?.meta?.industries || [])];
+    return ['all', ...(followedData?.meta?.industries || [])];
   }, [followedData?.meta?.industries]);
 
   return (
@@ -124,10 +124,7 @@ const FollowedCompaniesView = () => {
                     <span className="text-muted-foreground/60 hidden text-[10px] font-black tracking-widest uppercase sm:inline-block">
                       Industry:
                     </span>
-                    <Select
-                      value={categoryFilter}
-                      onValueChange={setCategoryFilter}
-                    >
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                       <SelectTrigger className="bg-muted/20 border-border h-8 w-full cursor-pointer rounded-full text-xs font-bold sm:h-10 sm:text-sm md:w-48">
                         <SelectValue placeholder="All industries" />
                       </SelectTrigger>
@@ -138,7 +135,7 @@ const FollowedCompaniesView = () => {
                             className="cursor-pointer rounded-lg text-xs font-medium sm:text-sm"
                             value={ind}
                           >
-                            {ind === "all" ? "All Industries" : ind}
+                            {ind === 'all' ? 'All Industries' : ind}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -159,33 +156,23 @@ const FollowedCompaniesView = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:gap-6 xl:grid-cols-3">
             <AnimatePresence mode="popLayout">
               {followedCompanies.length > 0 ? (
-                followedCompanies.map(
-                  (company: DisplayFollowedCompany, index: number) => (
-                    <FollowedCompanyCard
-                      key={company.id}
-                      company={company}
-                      index={index}
-                    />
-                  ),
-                )
+                followedCompanies.map((company: DisplayFollowedCompany, index: number) => (
+                  <FollowedCompanyCard key={company.id} company={company} index={index} />
+                ))
               ) : (
                 <div className="bg-card col-span-full flex flex-col items-center gap-4 rounded-xl border-2 border-dashed py-24 text-center">
                   <div className="bg-muted/20 rounded-full p-6">
                     <Search className="text-muted-foreground/20 h-10 w-10" />
                   </div>
-                  <h3 className="text-foreground text-lg font-bold">
-                    No companies found
-                  </h3>
+                  <h3 className="text-foreground text-lg font-bold">No companies found</h3>
                   <p className="text-muted-foreground max-w-sm text-sm">
-                    {searchTerm || categoryFilter !== "all"
+                    {searchTerm || categoryFilter !== 'all'
                       ? "Try adjusting your filters to find what you're looking for."
                       : "You haven't followed any companies yet."}
                   </p>
-                  {!searchTerm && categoryFilter === "all" && (
+                  {!searchTerm && categoryFilter === 'all' && (
                     <Link href="/companies">
-                      <Button className="mt-6 rounded-full font-bold">
-                        Explore Companies
-                      </Button>
+                      <Button className="mt-6 rounded-full font-bold">Explore Companies</Button>
                     </Link>
                   )}
                 </div>

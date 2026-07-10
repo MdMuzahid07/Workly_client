@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import DashboardAppliedJobsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAppliedJobsHeader";
-import { ApplicationRow } from "@/components/main/jobs/myAppliedJobs/ApplicationRow";
-import { ApplicationStats } from "@/components/main/jobs/myAppliedJobs/ApplicationStats";
-import ErrorState from "@/components/main/jobs/myAppliedJobs/ErrorState";
-import PaginationBar from "@/components/shared/PaginationBar";
+import DashboardAppliedJobsHeader from '@/components/dashboard/dashboard-nav/header/DashboardAppliedJobsHeader';
+import { ApplicationRow } from '@/components/main/jobs/myAppliedJobs/ApplicationRow';
+import { ApplicationStats } from '@/components/main/jobs/myAppliedJobs/ApplicationStats';
+import ErrorState from '@/components/main/jobs/myAppliedJobs/ErrorState';
+import PaginationBar from '@/components/shared/PaginationBar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,18 +14,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -33,42 +33,38 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   useGetMyApplicationsQuery,
   useGetMyApplicationSummaryQuery,
   useWithdrawApplicationMutation,
-} from "@/redux/feature/application/applicationApi";
-import { ApplicationStatus, MyAppliedJob } from "@/types/application";
-import debounce from "debounce";
-import { AnimatePresence } from "framer-motion";
-import { AlertTriangle, FilterX, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+} from '@/redux/feature/application/applicationApi';
+import { ApplicationStatus, MyAppliedJob } from '@/types/application';
+import debounce from 'debounce';
+import { AlertTriangle, FilterX, Search } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
-export type DateFilter = "all" | "today" | "last_7_days" | "this_month";
+export type DateFilter = 'all' | 'today' | 'last_7_days' | 'this_month';
 
-import MyAppliedJobsSkeleton from "@/skeleton/job/applied/MyAppliedJobsSkeleton";
+import MyAppliedJobsSkeleton from '@/skeleton/job/applied/MyAppliedJobsSkeleton';
 
 const MyAppliedJobsView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
-    "all",
-  );
-  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('all');
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState("10");
+  const [limit, setLimit] = useState('10');
 
   // UI State for search
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
 
   // Custom dialog state for confirmation
-  const [selectedWithdrawId, setSelectedWithdrawId] = useState<string | null>(
-    null,
-  );
+  const [selectedWithdrawId, setSelectedWithdrawId] = useState<string | null>(null);
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
 
   const jobsLimit = parseInt(limit);
@@ -92,8 +88,8 @@ const MyAppliedJobsView = () => {
       page: currentPage,
       limit: jobsLimit,
       q: searchTerm || undefined,
-      status: statusFilter !== "all" ? statusFilter : undefined,
-      dateFilter: dateFilter !== "all" ? dateFilter : undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      dateFilter: dateFilter !== 'all' ? dateFilter : undefined,
     }),
     [currentPage, dateFilter, jobsLimit, searchTerm, statusFilter],
   );
@@ -127,10 +123,10 @@ const MyAppliedJobsView = () => {
   };
 
   const handleClearFilters = () => {
-    setSearchValue("");
-    setSearchTerm("");
-    setStatusFilter("all");
-    setDateFilter("all");
+    setSearchValue('');
+    setSearchTerm('');
+    setStatusFilter('all');
+    setDateFilter('all');
     setCurrentPage(1);
   };
 
@@ -140,7 +136,7 @@ const MyAppliedJobsView = () => {
   };
 
   const handleStatusChange = (value: string) => {
-    setStatusFilter(value as ApplicationStatus | "all");
+    setStatusFilter(value as ApplicationStatus | 'all');
     setCurrentPage(1);
   };
 
@@ -163,22 +159,21 @@ const MyAppliedJobsView = () => {
     setSelectedWithdrawId(null);
 
     setWithdrawingId(targetId);
-    toast.loading("Withdrawing application...", { id: "withdraw-application" });
+    toast.loading('Withdrawing application...', { id: 'withdraw-application' });
 
     try {
       await withdrawApplication(targetId).unwrap();
-      toast.success("Application withdrawn", { id: "withdraw-application" });
+      toast.success('Application withdrawn', { id: 'withdraw-application' });
     } catch (error: unknown) {
       const message =
-        typeof error === "object" &&
+        typeof error === 'object' &&
         error !== null &&
-        "data" in error &&
-        typeof (error as { data?: { message?: string } }).data?.message ===
-          "string"
+        'data' in error &&
+        typeof (error as { data?: { message?: string } }).data?.message === 'string'
           ? (error as { data: { message: string } }).data.message
-          : "Failed to withdraw application";
+          : 'Failed to withdraw application';
 
-      toast.error(message, { id: "withdraw-application" });
+      toast.error(message, { id: 'withdraw-application' });
     } finally {
       setWithdrawingId(null);
     }
@@ -195,8 +190,7 @@ const MyAppliedJobsView = () => {
     };
   }, [summaryResponse]);
 
-  const hasActiveFilters =
-    searchValue !== "" || statusFilter !== "all" || dateFilter !== "all";
+  const hasActiveFilters = searchValue !== '' || statusFilter !== 'all' || dateFilter !== 'all';
 
   if (isLoading && !applicationsResponse) {
     return <MyAppliedJobsSkeleton />;
@@ -235,22 +229,13 @@ const MyAppliedJobsView = () => {
                   <SelectItem className="cursor-pointer rounded-lg" value="all">
                     All Time
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="today"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="today">
                     Today
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="last_7_days"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="last_7_days">
                     Last 7 Days
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="this_month"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="this_month">
                     This Month
                   </SelectItem>
                 </SelectContent>
@@ -264,52 +249,28 @@ const MyAppliedJobsView = () => {
                   <SelectItem className="cursor-pointer rounded-lg" value="all">
                     All Statuses
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="SUBMITTED"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="SUBMITTED">
                     Submitted
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="REVIEWING"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="REVIEWING">
                     Reviewing
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="SHORTLISTED"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="SHORTLISTED">
                     Shortlisted
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="INTERVIEWED"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="INTERVIEWED">
                     Interviewing
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="OFFERED"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="OFFERED">
                     Offer Received
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="ACCEPTED"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="ACCEPTED">
                     Accepted
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="REJECTED"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="REJECTED">
                     Rejected
                   </SelectItem>
-                  <SelectItem
-                    className="cursor-pointer rounded-lg"
-                    value="WITHDRAWN"
-                  >
+                  <SelectItem className="cursor-pointer rounded-lg" value="WITHDRAWN">
                     Withdrawn
                   </SelectItem>
                 </SelectContent>
@@ -350,22 +311,13 @@ const MyAppliedJobsView = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                      <SelectItem
-                        className="cursor-pointer rounded-lg"
-                        value="10"
-                      >
+                      <SelectItem className="cursor-pointer rounded-lg" value="10">
                         10
                       </SelectItem>
-                      <SelectItem
-                        className="cursor-pointer rounded-lg"
-                        value="20"
-                      >
+                      <SelectItem className="cursor-pointer rounded-lg" value="20">
                         20
                       </SelectItem>
-                      <SelectItem
-                        className="cursor-pointer rounded-lg"
-                        value="50"
-                      >
+                      <SelectItem className="cursor-pointer rounded-lg" value="50">
                         50
                       </SelectItem>
                     </SelectContent>
@@ -433,8 +385,7 @@ const MyAppliedJobsView = () => {
                                 Search results found nothing
                               </p>
                               <p className="text-muted-foreground mx-auto max-w-xs text-sm font-medium">
-                                Try broadening your search terms or resetting
-                                the filters entirely.
+                                Try broadening your search terms or resetting the filters entirely.
                               </p>
                             </div>
                             <Button
@@ -464,10 +415,7 @@ const MyAppliedJobsView = () => {
       </div>
 
       {/* Premium Custom Withdrawal Confirmation Modal */}
-      <AlertDialog
-        open={isWithdrawDialogOpen}
-        onOpenChange={setIsWithdrawDialogOpen}
-      >
+      <AlertDialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
         <AlertDialogContent className="bg-card max-w-md overflow-hidden rounded-2xl border-none p-6 shadow-2xl">
           <AlertDialogHeader className="flex flex-col items-center text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 text-amber-500 ring-8 ring-amber-500/5">
@@ -477,9 +425,8 @@ const MyAppliedJobsView = () => {
               Withdraw Application?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground mt-2 max-w-sm text-sm leading-relaxed font-medium">
-              Are you sure you want to withdraw your application? This action is
-              permanent and cannot be undone. You will lose your spot in the
-              recruitment pool.
+              Are you sure you want to withdraw your application? This action is permanent and
+              cannot be undone. You will lose your spot in the recruitment pool.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center sm:gap-4">
