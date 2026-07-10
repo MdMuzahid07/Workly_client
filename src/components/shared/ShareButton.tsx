@@ -262,7 +262,8 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
         {/* Share Items Grid */}
         <div className="grid max-h-[220px] grid-cols-4 gap-2 overflow-y-auto p-3">
           {shareItems.map((item, idx) => {
-            const ButtonComponent = item.button as React.ElementType;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const ButtonComponent = item.button as any;
             const Icon = item.icon;
 
             const content = (
@@ -335,7 +336,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
           </div>
 
           {/* Premium Native Share Feature Indicator */}
-          {typeof navigator !== 'undefined' && navigator.share && (
+          {typeof navigator !== 'undefined' && 'share' in navigator && (
             <Button
               variant="secondary"
               className="hover:bg-primary h-9 w-full cursor-pointer rounded-xl text-xs font-semibold transition-all duration-300 hover:text-white"
