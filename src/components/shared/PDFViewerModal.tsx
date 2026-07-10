@@ -1,26 +1,13 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useAuthenticatedPdf } from "@/hooks/useAuthenticatedPdf";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Loader2,
-  X,
-  ZoomIn,
-  ZoomOut,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useAuthenticatedPdf } from '@/hooks/useAuthenticatedPdf';
+import { ChevronLeft, ChevronRight, Download, Loader2, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -70,8 +57,8 @@ const PDFViewerModal = ({
     };
 
     updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
   }, [isOpen]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
@@ -82,17 +69,17 @@ const PDFViewerModal = ({
   const scrollToPage = (page: number) => {
     setPageNumber(page);
     document.getElementById(`resume-modal-page-${page}`)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+      behavior: 'smooth',
+      block: 'start',
     });
   };
 
   const handleDownload = () => {
     if (!pdfBlobUrl) return;
     setIsDownloading(true);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = pdfBlobUrl;
-    link.download = title.endsWith(".pdf") ? title : `${title}.pdf`;
+    link.download = title.endsWith('.pdf') ? title : `${title}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -114,7 +101,7 @@ const PDFViewerModal = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pr-8">
+          <div className="flex items-center gap-2 pr-14">
             <div className="bg-muted/30 flex items-center rounded-full border p-1">
               <Button
                 variant="ghost"
@@ -202,10 +189,7 @@ const PDFViewerModal = ({
                     <div className="bg-muted mb-3 h-5 w-20 rounded-md" />
                     <div className="flex flex-wrap gap-2">
                       {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div
-                          key={i}
-                          className="bg-muted h-7 w-16 rounded-full"
-                        />
+                        <div key={i} className="bg-muted h-7 w-16 rounded-full" />
                       ))}
                     </div>
                   </div>
@@ -232,12 +216,8 @@ const PDFViewerModal = ({
                   <X className="text-destructive h-8 w-8" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-destructive text-sm font-bold">
-                    Failed to load PDF
-                  </p>
-                  <p className="text-muted-foreground max-w-[200px] text-xs">
-                    {error}
-                  </p>
+                  <p className="text-destructive text-sm font-bold">Failed to load PDF</p>
+                  <p className="text-muted-foreground max-w-[200px] text-xs">{error}</p>
                 </div>
               </div>
             )}

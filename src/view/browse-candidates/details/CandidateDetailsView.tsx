@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShareButton } from '@/components/shared/ShareButton';
 import {
   Award,
   BadgeCheck,
@@ -14,7 +15,6 @@ import {
   Mail,
   MapPin,
   MessageSquare,
-  Share2,
   Shield,
   User,
   Video,
@@ -23,19 +23,20 @@ import {
   Twitter,
   Facebook,
   ArrowUpRight,
-} from "lucide-react";
-import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { toast } from "sonner";
+} from 'lucide-react';
+
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import {
   useGetCandidateByIdQuery,
   useToggleSaveCandidateMutation,
-} from "../../../redux/feature/candidate/candidateApi";
-import { useCreateConversationMutation } from "../../../redux/feature/message/messageApi";
-import { useLogProfileViewMutation } from "../../../redux/feature/profileView/profileViewApi";
-import { useAppSelector } from "../../../redux/hooks";
-import CandidateDetailsSkeleton from "../../../skeleton/browse-candidates/details/CandidateDetailsSkeleton";
+} from '../../../redux/feature/candidate/candidateApi';
+import { useCreateConversationMutation } from '../../../redux/feature/message/messageApi';
+import { useLogProfileViewMutation } from '../../../redux/feature/profileView/profileViewApi';
+import { useAppSelector } from '../../../redux/hooks';
+import CandidateDetailsSkeleton from '../../../skeleton/browse-candidates/details/CandidateDetailsSkeleton';
 
 const CandidateDetailsView = () => {
   const params = useParams();
@@ -44,8 +45,7 @@ const CandidateDetailsView = () => {
   const router = useRouter();
 
   const [logProfileView] = useLogProfileViewMutation();
-  const [createConversation, { isLoading: isCreatingChat }] =
-    useCreateConversationMutation();
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
 
   useEffect(() => {
     if (candidateId && currentUser?.id !== candidateId) {
@@ -54,9 +54,9 @@ const CandidateDetailsView = () => {
   }, [candidateId, currentUser, logProfileView]);
 
   const isEmployer =
-    currentUser?.role === "EMPLOYER" ||
-    currentUser?.role === "ADMIN" ||
-    currentUser?.role === "SUPER_ADMIN";
+    currentUser?.role === 'EMPLOYER' ||
+    currentUser?.role === 'ADMIN' ||
+    currentUser?.role === 'SUPER_ADMIN';
 
   const {
     data: response,
@@ -66,42 +66,41 @@ const CandidateDetailsView = () => {
     skip: !candidateId,
   });
 
-  const [toggleSaveCandidate, { isLoading: isSaving }] =
-    useToggleSaveCandidateMutation();
+  const [toggleSaveCandidate, { isLoading: isSaving }] = useToggleSaveCandidateMutation();
 
   const handleSave = async () => {
     try {
-      toast.loading("Updating candidate status...", { id: "save_candidate" });
+      toast.loading('Updating candidate status...', { id: 'save_candidate' });
       const res = await toggleSaveCandidate(candidateId).unwrap();
       if (res.success) {
-        toast.success(res.message, { id: "save_candidate" });
+        toast.success(res.message, { id: 'save_candidate' });
       }
     } catch (err) {
-      toast.error("Failed to update status", { id: "save_candidate" });
+      toast.error('Failed to update status', { id: 'save_candidate' });
       console.error(err);
     }
   };
 
   const handleStartChat = async () => {
     if (!isEmployer) {
-      toast.error("Only employers can start a conversation");
+      toast.error('Only employers can start a conversation');
       return;
     }
 
     try {
-      toast.loading("Starting conversation...", { id: "create_chat" });
+      toast.loading('Starting conversation...', { id: 'create_chat' });
       const res = await createConversation({
         participantId: candidateId,
       }).unwrap();
 
       if (res.success) {
-        toast.success("Conversation started!", { id: "create_chat" });
+        toast.success('Conversation started!', { id: 'create_chat' });
         // Redirect to employer messages
-        router.push("/employer/messages");
+        router.push('/employer/messages');
       }
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to start conversation", {
-        id: "create_chat",
+      toast.error(err?.data?.message || 'Failed to start conversation', {
+        id: 'create_chat',
       });
       console.error(err);
     }
@@ -124,28 +123,28 @@ const CandidateDetailsView = () => {
 
   const initials = candidate.fullName
     ? candidate.fullName
-        .split(" ")
+        .split(' ')
         .filter(Boolean)
         .map((n: string) => n[0])
-        .join("")
+        .join('')
         .toUpperCase()
         .slice(0, 2)
-    : "C";
+    : 'C';
 
   const isPlaceholderAvatar =
     !profile.avatarUrl ||
-    profile.avatarUrl.includes("placeholder") ||
-    !profile.avatarUrl.startsWith("http");
+    profile.avatarUrl.includes('placeholder') ||
+    !profile.avatarUrl.startsWith('http');
 
-  const rawHeadline = profile.headline || "";
+  const rawHeadline = profile.headline || '';
   const displayHeadline =
-    !rawHeadline || rawHeadline.toUpperCase() === "JOB_SEEKER"
+    !rawHeadline || rawHeadline.toUpperCase() === 'JOB_SEEKER'
       ? profile.skills?.length
         ? `${profile.skills
             .map((s: any) => s.skillName)
             .slice(0, 2)
-            .join(" & ")} Specialist`
-        : "Verified Talent"
+            .join(' & ')} Specialist`
+        : 'Verified Talent'
       : rawHeadline;
 
   return (
@@ -155,7 +154,7 @@ const CandidateDetailsView = () => {
         <Image
           src={
             profile.coverUrl ||
-            "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
           }
           alt="Cover"
           fill
@@ -190,13 +189,9 @@ const CandidateDetailsView = () => {
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge className="bg-primary/10 text-primary border-none">
-                          {profile.preference?.jobType?.replace(/_/g, " ") ||
-                            "Full Time"}
+                          {profile.preference?.jobType?.replace(/_/g, ' ') || 'Full Time'}
                         </Badge>
-                        <Badge
-                          variant="secondary"
-                          className="bg-secondary/50 border-none"
-                        >
+                        <Badge variant="secondary" className="bg-secondary/50 border-none">
                           {profile.totalExperienceYears || 0} Years Exp
                         </Badge>
                       </div>
@@ -204,20 +199,15 @@ const CandidateDetailsView = () => {
                         {candidate.fullName}
                         <BadgeCheck className="h-6 w-6 shrink-0 fill-emerald-500/10 text-emerald-500" />
                       </h1>
-                      <p className="text-muted-foreground text-lg font-medium">
-                        {displayHeadline}
-                      </p>
+                      <p className="text-muted-foreground text-lg font-medium">{displayHeadline}</p>
                       <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
                         <div className="flex items-center gap-1.5">
                           <MapPin className="h-4 w-4" />
-                          <span>{profile.location || "Location not set"}</span>
+                          <span>{profile.location || 'Location not set'}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Calendar className="h-4 w-4" />
-                          <span>
-                            Member since{" "}
-                            {new Date(candidate.createdAt).getFullYear()}
-                          </span>
+                          <span>Member since {new Date(candidate.createdAt).getFullYear()}</span>
                         </div>
                       </div>
                     </div>
@@ -229,28 +219,28 @@ const CandidateDetailsView = () => {
                         size="icon"
                         className={`rounded-xl border-gray-200 transition-colors ${
                           candidate.isSaved
-                            ? "bg-primary/10 text-primary border-primary/20"
-                            : "hover:bg-primary/10 hover:text-primary"
+                            ? 'bg-primary/10 text-primary border-primary/20'
+                            : 'hover:bg-primary/10 hover:text-primary'
                         }`}
                         onClick={handleSave}
                         disabled={isSaving}
                       >
                         <Bookmark
                           className={`h-5 w-5 ${
-                            candidate.isSaved
-                              ? "fill-current"
-                              : "text-slate-400"
+                            candidate.isSaved ? 'fill-current' : 'text-slate-400'
                           }`}
                         />
                       </Button>
                     )}
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-xl border-gray-200"
-                    >
-                      <Share2 className="h-5 w-5 text-gray-400" />
-                    </Button>
+                    <ShareButton
+                      title={candidate?.name || ''}
+                      summary={
+                        candidate?.title
+                          ? `Check out the professional profile of ${candidate.name} (${candidate.title})`
+                          : `Check out the professional profile of ${candidate.name}`
+                      }
+                      hashtags={['WorklyJob', 'Candidate', 'Resume', 'Talent']}
+                    />
                   </div>
                 </div>
 
@@ -284,7 +274,7 @@ const CandidateDetailsView = () => {
               </CardHeader>
               <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                 <p className="text-foreground/80 leading-relaxed whitespace-pre-line">
-                  {profile.bio || "No biography provided."}
+                  {profile.bio || 'No biography provided.'}
                 </p>
               </CardContent>
             </Card>
@@ -329,9 +319,7 @@ const CandidateDetailsView = () => {
                         key={skill.id}
                         className="bg-primary/5 border-primary/10 flex items-center gap-2 rounded-xl border px-4 py-2"
                       >
-                        <span className="text-foreground font-semibold">
-                          {skill.skillName}
-                        </span>
+                        <span className="text-foreground font-semibold">{skill.skillName}</span>
                         <Badge variant="outline" className="text-[10px]">
                           {skill.experienceYears}y
                         </Badge>
@@ -359,21 +347,13 @@ const CandidateDetailsView = () => {
                       )}
                       <div className="bg-primary/5 border-primary/20 absolute top-1 left-0 h-6 w-6 rounded-full border-2" />
                       <div className="space-y-1">
-                        <h4 className="text-foreground text-lg font-bold">
-                          {exp.jobTitle}
-                        </h4>
-                        <p className="text-primary font-medium">
-                          {exp.company}
-                        </p>
+                        <h4 className="text-foreground text-lg font-bold">{exp.jobTitle}</h4>
+                        <p className="text-primary font-medium">{exp.company}</p>
                         <p className="text-muted-foreground text-xs">
-                          {new Date(exp.startDate).toLocaleDateString()} -{" "}
-                          {exp.current
-                            ? "Present"
-                            : new Date(exp.endDate).toLocaleDateString()}
+                          {new Date(exp.startDate).toLocaleDateString()} -{' '}
+                          {exp.current ? 'Present' : new Date(exp.endDate).toLocaleDateString()}
                         </p>
-                        <p className="text-foreground/70 mt-2 text-sm">
-                          {exp.description}
-                        </p>
+                        <p className="text-foreground/70 mt-2 text-sm">{exp.description}</p>
                       </div>
                     </div>
                   ))}
@@ -397,20 +377,11 @@ const CandidateDetailsView = () => {
                         <GraduationCap className="text-primary h-6 w-6" />
                       </div>
                       <div className="space-y-1">
-                        <h4 className="text-foreground text-lg font-bold">
-                          {edu.degree}
-                        </h4>
-                        <p className="text-foreground/80 font-medium">
-                          {edu.institution}
-                        </p>
+                        <h4 className="text-foreground text-lg font-bold">{edu.degree}</h4>
+                        <p className="text-foreground/80 font-medium">{edu.institution}</p>
                         <p className="text-muted-foreground text-xs">
-                          {edu.startDate
-                            ? new Date(edu.startDate).getFullYear()
-                            : ""}{" "}
-                          -{" "}
-                          {edu.endDate
-                            ? new Date(edu.endDate).getFullYear()
-                            : "Present"}
+                          {edu.startDate ? new Date(edu.startDate).getFullYear() : ''} -{' '}
+                          {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
                         </p>
                       </div>
                     </div>
@@ -424,9 +395,7 @@ const CandidateDetailsView = () => {
           <div className="space-y-6">
             <Card className="bg-background/50 border backdrop-blur-sm">
               <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-base tracking-wider uppercase">
-                  Candidate Info
-                </CardTitle>
+                <CardTitle className="text-base tracking-wider uppercase">Candidate Info</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
                 <div className="flex justify-between text-sm">
@@ -437,9 +406,7 @@ const CandidateDetailsView = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Location</span>
-                  <span className="text-foreground font-bold">
-                    {profile.location || "N/A"}
-                  </span>
+                  <span className="text-foreground font-bold">{profile.location || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Experience</span>
@@ -450,7 +417,7 @@ const CandidateDetailsView = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Industry</span>
                   <span className="text-foreground font-bold">
-                    {profile.preference?.industry || "General"}
+                    {profile.preference?.industry || 'General'}
                   </span>
                 </div>
               </CardContent>
@@ -458,9 +425,7 @@ const CandidateDetailsView = () => {
 
             <Card className="bg-background/50 border backdrop-blur-sm">
               <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-base tracking-wider uppercase">
-                  Links
-                </CardTitle>
+                <CardTitle className="text-base tracking-wider uppercase">Links</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-3 p-4 pt-0 sm:grid-cols-2 sm:p-6 sm:pt-0 md:grid-cols-3 lg:grid-cols-1">
                 {profile.linkedInUrl && (
@@ -586,8 +551,8 @@ const CandidateDetailsView = () => {
                 <Award className="text-primary mx-auto h-12 w-12 opacity-20" />
                 <h3 className="text-lg font-bold">Workly Verified</h3>
                 <p className="text-muted-foreground text-xs">
-                  This candidate has a verified profile and is actively looking
-                  for new opportunities.
+                  This candidate has a verified profile and is actively looking for new
+                  opportunities.
                 </p>
                 <Button
                   onClick={handleStartChat}
