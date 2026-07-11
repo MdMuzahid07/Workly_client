@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import FeaturedJobsSlider from "../../../components/main/jobs/FeaturedJobsSlider";
-import Industries from "../../../components/main/jobs/Industries";
-import JobCard from "../../../components/main/jobs/JobCard";
-import Searchbar from "../../../components/main/jobs/Searchbar";
-import Sidebar from "../../../components/main/jobs/Sidebar";
-import SidebarFilter from "../../../components/main/jobs/filter/SidebarFilter";
-import PageHero from "../../../components/shared/PageHero";
-import ViewToggle from "../../../components/shared/ViewToggle";
-import { useGetCategoriesQuery } from "../../../redux/feature/category/categoryApi";
-import { useGetJobsQuery } from "../../../redux/feature/job/jobApi";
-import JobCardSkeleton from "../../../skeleton/job/browse/JobCardSkeleton";
+'use client';
+import { motion } from 'motion/react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import FeaturedJobsSlider from '../../../components/main/jobs/FeaturedJobsSlider';
+import Industries from '../../../components/main/jobs/Industries';
+import JobCard from '../../../components/main/jobs/JobCard';
+import Searchbar from '../../../components/main/jobs/Searchbar';
+import Sidebar from '../../../components/main/jobs/Sidebar';
+import SidebarFilter from '../../../components/main/jobs/filter/SidebarFilter';
+import PageHero from '../../../components/shared/PageHero';
+import ViewToggle from '../../../components/shared/ViewToggle';
+import { useGetCategoriesQuery } from '../../../redux/feature/category/categoryApi';
+import { useGetJobsQuery } from '../../../redux/feature/job/jobApi';
+import JobCardSkeleton from '../../../skeleton/job/browse/JobCardSkeleton';
 
 type Filters = {
   search: string;
@@ -28,44 +29,43 @@ type Filters = {
 };
 
 const DEFAULT_FILTERS: Filters = {
-  search: "",
-  location: "",
+  search: '',
+  location: '',
   budgetRange: [0, 10000],
-  jobType: "",
-  experienceLevel: "",
+  jobType: '',
+  experienceLevel: '',
   skills: [],
-  postedWithin: "",
+  postedWithin: '',
   isRemote: undefined,
   categories: [],
 };
 
 const CATEGORY_MAP: Record<number, string> = {
-  1: "Software Development",
-  2: "Healthcare",
-  3: "Finance",
-  4: "Marketing",
-  5: "Design",
-  6: "Sales",
-  7: "Education",
-  8: "Remote",
+  1: 'Software Development',
+  2: 'Healthcare',
+  3: 'Finance',
+  4: 'Marketing',
+  5: 'Design',
+  6: 'Sales',
+  7: 'Education',
+  8: 'Remote',
 };
 
 const JobView = () => {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [allJobs, setAllJobs] = useState<any[]>([]);
-  const [viewType, setViewType] = useState<"grid" | "list">("list");
+  const [viewType, setViewType] = useState<'grid' | 'list'>('list');
 
   const searchParams = useSearchParams();
 
-  const { data: categories, isLoading: categoriesLoading } =
-    useGetCategoriesQuery(undefined);
+  const { data: categories, isLoading: categoriesLoading } = useGetCategoriesQuery(undefined);
 
   useEffect(() => {
-    const search = searchParams.get("search") || "";
-    const location = searchParams.get("location") || "";
-    const category = searchParams.get("category") || "";
-    const industry = searchParams.get("industry") || "";
+    const search = searchParams.get('search') || '';
+    const location = searchParams.get('location') || '';
+    const category = searchParams.get('category') || '';
+    const industry = searchParams.get('industry') || '';
 
     if (search || location || category || industry) {
       setFilters((prev) => {
@@ -85,9 +85,7 @@ const JobView = () => {
           } else {
             // Fallback to static mapping if not found in backend categories
             const catId = Object.keys(CATEGORY_MAP).find(
-              (key) =>
-                CATEGORY_MAP[Number(key)].toLowerCase() ===
-                targetCategoryName.toLowerCase(),
+              (key) => CATEGORY_MAP[Number(key)].toLowerCase() === targetCategoryName.toLowerCase(),
             );
             if (catId) {
               updated.categories = [Number(catId)];
@@ -105,8 +103,8 @@ const JobView = () => {
     const p: any = {
       page: currentPage,
       limit: 12, // Increased limit for grid
-      sortBy: "createdAt",
-      sortOrder: "desc",
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     };
 
     if (filters.search) p.search = filters.search;
@@ -115,15 +113,13 @@ const JobView = () => {
     if (filters.experienceLevel) p.experienceLevel = filters.experienceLevel;
     if (filters.postedWithin) p.postedWithin = filters.postedWithin;
     if (filters.isRemote !== undefined) p.isRemote = filters.isRemote;
-    if (filters.skills.length > 0) p.skills = filters.skills.join(",");
+    if (filters.skills.length > 0) p.skills = filters.skills.join(',');
 
     if (filters.categories && filters.categories.length > 0) {
       const industries = filters.categories
         .map((catId) => {
           // Look up matched category in loaded backend categories first
-          const matched = categories?.data?.find(
-            (c: any) => String(c.id) === String(catId),
-          );
+          const matched = categories?.data?.find((c: any) => String(c.id) === String(catId));
           if (matched) return matched.name;
 
           // Fallback to static mapping
@@ -131,7 +127,7 @@ const JobView = () => {
         })
         .filter(Boolean);
       if (industries.length > 0) {
-        p.industry = industries.join(",");
+        p.industry = industries.join(',');
       }
     }
 
@@ -147,8 +143,8 @@ const JobView = () => {
   const { data: featuredData, isLoading: featuredLoading } = useGetJobsQuery({
     isFeatured: true,
     limit: 6,
-    sortBy: "createdAt",
-    sortOrder: "desc",
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
 
   const featuredJobs = useMemo(() => {
@@ -163,8 +159,7 @@ const JobView = () => {
         setAllJobs((prev) => {
           const combined = [...prev, ...data.data];
           return combined.filter(
-            (job, index, self) =>
-              self.findIndex((j) => j.id === job.id) === index,
+            (job, index, self) => self.findIndex((j) => j.id === job.id) === index,
           );
         });
       }
@@ -207,7 +202,7 @@ const JobView = () => {
       {/* Hero Section */}
       <PageHero
         title="Find Your Next Job"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Find Jobs" }]}
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Find Jobs' }]}
         backgroundImage="https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
       />
 
@@ -258,10 +253,7 @@ const JobView = () => {
             {/* Sidebar - only show on desktop */}
             <div className="col-span-12 lg:col-span-4 xl:col-span-3">
               <div className="sticky top-24 hidden lg:block">
-                <SidebarFilter
-                  onFiltersChange={handleFiltersChange}
-                  className="w-full"
-                />
+                <SidebarFilter onFiltersChange={handleFiltersChange} className="w-full" />
               </div>
             </div>
 
@@ -274,9 +266,9 @@ const JobView = () => {
                 loader={
                   <div
                     className={
-                      viewType === "grid"
-                        ? "grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5 xl:grid-cols-3"
-                        : "flex flex-col gap-3 sm:gap-3.5 lg:gap-4"
+                      viewType === 'grid'
+                        ? 'grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5 xl:grid-cols-3'
+                        : 'flex flex-col gap-3 sm:gap-3.5 lg:gap-4'
                     }
                   >
                     {[...Array(3)].map((_, i) => (
@@ -286,22 +278,20 @@ const JobView = () => {
                 }
                 endMessage={
                   <p className="text-muted-foreground py-8 text-center font-medium italic">
-                    {allJobs.length > 0
-                      ? "You've reached the end of the list"
-                      : ""}
+                    {allJobs.length > 0 ? "You've reached the end of the list" : ''}
                   </p>
                 }
               >
                 <div
                   className={
-                    viewType === "grid"
-                      ? "grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5 xl:grid-cols-3"
-                      : "flex flex-col gap-3 sm:gap-3.5 lg:gap-4"
+                    viewType === 'grid'
+                      ? 'grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-5 xl:grid-cols-3'
+                      : 'flex flex-col gap-3 sm:gap-3.5 lg:gap-4'
                   }
                 >
                   {isLoading &&
                     currentPage === 1 &&
-                    [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
+                    [...Array(viewType === 'grid' ? 12 : 6)].map((_, index) => (
                       <JobCardSkeleton key={index} />
                     ))}
 
@@ -312,16 +302,28 @@ const JobView = () => {
                   )}
 
                   {allJobs.length === 0 && !isLoading && !error && (
-                    <div className="py-20 text-center font-medium opacity-50">
-                      No jobs found.
-                    </div>
+                    <div className="py-20 text-center font-medium opacity-50">No jobs found.</div>
                   )}
 
-                  {allJobs.map((job: any) => (
-                    <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
-                      <JobCard job={job} viewType={viewType} />
-                    </Suspense>
-                  ))}
+                  {allJobs.map((job: any, index: number) => {
+                    const delay = viewType === 'grid' ? (index % 3) * 0.06 : 0;
+                    return (
+                      <Suspense key={job?.id} fallback={<JobCardSkeleton />}>
+                        <motion.div
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          whileInView={{ scale: 1, opacity: 1 }}
+                          viewport={{ once: false, margin: '0px 0px -100px 0px', amount: 0.05 }}
+                          transition={{
+                            duration: 0.45,
+                            delay,
+                            ease: [0.16, 1, 0.3, 1], // Custom premium ease-out
+                          }}
+                        >
+                          <JobCard job={job} viewType={viewType} />
+                        </motion.div>
+                      </Suspense>
+                    );
+                  })}
                 </div>
               </InfiniteScroll>
             </div>

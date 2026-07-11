@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+'use client';
+import { motion } from 'motion/react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -13,23 +14,23 @@ import {
   MapPin,
   Star,
   Users,
-} from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import "swiper/css";
-import "swiper/css/navigation";
-import { Autoplay, Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import CandidateCard from "../../../components/main/candidates/CandidateCard";
-import CandidateSidebarFilter from "../../../components/main/candidates/filter/CandidateSidebarFilter";
-import CandidateMobileSidebar from "../../../components/main/candidates/filter/CandidateMobileSidebar";
-import Searchbar from "../../../components/main/jobs/Searchbar";
-import PageHero from "../../../components/shared/PageHero";
-import ViewToggle from "../../../components/shared/ViewToggle";
-import { useGetCandidatesQuery } from "../../../redux/feature/candidate/candidateApi";
-import CandidateCardSkeleton from "../../../skeleton/browse-candidates/browse/CandidateCardSkeleton";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Autoplay, Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import CandidateCard from '../../../components/main/candidates/CandidateCard';
+import CandidateSidebarFilter from '../../../components/main/candidates/filter/CandidateSidebarFilter';
+import CandidateMobileSidebar from '../../../components/main/candidates/filter/CandidateMobileSidebar';
+import Searchbar from '../../../components/main/jobs/Searchbar';
+import PageHero from '../../../components/shared/PageHero';
+import ViewToggle from '../../../components/shared/ViewToggle';
+import { useGetCandidatesQuery } from '../../../redux/feature/candidate/candidateApi';
+import CandidateCardSkeleton from '../../../skeleton/browse-candidates/browse/CandidateCardSkeleton';
 
 type Filters = {
   search: string;
@@ -40,10 +41,10 @@ type Filters = {
 };
 
 const DEFAULT_FILTERS: Filters = {
-  search: "",
-  location: "",
+  search: '',
+  location: '',
   experienceRange: [0, 30],
-  industry: "",
+  industry: '',
   skills: [],
 };
 
@@ -105,14 +106,14 @@ const BrowseCandidatesView = () => {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [allCandidates, setAllCandidates] = useState<any[]>([]);
-  const [viewType, setViewType] = useState<"grid" | "list">("list");
+  const [viewType, setViewType] = useState<'grid' | 'list'>('list');
 
   const params = useMemo(() => {
     const p: any = {
       page: currentPage,
       limit: 12,
-      sortBy: "fullName",
-      sortOrder: "desc",
+      sortBy: 'fullName',
+      sortOrder: 'desc',
     };
 
     if (filters.search) p.search = filters.search;
@@ -125,7 +126,7 @@ const BrowseCandidatesView = () => {
       p.minExperience = filters.experienceRange[0];
       p.maxExperience = filters.experienceRange[1];
     }
-    if (filters.skills.length > 0) p.skills = filters.skills.join(",");
+    if (filters.skills.length > 0) p.skills = filters.skills.join(',');
 
     return p;
   }, [filters, currentPage]);
@@ -135,12 +136,11 @@ const BrowseCandidatesView = () => {
   const { data, isLoading, error } = useGetCandidatesQuery(params);
 
   // Fetch featured / top candidates
-  const { data: featuredData, isLoading: featuredLoading } =
-    useGetCandidatesQuery({
-      limit: 6,
-      sortBy: "fullName",
-      sortOrder: "desc",
-    });
+  const { data: featuredData, isLoading: featuredLoading } = useGetCandidatesQuery({
+    limit: 6,
+    sortBy: 'fullName',
+    sortOrder: 'desc',
+  });
 
   const featuredCandidates = useMemo(() => {
     const list = featuredData?.data || [];
@@ -148,41 +148,41 @@ const BrowseCandidatesView = () => {
     return allCandidates.slice(0, 6);
   }, [featuredData, allCandidates]);
 
-  console.log("Candidates Data:", data);
+  console.log('Candidates Data:', data);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderFeaturedCard = (candidate: any, index?: number) => {
     const initials = candidate.fullName
       ? candidate.fullName
-          .split(" ")
+          .split(' ')
           .filter(Boolean)
           .map((n: string) => n[0])
-          .join("")
+          .join('')
           .toUpperCase()
           .slice(0, 2)
-      : "C";
+      : 'C';
 
     const isPlaceholderAvatar =
       !candidate.profile?.avatarUrl ||
-      candidate.profile.avatarUrl.includes("placeholder") ||
-      !candidate.profile.avatarUrl.startsWith("http");
+      candidate.profile.avatarUrl.includes('placeholder') ||
+      !candidate.profile.avatarUrl.startsWith('http');
 
-    const rawHeadline = candidate.profile?.headline || "";
+    const rawHeadline = candidate.profile?.headline || '';
     const displayHeadline =
-      !rawHeadline || rawHeadline.toUpperCase() === "JOB_SEEKER"
+      !rawHeadline || rawHeadline.toUpperCase() === 'JOB_SEEKER'
         ? candidate.profile?.skills?.length
           ? `${candidate.profile.skills
               .map((s: any) => s.skillName)
               .slice(0, 2)
-              .join(" & ")} Specialist`
-          : "Verified Talent"
+              .join(' & ')} Specialist`
+          : 'Verified Talent'
         : rawHeadline;
 
     const experienceText =
       candidate.profile?.totalExperienceYears !== undefined &&
       candidate.profile.totalExperienceYears > 0
         ? `${candidate.profile.totalExperienceYears} Yrs Exp`
-        : "Entry-level Talent";
+        : 'Entry-level Talent';
 
     return (
       <Card
@@ -234,7 +234,7 @@ const BrowseCandidatesView = () => {
           <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-semibold sm:text-xs">
             <span className="flex items-center gap-1">
               <MapPin className="text-primary/60 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              {candidate.profile?.location || "Not specified"}
+              {candidate.profile?.location || 'Not specified'}
             </span>
             <span className="text-muted-foreground/30">•</span>
             <span className="flex items-center gap-1">
@@ -245,7 +245,7 @@ const BrowseCandidatesView = () => {
               <>
                 <span className="text-muted-foreground/30">•</span>
                 <span className="text-primary font-bold">
-                  {candidate.profile.preference.jobType.replace("_", " ")}
+                  {candidate.profile.preference.jobType.replace('_', ' ')}
                 </span>
               </>
             )}
@@ -253,17 +253,15 @@ const BrowseCandidatesView = () => {
 
           {/* Skills Badges */}
           <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-2">
-            {(candidate.profile?.skills?.slice(0, 3) || []).map(
-              (skill: any) => (
-                <Badge
-                  key={skill.id}
-                  variant="secondary"
-                  className="bg-primary/5 text-primary/95 border-primary/10 rounded-lg border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase transition-colors sm:px-2.5 sm:py-1 sm:text-[10px]"
-                >
-                  {skill.skillName}
-                </Badge>
-              ),
-            )}
+            {(candidate.profile?.skills?.slice(0, 3) || []).map((skill: any) => (
+              <Badge
+                key={skill.id}
+                variant="secondary"
+                className="bg-primary/5 text-primary/95 border-primary/10 rounded-lg border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase transition-colors sm:px-2.5 sm:py-1 sm:text-[10px]"
+              >
+                {skill.skillName}
+              </Badge>
+            ))}
             {!candidate.profile?.skills?.length && (
               <span className="text-muted-foreground text-[9px] sm:text-[10px]">
                 No skills listed
@@ -283,8 +281,7 @@ const BrowseCandidatesView = () => {
         setAllCandidates((prev) => {
           const combined = [...prev, ...data.data];
           return combined.filter(
-            (candidate, index, self) =>
-              self.findIndex((c) => c.id === candidate.id) === index,
+            (candidate, index, self) => self.findIndex((c) => c.id === candidate.id) === index,
           );
         });
       }
@@ -317,10 +314,7 @@ const BrowseCandidatesView = () => {
     <div className="bg-background min-h-screen">
       <PageHero
         title="Discover Top Talent"
-        breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Browse Candidates" },
-        ]}
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Browse Candidates' }]}
         backgroundImage="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400&auto=format&fit=crop"
       />
 
@@ -333,8 +327,8 @@ const BrowseCandidatesView = () => {
             hidePadding
             buttonLabel="Find Talent"
             placeholder={{
-              search: "Candidate Name, Skills, or Keywords",
-              location: "City, State or ZIP",
+              search: 'Candidate Name, Skills, or Keywords',
+              location: 'City, State or ZIP',
             }}
           />
         </div>
@@ -387,8 +381,8 @@ const BrowseCandidatesView = () => {
                   pauseOnMouseEnter: true,
                 }}
                 navigation={{
-                  nextEl: ".featured-candidates-next",
-                  prevEl: ".featured-candidates-prev",
+                  nextEl: '.featured-candidates-next',
+                  prevEl: '.featured-candidates-prev',
                 }}
                 breakpoints={{
                   640: { slidesPerView: 2, spaceBetween: 20 },
@@ -436,10 +430,7 @@ const BrowseCandidatesView = () => {
             {/* Sidebar - only show on desktop */}
             <div className="col-span-12 lg:col-span-4 xl:col-span-3">
               <div className="sticky top-24 hidden lg:block">
-                <CandidateSidebarFilter
-                  onFiltersChange={handleFiltersChange}
-                  className="w-full"
-                />
+                <CandidateSidebarFilter onFiltersChange={handleFiltersChange} className="w-full" />
               </div>
             </div>
 
@@ -452,37 +443,32 @@ const BrowseCandidatesView = () => {
                 loader={
                   <div
                     className={
-                      viewType === "grid"
-                        ? "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
-                        : "flex flex-col gap-5"
+                      viewType === 'grid'
+                        ? 'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'
+                        : 'flex flex-col gap-5'
                     }
                   >
                     {[...Array(3)].map((_, i) => (
-                      <CandidateCardSkeleton
-                        key={`loader-${i}`}
-                        viewType={viewType}
-                      />
+                      <CandidateCardSkeleton key={`loader-${i}`} viewType={viewType} />
                     ))}
                   </div>
                 }
                 endMessage={
                   <p className="text-muted-foreground py-8 text-center font-medium italic">
-                    {allCandidates.length > 0
-                      ? "You've reached the end of the list"
-                      : ""}
+                    {allCandidates.length > 0 ? "You've reached the end of the list" : ''}
                   </p>
                 }
               >
                 <div
                   className={
-                    viewType === "grid"
-                      ? "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
-                      : "flex flex-col gap-5"
+                    viewType === 'grid'
+                      ? 'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'
+                      : 'flex flex-col gap-5'
                   }
                 >
                   {isLoading &&
                     currentPage === 1 &&
-                    [...Array(viewType === "grid" ? 12 : 6)].map((_, index) => (
+                    [...Array(viewType === 'grid' ? 12 : 6)].map((_, index) => (
                       <CandidateCardSkeleton key={index} viewType={viewType} />
                     ))}
 
@@ -498,17 +484,28 @@ const BrowseCandidatesView = () => {
                     </div>
                   )}
 
-                  {allCandidates.map((candidate: any) => (
-                    <Suspense
-                      key={candidate?.id}
-                      fallback={<CandidateCardSkeleton viewType={viewType} />}
-                    >
-                      <CandidateCard
-                        candidate={candidate}
-                        viewType={viewType}
-                      />
-                    </Suspense>
-                  ))}
+                  {allCandidates.map((candidate: any, index: number) => {
+                    const delay = viewType === 'grid' ? (index % 3) * 0.06 : 0;
+                    return (
+                      <Suspense
+                        key={candidate?.id}
+                        fallback={<CandidateCardSkeleton viewType={viewType} />}
+                      >
+                        <motion.div
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          whileInView={{ scale: 1, opacity: 1 }}
+                          viewport={{ once: false, margin: '0px 0px -100px 0px', amount: 0.05 }}
+                          transition={{
+                            duration: 0.45,
+                            delay,
+                            ease: [0.16, 1, 0.3, 1],
+                          }}
+                        >
+                          <CandidateCard candidate={candidate} viewType={viewType} />
+                        </motion.div>
+                      </Suspense>
+                    );
+                  })}
                 </div>
               </InfiniteScroll>
             </div>

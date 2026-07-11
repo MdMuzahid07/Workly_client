@@ -12,7 +12,6 @@ import {
   PlusCircle,
   Radio,
   Search,
-  Sparkles,
   Star,
   TrendingUp,
   Upload,
@@ -302,7 +301,10 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   className="space-y-3"
                 >
                   <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase">
-                    <Sparkles className="h-3 w-3" />
+                    {(() => {
+                      const Icon = activeSlide.badgeIcon;
+                      return <Icon className="h-3 w-3" />;
+                    })()}
                     <span>Explore {activeSlide.badgeText}</span>
                   </div>
 
