@@ -1,4 +1,4 @@
-export type AdminJobStatus = "ACTIVE" | "CLOSED" | "EXPIRED" | "DRAFT";
+export type AdminJobStatus = 'ACTIVE' | 'CLOSED' | 'EXPIRED' | 'DRAFT';
 
 export interface AdminJobRow {
   id: string;
@@ -13,6 +13,7 @@ export interface AdminJobRow {
   views: number;
   applications: number;
   status: AdminJobStatus;
+  isFeatured?: boolean;
   description?: string;
   postedBy?: {
     fullName: string;

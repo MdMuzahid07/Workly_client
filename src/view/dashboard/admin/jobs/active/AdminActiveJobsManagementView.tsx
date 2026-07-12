@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +12,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import AdminJobsSkeleton from "@/skeleton/dashboard/admin/AdminJobsSkeleton";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import AdminJobsSkeleton from '@/skeleton/dashboard/admin/AdminJobsSkeleton';
 import {
   Table,
   TableBody,
@@ -22,15 +22,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import PaginationBar from "@/components/shared/PaginationBar";
+} from '@/components/ui/table';
+import PaginationBar from '@/components/shared/PaginationBar';
 import {
   useGetActiveJobsAdminQuery,
   useGetActiveJobsStatsQuery,
   useDeactivateJobMutation,
   useDeleteJobListingMutation,
-} from "@/redux/feature/admin/adminApi";
-import { formatDistanceToNow } from "date-fns";
+  useToggleJobFeaturedMutation,
+} from '@/redux/feature/admin/adminApi';
+import { formatDistanceToNow } from 'date-fns';
 import {
   AlertTriangle,
   Briefcase,
@@ -47,16 +48,17 @@ import {
   Trash2,
   TrendingUp,
   X,
-} from "lucide-react";
-import debounce from "debounce";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-import DashboardAdminActiveJobsHeader from "../../../../../components/dashboard/dashboard-nav/header/DashboardAdminActiveJobsHeader";
+  Star,
+} from 'lucide-react';
+import debounce from 'debounce';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import DashboardAdminActiveJobsHeader from '../../../../../components/dashboard/dashboard-nav/header/DashboardAdminActiveJobsHeader';
 
 const AdminActiveJobsManagementView = () => {
   // Separate UI search value (immediate) from debounced search term (sent to backend)
-  const [searchValue, setSearchValue] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchValue, setSearchValue] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
@@ -102,6 +104,7 @@ const AdminActiveJobsManagementView = () => {
 
   const [deactivateJob] = useDeactivateJobMutation();
   const [deleteJobListing] = useDeleteJobListingMutation();
+  const [toggleFeatured] = useToggleJobFeaturedMutation();
 
   const jobs = jobsData?.data || [];
   const rawMeta = jobsData?.meta as any;
@@ -120,45 +123,45 @@ const AdminActiveJobsManagementView = () => {
 
   const stats = [
     {
-      label: "Total Active Jobs",
-      value: statsValues?.totalActiveJobs?.toLocaleString() || "0",
+      label: 'Total Active Jobs',
+      value: statsValues?.totalActiveJobs?.toLocaleString() || '0',
       icon: Briefcase,
-      color: "text-primary",
+      color: 'text-primary',
     },
     {
-      label: "New Today",
-      value: statsValues?.newToday?.toLocaleString() || "0",
+      label: 'New Today',
+      value: statsValues?.newToday?.toLocaleString() || '0',
       icon: TrendingUp,
-      color: "text-emerald-500",
+      color: 'text-emerald-500',
     },
     {
-      label: "Total Applications",
-      value: statsValues?.totalApplications?.toLocaleString() || "0",
+      label: 'Total Applications',
+      value: statsValues?.totalApplications?.toLocaleString() || '0',
       icon: Globe,
-      color: "text-blue-500",
+      color: 'text-blue-500',
     },
     {
-      label: "Expiring Soon",
-      value: statsValues?.expiringSoon?.toLocaleString() || "0",
+      label: 'Expiring Soon',
+      value: statsValues?.expiringSoon?.toLocaleString() || '0',
       icon: Clock,
-      color: "text-amber-500",
+      color: 'text-amber-500',
     },
   ];
 
   const typeOptions = [
-    { label: "Full Time", value: "FULL_TIME" },
-    { label: "Part Time", value: "PART_TIME" },
-    { label: "Contract", value: "CONTRACT" },
-    { label: "Freelance", value: "FREELANCE" },
-    { label: "Internship", value: "INTERNSHIP" },
-    { label: "Remote", value: "REMOTE" },
+    { label: 'Full Time', value: 'FULL_TIME' },
+    { label: 'Part Time', value: 'PART_TIME' },
+    { label: 'Contract', value: 'CONTRACT' },
+    { label: 'Freelance', value: 'FREELANCE' },
+    { label: 'Internship', value: 'INTERNSHIP' },
+    { label: 'Remote', value: 'REMOTE' },
   ];
 
-  const hasActiveFilters = searchValue !== "" || selectedType !== null;
+  const hasActiveFilters = searchValue !== '' || selectedType !== null;
 
   const handleClearFilters = () => {
-    setSearchValue("");
-    setSearchTerm("");
+    setSearchValue('');
+    setSearchTerm('');
     setSelectedType(null);
     setPage(1);
   };
@@ -168,7 +171,7 @@ const AdminActiveJobsManagementView = () => {
       await deactivateJob(jobId).unwrap();
       toast.success(`"${title}" has been deactivated`);
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to deactivate job");
+      toast.error(err?.data?.message || 'Failed to deactivate job');
     }
   };
 
@@ -177,7 +180,20 @@ const AdminActiveJobsManagementView = () => {
       await deleteJobListing(jobId).unwrap();
       toast.success(`"${title}" has been deleted`);
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to delete job listing");
+      toast.error(err?.data?.message || 'Failed to delete job listing');
+    }
+  };
+
+  const handleToggleFeatured = async (jobId: string, currentFeatured: boolean) => {
+    try {
+      await toggleFeatured({ jobId, isFeatured: !currentFeatured }).unwrap();
+      toast.success(
+        currentFeatured
+          ? 'Job listing removed from featured opportunities'
+          : 'Job listing added to featured opportunities',
+      );
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to update job featured status');
     }
   };
 
@@ -187,8 +203,7 @@ const AdminActiveJobsManagementView = () => {
 
   if (statsError || jobsError) {
     const error = (statsError || jobsError) as any;
-    const errorMessage =
-      error?.data?.message || error?.message || "An unexpected error occurred";
+    const errorMessage = error?.data?.message || error?.message || 'An unexpected error occurred';
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -219,9 +234,7 @@ const AdminActiveJobsManagementView = () => {
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  {stat.value}
-                </div>
+                <div className="text-2xl font-bold tracking-tight sm:text-3xl">{stat.value}</div>
               </CardContent>
             </Card>
           ))}
@@ -242,8 +255,8 @@ const AdminActiveJobsManagementView = () => {
             {searchValue && (
               <button
                 onClick={() => {
-                  setSearchValue("");
-                  setSearchTerm("");
+                  setSearchValue('');
+                  setSearchTerm('');
                   setPage(1);
                 }}
                 className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
@@ -263,15 +276,12 @@ const AdminActiveJobsManagementView = () => {
                   <Filter className="h-4 w-4" />
                   {selectedType
                     ? typeOptions.find((t) => t.value === selectedType)?.label
-                    : "Job Type"}
+                    : 'Job Type'}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  onClick={() => handleTypeChange(null)}
-                  className="cursor-pointer"
-                >
+                <DropdownMenuItem onClick={() => handleTypeChange(null)} className="cursor-pointer">
                   All Types
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -306,32 +316,24 @@ const AdminActiveJobsManagementView = () => {
             <div className="border-b px-6 py-3">
               <p className="text-muted-foreground text-xs font-medium">
                 {isFetching ? (
-                  "Loading..."
+                  'Loading...'
                 ) : (
                   <>
-                    Showing{" "}
+                    Showing{' '}
                     <span className="text-foreground font-bold">
                       {Math.min(
                         (paginationMeta.page - 1) * paginationMeta.limit + 1,
                         paginationMeta.total,
                       )}
-                    </span>{" "}
-                    –{" "}
+                    </span>{' '}
+                    –{' '}
                     <span className="text-foreground font-bold">
-                      {Math.min(
-                        paginationMeta.page * paginationMeta.limit,
-                        paginationMeta.total,
-                      )}
-                    </span>{" "}
-                    of{" "}
-                    <span className="text-foreground font-bold">
-                      {paginationMeta.total}
-                    </span>{" "}
+                      {Math.min(paginationMeta.page * paginationMeta.limit, paginationMeta.total)}
+                    </span>{' '}
+                    of <span className="text-foreground font-bold">{paginationMeta.total}</span>{' '}
                     jobs
                     {hasActiveFilters && (
-                      <span className="text-primary ml-1 font-semibold">
-                        (filtered)
-                      </span>
+                      <span className="text-primary ml-1 font-semibold">(filtered)</span>
                     )}
                   </>
                 )}
@@ -367,13 +369,11 @@ const AdminActiveJobsManagementView = () => {
                         <div className="bg-muted mb-4 rounded-full p-4">
                           <AlertTriangle className="text-muted-foreground h-8 w-8" />
                         </div>
-                        <h3 className="text-lg font-bold">
-                          No job listings found
-                        </h3>
+                        <h3 className="text-lg font-bold">No job listings found</h3>
                         <p className="text-muted-foreground mx-auto mt-2 max-w-xs">
                           {hasActiveFilters
-                            ? "No results match your current filters. Try broadening your search."
-                            : "There are currently no active job listings."}
+                            ? 'No results match your current filters. Try broadening your search.'
+                            : 'There are currently no active job listings.'}
                         </p>
                         {hasActiveFilters && (
                           <Button
@@ -389,10 +389,7 @@ const AdminActiveJobsManagementView = () => {
                   </TableRow>
                 ) : (
                   jobs.map((job) => (
-                    <TableRow
-                      key={job.id}
-                      className="group hover:bg-muted/40 transition-colors"
-                    >
+                    <TableRow key={job.id} className="group hover:bg-muted/40 transition-colors">
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
@@ -402,7 +399,12 @@ const AdminActiveJobsManagementView = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="truncate font-bold">{job.title}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="truncate font-bold">{job.title}</p>
+                              {job.isFeatured && (
+                                <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
+                              )}
+                            </div>
                             <div className="text-muted-foreground flex items-center gap-1 text-xs outline-none">
                               <Building2 className="h-3 w-3" />
                               <span className="truncate">{job.company}</span>
@@ -417,7 +419,7 @@ const AdminActiveJobsManagementView = () => {
                             variant="secondary"
                             className="bg-primary/10 text-primary border-none text-[10px] font-bold"
                           >
-                            {job.type.replace("_", " ")}
+                            {job.type.replace('_', ' ')}
                           </Badge>
                         </div>
                       </TableCell>
@@ -431,17 +433,11 @@ const AdminActiveJobsManagementView = () => {
                         <div className="flex items-center gap-4">
                           <div className="text-center">
                             <p className="text-xs font-bold">{job.views}</p>
-                            <p className="text-muted-foreground text-[10px]">
-                              Views
-                            </p>
+                            <p className="text-muted-foreground text-[10px]">Views</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-primary text-xs font-bold">
-                              {job.applications}
-                            </p>
-                            <p className="text-muted-foreground text-[10px]">
-                              Applies
-                            </p>
+                            <p className="text-primary text-xs font-bold">{job.applications}</p>
+                            <p className="text-muted-foreground text-[10px]">Applies</p>
                           </div>
                         </div>
                       </TableCell>
@@ -450,7 +446,7 @@ const AdminActiveJobsManagementView = () => {
                           <div className="text-muted-foreground flex items-center gap-1 text-xs">
                             <Clock className="h-3 w-3" />
                             <span>
-                              Posted{" "}
+                              Posted{' '}
                               {formatDistanceToNow(new Date(job.posted), {
                                 addSuffix: true,
                               })}
@@ -489,12 +485,19 @@ const AdminActiveJobsManagementView = () => {
                               <TrendingUp className="mr-2 h-4 w-4" />
                               Performance Report
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer font-bold text-amber-500"
+                              onClick={() => handleToggleFeatured(job.id, !!job.isFeatured)}
+                            >
+                              <Star
+                                className={`mr-2 h-4 w-4 ${job.isFeatured ? 'shrink-0 fill-amber-500 text-amber-500' : 'shrink-0'}`}
+                              />
+                              {job.isFeatured ? 'Unfeature Listing' : 'Feature Listing'}
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="cursor-pointer text-amber-600"
-                              onClick={() =>
-                                handleDeactivate(job.id, job.title)
-                              }
+                              onClick={() => handleDeactivate(job.id, job.title)}
                             >
                               <Clock className="mr-2 h-4 w-4" />
                               Deactivate Job

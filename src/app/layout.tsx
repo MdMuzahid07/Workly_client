@@ -1,24 +1,25 @@
-import type { Metadata } from "next";
-import { Toaster } from "sonner";
-import ThemeChangeNotification from "../components/shared/ThemeChangeNotification";
-import ReduxProvider from "../provider/ReduxProvider";
-import SocketProvider from "../provider/SocketProvider";
-import ThemeProvider from "../provider/ThemeProvider";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Toaster } from 'sonner';
+import ThemeChangeNotification from '../components/shared/ThemeChangeNotification';
+import ReduxProvider from '../provider/ReduxProvider';
+import SocketProvider from '../provider/SocketProvider';
+import ThemeProvider from '../provider/ThemeProvider';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: "Workly_job",
-    template: "%s | Workly_job",
+    default: 'Workly_job',
+    template: '%s | Workly_job',
   },
-  description: "Find the perfect job for you",
+  description: 'Find the perfect job for you',
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
   },
 };
 
-import MaintenanceModeProvider from "../provider/MaintenanceModeProvider";
-import ContentProtection from "@/components/shared/ContentProtection";
+import MaintenanceModeProvider from '../provider/MaintenanceModeProvider';
+import NotificationProvider from '../provider/NotificationProvider';
+import ContentProtection from '@/components/shared/ContentProtection';
 
 export default function RootLayout({
   children,
@@ -41,7 +42,9 @@ export default function RootLayout({
         >
           <ReduxProvider>
             <SocketProvider>
-              <MaintenanceModeProvider>{children}</MaintenanceModeProvider>
+              <NotificationProvider>
+                <MaintenanceModeProvider>{children}</MaintenanceModeProvider>
+              </NotificationProvider>
             </SocketProvider>
           </ReduxProvider>
           <ThemeChangeNotification />

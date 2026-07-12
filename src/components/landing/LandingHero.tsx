@@ -1,32 +1,31 @@
-"use client";
+'use client';
 
-import { Card } from "@/components/ui/card";
-import type { GlobeConfig } from "@/components/ui/globe";
+import { Card } from '@/components/ui/card';
+import type { GlobeConfig } from '@/components/ui/globe';
 import {
+  ArrowRight,
   Briefcase,
   Building2,
-  MapPin,
-  Search,
-  TrendingUp,
-  Users,
-  ArrowRight,
-  Sparkles,
-  Upload,
-  FileText,
-  PlusCircle,
   CheckCircle2,
-  Star,
-  UserCheck,
+  FileText,
+  MapPin,
+  PlusCircle,
   Radio,
-} from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
-import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState, type ComponentType } from "react";
-import { globeConfig, globeSampleAreas } from "../../constants";
-import { useGetSearchSuggestionsQuery } from "../../redux/feature/job/jobApi";
-import GlobeSkeleton from "../../skeleton/landing/home/GlobeSkeleton";
-import { useGetLandingStatsQuery } from "../../redux/feature/statistics/statisticsApi";
-import AnimatedCounter from "../shared/AnimatedCounter";
+  Search,
+  Star,
+  TrendingUp,
+  Upload,
+  UserCheck,
+  Users,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState, type ComponentType } from 'react';
+import { globeConfig, globeSampleAreas } from '../../constants';
+import { useGetSearchSuggestionsQuery } from '../../redux/feature/job/jobApi';
+import { useGetLandingStatsQuery } from '../../redux/feature/statistics/statisticsApi';
+import GlobeSkeleton from '../../skeleton/landing/home/GlobeSkeleton';
+import AnimatedCounter from '../shared/AnimatedCounter';
 
 interface WorldProps {
   data: typeof globeSampleAreas;
@@ -39,46 +38,34 @@ interface LandingHeroProps {
 
 const SLIDES = [
   {
-    id: "jobs",
-    title: "Find Your Next Career Move",
+    id: 'jobs',
+    title: 'Find Your Next Career Move',
     subtitle:
-      "Explore thousands of active jobs from top-rated startups and global tech enterprises. Apply with a single click and land your dream job.",
-    highlights: [
-      "1-Click Easy Apply",
-      "Verified Job Openings",
-      "Direct Apply to Employers",
-    ],
-    badgeText: "Search Jobs",
+      'Explore thousands of active jobs from top-rated startups and global tech enterprises. Apply with a single click and land your dream job.',
+    highlights: ['1-Click Easy Apply', 'Verified Job Openings', 'Direct Apply to Employers'],
+    badgeText: 'Search Jobs',
     badgeIcon: Briefcase,
-    colorTheme: "primary",
+    colorTheme: 'primary',
   },
   {
-    id: "post-job",
-    title: "Post Jobs & Find Top Talent",
+    id: 'post-job',
+    title: 'Post Jobs & Find Top Talent',
     subtitle:
-      "List your open positions on Workly, reach thousands of qualified applicants daily, and build your dream team with ease.",
-    highlights: [
-      "Simple Job Creator",
-      "Reach Premium Candidates",
-      "Manage Applications",
-    ],
-    badgeText: "Post Openings",
+      'List your open positions on Workly, reach thousands of qualified applicants daily, and build your dream team with ease.',
+    highlights: ['Simple Job Creator', 'Reach Premium Candidates', 'Manage Applications'],
+    badgeText: 'Post Openings',
     badgeIcon: PlusCircle,
-    colorTheme: "accent",
+    colorTheme: 'accent',
   },
   {
-    id: "cv-manager",
-    title: "Manage CVs & Stand Out",
+    id: 'cv-manager',
+    title: 'Manage CVs & Stand Out',
     subtitle:
-      "Upload your professional resumes in our CV Manager, highlight your qualifications, and let top recruiters discover your profile.",
-    highlights: [
-      "CV/Resume Manager",
-      "Featured Talent Profiles",
-      "Direct Profile Inquiries",
-    ],
-    badgeText: "Resume Manager",
+      'Upload your professional resumes in our CV Manager, highlight your qualifications, and let top recruiters discover your profile.',
+    highlights: ['CV/Resume Manager', 'Featured Talent Profiles', 'Direct Profile Inquiries'],
+    badgeText: 'Resume Manager',
     badgeIcon: FileText,
-    colorTheme: "primary",
+    colorTheme: 'primary',
   },
 ];
 
@@ -125,28 +112,20 @@ const LandingHero = ({ World }: LandingHeroProps) => {
   const [direction, setDirection] = useState(1); // 1 = right, -1 = left
 
   // Search input fields
-  const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
+  const [keyword, setKeyword] = useState('');
+  const [location, setLocation] = useState('');
 
   const { data: statsRes, isLoading: statsLoading } = useGetLandingStatsQuery();
   const stats = statsRes?.data;
 
-  const trendingList = stats?.trendingKeywords || [
-    "React",
-    "UI/UX",
-    "Python",
-    "Remote",
-    "DevOps",
-  ];
+  const trendingList = stats?.trendingKeywords || ['React', 'UI/UX', 'Python', 'Remote', 'DevOps'];
 
-  const [activeInput, setActiveInput] = useState<"keyword" | "location" | null>(
-    null,
-  );
+  const [activeInput, setActiveInput] = useState<'keyword' | 'location' | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   // Debouncing search queries
-  const [debouncedKeyword, setDebouncedKeyword] = useState("");
-  const [debouncedLocation, setDebouncedLocation] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
+  const [debouncedLocation, setDebouncedLocation] = useState('');
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -166,27 +145,21 @@ const LandingHero = ({ World }: LandingHeroProps) => {
   const { data: keywordSuggestionsData } = useGetSearchSuggestionsQuery(
     { keyword: debouncedKeyword },
     {
-      skip:
-        !debouncedKeyword ||
-        debouncedKeyword.trim().length < 2 ||
-        activeInput !== "keyword",
+      skip: !debouncedKeyword || debouncedKeyword.trim().length < 2 || activeInput !== 'keyword',
     },
   );
 
   const { data: locationSuggestionsData } = useGetSearchSuggestionsQuery(
     { location: debouncedLocation },
     {
-      skip:
-        !debouncedLocation ||
-        debouncedLocation.trim().length < 2 ||
-        activeInput !== "location",
+      skip: !debouncedLocation || debouncedLocation.trim().length < 2 || activeInput !== 'location',
     },
   );
 
   const suggestions =
-    activeInput === "keyword"
+    activeInput === 'keyword'
       ? keywordSuggestionsData?.data?.keywords || []
-      : activeInput === "location"
+      : activeInput === 'location'
         ? locationSuggestionsData?.data?.locations || []
         : [];
 
@@ -206,7 +179,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    type: "keyword" | "location",
+    type: 'keyword' | 'location',
   ) => {
     if (activeInput !== type) {
       setActiveInput(type);
@@ -214,17 +187,17 @@ const LandingHero = ({ World }: LandingHeroProps) => {
       return;
     }
 
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       setFocusedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setFocusedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
-    } else if (e.key === "Enter") {
+    } else if (e.key === 'Enter') {
       if (focusedIndex >= 0 && focusedIndex < suggestions.length) {
         e.preventDefault();
         const selectedValue = suggestions[focusedIndex];
-        if (type === "keyword") {
+        if (type === 'keyword') {
           setKeyword(selectedValue);
         } else {
           setLocation(selectedValue);
@@ -232,7 +205,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
         setActiveInput(null);
         setFocusedIndex(-1);
       }
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       setActiveInput(null);
       setFocusedIndex(-1);
     }
@@ -241,20 +214,20 @@ const LandingHero = ({ World }: LandingHeroProps) => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest(".search-form-container")) {
+      if (!target.closest('.search-form-container')) {
         setActiveInput(null);
         setFocusedIndex(-1);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const queryParams = new URLSearchParams();
-    if (keyword) queryParams.set("search", keyword);
-    if (location) queryParams.set("location", location);
+    if (keyword) queryParams.set('search', keyword);
+    if (location) queryParams.set('location', location);
     router.push(`/jobs?${queryParams.toString()}`);
   };
 
@@ -266,10 +239,19 @@ const LandingHero = ({ World }: LandingHeroProps) => {
   const activeSlide = SLIDES[currentSlide];
 
   return (
-    <section className="bg-background border-primary/20 relative flex min-h-[520px] w-full items-center overflow-hidden border-b pt-24 pb-14 sm:min-h-[700px] sm:pt-36 sm:pb-24 lg:min-h-[800px] lg:pt-40 lg:pb-32">
+    <section className="bg-background border-primary/20 relative flex min-h-130 w-full items-center overflow-hidden border-b pt-24 pb-14 sm:min-h-[700px] sm:pt-36 sm:pb-24 lg:min-h-[800px] lg:pt-40 lg:pb-32">
       {/* Background patterns */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-[0.04]" />
+        {/* Subtle corporate background visual (Conference Room) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.08] mix-blend-multiply grayscale transition-all duration-300 dark:opacity-[0.11] dark:mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1920')",
+          }}
+        />
+
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-[0.03]" />
 
         {/* Theme compliant color orbs (Green only) */}
         <div className="bg-primary/5 absolute -top-40 -right-40 h-[450px] w-[450px] rounded-full blur-[110px]" />
@@ -291,8 +273,8 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                     onClick={() => handleSlideChange(index)}
                     className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold backdrop-blur-sm transition-all duration-300 sm:gap-1.5 sm:px-3.5 sm:py-1.5 sm:text-xs ${
                       isSelected
-                        ? "border-primary bg-primary/10 text-primary scale-105"
-                        : "border-border/60 bg-card/40 text-muted-foreground hover:bg-card/80 hover:text-foreground"
+                        ? 'border-primary bg-primary/10 text-primary scale-105'
+                        : 'border-border/60 bg-card/40 text-muted-foreground hover:bg-card/80 hover:text-foreground'
                     }`}
                   >
                     <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -313,30 +295,33 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   exit="exit"
                   variants={textTransitionVariants}
                   transition={{
-                    y: { type: "spring", stiffness: 350, damping: 30 },
+                    y: { type: 'spring', stiffness: 350, damping: 30 },
                     opacity: { duration: 0.15 },
                   }}
                   className="space-y-3"
                 >
                   <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase">
-                    <Sparkles className="h-3 w-3" />
+                    {(() => {
+                      const Icon = activeSlide.badgeIcon;
+                      return <Icon className="h-3 w-3" />;
+                    })()}
                     <span>Explore {activeSlide.badgeText}</span>
                   </div>
 
                   <h1 className="text-foreground text-3xl leading-[1.15] font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
-                    {activeSlide.title.split(" ").map((word, idx) => {
+                    {activeSlide.title.split(' ').map((word, idx) => {
                       const isHighlight =
-                        word.toLowerCase().includes("career") ||
-                        word.toLowerCase().includes("talent") ||
-                        word.toLowerCase().includes("jobs") ||
-                        word.toLowerCase().includes("skills");
+                        word.toLowerCase().includes('career') ||
+                        word.toLowerCase().includes('talent') ||
+                        word.toLowerCase().includes('jobs') ||
+                        word.toLowerCase().includes('skills');
                       if (isHighlight) {
                         return (
                           <span
                             key={idx}
                             className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent"
                           >
-                            {word}{" "}
+                            {word}{' '}
                           </span>
                         );
                       }
@@ -376,18 +361,18 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                     value={keyword}
                     onChange={(e) => {
                       setKeyword(e.target.value);
-                      setActiveInput("keyword");
+                      setActiveInput('keyword');
                     }}
                     onFocus={() => {
-                      setActiveInput("keyword");
+                      setActiveInput('keyword');
                       setFocusedIndex(-1);
                     }}
-                    onKeyDown={(e) => handleKeyDown(e, "keyword")}
+                    onKeyDown={(e) => handleKeyDown(e, 'keyword')}
                     placeholder="Job title, keywords, or skills..."
                     className="placeholder:text-muted-foreground text-foreground h-11 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
                   />
 
-                  {activeInput === "keyword" && suggestions.length > 0 && (
+                  {activeInput === 'keyword' && suggestions.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -403,8 +388,8 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                           }}
                           className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
                             focusedIndex === idx
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted/60"
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-foreground hover:bg-muted/60'
                           }`}
                         >
                           <Search className="text-muted-foreground h-4 w-4" />
@@ -425,18 +410,18 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                     value={location}
                     onChange={(e) => {
                       setLocation(e.target.value);
-                      setActiveInput("location");
+                      setActiveInput('location');
                     }}
                     onFocus={() => {
-                      setActiveInput("location");
+                      setActiveInput('location');
                       setFocusedIndex(-1);
                     }}
-                    onKeyDown={(e) => handleKeyDown(e, "location")}
+                    onKeyDown={(e) => handleKeyDown(e, 'location')}
                     placeholder="Location or Remote..."
                     className="placeholder:text-muted-foreground text-foreground h-11 w-full bg-transparent pr-4 pl-12 text-sm focus:outline-hidden"
                   />
 
-                  {activeInput === "location" && suggestions.length > 0 && (
+                  {activeInput === 'location' && suggestions.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -452,8 +437,8 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                           }}
                           className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
                             focusedIndex === idx
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted/60"
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-foreground hover:bg-muted/60'
                           }`}
                         >
                           <MapPin className="text-muted-foreground h-4 w-4" />
@@ -498,21 +483,21 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                 {[
                   {
                     icon: Briefcase,
-                    label: "Active Jobs",
+                    label: 'Active Jobs',
                     value: stats?.activeJobs ?? 0,
-                    colorClass: "text-primary bg-primary/10",
+                    colorClass: 'text-primary bg-primary/10',
                   },
                   {
                     icon: Building2,
-                    label: "Firms Hiring",
+                    label: 'Firms Hiring',
                     value: stats?.companies ?? 0,
-                    colorClass: "text-accent bg-accent/10",
+                    colorClass: 'text-accent bg-accent/10',
                   },
                   {
                     icon: Users,
-                    label: "Job Seekers",
+                    label: 'Job Seekers',
                     value: stats?.jobSeekers ?? 0,
-                    colorClass: "text-primary bg-primary/10",
+                    colorClass: 'text-primary bg-primary/10',
                   },
                 ].map((stat, i) => (
                   <div key={i} className="space-y-1">
@@ -550,11 +535,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
 
             {/* Interactive Slide overlays - Offset slightly for premium multi-layered look */}
             <div className="xs:max-w-[310px] xs:right-2 absolute -right-2 bottom-6 z-10 w-full max-w-[290px] sm:right-4 sm:bottom-10 sm:max-w-[330px] md:right-2 md:bottom-8 md:max-w-[310px] lg:right-4 lg:bottom-12 lg:max-w-[330px]">
-              <AnimatePresence
-                initial={false}
-                custom={direction}
-                mode="popLayout"
-              >
+              <AnimatePresence initial={false} custom={direction} mode="popLayout">
                 <motion.div
                   key={currentSlide}
                   custom={direction}
@@ -563,7 +544,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   animate="center"
                   exit="exit"
                   transition={{
-                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    x: { type: 'spring', stiffness: 300, damping: 30 },
                     opacity: { duration: 0.2 },
                   }}
                   className="w-full"
@@ -583,8 +564,8 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   y: {
                     duration: 2.5,
                     repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
+                    repeatType: 'reverse',
+                    ease: 'easeInOut',
                   },
                 }}
                 className="border-primary/30 bg-card/90 flex items-center gap-1.5 rounded-full border px-3 py-1.5 backdrop-blur-md"
@@ -601,9 +582,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
                   ) : (
                     <span className="text-foreground flex items-center gap-0.5 text-xs font-extrabold">
                       <AnimatedCounter value={stats?.activeNow ?? 0} />
-                      <span>
-                        {stats?.activeNow === 1 ? "Candidate" : "Candidates"}
-                      </span>
+                      <span>{stats?.activeNow === 1 ? 'Candidate' : 'Candidates'}</span>
                     </span>
                   )}
                 </div>
@@ -614,9 +593,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
             <div className="border-border bg-card/90 absolute right-2 bottom-1 left-2 z-20 flex items-center justify-between rounded-xl border p-2.5 backdrop-blur-md">
               <div className="flex items-center gap-1.5">
                 <Radio className="text-primary h-3.5 w-3.5 shrink-0" />
-                <span className="text-foreground text-[10px] font-bold">
-                  Network online
-                </span>
+                <span className="text-foreground text-[10px] font-bold">Network online</span>
               </div>
               <span className="text-primary flex items-center gap-0.5 text-[10px] font-extrabold">
                 Connecting Global Talent <ArrowRight className="h-3 w-3" />
@@ -667,7 +644,7 @@ const InteractiveJobCard = () => {
       </div>
 
       <div className="mt-3.5 flex flex-wrap gap-1">
-        {["Next.js", "TypeScript", "Tailwind"].map((t, idx) => (
+        {['Next.js', 'TypeScript', 'Tailwind'].map((t, idx) => (
           <span
             key={idx}
             className="bg-muted text-muted-foreground/80 rounded-md px-1.5 py-0.5 text-[9px] font-medium"
@@ -678,7 +655,7 @@ const InteractiveJobCard = () => {
       </div>
 
       <button
-        onClick={() => router.push("/jobs")}
+        onClick={() => router.push('/jobs')}
         className="bg-primary hover:bg-primary/90 mt-4 flex h-8.5 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-white transition-all"
       >
         <span>Apply Instantly</span>
@@ -700,9 +677,7 @@ const InteractivePostJobCard = () => {
             <PlusCircle className="h-5 w-5" />
           </div>
           <div>
-            <h5 className="text-foreground text-xs leading-tight font-bold">
-              Create Job Posting
-            </h5>
+            <h5 className="text-foreground text-xs leading-tight font-bold">Create Job Posting</h5>
             <p className="text-muted-foreground mt-0.5 text-[10px] leading-none font-medium">
               Quick Employer Tool
             </p>
@@ -728,7 +703,7 @@ const InteractivePostJobCard = () => {
       </div>
 
       <button
-        onClick={() => router.push("/employer/post-job")}
+        onClick={() => router.push('/employer/post-job')}
         className="bg-accent hover:bg-accent/90 mt-4 flex h-8.5 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-white transition-all"
       >
         <PlusCircle className="h-3.5 w-3.5" />
@@ -750,9 +725,7 @@ const InteractiveCVCard = () => {
             <FileText className="h-5 w-5" />
           </div>
           <div>
-            <h5 className="text-foreground text-xs leading-tight font-bold">
-              Resume Verified
-            </h5>
+            <h5 className="text-foreground text-xs leading-tight font-bold">Resume Verified</h5>
             <p className="text-muted-foreground mt-0.5 text-[10px] leading-none font-medium">
               CV Manager System
             </p>
@@ -779,7 +752,7 @@ const InteractiveCVCard = () => {
       </div>
 
       <button
-        onClick={() => router.push("/dashboard/cv-manager")}
+        onClick={() => router.push('/dashboard/cv-manager')}
         className="bg-primary hover:bg-primary/90 mt-4 flex h-8.5 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-white transition-all"
       >
         <Upload className="h-3.5 w-3.5" />

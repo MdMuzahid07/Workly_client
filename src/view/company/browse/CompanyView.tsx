@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+'use client';
+import { motion } from 'motion/react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -11,22 +12,22 @@ import {
   Crown,
   MapPin,
   Users,
-} from "lucide-react";
-import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import "swiper/css";
-import "swiper/css/navigation";
-import { Autoplay, Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import CompanyCard from "../../../components/main/company/CompanyCard";
-import CompanyFilter from "../../../components/main/company/CompanyFilter";
-import Searchbar from "../../../components/main/jobs/Searchbar";
-import PageHero from "../../../components/shared/PageHero";
-import ViewToggle from "../../../components/shared/ViewToggle";
-import { useGetCompaniesQuery } from "../../../redux/feature/company/companyApi";
-import CompanyCardSkeleton from "../../../skeleton/company/browse/CompanyCardSkeleton";
+} from 'lucide-react';
+import Image from 'next/image';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Autoplay, Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import CompanyCard from '../../../components/main/company/CompanyCard';
+import CompanyFilter from '../../../components/main/company/CompanyFilter';
+import Searchbar from '../../../components/main/jobs/Searchbar';
+import PageHero from '../../../components/shared/PageHero';
+import ViewToggle from '../../../components/shared/ViewToggle';
+import { useGetCompaniesQuery } from '../../../redux/feature/company/companyApi';
+import CompanyCardSkeleton from '../../../skeleton/company/browse/CompanyCardSkeleton';
 
 /* ==================== Skeleton ==================== */
 const FeaturedCompaniesSkeleton = () => (
@@ -74,25 +75,19 @@ const FeaturedCompaniesSkeleton = () => (
 );
 
 /* ==================== Main View ==================== */
-const CompanyView = ({
-  companies: initialCompanies,
-}: {
-  companies?: any[];
-}) => {
+const CompanyView = ({ companies: initialCompanies }: { companies?: any[] }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentSearch = searchParams.get("q") || "";
-  const currentLocation = searchParams.get("location") || "";
-  const currentIndustry = searchParams.get("industry") || "";
-  const currentSize = searchParams.get("size") || "";
+  const currentSearch = searchParams.get('q') || '';
+  const currentLocation = searchParams.get('location') || '';
+  const currentIndustry = searchParams.get('industry') || '';
+  const currentSize = searchParams.get('size') || '';
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [allCompanies, setAllCompanies] = useState<any[]>(
-    initialCompanies || [],
-  );
-  const [viewType, setViewType] = useState<"grid" | "list">("grid");
+  const [allCompanies, setAllCompanies] = useState<any[]>(initialCompanies || []);
+  const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const limit = 12;
 
   useEffect(() => {
@@ -110,8 +105,8 @@ const CompanyView = ({
       location: currentLocation,
       industry: currentIndustry,
       size: currentSize,
-      sortBy: "createdAt",
-      sortOrder: "desc",
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     }),
     [currentPage, currentSearch, currentLocation, currentIndustry, currentSize],
   );
@@ -120,11 +115,10 @@ const CompanyView = ({
     skip: currentPage === 1 && !!initialCompanies,
   });
 
-  const { data: featuredData, isLoading: featuredLoading } =
-    useGetCompaniesQuery({
-      isVerified: true,
-      limit: 6,
-    });
+  const { data: featuredData, isLoading: featuredLoading } = useGetCompaniesQuery({
+    isVerified: true,
+    limit: 6,
+  });
 
   const featuredCompanies = useMemo(() => {
     const list = featuredData?.data?.result || featuredData?.data || [];
@@ -137,8 +131,7 @@ const CompanyView = ({
       setAllCompanies((prev) => {
         const combined = [...prev, ...data.data];
         return combined.filter(
-          (company, index, self) =>
-            self.findIndex((c) => c.id === company.id) === index,
+          (company, index, self) => self.findIndex((c) => c.id === company.id) === index,
         );
       });
     }
@@ -156,15 +149,15 @@ const CompanyView = ({
 
   const handleSearch = (searchData: { search: string; location: string }) => {
     const p = new URLSearchParams(searchParams.toString());
-    if (searchData.search) p.set("q", searchData.search);
-    else p.delete("q");
-    if (searchData.location) p.set("location", searchData.location);
-    else p.delete("location");
+    if (searchData.search) p.set('q', searchData.search);
+    else p.delete('q');
+    if (searchData.location) p.set('location', searchData.location);
+    else p.delete('location');
     router.push(`${pathname}?${p.toString()}`);
   };
 
   const handleFilterChange = (value: string) => {
-    router.push(`${pathname}?${createQueryString("industry", value)}`);
+    router.push(`${pathname}?${createQueryString('industry', value)}`);
   };
 
   const loadMoreCompanies = () => {
@@ -185,7 +178,7 @@ const CompanyView = ({
       {/* ==================== Hero Section ==================== */}
       <PageHero
         title="Explore Top Companies"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Companies" }]}
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Companies' }]}
         backgroundImage="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1440&q=40"
       />
 
@@ -199,8 +192,8 @@ const CompanyView = ({
           buttonLabel="Find Company"
           hidePadding
           placeholder={{
-            search: "Company Name or Keywords",
-            location: "City or Country",
+            search: 'Company Name or Keywords',
+            location: 'City or Country',
           }}
         />
 
@@ -252,8 +245,8 @@ const CompanyView = ({
                   pauseOnMouseEnter: true,
                 }}
                 navigation={{
-                  nextEl: ".featured-companies-next",
-                  prevEl: ".featured-companies-prev",
+                  nextEl: '.featured-companies-next',
+                  prevEl: '.featured-companies-prev',
                 }}
                 breakpoints={{
                   480: { slidesPerView: 1.25, spaceBetween: 12 },
@@ -264,22 +257,18 @@ const CompanyView = ({
               >
                 {featuredCompanies.map((company: any, index: number) => {
                   const bgOptions = [
-                    "bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
-                    "bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400",
-                    "bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
-                    "bg-emerald-600/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
+                    'bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
+                    'bg-pink-600/10 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400',
+                    'bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400',
+                    'bg-emerald-600/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400',
                   ];
                   const randomBg = bgOptions[index % bgOptions.length];
-                  const initial = company.name
-                    ? company.name[0].toUpperCase()
-                    : "C";
+                  const initial = company.name ? company.name[0].toUpperCase() : 'C';
 
                   return (
                     <SwiperSlide key={company.id || index} className="h-auto">
                       <div
-                        onClick={() =>
-                          router.push(`/companies/${company.slug}`)
-                        }
+                        onClick={() => router.push(`/companies/${company.slug}`)}
                         className="group hover:border-primary/50 relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-300 hover:shadow-md sm:p-5 dark:border-slate-800 dark:bg-slate-900/50"
                       >
                         <div className="relative z-10 space-y-3">
@@ -312,7 +301,7 @@ const CompanyView = ({
                                   )}
                                 </h4>
                                 <span className="text-primary mt-0.5 block text-[11px] font-bold">
-                                  {company.industry?.name || "Verified Partner"}
+                                  {company.industry?.name || 'Verified Partner'}
                                 </span>
                               </div>
                             </div>
@@ -324,19 +313,19 @@ const CompanyView = ({
                           {/* Description */}
                           <p className="text-muted-foreground/80 line-clamp-2 text-xs leading-relaxed">
                             {company.description ||
-                              "Building powerful and innovative digital solutions."}
+                              'Building powerful and innovative digital solutions.'}
                           </p>
 
                           {/* Meta */}
                           <div className="text-muted-foreground/80 flex flex-wrap items-center gap-x-1.5 gap-y-1 border-t border-gray-100 pt-3 text-xs font-semibold dark:border-slate-800">
                             <span className="flex items-center gap-1">
                               <MapPin className="text-primary/60 h-3 w-3" />
-                              {company.location || "Remote"}
+                              {company.location || 'Remote'}
                             </span>
                             <span className="opacity-30">•</span>
                             <span className="flex items-center gap-1">
                               <Users className="text-primary/60 h-3 w-3" />
-                              {company.size || "11-50"} staff
+                              {company.size || '11-50'} staff
                             </span>
                             <span className="opacity-30">•</span>
                             {company.openJobs > 0 ? (
@@ -370,8 +359,8 @@ const CompanyView = ({
                 All Companies
               </h2>
               <p className="text-muted-foreground mt-0.5 text-xs font-medium sm:text-sm">
-                Showing {allCompanies.length} of{" "}
-                {data?.meta?.total || allCompanies.length} companies
+                Showing {allCompanies.length} of {data?.meta?.total || allCompanies.length}{' '}
+                companies
               </p>
             </div>
             <ViewToggle
@@ -383,10 +372,7 @@ const CompanyView = ({
 
           {/* Filter chips */}
           <div className="mt-4 pb-1 sm:mt-5">
-            <CompanyFilter
-              selectedFilter={currentIndustry}
-              onFilterChange={handleFilterChange}
-            />
+            <CompanyFilter selectedFilter={currentIndustry} onFilterChange={handleFilterChange} />
           </div>
 
           {/* Card grid */}
@@ -398,9 +384,9 @@ const CompanyView = ({
               loader={
                 <div
                   className={
-                    viewType === "grid"
-                      ? "mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
-                      : "mt-3 flex flex-col gap-2.5 sm:gap-3"
+                    viewType === 'grid'
+                      ? 'mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3'
+                      : 'mt-3 flex flex-col gap-2.5 sm:gap-3'
                   }
                 >
                   {[...Array(3)].map((_, i) => (
@@ -410,34 +396,46 @@ const CompanyView = ({
               }
               endMessage={
                 <p className="text-muted-foreground py-8 text-center font-medium italic">
-                  {allCompanies.length > 0
-                    ? "You've reached the end of the list"
-                    : ""}
+                  {allCompanies.length > 0 ? "You've reached the end of the list" : ''}
                 </p>
               }
               scrollThreshold={0.8}
-              style={{ overflow: "visible" }}
+              style={{ overflow: 'visible' }}
             >
               <div
                 className={
-                  viewType === "grid"
-                    ? "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
-                    : "flex flex-col gap-2.5 sm:gap-3 lg:gap-4"
+                  viewType === 'grid'
+                    ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'
+                    : 'flex flex-col gap-2.5 sm:gap-3 lg:gap-4'
                 }
               >
                 {allCompanies.length > 0 ? (
-                  allCompanies.map((company, index) => (
-                    <CompanyCard
-                      key={company.id || index}
-                      company={{
-                        ...company,
-                        logo: company.logoUrl || company.logo,
-                      }}
-                      viewType={viewType}
-                    />
-                  ))
+                  allCompanies.map((company, index) => {
+                    const delay = viewType === 'grid' ? (index % 4) * 0.05 : 0;
+                    return (
+                      <motion.div
+                        key={company.id || index}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        viewport={{ once: false, margin: '0px 0px -100px 0px', amount: 0.05 }}
+                        transition={{
+                          duration: 0.45,
+                          delay,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                      >
+                        <CompanyCard
+                          company={{
+                            ...company,
+                            logo: company.logoUrl || company.logo,
+                          }}
+                          viewType={viewType}
+                        />
+                      </motion.div>
+                    );
+                  })
                 ) : isLoading ? (
-                  [...Array(viewType === "grid" ? 12 : 6)].map((_, i) => (
+                  [...Array(viewType === 'grid' ? 12 : 6)].map((_, i) => (
                     <CompanyCardSkeleton key={i} />
                   ))
                 ) : (

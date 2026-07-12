@@ -1,74 +1,82 @@
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 const jobApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createJob: builder.mutation({
       query: (data) => ({
-        url: "/job/create",
-        method: "POST",
+        url: '/job/create',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["jobs"],
+      invalidatesTags: ['jobs'],
     }),
 
     getJobs: builder.query({
       query: (params) => ({
-        url: "/job/jobs",
-        method: "GET",
+        url: '/job/jobs',
+        method: 'GET',
         params,
       }),
-      providesTags: ["jobs"],
+      providesTags: ['jobs'],
     }),
 
     getSearchSuggestions: builder.query({
       query: (params: { keyword?: string; location?: string }) => ({
-        url: "/job/suggestions",
-        method: "GET",
+        url: '/job/suggestions',
+        method: 'GET',
         params,
       }),
     }),
 
     getMyJobs: builder.query({
       query: (params) => ({
-        url: "/job/my-jobs",
-        method: "GET",
+        url: '/job/my-jobs',
+        method: 'GET',
         params,
       }),
-      providesTags: ["jobs"],
+      providesTags: ['jobs'],
     }),
 
     getJobById: builder.query({
       query: (id: string) => ({
         url: `/job/job/${id}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: "jobs", id }],
+      providesTags: (result, error, id) => [{ type: 'jobs', id }],
     }),
 
     updateJob: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/job/update/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["jobs"],
+      invalidatesTags: ['jobs'],
     }),
 
     getRecommendedJobs: builder.query({
       query: (params) => ({
-        url: "/job/recommended",
-        method: "GET",
+        url: '/job/recommended',
+        method: 'GET',
         params,
       }),
-      providesTags: ["jobs"],
+      providesTags: ['jobs'],
     }),
 
     deleteJob: builder.mutation({
       query: (id: string) => ({
         url: `/job/delete/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["jobs"],
+      invalidatesTags: ['jobs'],
+    }),
+
+    reportJob: builder.mutation({
+      query: ({ jobId, ...data }) => ({
+        url: `/job/${jobId}/report`,
+        method: 'POST',
+        body: data,
+      }),
     }),
   }),
 });
@@ -82,5 +90,6 @@ export const {
   useUpdateJobMutation,
   useDeleteJobMutation,
   useGetSearchSuggestionsQuery,
+  useReportJobMutation,
 } = jobApi;
 export default jobApi;

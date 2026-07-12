@@ -1,18 +1,19 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { useGetJobsQuery } from "@/redux/feature/job/jobApi";
-import { useCreateConversationMutation } from "@/redux/feature/message/messageApi";
-import { useCanAccess } from "@/hooks/useEntitlements";
-import { useAppSelector } from "@/redux/hooks";
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import { useGetJobsQuery, useReportJobMutation } from '@/redux/feature/job/jobApi';
+import { useCreateConversationMutation } from '@/redux/feature/message/messageApi';
+import { useCanAccess } from '@/hooks/useEntitlements';
+import { useAppSelector } from '@/redux/hooks';
 import {
+  AlertTriangle,
   ArrowRight,
   Bookmark,
   Building2,
@@ -25,12 +26,12 @@ import {
   MessageSquare,
   Sparkles,
   Users,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
-import JobDetailsSimilarJobCard from "./JobDetailsSimilarJobCard";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import JobDetailsSimilarJobCard from './JobDetailsSimilarJobCard';
 
 interface Company {
   id: string;
@@ -95,9 +96,7 @@ const StatItem = ({
         <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
           <Icon className="text-primary h-4 w-4" />
         </div>
-        <span className="text-muted-foreground text-sm font-medium">
-          {label}
-        </span>
+        <span className="text-muted-foreground text-sm font-medium">{label}</span>
       </div>
       <span className="text-foreground font-bold">{value}</span>
     </div>
@@ -105,13 +104,7 @@ const StatItem = ({
   </>
 );
 
-const CompanyInfoItem = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) => (
+const CompanyInfoItem = ({ label, value }: { label: string; value: string }) => (
   <>
     <div className="flex items-center justify-between py-1">
       <span className="text-muted-foreground text-sm font-medium">{label}</span>
@@ -122,8 +115,8 @@ const CompanyInfoItem = ({
 );
 
 const formatJobType = (type: string) => {
-  if (!type) return "";
-  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  if (!type) return '';
+  return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
 const JobDetailsSidebar = ({
@@ -135,19 +128,50 @@ const JobDetailsSidebar = ({
 }: JobDetailsSidebarProps) => {
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.auth.user);
-  const [createConversation, { isLoading: isCreatingChat }] =
-    useCreateConversationMutation();
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportComment, setReportComment] = useState('');
+  const [reportSeverity, setReportSeverity] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>(
+    'LOW',
+  );
+  const [reportJob, { isLoading: isReporting }] = useReportJobMutation();
 
-  const isJobSeeker = currentUser?.role === "JOB_SEEKER";
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportReason) {
+      toast.error('Please select a reason for reporting');
+      return;
+    }
+    try {
+      await reportJob({
+        jobId: job.id,
+        reason: reportReason,
+        comment: reportComment,
+        severity: reportSeverity,
+      }).unwrap();
+      toast.success('Job report submitted successfully');
+      setShowReportModal(false);
+      setReportReason('');
+      setReportComment('');
+      setReportSeverity('LOW');
+    } catch (err) {
+      const error = err as { data?: { message?: string }; message?: string };
+      toast.error(error?.data?.message || error?.message || 'Failed to submit report');
+    }
+  };
+
+  const isJobSeeker = currentUser?.role === 'JOB_SEEKER';
   // Use live subscription data — NOT the stale JWT flag — as the source of truth.
-  const { hasAccess: isPremium } = useCanAccess("canMessageEmployer");
+  const { hasAccess: isPremium } = useCanAccess('canMessageEmployer');
   const recruiterId = job.postedById || job.postedBy?.id;
   const isNotOwnJob = recruiterId && recruiterId !== currentUser?.id;
 
   // Show the button to ALL job seekers who are not the job poster.
   // Free users see it but get an upsell modal; premium users get the real chat flow.
   const showMessageButton = isJobSeeker && isNotOwnJob;
+  const showReportButton = !!currentUser && isNotOwnJob;
 
   const handleMessageButtonClick = () => {
     if (!isPremium) {
@@ -159,58 +183,54 @@ const JobDetailsSidebar = ({
 
   const handleMessageRecruiter = async () => {
     if (!recruiterId) {
-      toast.error("Recruiter details not available");
+      toast.error('Recruiter details not available');
       return;
     }
 
     try {
-      toast.loading("Starting conversation...", { id: "create_chat" });
+      toast.loading('Starting conversation...', { id: 'create_chat' });
       const response = await createConversation({
         participantId: recruiterId,
       }).unwrap();
 
       if (response.success && response.data?.id) {
-        toast.success("Conversation started!", { id: "create_chat" });
+        toast.success('Conversation started!', { id: 'create_chat' });
         router.push(`/dashboard/messages?conversationId=${response.data.id}`);
       } else {
-        toast.error("Failed to start conversation", { id: "create_chat" });
+        toast.error('Failed to start conversation', { id: 'create_chat' });
       }
     } catch (err: unknown) {
       const error = err as { data?: { message?: string }; message?: string };
-      toast.error(
-        error?.data?.message ||
-          error?.message ||
-          "Failed to start conversation",
-        { id: "create_chat" },
-      );
-      console.error("Failed to start conversation:", err);
+      toast.error(error?.data?.message || error?.message || 'Failed to start conversation', {
+        id: 'create_chat',
+      });
+      console.error('Failed to start conversation:', err);
     }
   };
 
-  const companyName = job.company?.name || "Unknown Company";
-  const industry =
-    job.industry?.name || job.company?.industry?.name || "Not specified";
-  const companySize = job.companySize || job.company?.size || "Not specified";
-  const jobType = job.type || job.jobType || "Not specified";
+  const companyName = job.company?.name || 'Unknown Company';
+  const industry = job.industry?.name || job.company?.industry?.name || 'Not specified';
+  const companySize = job.companySize || job.company?.size || 'Not specified';
+  const jobType = job.type || job.jobType || 'Not specified';
 
   const postedTime =
     job.postedTime ||
     (job.createdAt
-      ? new Date(job.createdAt).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
+      ? new Date(job.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
         })
-      : "Recently");
+      : 'Recently');
 
   const stats = [
     {
-      label: "Applications",
+      label: 'Applications',
       value: job.applyCount || 0,
       icon: STATS_ICONS.applications,
     },
-    { label: "Views", value: job.viewCount || 0, icon: STATS_ICONS.views },
-    { label: "Posted", value: postedTime, icon: STATS_ICONS.posted },
+    { label: 'Views', value: job.viewCount || 0, icon: STATS_ICONS.views },
+    { label: 'Posted', value: postedTime, icon: STATS_ICONS.posted },
   ];
 
   // Fetch similar jobs
@@ -219,9 +239,7 @@ const JobDetailsSidebar = ({
   });
 
   const similarJobsList = useMemo(() => {
-    const raw = (similarJobsData?.data?.result ||
-      similarJobsData?.data ||
-      []) as Job[];
+    const raw = (similarJobsData?.data?.result || similarJobsData?.data || []) as Job[];
     const filtered = raw.filter((j: Job) => j.id !== job.id);
 
     // Filter by same industry
@@ -267,30 +285,30 @@ const JobDetailsSidebar = ({
             <Button
               variant="outline"
               className={cn(
-                "h-12 w-full border text-lg font-bold transition-all",
+                'h-12 w-full border text-lg font-bold transition-all',
                 job.isSaved
-                  ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary"
-                  : "hover:bg-primary/5 hover:text-primary border-primary/20",
+                  ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary'
+                  : 'hover:bg-primary/5 hover:text-primary border-primary/20',
               )}
               onClick={handleSave}
               disabled={isSaving}
             >
               <Bookmark
                 className={cn(
-                  "mr-2 h-5 w-5 transition-all duration-200",
-                  job.isSaved ? "fill-primary" : "",
+                  'mr-2 h-5 w-5 transition-all duration-200',
+                  job.isSaved ? 'fill-primary' : '',
                 )}
               />
-              {isSaving ? "Saving..." : job.isSaved ? "Saved" : "Save Job"}
+              {isSaving ? 'Saving...' : job.isSaved ? 'Saved' : 'Save Job'}
             </Button>
             {showMessageButton && (
               <Button
                 variant="outline"
                 className={cn(
-                  "relative flex h-12 w-full items-center justify-center gap-2 border text-base font-bold transition-all",
+                  'relative flex h-12 w-full items-center justify-center gap-2 border text-base font-bold transition-all',
                   isPremium
-                    ? "bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:text-primary"
-                    : "border-amber-300/60 bg-amber-50/50 text-amber-700 hover:border-amber-400 hover:bg-amber-50 dark:border-amber-700/50 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-950/30",
+                    ? 'bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:text-primary'
+                    : 'border-amber-300/60 bg-amber-50/50 text-amber-700 hover:border-amber-400 hover:bg-amber-50 dark:border-amber-700/50 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-950/30',
                 )}
                 onClick={handleMessageButtonClick}
                 disabled={isCreatingChat}
@@ -335,9 +353,9 @@ const JobDetailsSidebar = ({
                 <div className="space-y-5 p-6">
                   <ul className="space-y-3">
                     {[
-                      "Direct 1-on-1 messages with recruiters & HR",
-                      "Real-time chat with typing indicators",
-                      "Share your CV, portfolio or cover letter in-chat",
+                      'Direct 1-on-1 messages with recruiters & HR',
+                      'Real-time chat with typing indicators',
+                      'Share your CV, portfolio or cover letter in-chat',
                       "Stand out — most applicants can't do this",
                     ].map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
@@ -356,7 +374,7 @@ const JobDetailsSidebar = ({
                       className="h-12 w-full rounded-xl bg-linear-to-r from-amber-500 to-yellow-400 text-base font-black text-white shadow-lg transition-all hover:scale-[1.02] hover:from-amber-600 hover:to-yellow-500"
                       onClick={() => {
                         setShowPremiumModal(false);
-                        router.push("/dashboard/pricing");
+                        router.push('/dashboard/pricing');
                       }}
                     >
                       Upgrade to Premium
@@ -371,6 +389,106 @@ const JobDetailsSidebar = ({
                     </Button>
                   </div>
                 </div>
+              </DialogContent>
+            </Dialog>
+
+            {showReportButton && (
+              <Button
+                variant="ghost"
+                className="text-muted-foreground mt-2 h-12 w-full border border-transparent text-base font-bold transition-all hover:border-rose-200/50 hover:bg-rose-50 hover:text-rose-600"
+                onClick={() => setShowReportModal(true)}
+              >
+                <AlertTriangle className="mr-2 h-5 w-5" />
+                Report Listing
+              </Button>
+            )}
+
+            <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+              <DialogContent className="bg-card max-w-md overflow-hidden rounded-2xl border p-6 shadow-2xl">
+                <DialogHeader className="mb-4">
+                  <DialogTitle className="flex items-center gap-2 text-xl font-bold text-rose-600">
+                    <AlertTriangle className="h-6 w-6" />
+                    Report Job Listing
+                  </DialogTitle>
+                  <DialogDescription className="text-muted-foreground mt-1 text-sm">
+                    Please provide details on why you are reporting this job listing. Our moderation
+                    team will review it.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <form onSubmit={handleReportSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-foreground block text-sm font-semibold">
+                      Reason for Report
+                    </label>
+                    <select
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                      required
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-lg border px-3 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                    >
+                      <option value="" disabled>
+                        Select a reason...
+                      </option>
+                      <option value="Spam or misleading">Spam or misleading</option>
+                      <option value="Fraud or scam (asking for money)">
+                        Fraud or scam (asking for money)
+                      </option>
+                      <option value="Discriminatory or offensive content">
+                        Discriminatory or offensive content
+                      </option>
+                      <option value="Incorrect information">Incorrect information</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-foreground block text-sm font-semibold">Severity</label>
+                    <select
+                      value={reportSeverity}
+                      onChange={(e) =>
+                        setReportSeverity(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL')
+                      }
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-lg border px-3 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                    >
+                      <option value="LOW">Low</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="HIGH">High</option>
+                      <option value="CRITICAL">Critical</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-foreground block text-sm font-semibold">
+                      Comments / Details
+                    </label>
+                    <textarea
+                      value={reportComment}
+                      onChange={(e) => setReportComment(e.target.value)}
+                      placeholder="Please add any details that can help us verify the issue..."
+                      rows={4}
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full resize-none rounded-lg border p-3 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setShowReportModal(false)}
+                      className="rounded-xl font-bold"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isReporting}
+                      className="rounded-xl bg-rose-600 font-bold text-white hover:bg-rose-700"
+                    >
+                      {isReporting ? 'Submitting...' : 'Submit Report'}
+                    </Button>
+                  </div>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
@@ -408,12 +526,7 @@ const JobDetailsSidebar = ({
         </CardHeader>
         <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
           {stats.map((stat, index) => (
-            <StatItem
-              key={index}
-              label={stat.label}
-              value={stat.value}
-              icon={stat.icon}
-            />
+            <StatItem key={index} label={stat.label} value={stat.value} icon={stat.icon} />
           ))}
         </CardContent>
       </Card>
@@ -445,16 +558,16 @@ const JobDetailsSidebar = ({
                   ? `$${Math.round(similarJob.salaryMin / 1000)}k - $${Math.round(similarJob.salaryMax / 1000)}k / yr`
                   : similarJob.salaryMin
                     ? `$${Math.round(similarJob.salaryMin / 1000)}k+ / yr`
-                    : "Competitive Salary";
+                    : 'Competitive Salary';
               return (
                 <JobDetailsSimilarJobCard
                   key={similarJob.id || index}
                   id={similarJob.id}
                   title={similarJob.title}
-                  company={similarJob.company?.name || "Verified Partner"}
-                  location={similarJob.location || "Remote"}
+                  company={similarJob.company?.name || 'Verified Partner'}
+                  location={similarJob.location || 'Remote'}
                   salary={salaryStr}
-                  type={formatJobType(similarJob.jobType || "Full-Time")}
+                  type={formatJobType(similarJob.jobType || 'Full-Time')}
                 />
               );
             })

@@ -1,18 +1,22 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { useChangePasswordMutation } from "@/redux/feature/auth/authApi";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useChangePasswordMutation } from '@/redux/feature/auth/authApi';
+import { useGetSecurityMetadataQuery, SecuritySession } from '@/redux/feature/admin/adminApi';
 import {
   AlertCircle,
   ArrowLeft,
@@ -20,32 +24,41 @@ import {
   Lock,
   Shield,
   ShieldCheck,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+  Loader2,
+  Globe,
+  Cpu,
+  History,
+} from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
 
 interface AdminSecurityViewProps {
   onBack: () => void;
 }
 
 export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
-  const [changePassword, { isLoading: isUpdating }] =
-    useChangePasswordMutation();
+  const [changePassword, { isLoading: isUpdating }] = useChangePasswordMutation();
+
+  const { data: securityDataEnvelope, isLoading: isSecLoading } = useGetSecurityMetadataQuery();
+  const securityData = securityDataEnvelope?.data;
+  const activeSessions = securityData?.activeSessions || [];
+  const rateLimits = securityData?.rateLimits;
 
   const [formData, setFormData] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.newPassword !== formData.confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error('New passwords do not match');
       return;
     }
     if (formData.newPassword.length < 8 || formData.newPassword.length > 72) {
-      toast.error("Password must be between 8 and 72 characters");
+      toast.error('Password must be between 8 and 72 characters');
       return;
     }
 
@@ -54,7 +67,7 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
         oldPassword: formData.oldPassword,
         newPassword: formData.newPassword,
       }).unwrap();
-      toast.success("Security settings updated successfully");
+      toast.success('Security settings updated successfully');
       onBack();
     } catch (err) {
       interface ApiErrorData {
@@ -71,7 +84,7 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
       toast.error(
         error.data?.message ||
           error.data?.errorSources?.message ||
-          "Failed to update security settings",
+          'Failed to update security settings',
       );
     }
   };
@@ -88,19 +101,13 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
             <ArrowLeft className="h-4 w-4" />
             Back to Settings
           </button>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Security & Access
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Security & Access</h1>
           <p className="text-muted-foreground mt-2 text-lg font-medium opacity-80">
             Secure your administrative portal and manage credentials.
           </p>
         </div>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="rounded-full font-bold"
-            onClick={onBack}
-          >
+          <Button variant="outline" className="rounded-full font-bold" onClick={onBack}>
             Cancel
           </Button>
           <Button
@@ -108,7 +115,7 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
             onClick={handleUpdatePassword}
             disabled={isUpdating}
           >
-            {isUpdating ? "Updating..." : "Save Controls"}
+            {isUpdating ? 'Updating...' : 'Save Controls'}
           </Button>
         </div>
       </div>
@@ -127,17 +134,14 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
             </CardHeader>
             <CardContent className="space-y-3 pt-6 text-sm font-bold">
               {[
-                "Minimum 12 characters recommended",
-                "Uppercase character required",
-                "Numeric character required",
-                "Special character (!@#) required",
+                'Minimum 12 characters recommended',
+                'Uppercase character required',
+                'Numeric character required',
+                'Special character (!@#) required',
               ].map((req, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="bg-primary/20 flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
-                    <Check
-                      className="text-primary bold h-3 w-3"
-                      strokeWidth={4}
-                    />
+                    <Check className="text-primary bold h-3 w-3" strokeWidth={4} />
                   </div>
                   <span className="opacity-80">{req}</span>
                 </div>
@@ -149,12 +153,10 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
             <div className="flex items-start gap-3">
               <AlertCircle className="text-primary mt-0.5 h-6 w-6 shrink-0" />
               <div className="space-y-1">
-                <p className="text-sm font-bold tracking-widest uppercase">
-                  Brute Force Guard
-                </p>
+                <p className="text-sm font-bold tracking-widest uppercase">Brute Force Guard</p>
                 <p className="text-muted-foreground text-xs leading-relaxed font-medium">
-                  System automatically locks administrative accounts after 5
-                  failed login attempts for 30 minutes.
+                  System automatically locks administrative accounts after 5 failed login attempts
+                  for 30 minutes.
                 </p>
               </div>
             </div>
@@ -273,8 +275,8 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
                   <div>
                     <h3 className="text-lg font-bold">MFA Enforcement</h3>
                     <p className="text-muted-foreground max-w-[280px] text-xs font-medium">
-                      Require a secondary security code via authenticated app
-                      for all login attempts.
+                      Require a secondary security code via authenticated app for all login
+                      attempts.
                     </p>
                   </div>
                 </div>
@@ -282,12 +284,183 @@ export default function AdminSecurityView({ onBack }: AdminSecurityViewProps) {
                   <span className="text-primary text-[10px] font-bold tracking-widest uppercase">
                     SECURE
                   </span>
-                  <Switch
-                    defaultChecked
-                    className="data-[state=checked]:bg-primary"
-                  />
+                  <Switch defaultChecked className="data-[state=checked]:bg-primary" />
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* ========================= Rate Limits Monitoring Card ======================== */}
+          <Card className="overflow-hidden rounded-xl border shadow-sm">
+            <CardHeader className="bg-muted/10 border-b pb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="font-bold">Rate Limiting Status</CardTitle>
+                  <CardDescription className="font-medium">
+                    Defense-in-depth API access control policies.
+                  </CardDescription>
+                </div>
+                <div className="bg-background flex h-10 w-10 items-center justify-center rounded-full border shadow-inner">
+                  <Cpu className="text-muted-foreground h-5 w-5" />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {isSecLoading ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="text-primary h-6 w-6 animate-spin" />
+                </div>
+              ) : rateLimits ? (
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="bg-muted/10 space-y-2 rounded-xl border p-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold">Global Limiter</h4>
+                      <Badge
+                        variant="outline"
+                        className="border-none bg-emerald-500/10 text-[10px] font-bold text-emerald-500"
+                      >
+                        ACTIVE
+                      </Badge>
+                    </div>
+                    <div className="text-muted-foreground space-y-1 text-xs font-medium">
+                      <p>
+                        Limit:{' '}
+                        <span className="text-foreground font-bold">
+                          {rateLimits.global.limit} reqs
+                        </span>
+                      </p>
+                      <p>
+                        Window:{' '}
+                        <span className="text-foreground font-bold">
+                          {rateLimits.global.windowMs / 1000 / 60} minutes
+                        </span>
+                      </p>
+                      <p>
+                        Store:{' '}
+                        <span className="text-foreground font-bold">{rateLimits.global.store}</span>
+                      </p>
+                      <p>
+                        Redis Status:{' '}
+                        <span
+                          className={`font-bold ${rateLimits.global.redisStatus === 'UP' ? 'text-emerald-500' : 'text-amber-500'}`}
+                        >
+                          {rateLimits.global.redisStatus}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/10 space-y-2 rounded-xl border p-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold">Auth Limiter</h4>
+                      <Badge
+                        variant="outline"
+                        className="border-none bg-emerald-500/10 text-[10px] font-bold text-emerald-500"
+                      >
+                        ACTIVE
+                      </Badge>
+                    </div>
+                    <div className="text-muted-foreground space-y-1 text-xs font-medium">
+                      <p>
+                        Limit:{' '}
+                        <span className="text-foreground font-bold">
+                          {rateLimits.auth.limit} reqs
+                        </span>
+                      </p>
+                      <p>
+                        Window:{' '}
+                        <span className="text-foreground font-bold">
+                          {rateLimits.auth.windowMs / 1000 / 60} minutes
+                        </span>
+                      </p>
+                      <p>
+                        Store:{' '}
+                        <span className="text-foreground font-bold">{rateLimits.auth.store}</span>
+                      </p>
+                      <p>
+                        Redis Status:{' '}
+                        <span
+                          className={`font-bold ${rateLimits.auth.redisStatus === 'UP' ? 'text-emerald-500' : 'text-amber-500'}`}
+                        >
+                          {rateLimits.auth.redisStatus}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center text-xs font-medium">
+                  Failed to load rate limiter configurations.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ========================= Active Sessions Card ======================== */}
+          <Card className="overflow-hidden rounded-xl border shadow-sm">
+            <CardHeader className="bg-muted/10 border-b pb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="font-bold">Active Staff Sessions</CardTitle>
+                  <CardDescription className="font-medium">
+                    Current active refresh-token sessions for administrative staff.
+                  </CardDescription>
+                </div>
+                <div className="bg-background flex h-10 w-10 items-center justify-center rounded-full border shadow-inner">
+                  <History className="text-muted-foreground h-5 w-5" />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {isSecLoading ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="text-primary h-6 w-6 animate-spin" />
+                </div>
+              ) : activeSessions.length === 0 ? (
+                <p className="text-muted-foreground py-4 text-center text-xs font-medium">
+                  No active administrative sessions found.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader className="bg-muted/30">
+                      <TableRow>
+                        <TableHead className="text-xs">Staff User</TableHead>
+                        <TableHead className="text-xs">IP Address</TableHead>
+                        <TableHead className="text-xs">User Agent</TableHead>
+                        <TableHead className="text-right text-xs">Age</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {activeSessions.map((session: SecuritySession) => (
+                        <TableRow key={session.id} className="text-xs">
+                          <TableCell>
+                            <div>
+                              <p className="font-bold">{session.fullName}</p>
+                              <p className="text-muted-foreground text-[10px]">{session.email}</p>
+                              <Badge className="bg-primary/10 text-primary mt-0.5 border-none px-1 text-[9px] font-bold">
+                                {session.role}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground font-medium">
+                            <div className="flex items-center gap-1">
+                              <Globe className="h-3 w-3 shrink-0" />
+                              {session.ipAddress}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground max-w-[200px] truncate font-medium">
+                            {session.userAgent}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-right font-semibold">
+                            {formatDistanceToNow(new Date(session.createdAt), { addSuffix: true })}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -1,9 +1,10 @@
-"use client";
-import ThemeToggleButtonCompact from "@/components/shared/ThemeToggleButtonCompact";
-import { Button } from "@/components/ui/button";
-import { useSidebar } from "@/components/ui/sidebar";
-import { ChevronRight } from "lucide-react";
-import { ReactNode, useEffect, useRef } from "react";
+'use client';
+import ThemeToggleButtonCompact from '@/components/shared/ThemeToggleButtonCompact';
+import NotificationDropdown from '@/components/shared/navigation/NotificationDropdown';
+import { Button } from '@/components/ui/button';
+import { useSidebar } from '@/components/ui/sidebar';
+import { ChevronRight } from 'lucide-react';
+import { ReactNode, useEffect, useRef } from 'react';
 
 const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
   const headerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +25,7 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
     updateParentPadding();
 
     // Set up a ResizeObserver to handle layout/content wrap changes dynamically
-    if (typeof ResizeObserver !== "undefined" && headerRef.current) {
+    if (typeof ResizeObserver !== 'undefined' && headerRef.current) {
       const resizeObserver = new ResizeObserver(() => {
         updateParentPadding();
       });
@@ -32,8 +33,8 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
       return () => resizeObserver.disconnect();
     }
 
-    window.addEventListener("resize", updateParentPadding);
-    return () => window.removeEventListener("resize", updateParentPadding);
+    window.addEventListener('resize', updateParentPadding);
+    return () => window.removeEventListener('resize', updateParentPadding);
   }, []);
 
   return (
@@ -49,14 +50,14 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
         style={{
           left: isMobile
             ? 0
-            : state === "collapsed"
-              ? "var(--sidebar-width-icon)"
-              : "var(--sidebar-width)",
+            : state === 'collapsed'
+              ? 'var(--sidebar-width-icon)'
+              : 'var(--sidebar-width)',
         }}
         className="dashboard-header border-border bg-card/95 ease-apple fixed top-0 right-0 z-50 border-b backdrop-blur-sm transition-[left] duration-300"
       >
         <div className="mx-auto flex h-auto min-h-12 shrink-0 items-center justify-between gap-3 py-3 pr-16 pl-4 sm:h-auto sm:min-h-14 sm:py-4 sm:pr-16 sm:pl-6 md:h-auto md:min-h-16 md:px-8 md:py-0 md:pr-8">
-          {!isMobile && state === "collapsed" && (
+          {!isMobile && state === 'collapsed' && (
             <Button
               variant="ghost"
               size="icon"
@@ -68,11 +69,11 @@ const DashboardHeaderContainer = ({ children }: { children: ReactNode }) => {
             </Button>
           )}
           <div className="min-w-0 flex-1">{children}</div>
-          {!isMobile && state === "collapsed" && (
-            <div className="ml-2 hidden shrink-0 items-center md:flex">
-              <ThemeToggleButtonCompact />
-            </div>
-          )}
+
+          <div className="flex shrink-0 items-center gap-2">
+            <NotificationDropdown />
+            {!isMobile && state === 'collapsed' && <ThemeToggleButtonCompact />}
+          </div>
         </div>
       </header>
     </>

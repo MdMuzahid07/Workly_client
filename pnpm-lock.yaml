@@ -97,6 +97,9 @@ importers:
       frimousse:
         specifier: ^0.3.0
         version: 0.3.0(react@19.2.7)(typescript@5.9.3)
+      howler:
+        specifier: ^2.2.4
+        version: 2.2.4
       input:
         specifier: ^1.0.1
         version: 1.0.1
@@ -182,6 +185,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.3.2
+      '@types/howler':
+        specifier: ^2.2.11
+        version: 2.2.13
       '@types/node':
         specifier: ^24
         version: 24.13.3
@@ -2582,6 +2588,12 @@ packages:
     resolution:
       {
         integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==,
+      }
+
+  '@types/howler@2.2.13':
+    resolution:
+      {
+        integrity: sha512-40+EBjqIHHrC4VShlz/7i0lBUsE3QkgzZinQQji74Hd8sBkJZUBaT7LWFLK6rcabsDOOQpoMbEJvtaFQwxOu/g==,
       }
 
   '@types/json-schema@7.0.15':
@@ -5074,6 +5086,12 @@ packages:
         integrity: sha512-YwUvVpSF7m1yOblFPrU3Hbo8XhPheBoiyfGuII6z19LnOr6JpDnyyp7LFNrfV56wS8tpvtBFGRISHN02pDdLOA==,
       }
     engines: { node: '>=16.9.0' }
+
+  howler@2.2.4:
+    resolution:
+      {
+        integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==,
+      }
 
   hsl-to-hex@1.0.0:
     resolution:
@@ -10184,6 +10202,8 @@ snapshots:
 
   '@types/geojson@7946.0.16': {}
 
+  '@types/howler@2.2.13': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -11758,6 +11778,8 @@ snapshots:
   hls.js@1.6.16: {}
 
   hono@4.12.28: {}
+
+  howler@2.2.4: {}
 
   hsl-to-hex@1.0.0:
     dependencies:

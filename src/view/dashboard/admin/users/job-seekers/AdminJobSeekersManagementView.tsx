@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +11,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -20,7 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   AlertTriangle,
   ChevronDown,
@@ -38,39 +38,33 @@ import {
   TrendingUp,
   UserX,
   Users,
-} from "lucide-react";
-import DeleteConfirmationModal from "@/components/shared/DeleteConfirmationModal";
-import { downloadAdminJobSeekerResume } from "@/lib/pdfSource";
-import debounce from "debounce";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-import DashboardAdminJobSeekersHeader from "../../../../../components/dashboard/dashboard-nav/header/DashboardAdminJobSeekersHeader";
-import type {
-  AdminJobSeekerRow,
-  AdminJobSeekerStatus,
-} from "@/types/adminJobSeekers";
+  LockOpen,
+} from 'lucide-react';
+import DeleteConfirmationModal from '@/components/shared/DeleteConfirmationModal';
+import { downloadAdminJobSeekerResume } from '@/lib/pdfSource';
+import debounce from 'debounce';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import DashboardAdminJobSeekersHeader from '../../../../../components/dashboard/dashboard-nav/header/DashboardAdminJobSeekersHeader';
+import type { AdminJobSeekerRow, AdminJobSeekerStatus } from '@/types/adminJobSeekers';
 import {
   useDeleteJobSeekerAdminMutation,
   useGetJobSeekerStatsQuery,
   useGetJobSeekersAdminQuery,
   useReactivateJobSeekerAdminMutation,
   useSuspendJobSeekerAdminMutation,
-} from "@/redux/feature/admin/adminApi";
-import AdminUsersSkeleton from "@/skeleton/dashboard/admin/AdminUsersSkeleton";
+  useClearUserLockoutMutation,
+} from '@/redux/feature/admin/adminApi';
+import AdminUsersSkeleton from '@/skeleton/dashboard/admin/AdminUsersSkeleton';
 
 const AdminJobSeekersManagementView = () => {
-  const [searchValue, setSearchValue] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedStatus, setSelectedStatus] =
-    useState<AdminJobSeekerStatus | null>(null);
+  const [searchValue, setSearchValue] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<AdminJobSeekerStatus | null>(null);
   const [page, setPage] = useState(1);
-  const [deleteTarget, setDeleteTarget] = useState<AdminJobSeekerRow | null>(
-    null,
-  );
-  const [downloadingResumeId, setDownloadingResumeId] = useState<string | null>(
-    null,
-  );
+  const [deleteTarget, setDeleteTarget] = useState<AdminJobSeekerRow | null>(null);
+  const [downloadingResumeId, setDownloadingResumeId] = useState<string | null>(null);
   const limit = 20;
 
   const applyDebouncedSearch = useMemo(
@@ -123,49 +117,43 @@ const AdminJobSeekersManagementView = () => {
     const s = statsEnvelope?.data;
     return [
       {
-        label: "Total Job Seekers",
-        value: s ? String(s.totalJobSeekers) : "—",
+        label: 'Total Job Seekers',
+        value: s ? String(s.totalJobSeekers) : '—',
         icon: Users,
-        color: "text-blue-500",
+        color: 'text-blue-500',
       },
       {
-        label: "Active Resumes",
-        value: s ? String(s.activeResumes) : "—",
+        label: 'Active Resumes',
+        value: s ? String(s.activeResumes) : '—',
         icon: FileText,
-        color: "text-emerald-500",
+        color: 'text-emerald-500',
       },
       {
-        label: "Portfolios Shared",
-        value: s ? String(s.portfoliosShared) : "—",
+        label: 'Portfolios Shared',
+        value: s ? String(s.portfoliosShared) : '—',
         icon: Globe,
-        color: "text-purple-500",
+        color: 'text-purple-500',
       },
       {
-        label: "High Match Rate",
-        value: s ? `${s.highMatchRate}%` : "—",
+        label: 'High Match Rate',
+        value: s ? `${s.highMatchRate}%` : '—',
         icon: TrendingUp,
-        color: "text-amber-500",
+        color: 'text-amber-500',
       },
     ];
   }, [statsEnvelope]);
 
-  const statusOptions: AdminJobSeekerStatus[] = [
-    "Hired",
-    "Looking",
-    "Active",
-    "Suspended",
-  ];
+  const statusOptions: AdminJobSeekerStatus[] = ['Hired', 'Looking', 'Active', 'Suspended'];
 
-  const [suspend, { isLoading: suspending }] =
-    useSuspendJobSeekerAdminMutation();
-  const [reactivate, { isLoading: reactivating }] =
-    useReactivateJobSeekerAdminMutation();
+  const [suspend, { isLoading: suspending }] = useSuspendJobSeekerAdminMutation();
+  const [reactivate, { isLoading: reactivating }] = useReactivateJobSeekerAdminMutation();
   const [remove, { isLoading: deleting }] = useDeleteJobSeekerAdminMutation();
+  const [clearLockout] = useClearUserLockoutMutation();
   const busy = suspending || reactivating || deleting;
 
   const handleStatusToggle = async (jobSeeker: AdminJobSeekerRow) => {
     try {
-      if (jobSeeker.status === "Suspended") {
+      if (jobSeeker.status === 'Suspended') {
         await reactivate(jobSeeker.id).unwrap();
         toast.success(`${jobSeeker.name} has been reactivated`);
       } else {
@@ -175,14 +163,26 @@ const AdminJobSeekersManagementView = () => {
     } catch (error: unknown) {
       const message =
         (error as { data?: { message?: string } })?.data?.message ||
-        "Failed to update candidate status";
+        'Failed to update candidate status';
+      toast.error(message);
+    }
+  };
+
+  const handleClearLockout = async (userId: string) => {
+    try {
+      await clearLockout(userId).unwrap();
+      toast.success('User lockout cleared successfully');
+      refetch();
+    } catch (error: unknown) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message || 'Failed to clear user lockout';
       toast.error(message);
     }
   };
 
   const handleDownloadResume = async (jobSeeker: AdminJobSeekerRow) => {
     if (!jobSeeker.hasResume) {
-      toast.error("No resume available for this candidate");
+      toast.error('No resume available for this candidate');
       return;
     }
 
@@ -190,14 +190,12 @@ const AdminJobSeekersManagementView = () => {
     try {
       await downloadAdminJobSeekerResume(
         jobSeeker.id,
-        `${jobSeeker.name.replace(/\s+/g, "-")}-resume.pdf`,
+        `${jobSeeker.name.replace(/\s+/g, '-')}-resume.pdf`,
       );
-      toast.success("Resume downloaded successfully");
+      toast.success('Resume downloaded successfully');
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to download resume. Please try again.",
+        error instanceof Error ? error.message : 'Failed to download resume. Please try again.',
       );
     } finally {
       setDownloadingResumeId(null);
@@ -229,13 +227,9 @@ const AdminJobSeekersManagementView = () => {
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold sm:text-3xl">
-                  {stat.value}
-                </div>
+                <div className="text-2xl font-bold sm:text-3xl">{stat.value}</div>
                 {statsError && (
-                  <p className="text-destructive mt-2 text-xs font-medium">
-                    Unable to load stats.
-                  </p>
+                  <p className="text-destructive mt-2 text-xs font-medium">Unable to load stats.</p>
                 )}
               </CardContent>
             </Card>
@@ -261,7 +255,7 @@ const AdminJobSeekersManagementView = () => {
                   className="border-primary/20 flex items-center gap-2 rounded-full font-bold"
                 >
                   <Filter className="h-4 w-4" />
-                  {selectedStatus || "Status Filters"}
+                  {selectedStatus || 'Status Filters'}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -295,8 +289,8 @@ const AdminJobSeekersManagementView = () => {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setSearchValue("");
-                  setDebouncedSearch("");
+                  setSearchValue('');
+                  setDebouncedSearch('');
                   setSelectedStatus(null);
                   setPage(1);
                 }}
@@ -334,10 +328,7 @@ const AdminJobSeekersManagementView = () => {
               </TableHeader>
               <TableBody>
                 {jobSeekers.map((js) => (
-                  <TableRow
-                    key={js.id}
-                    className="group hover:bg-muted/40 transition-colors"
-                  >
+                  <TableRow key={js.id} className="group hover:bg-muted/40 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
@@ -348,9 +339,16 @@ const AdminJobSeekersManagementView = () => {
                         </Avatar>
                         <div className="min-w-0">
                           <p className="truncate font-bold">{js.name}</p>
-                          <p className="text-muted-foreground truncate text-xs">
-                            {js.email}
-                          </p>
+                          <p className="text-muted-foreground truncate text-xs">{js.email}</p>
+                          {js.lockedUntil && new Date(js.lockedUntil) > new Date() ? (
+                            <span className="mt-0.5 block text-[10px] font-bold text-red-500">
+                              Locked until {new Date(js.lockedUntil).toLocaleString()}
+                            </span>
+                          ) : js.failedLoginAttempts > 0 ? (
+                            <span className="mt-0.5 block text-[10px] font-semibold text-amber-500">
+                              {js.failedLoginAttempts} failed attempts
+                            </span>
+                          ) : null}
                         </div>
                       </div>
                     </TableCell>
@@ -374,11 +372,11 @@ const AdminJobSeekersManagementView = () => {
                     <TableCell>
                       <Badge
                         className={`font-bold ${
-                          js.status === "Hired"
-                            ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                            : js.status === "Looking"
-                              ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
-                              : "bg-muted text-muted-foreground"
+                          js.status === 'Hired'
+                            ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20'
+                            : js.status === 'Looking'
+                              ? 'bg-blue-500/10 text-blue-600 hover:bg-blue-500/20'
+                              : 'bg-muted text-muted-foreground'
                         }`}
                         variant="secondary"
                       >
@@ -445,14 +443,8 @@ const AdminJobSeekersManagementView = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem
-                              asChild
-                              className="cursor-pointer"
-                            >
-                              <Link
-                                href={`/browse-candidates/${js.id}`}
-                                target="_blank"
-                              >
+                            <DropdownMenuItem asChild className="cursor-pointer">
+                              <Link href={`/browse-candidates/${js.id}`} target="_blank">
                                 <ExternalLink className="mr-2 h-4 w-4" />
                                 View Full Profile
                               </Link>
@@ -466,15 +458,24 @@ const AdminJobSeekersManagementView = () => {
                               Download Resume
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
+                            {((js.lockedUntil && new Date(js.lockedUntil) > new Date()) ||
+                              js.failedLoginAttempts > 0) && (
+                              <DropdownMenuItem
+                                className="cursor-pointer font-bold text-emerald-600"
+                                disabled={busy}
+                                onClick={() => handleClearLockout(js.id)}
+                              >
+                                <LockOpen className="mr-2 h-4 w-4" />
+                                Clear Lockout
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               className="cursor-pointer text-amber-600"
                               disabled={busy}
                               onClick={() => handleStatusToggle(js)}
                             >
                               <UserX className="mr-2 h-4 w-4" />
-                              {js.status === "Suspended"
-                                ? "Reactivate User"
-                                : "Suspend User"}
+                              {js.status === 'Suspended' ? 'Reactivate User' : 'Suspend User'}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive cursor-pointer"
