@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import AdminUsersSkeleton from "@/skeleton/dashboard/admin/AdminUsersSkeleton";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import AdminUsersSkeleton from '@/skeleton/dashboard/admin/AdminUsersSkeleton';
 import {
   Table,
   TableBody,
@@ -21,20 +21,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
-  useDeleteEmployerAdminMutation,
-  useGetEmployerStatsQuery,
-  useGetEmployersAdminQuery,
-  useReactivateEmployerAdminMutation,
-  useSuspendEmployerAdminMutation,
-  useVerifyCompanyAdminMutation,
-} from "@/redux/feature/admin/adminApi";
-import type { AdminEmployerStatus } from "@/types/adminEmployers";
-import {
-  AlertTriangle,
-  Briefcase,
-  Building2,
   CheckCircle2,
   ChevronDown,
   ExternalLink,
@@ -44,15 +32,31 @@ import {
   ShieldCheck,
   Trash2,
   UserX,
-} from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import DashboardAdminEmployersHeader from "../../../../../components/dashboard/dashboard-nav/header/DashboardAdminEmployersHeader";
+  LockOpen,
+  AlertTriangle,
+  Briefcase,
+  Building2,
+} from 'lucide-react';
+import DeleteConfirmationModal from '@/components/shared/DeleteConfirmationModal';
+import type { AdminEmployerRow, AdminEmployerStatus } from '@/types/adminEmployers';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import DashboardAdminEmployersHeader from '../../../../../components/dashboard/dashboard-nav/header/DashboardAdminEmployersHeader';
+import {
+  useDeleteEmployerAdminMutation,
+  useGetEmployerStatsQuery,
+  useGetEmployersAdminQuery,
+  useReactivateEmployerAdminMutation,
+  useSuspendEmployerAdminMutation,
+  useVerifyCompanyAdminMutation,
+  useClearUserLockoutMutation,
+} from '@/redux/feature/admin/adminApi';
 
 const AdminEmployersManagementView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] =
-    useState<AdminEmployerStatus | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<AdminEmployerStatus | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminEmployerRow | null>(null);
 
   const [page, setPage] = useState(1);
   const limit = 20;
@@ -93,48 +97,68 @@ const AdminEmployersManagementView = () => {
     const s = statsEnvelope?.data;
     return [
       {
-        label: "Total Employers",
-        value: s ? String(s.totalEmployers) : "—",
+        label: 'Total Employers',
+        value: s ? String(s.totalEmployers) : '—',
         icon: Building2,
-        color: "text-blue-500",
+        color: 'text-blue-500',
       },
       {
-        label: "Verified Companies",
-        value: s ? String(s.verifiedCompanies) : "—",
+        label: 'Verified Companies',
+        value: s ? String(s.verifiedCompanies) : '—',
         icon: CheckCircle2,
-        color: "text-emerald-500",
+        color: 'text-emerald-500',
       },
       {
-        label: "Pending Verification",
-        value: s ? String(s.pendingVerification) : "—",
+        label: 'Pending Verification',
+        value: s ? String(s.pendingVerification) : '—',
         icon: ShieldCheck,
-        color: "text-amber-500",
+        color: 'text-amber-500',
       },
       {
-        label: "Active Jobs",
-        value: s ? String(s.activeJobs) : "—",
+        label: 'Active Jobs',
+        value: s ? String(s.activeJobs) : '—',
         icon: Briefcase,
-        color: "text-purple-500",
+        color: 'text-purple-500',
       },
     ];
   }, [statsEnvelope]);
 
-  const statusOptions: AdminEmployerStatus[] = [
-    "Verified",
-    "Pending",
-    "Suspended",
-  ];
+  const statusOptions: AdminEmployerStatus[] = ['Verified', 'Pending', 'Suspended'];
 
-  const [verifyCompany, { isLoading: verifying }] =
-    useVerifyCompanyAdminMutation();
-  const [suspendEmployer, { isLoading: suspending }] =
-    useSuspendEmployerAdminMutation();
-  const [reactivateEmployer, { isLoading: reactivating }] =
-    useReactivateEmployerAdminMutation();
-  const [deleteEmployer, { isLoading: deleting }] =
-    useDeleteEmployerAdminMutation();
+  const [verifyCompany, { isLoading: verifying }] = useVerifyCompanyAdminMutation();
+  const [suspendEmployer, { isLoading: suspending }] = useSuspendEmployerAdminMutation();
+  const [reactivateEmployer, { isLoading: reactivating }] = useReactivateEmployerAdminMutation();
+  const [deleteEmployer, { isLoading: deleting }] = useDeleteEmployerAdminMutation();
+  const [clearLockout] = useClearUserLockoutMutation();
 
   const busy = verifying || suspending || reactivating || deleting;
+
+  const handleClearLockout = async (userId: string) => {
+    try {
+      await clearLockout(userId).unwrap();
+      toast.success('User lockout cleared successfully');
+      refetch();
+    } catch (error: unknown) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message || 'Failed to clear user lockout';
+      toast.error(message);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget || !deleteTarget.ownerId) return;
+    try {
+      await deleteEmployer(deleteTarget.ownerId).unwrap();
+      toast.success(`${deleteTarget.companyName} deleted successfully`);
+      refetch();
+    } catch (error: unknown) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message || 'Failed to delete employer';
+      toast.error(message);
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
 
   if (statsLoading || listLoading) {
     return <AdminUsersSkeleton />;
@@ -156,13 +180,9 @@ const AdminEmployersManagementView = () => {
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold sm:text-3xl">
-                  {stat.value}
-                </div>
+                <div className="text-2xl font-bold sm:text-3xl">{stat.value}</div>
                 {statsError && (
-                  <p className="text-destructive mt-2 text-xs font-medium">
-                    Unable to load stats.
-                  </p>
+                  <p className="text-destructive mt-2 text-xs font-medium">Unable to load stats.</p>
                 )}
               </CardContent>
             </Card>
@@ -188,7 +208,7 @@ const AdminEmployersManagementView = () => {
                   className="border-primary/20 flex items-center gap-2 rounded-full font-bold"
                 >
                   <Filter className="h-4 w-4" />
-                  {selectedStatus || "Status Filters"}
+                  {selectedStatus || 'Status Filters'}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -216,7 +236,7 @@ const AdminEmployersManagementView = () => {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setSearchTerm("");
+                  setSearchTerm('');
                   setSelectedStatus(null);
                   setPage(1);
                 }}
@@ -253,10 +273,7 @@ const AdminEmployersManagementView = () => {
               </TableHeader>
               <TableBody>
                 {employers.map((emp) => (
-                  <TableRow
-                    key={emp.id}
-                    className="group hover:bg-muted/40 transition-colors"
-                  >
+                  <TableRow key={emp.id} className="group hover:bg-muted/40 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="ring-primary/5 group-hover:ring-primary/20 h-10 w-10 ring-2 transition-all">
@@ -266,39 +283,39 @@ const AdminEmployersManagementView = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <p className="truncate font-bold">
-                            {emp.companyName}
-                          </p>
-                          <p className="text-muted-foreground truncate text-xs">
-                            {emp.industry}
-                          </p>
+                          <p className="truncate font-bold">{emp.companyName}</p>
+                          <p className="text-muted-foreground truncate text-xs">{emp.industry}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
                         <p className="font-medium">{emp.ownerName}</p>
-                        <p className="text-muted-foreground truncate text-xs">
-                          {emp.ownerEmail}
-                        </p>
+                        <p className="text-muted-foreground truncate text-xs">{emp.ownerEmail}</p>
+                        {emp.lockedUntil && new Date(emp.lockedUntil) > new Date() ? (
+                          <span className="mt-0.5 block text-[10px] font-bold text-red-500">
+                            Locked until {new Date(emp.lockedUntil).toLocaleString()}
+                          </span>
+                        ) : emp.failedLoginAttempts > 0 ? (
+                          <span className="mt-0.5 block text-[10px] font-semibold text-amber-500">
+                            {emp.failedLoginAttempts} failed attempts
+                          </span>
+                        ) : null}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 text-primary font-bold"
-                      >
+                      <Badge variant="secondary" className="bg-primary/10 text-primary font-bold">
                         {emp.activeJobs} Jobs
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
                         className={`font-bold ${
-                          emp.status === "Verified"
-                            ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                            : emp.status === "Pending"
-                              ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20"
-                              : "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                          emp.status === 'Verified'
+                            ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20'
+                            : emp.status === 'Pending'
+                              ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
+                              : 'bg-destructive/10 text-destructive hover:bg-destructive/20'
                         }`}
                         variant="secondary"
                       >
@@ -318,16 +335,13 @@ const AdminEmployersManagementView = () => {
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link
-                              href={`/companies/${emp.slug}`}
-                              target="_blank"
-                            >
+                            <Link href={`/companies/${emp.slug}`} target="_blank">
                               <ExternalLink className="mr-2 h-4 w-4" />
                               View Profile
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {emp.status !== "Verified" && (
+                          {emp.status !== 'Verified' && (
                             <DropdownMenuItem
                               className="cursor-pointer text-emerald-600"
                               disabled={busy}
@@ -337,14 +351,24 @@ const AdminEmployersManagementView = () => {
                               Verify Account
                             </DropdownMenuItem>
                           )}
-                          {emp.status !== "Suspended" ? (
+                          {emp.ownerId &&
+                            ((emp.lockedUntil && new Date(emp.lockedUntil) > new Date()) ||
+                              emp.failedLoginAttempts > 0) && (
+                              <DropdownMenuItem
+                                className="cursor-pointer font-bold text-emerald-600"
+                                disabled={busy}
+                                onClick={() => handleClearLockout(emp.ownerId)}
+                              >
+                                <LockOpen className="mr-2 h-4 w-4" />
+                                Clear Lockout
+                              </DropdownMenuItem>
+                            )}
+                          {emp.status !== 'Suspended' ? (
                             <DropdownMenuItem
                               className="cursor-pointer text-amber-600"
                               disabled={busy || !emp.ownerId}
                               onClick={() =>
-                                emp.ownerId
-                                  ? suspendEmployer(emp.ownerId)
-                                  : undefined
+                                emp.ownerId ? suspendEmployer(emp.ownerId) : undefined
                               }
                             >
                               <UserX className="mr-2 h-4 w-4" />
@@ -355,9 +379,7 @@ const AdminEmployersManagementView = () => {
                               className="cursor-pointer text-emerald-600"
                               disabled={busy || !emp.ownerId}
                               onClick={() =>
-                                emp.ownerId
-                                  ? reactivateEmployer(emp.ownerId)
-                                  : undefined
+                                emp.ownerId ? reactivateEmployer(emp.ownerId) : undefined
                               }
                             >
                               <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -367,11 +389,7 @@ const AdminEmployersManagementView = () => {
                           <DropdownMenuItem
                             className="text-destructive cursor-pointer"
                             disabled={busy || !emp.ownerId}
-                            onClick={() =>
-                              emp.ownerId
-                                ? deleteEmployer(emp.ownerId)
-                                : undefined
-                            }
+                            onClick={() => setDeleteTarget(emp)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Account
@@ -391,8 +409,8 @@ const AdminEmployersManagementView = () => {
               </div>
               <h3 className="text-lg font-bold">No employers found</h3>
               <p className="text-muted-foreground mx-auto mt-2 max-w-xs">
-                We {`couldn't`} find any company matching your search criteria.
-                Try a different term.
+                We {`couldn't`} find any company matching your search criteria. Try a different
+                term.
               </p>
             </div>
           )}
@@ -422,6 +440,17 @@ const AdminEmployersManagementView = () => {
           </div>
         </div>
       </div>
+
+      <DeleteConfirmationModal
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete employer account?"
+        description="This will permanently delete the employer's profile and account, soft-delete their Company page, and close all their active job listings. This action cannot be undone."
+        itemName={deleteTarget?.companyName}
+      />
     </div>
   );
 };

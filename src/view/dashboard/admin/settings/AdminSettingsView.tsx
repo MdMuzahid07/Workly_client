@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import DashboardAdminSettingsHeader from "@/components/dashboard/dashboard-nav/header/DashboardAdminSettingsHeader";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
+import DashboardAdminSettingsHeader from '@/components/dashboard/dashboard-nav/header/DashboardAdminSettingsHeader';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import {
   useGetSystemSettingsQuery,
   useUpdateSystemSettingsMutation,
-} from "@/redux/feature/admin/adminApi";
+} from '@/redux/feature/admin/adminApi';
 import {
   BellRing,
   ChevronRight,
@@ -24,13 +24,14 @@ import {
   Trash2,
   User,
   Zap,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import AdminBrandingView from "./AdminBrandingView";
-import AdminSettingsSkeleton from "@/skeleton/dashboard/admin/AdminSettingsSkeleton";
-import AdminPersonalInformationView from "./AdminPersonalInformationView";
-import AdminSecurityView from "./AdminSecurityView";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import AdminBrandingView from './AdminBrandingView';
+import AdminSettingsSkeleton from '@/skeleton/dashboard/admin/AdminSettingsSkeleton';
+import AdminPersonalInformationView from './AdminPersonalInformationView';
+import AdminSecurityView from './AdminSecurityView';
+import AdminBroadcastView from './AdminBroadcastView';
 
 interface SettingItem {
   id: string;
@@ -42,30 +43,30 @@ interface SettingItem {
 
 const platformControlsSeed: SettingItem[] = [
   {
-    id: "aiMatchmaking",
-    label: "AI Matchmaking Engine",
-    description: "Real-time candidate-to-job scoring using LLMs",
+    id: 'aiMatchmaking',
+    label: 'AI Matchmaking Engine',
+    description: 'Real-time candidate-to-job scoring using LLMs',
     icon: <Cpu className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "publicRegistration",
-    label: "Public Registration",
-    description: "Allow new employers and candidates to sign up",
+    id: 'publicRegistration',
+    label: 'Public Registration',
+    description: 'Allow new employers and candidates to sign up',
     icon: <User className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "globalNotifications",
-    label: "Global Notification Relay",
-    description: "System dispatching for all outbound alerts",
+    id: 'globalNotifications',
+    label: 'Global Notification Relay',
+    description: 'System dispatching for all outbound alerts',
     icon: <BellRing className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "extendedAuditLogging",
-    label: "Extended Audit Logging",
-    description: "Track all administrative actions for 365 days",
+    id: 'extendedAuditLogging',
+    label: 'Extended Audit Logging',
+    description: 'Track all administrative actions for 365 days',
     icon: <Zap className="h-5 w-5" />,
     enabled: true,
   },
@@ -73,11 +74,10 @@ const platformControlsSeed: SettingItem[] = [
 
 const AdminSettingsView = () => {
   const [activeSection, setActiveSection] = useState<
-    "main" | "personal" | "security" | "branding"
-  >("main");
+    'main' | 'personal' | 'security' | 'branding' | 'broadcast'
+  >('main');
   const { data: settingsData, isLoading } = useGetSystemSettingsQuery();
-  const [updateSettings, { isLoading: isSaving }] =
-    useUpdateSystemSettingsMutation();
+  const [updateSettings, { isLoading: isSaving }] = useUpdateSystemSettingsMutation();
 
   const [controls, setControls] = useState(platformControlsSeed);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -97,8 +97,7 @@ const AdminSettingsView = () => {
       setMaintenanceMode(data.maintenanceMode ?? false);
 
       if (data.maintenanceEstimatedEnd) {
-        const remainingMs =
-          new Date(data.maintenanceEstimatedEnd).getTime() - Date.now();
+        const remainingMs = new Date(data.maintenanceEstimatedEnd).getTime() - Date.now();
         if (remainingMs > 0) {
           const totalMins = Math.floor(remainingMs / (1000 * 60));
           setDurationDays(Math.floor(totalMins / (24 * 60)));
@@ -111,18 +110,14 @@ const AdminSettingsView = () => {
 
   const toggleControl = (id: string) => {
     setControls((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item,
-      ),
+      prev.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item)),
     );
   };
 
   const handleSave = async () => {
     try {
       const totalMins =
-        Number(durationDays) * 24 * 60 +
-        Number(durationHours) * 60 +
-        Number(durationMinutes);
+        Number(durationDays) * 24 * 60 + Number(durationHours) * 60 + Number(durationMinutes);
 
       const maintenanceEstimatedEnd =
         maintenanceMode && totalMins > 0
@@ -138,9 +133,9 @@ const AdminSettingsView = () => {
         maintenanceEstimatedEnd,
       };
       await updateSettings(payload).unwrap();
-      toast.success("System settings updated");
+      toast.success('System settings updated');
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to update settings");
+      toast.error(err?.data?.message || 'Failed to update settings');
     }
   };
 
@@ -148,18 +143,20 @@ const AdminSettingsView = () => {
     return <AdminSettingsSkeleton />;
   }
 
-  if (activeSection === "personal") {
-    return (
-      <AdminPersonalInformationView onBack={() => setActiveSection("main")} />
-    );
+  if (activeSection === 'personal') {
+    return <AdminPersonalInformationView onBack={() => setActiveSection('main')} />;
   }
 
-  if (activeSection === "security") {
-    return <AdminSecurityView onBack={() => setActiveSection("main")} />;
+  if (activeSection === 'security') {
+    return <AdminSecurityView onBack={() => setActiveSection('main')} />;
   }
 
-  if (activeSection === "branding") {
-    return <AdminBrandingView onBack={() => setActiveSection("main")} />;
+  if (activeSection === 'branding') {
+    return <AdminBrandingView onBack={() => setActiveSection('main')} />;
+  }
+
+  if (activeSection === 'broadcast') {
+    return <AdminBroadcastView onBack={() => setActiveSection('main')} />;
   }
 
   return (
@@ -180,7 +177,7 @@ const AdminSettingsView = () => {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div onClick={() => setActiveSection("personal")}>
+              <div onClick={() => setActiveSection('personal')}>
                 <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border-2 p-5 transition-all duration-300">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -188,9 +185,7 @@ const AdminSettingsView = () => {
                         <User className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold tracking-tight">
-                          Personal Information
-                        </h3>
+                        <h3 className="font-bold tracking-tight">Personal Information</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           Identity, email, system profile
                         </p>
@@ -201,7 +196,7 @@ const AdminSettingsView = () => {
                 </Card>
               </div>
 
-              <div onClick={() => setActiveSection("security")}>
+              <div onClick={() => setActiveSection('security')}>
                 <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border-2 p-5 transition-all duration-300">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -209,9 +204,7 @@ const AdminSettingsView = () => {
                         <Lock className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold tracking-tight">
-                          Security & Access
-                        </h3>
+                        <h3 className="font-bold tracking-tight">Security & Access</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           Password, MFA, session control
                         </p>
@@ -222,10 +215,7 @@ const AdminSettingsView = () => {
                 </Card>
               </div>
 
-              <div
-                onClick={() => setActiveSection("branding")}
-                className="sm:col-span-2"
-              >
+              <div onClick={() => setActiveSection('branding')}>
                 <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border-2 p-5 transition-all duration-300">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -233,20 +223,32 @@ const AdminSettingsView = () => {
                         <Globe className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold tracking-tight">
-                          Portal Branding
-                        </h3>
+                        <h3 className="font-bold tracking-tight">Portal Branding</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
-                          Site name, slogans, support alias and identity
+                          Site name, slogans, logos
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-primary text-[10px] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
-                        Global Config
-                      </span>
-                      <ChevronRight className="text-muted-foreground group-hover:text-primary h-5 w-5 transition-all group-hover:translate-x-1" />
+                    <ChevronRight className="text-muted-foreground group-hover:text-primary h-5 w-5 transition-all group-hover:translate-x-1" />
+                  </div>
+                </Card>
+              </div>
+
+              <div onClick={() => setActiveSection('broadcast')}>
+                <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border-2 p-5 transition-all duration-300">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 text-primary group-hover:bg-primary/20 flex h-12 w-12 items-center justify-center rounded-xl ring-4 ring-transparent transition-all">
+                        <BellRing className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold tracking-tight">Broadcast announcement</h3>
+                        <p className="text-muted-foreground text-xs font-medium opacity-70">
+                          Push notifications & emails
+                        </p>
+                      </div>
                     </div>
+                    <ChevronRight className="text-muted-foreground group-hover:text-primary h-5 w-5 transition-all group-hover:translate-x-1" />
                   </div>
                 </Card>
               </div>
@@ -278,9 +280,7 @@ const AdminSettingsView = () => {
                         {item.icon}
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold tracking-tight">
-                          {item.label}
-                        </h3>
+                        <h3 className="text-sm font-bold tracking-tight">{item.label}</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           {item.description}
                         </p>
@@ -312,12 +312,12 @@ const AdminSettingsView = () => {
 
             <div className="grid gap-3">
               <Card
-                className={`rounded-xl border-2 p-5 transition-all duration-300 ${maintenanceMode ? "border-destructive bg-destructive/10 shadow-destructive/10 shadow-lg" : "border-border bg-card hover:border-destructive/30"}`}
+                className={`rounded-xl border-2 p-5 transition-all duration-300 ${maintenanceMode ? 'border-destructive bg-destructive/10 shadow-destructive/10 shadow-lg' : 'border-border bg-card hover:border-destructive/30'}`}
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-4">
                     <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-xl shadow-lg transition-all ${maintenanceMode ? "bg-destructive shadow-destructive/30 animate-pulse text-white" : "bg-muted text-muted-foreground"}`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-xl shadow-lg transition-all ${maintenanceMode ? 'bg-destructive shadow-destructive/30 animate-pulse text-white' : 'bg-muted text-muted-foreground'}`}
                     >
                       <Monitor className="h-6 w-6" />
                     </div>
@@ -329,8 +329,8 @@ const AdminSettingsView = () => {
                       </div>
                       <p className="text-muted-foreground mt-0.5 text-xs font-medium">
                         {maintenanceMode
-                          ? "Site access is locked down. Non-admin users (including landing page) are redirected to /maintenance."
-                          : "Platform is live and accessible to all job seekers and employers."}
+                          ? 'Site access is locked down. Non-admin users (including landing page) are redirected to /maintenance.'
+                          : 'Platform is live and accessible to all job seekers and employers.'}
                       </p>
                     </div>
                   </div>
@@ -338,13 +338,11 @@ const AdminSettingsView = () => {
                     <span
                       className={`rounded-full border px-3 py-1 text-[11px] font-extrabold tracking-wider uppercase transition-all ${
                         maintenanceMode
-                          ? "bg-destructive text-destructive-foreground border-destructive/50 shadow-sm"
-                          : "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400"
+                          ? 'bg-destructive text-destructive-foreground border-destructive/50 shadow-sm'
+                          : 'border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400'
                       }`}
                     >
-                      {maintenanceMode
-                        ? "MAINTENANCE MODE ON"
-                        : "MAINTENANCE MODE OFF"}
+                      {maintenanceMode ? 'MAINTENANCE MODE ON' : 'MAINTENANCE MODE OFF'}
                     </span>
                     <Switch
                       checked={maintenanceMode}
@@ -376,13 +374,13 @@ const AdminSettingsView = () => {
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {[
-                          { label: "15 Mins", d: 0, h: 0, m: 15 },
-                          { label: "30 Mins", d: 0, h: 0, m: 30 },
-                          { label: "1 Hour", d: 0, h: 1, m: 0 },
-                          { label: "2 Hours", d: 0, h: 2, m: 0 },
-                          { label: "6 Hours", d: 0, h: 6, m: 0 },
-                          { label: "12 Hours", d: 0, h: 12, m: 0 },
-                          { label: "1 Day", d: 1, h: 0, m: 0 },
+                          { label: '15 Mins', d: 0, h: 0, m: 15 },
+                          { label: '30 Mins', d: 0, h: 0, m: 30 },
+                          { label: '1 Hour', d: 0, h: 1, m: 0 },
+                          { label: '2 Hours', d: 0, h: 2, m: 0 },
+                          { label: '6 Hours', d: 0, h: 6, m: 0 },
+                          { label: '12 Hours', d: 0, h: 12, m: 0 },
+                          { label: '1 Day', d: 1, h: 0, m: 0 },
                         ].map((preset, idx) => (
                           <button
                             key={idx}
@@ -410,9 +408,7 @@ const AdminSettingsView = () => {
                         <div className="mt-2 flex items-center justify-between">
                           <button
                             type="button"
-                            onClick={() =>
-                              setDurationDays((v) => Math.max(0, v - 1))
-                            }
+                            onClick={() => setDurationDays((v) => Math.max(0, v - 1))}
                             className="border-input bg-muted hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-colors"
                           >
                             <Minus className="h-3.5 w-3.5" />
@@ -422,9 +418,7 @@ const AdminSettingsView = () => {
                           </span>
                           <button
                             type="button"
-                            onClick={() =>
-                              setDurationDays((v) => Math.min(30, v + 1))
-                            }
+                            onClick={() => setDurationDays((v) => Math.min(30, v + 1))}
                             className="border-input bg-muted hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-colors"
                           >
                             <Plus className="h-3.5 w-3.5" />
@@ -440,9 +434,7 @@ const AdminSettingsView = () => {
                         <div className="mt-2 flex items-center justify-between">
                           <button
                             type="button"
-                            onClick={() =>
-                              setDurationHours((v) => Math.max(0, v - 1))
-                            }
+                            onClick={() => setDurationHours((v) => Math.max(0, v - 1))}
                             className="border-input bg-muted hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-colors"
                           >
                             <Minus className="h-3.5 w-3.5" />
@@ -452,9 +444,7 @@ const AdminSettingsView = () => {
                           </span>
                           <button
                             type="button"
-                            onClick={() =>
-                              setDurationHours((v) => Math.min(23, v + 1))
-                            }
+                            onClick={() => setDurationHours((v) => Math.min(23, v + 1))}
                             className="border-input bg-muted hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-colors"
                           >
                             <Plus className="h-3.5 w-3.5" />
@@ -470,9 +460,7 @@ const AdminSettingsView = () => {
                         <div className="mt-2 flex items-center justify-between">
                           <button
                             type="button"
-                            onClick={() =>
-                              setDurationMinutes((v) => Math.max(0, v - 1))
-                            }
+                            onClick={() => setDurationMinutes((v) => Math.max(0, v - 1))}
                             className="border-input bg-muted hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-colors"
                           >
                             <Minus className="h-3.5 w-3.5" />
@@ -482,9 +470,7 @@ const AdminSettingsView = () => {
                           </span>
                           <button
                             type="button"
-                            onClick={() =>
-                              setDurationMinutes((v) => Math.min(59, v + 1))
-                            }
+                            onClick={() => setDurationMinutes((v) => Math.min(59, v + 1))}
                             className="border-input bg-muted hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-colors"
                           >
                             <Plus className="h-3.5 w-3.5" />
@@ -501,14 +487,10 @@ const AdminSettingsView = () => {
                         <span className="text-foreground font-mono font-bold">
                           {(() => {
                             const totalMins =
-                              durationDays * 24 * 60 +
-                              durationHours * 60 +
-                              durationMinutes;
-                            if (totalMins === 0) return "Indefinite / Untimed";
-                            const targetDate = new Date(
-                              Date.now() + totalMins * 60 * 1000,
-                            );
-                            return `${targetDate.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })} at ${targetDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+                              durationDays * 24 * 60 + durationHours * 60 + durationMinutes;
+                            if (totalMins === 0) return 'Indefinite / Untimed';
+                            const targetDate = new Date(Date.now() + totalMins * 60 * 1000);
+                            return `${targetDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })} at ${targetDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                           })()}
                         </span>
                       </div>
@@ -524,9 +506,7 @@ const AdminSettingsView = () => {
                       <Trash2 className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold tracking-tight">
-                        Factory System Reset
-                      </h3>
+                      <h3 className="text-sm font-bold tracking-tight">Factory System Reset</h3>
                       <p className="text-muted-foreground text-xs font-medium opacity-70">
                         Wipe all cache and transient system data
                       </p>

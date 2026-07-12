@@ -239,7 +239,7 @@ const LandingHero = ({ World }: LandingHeroProps) => {
   const activeSlide = SLIDES[currentSlide];
 
   return (
-    <section className="bg-background border-primary/20 relative flex min-h-[520px] w-full items-center overflow-hidden border-b pt-24 pb-14 sm:min-h-[700px] sm:pt-36 sm:pb-24 lg:min-h-[800px] lg:pt-40 lg:pb-32">
+    <section className="bg-background border-primary/20 relative flex min-h-130 w-full items-center overflow-hidden border-b pt-24 pb-14 sm:min-h-[700px] sm:pt-36 sm:pb-24 lg:min-h-[800px] lg:pt-40 lg:pb-32">
       {/* Background patterns */}
       <div className="pointer-events-none absolute inset-0 z-0">
         {/* Subtle corporate background visual (Conference Room) */}
