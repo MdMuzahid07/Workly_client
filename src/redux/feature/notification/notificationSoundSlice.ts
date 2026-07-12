@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface NotificationSoundState {
+export interface NotificationSoundState {
   enabled: boolean;
   volume: number; // 0.0 to 1.0
 }
