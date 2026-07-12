@@ -26,7 +26,7 @@ const getSentSound = (): Howl | null => {
 
   if (!sentSound) {
     sentSound = new Howl({
-      src: ['/sounds/message-sent.webm', '/sounds/message-sent.mp3'],
+      src: ['/sounds/message-sent.mp3'],
       volume: 0.5,
       preload: true,
     });
@@ -47,7 +47,7 @@ const getReceivedSound = (): Howl | null => {
 
   if (!receivedSound) {
     receivedSound = new Howl({
-      src: ['/sounds/message-received.webm', '/sounds/message-received.mp3'],
+      src: ['/sounds/message-received.mp3'],
       volume: 0.5,
       preload: true,
     });
