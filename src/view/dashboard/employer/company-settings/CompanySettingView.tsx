@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -14,13 +14,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  useLogoutUserMutation,
-  useDeleteMeMutation,
-} from "@/redux/feature/auth/authApi";
-import { logout } from "@/redux/feature/auth/authSlice";
-import { useAppDispatch } from "@/redux/hooks";
+} from '@/components/ui/alert-dialog';
+import { useLogoutUserMutation, useDeleteMeMutation } from '@/redux/feature/auth/authApi';
+import { logout } from '@/redux/feature/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { toggleSound, setVolume } from '@/redux/feature/notification/notificationSoundSlice';
+import { playReceived } from '@/lib/notificationSound';
+import { Slider } from '@/components/ui/slider';
 import {
   BellRing,
   ChevronRight,
@@ -33,17 +33,19 @@ import {
   Smartphone,
   Trash2,
   User,
+  Volume2,
   Zap,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import DashboardCompanySettingsHeader from "../../../../components/dashboard/dashboard-nav/header/DashboardCompanySettingsHeader";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import DashboardCompanySettingsHeader from '../../../../components/dashboard/dashboard-nav/header/DashboardCompanySettingsHeader';
 import {
   useGetMyCompanyQuery,
   useUpdateCompanySettingsMutation,
-} from "../../../../redux/feature/company/companyApi";
-import CompanyPersonalInformationView from "../company-personal-information/CompanyPersonalInformationView";
-import CompanySecurityView from "../company-security/CompanySecurityView";
-import { toast } from "sonner";
+} from '../../../../redux/feature/company/companyApi';
+import CompanyPersonalInformationView from '../company-personal-information/CompanyPersonalInformationView';
+import CompanySecurityView from '../company-security/CompanySecurityView';
+import { toast } from 'sonner';
+import SignOutModal from '@/components/shared/SignOutModal';
 
 interface SettingItem {
   id: string;
@@ -55,30 +57,30 @@ interface SettingItem {
 
 const notificationSettingsSeed: SettingItem[] = [
   {
-    id: "emailNotifications",
-    label: "Email Notifications",
-    description: "Receive updates and alerts via email",
+    id: 'emailNotifications',
+    label: 'Email Notifications',
+    description: 'Receive updates and alerts via email',
     icon: <Mail className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "applicationAlerts",
-    label: "Application Alerts",
-    description: "Get notified when new candidates apply",
+    id: 'applicationAlerts',
+    label: 'Application Alerts',
+    description: 'Get notified when new candidates apply',
     icon: <Zap className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "jobExpiryReminders",
-    label: "Job Expiry Reminders",
-    description: "Notifications before your job posts expire",
+    id: 'jobExpiryReminders',
+    label: 'Job Expiry Reminders',
+    description: 'Notifications before your job posts expire',
     icon: <Smartphone className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "weeklyReports",
-    label: "Weekly Reports",
-    description: "Receive a summary of hiring activity",
+    id: 'weeklyReports',
+    label: 'Weekly Reports',
+    description: 'Receive a summary of hiring activity',
     icon: <BellRing className="h-5 w-5" />,
     enabled: false,
   },
@@ -86,23 +88,23 @@ const notificationSettingsSeed: SettingItem[] = [
 
 const privacySettingsSeed: SettingItem[] = [
   {
-    id: "profileVisibility",
-    label: "Profile Visibility",
-    description: "Allow candidates to see your company profile",
+    id: 'profileVisibility',
+    label: 'Profile Visibility',
+    description: 'Allow candidates to see your company profile',
     icon: <Globe className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "showEmployeeCount",
-    label: "Show team member count",
-    description: "Display your size on your public profile",
+    id: 'showEmployeeCount',
+    label: 'Show team member count',
+    description: 'Display your size on your public profile',
     icon: <Eye className="h-5 w-5" />,
     enabled: true,
   },
   {
-    id: "allowDirectMessages",
-    label: "Allow Direct Messages",
-    description: "Let candidates message your company contact",
+    id: 'allowDirectMessages',
+    label: 'Allow Direct Messages',
+    description: 'Let candidates message your company contact',
     icon: <ShieldCheck className="h-5 w-5" />,
     enabled: true,
   },
@@ -110,23 +112,22 @@ const privacySettingsSeed: SettingItem[] = [
 
 const CompanySettingsView = () => {
   const dispatch = useAppDispatch();
-  const [logoutUser] = useLogoutUserMutation();
+  const [logoutUser, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const [deleteMe, { isLoading: isDeleting }] = useDeleteMeMutation();
-  const [activeSection, setActiveSection] = useState<
-    "main" | "personal" | "security"
-  >("main");
+  const [activeSection, setActiveSection] = useState<'main' | 'personal' | 'security'>('main');
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
 
-  const { data: companyData, isLoading: isLoadingCompany } =
-    useGetMyCompanyQuery(undefined);
+  const { data: companyData, isLoading: isLoadingCompany } = useGetMyCompanyQuery(undefined);
 
-  const [updateCompanySettings, { isLoading: isSaving }] =
-    useUpdateCompanySettingsMutation();
+  const [updateCompanySettings, { isLoading: isSaving }] = useUpdateCompanySettingsMutation();
 
   const [notifications, setNotifications] = useState(notificationSettingsSeed);
   const [privacy, setPrivacy] = useState(privacySettingsSeed);
+
+  const soundSettings = useAppSelector((state) => state.notificationSound);
 
   // Sync state with fetched data
   useEffect(() => {
@@ -149,23 +150,19 @@ const CompanySettingsView = () => {
 
   const toggleNotification = (id: string) => {
     setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item,
-      ),
+      prev.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item)),
     );
   };
 
   const togglePrivacy = (id: string) => {
     setPrivacy((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item,
-      ),
+      prev.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item)),
     );
   };
 
   const handleSaveSettings = async () => {
     if (!companyData?.data?.id) {
-      toast.error("Company data not loaded");
+      toast.error('Company data not loaded');
       return;
     }
     try {
@@ -184,87 +181,82 @@ const CompanySettingsView = () => {
         companyId: companyData.data.id,
         ...mergedSettings,
       }).unwrap();
-      toast.success("Settings updated successfully");
+      toast.success('Settings updated successfully');
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to update settings");
+      toast.error(err?.data?.message || 'Failed to update settings');
     }
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
+    setIsSignOutModalOpen(true);
+  };
+
+  const handleConfirmSignOut = async () => {
     try {
       await logoutUser(undefined).unwrap();
     } catch {
       // ignore
     } finally {
       dispatch(logout());
-      window.location.href = "/";
+      window.location.href = '/';
     }
   };
 
   const handleDeleteAccount = () => {
-    setDeleteConfirmText("");
+    setDeleteConfirmText('');
     setIsDeleteOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (deleteConfirmText !== "DELETE") {
-      toast.error("Please type DELETE to confirm");
+    if (deleteConfirmText !== 'DELETE') {
+      toast.error('Please type DELETE to confirm');
       return;
     }
     try {
       await deleteMe().unwrap();
-      toast.success("Company account deleted successfully");
+      toast.success('Company account deleted successfully');
       setIsDeleteOpen(false);
       dispatch(logout());
-      window.location.href = "/";
+      window.location.href = '/';
     } catch (error) {
       const err = error as { data?: { message?: string } };
-      toast.error(err?.data?.message || "Failed to delete company account");
+      toast.error(err?.data?.message || 'Failed to delete company account');
     }
   };
 
   if (isLoadingCompany) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-muted-foreground animate-pulse font-medium">
-          Loading settings...
-        </div>
+        <div className="text-muted-foreground animate-pulse font-medium">Loading settings...</div>
       </div>
     );
   }
 
-  if (activeSection === "personal") {
-    return (
-      <CompanyPersonalInformationView onBack={() => setActiveSection("main")} />
-    );
+  if (activeSection === 'personal') {
+    return <CompanyPersonalInformationView onBack={() => setActiveSection('main')} />;
   }
 
-  if (activeSection === "security") {
-    return <CompanySecurityView onBack={() => setActiveSection("main")} />;
+  if (activeSection === 'security') {
+    return <CompanySecurityView onBack={() => setActiveSection('main')} />;
   }
 
   return (
     <div className="bg-background min-h-screen">
-      <DashboardCompanySettingsHeader
-        handleSaveSettings={handleSaveSettings}
-        isSaving={isSaving}
-      />
+      <DashboardCompanySettingsHeader handleSaveSettings={handleSaveSettings} isSaving={isSaving} />
 
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl space-y-10">
           {/* Account */}
           <section>
             <div className="mb-6">
-              <h2 className="text-lg font-black tracking-tight sm:text-xl">
-                Account
-              </h2>
+              <h2 className="text-lg font-black tracking-tight sm:text-xl">Account</h2>
               <p className="text-muted-foreground text-sm font-medium opacity-80">
                 Manage your company contact information and security
               </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div onClick={() => setActiveSection("personal")}>
+              <div onClick={() => setActiveSection('personal')}>
                 <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border p-5 transition-all duration-300">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -272,9 +264,7 @@ const CompanySettingsView = () => {
                         <User className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold tracking-tight">
-                          Account Profile
-                        </h3>
+                        <h3 className="font-bold tracking-tight">Account Profile</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           Your login identity and personal user info
                         </p>
@@ -285,7 +275,7 @@ const CompanySettingsView = () => {
                 </Card>
               </div>
 
-              <div onClick={() => setActiveSection("security")}>
+              <div onClick={() => setActiveSection('security')}>
                 <Card className="group bg-card hover:border-primary/50 relative cursor-pointer overflow-hidden rounded-xl border p-5 transition-all duration-300">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -293,9 +283,7 @@ const CompanySettingsView = () => {
                         <Lock className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold tracking-tight">
-                          Password & Security
-                        </h3>
+                        <h3 className="font-bold tracking-tight">Password & Security</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           Change password, session security
                         </p>
@@ -333,9 +321,7 @@ const CompanySettingsView = () => {
                         {item.icon}
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold tracking-tight">
-                          {item.label}
-                        </h3>
+                        <h3 className="text-sm font-bold tracking-tight">{item.label}</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           {item.description}
                         </p>
@@ -354,12 +340,69 @@ const CompanySettingsView = () => {
 
           <Separator className="opacity-50" />
 
+          {/* Audio Settings */}
+          <section>
+            <div className="mb-6">
+              <h2 className="text-lg font-black tracking-tight sm:text-xl">Audio Settings</h2>
+              <p className="text-muted-foreground text-sm font-medium opacity-80">
+                Control sound alerts for new chat messages
+              </p>
+            </div>
+
+            <Card className="bg-card hover:border-primary/20 space-y-4 rounded-xl border p-5 transition-all duration-300">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary/10 text-primary ring-primary/5 flex h-10 w-10 items-center justify-center rounded-lg ring-2">
+                    <Volume2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold tracking-tight">Chat Sounds</h3>
+                    <p className="text-muted-foreground text-xs font-medium opacity-70">
+                      Play sound effects on sending and receiving messages
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={soundSettings?.enabled ?? true}
+                  onCheckedChange={() => dispatch(toggleSound())}
+                  className="data-[state=checked]:bg-primary"
+                />
+              </div>
+
+              {(soundSettings?.enabled ?? true) && (
+                <div className="space-y-2 pt-2 pr-4 pl-14">
+                  <div className="text-muted-foreground flex items-center justify-between text-xs font-bold">
+                    <span>Volume</span>
+                    <span>{Math.round((soundSettings?.volume ?? 0.5) * 100)}%</span>
+                  </div>
+                  <Slider
+                    defaultValue={[soundSettings?.volume ?? 0.5]}
+                    value={[soundSettings?.volume ?? 0.5]}
+                    max={1}
+                    min={0}
+                    step={0.05}
+                    onValueChange={(val) => {
+                      if (val[0] !== undefined) {
+                        dispatch(setVolume(val[0]));
+                      }
+                    }}
+                    onValueCommit={() => {
+                      // Play a brief chime to preview the volume
+                      playReceived();
+                    }}
+                    className="cursor-pointer"
+                  />
+                </div>
+              )}
+            </Card>
+          </section>
+
+          <Separator className="opacity-50" />
+
           {/* Privacy */}
           <section>
             <div className="mb-6">
-              <h2 className="text-lg font-black tracking-tight sm:text-xl">
-                Privacy & Visibility
-              </h2>
+              <h2 className="text-lg font-black tracking-tight sm:text-xl">Privacy & Visibility</h2>
               <p className="text-muted-foreground text-sm font-medium opacity-80">
                 Manage your company profile visibility and data display
               </p>
@@ -377,9 +420,7 @@ const CompanySettingsView = () => {
                         {item.icon}
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold tracking-tight">
-                          {item.label}
-                        </h3>
+                        <h3 className="text-sm font-bold tracking-tight">{item.label}</h3>
                         <p className="text-muted-foreground text-xs font-medium opacity-70">
                           {item.description}
                         </p>
@@ -417,9 +458,7 @@ const CompanySettingsView = () => {
                       <LogOut className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold tracking-tight">
-                        Sign Out
-                      </h3>
+                      <h3 className="text-sm font-bold tracking-tight">Sign Out</h3>
                       <p className="text-muted-foreground text-xs font-medium opacity-70">
                         Exit your current hiring session
                       </p>
@@ -471,9 +510,8 @@ const CompanySettingsView = () => {
               Delete Company Account
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed font-medium">
-              This action is permanent and cannot be undone. All your company
-              details, job posts, and candidate applications will be permanently
-              deleted.
+              This action is permanent and cannot be undone. All your company details, job posts,
+              and candidate applications will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -490,20 +528,25 @@ const CompanySettingsView = () => {
           </div>
 
           <AlertDialogFooter className="mt-6 flex gap-2">
-            <AlertDialogCancel className="h-10 rounded-full font-bold">
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel className="h-10 rounded-full font-bold">Cancel</AlertDialogCancel>
             <Button
               onClick={handleConfirmDelete}
-              disabled={isDeleting || deleteConfirmText !== "DELETE"}
+              disabled={isDeleting || deleteConfirmText !== 'DELETE'}
               variant="destructive"
               className="shadow-destructive/10 h-10 rounded-full font-bold shadow-lg"
             >
-              {isDeleting ? "Deleting..." : "Delete Account"}
+              {isDeleting ? 'Deleting...' : 'Delete Account'}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <SignOutModal
+        open={isSignOutModalOpen}
+        onOpenChange={setIsSignOutModalOpen}
+        onConfirm={handleConfirmSignOut}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 };

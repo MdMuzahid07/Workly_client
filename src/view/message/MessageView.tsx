@@ -61,6 +61,7 @@ import messageApi, {
 import { useUploadSingleFileMutation } from '../../redux/feature/upload/uploadApi';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import MessageViewSkeleton from '../../skeleton/message/inbox/MessageViewSkeleton';
+import { playSent, playReceived } from '../../lib/notificationSound';
 
 interface Message {
   id: string;
@@ -102,6 +103,11 @@ const MessageViewContent = () => {
   const queryConversationId = searchParams.get('conversationId') || searchParams.get('active');
 
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+
+  const selectedConversationRef = useRef<string | null>(null);
+  useEffect(() => {
+    selectedConversationRef.current = selectedConversation;
+  }, [selectedConversation]);
 
   useEffect(() => {
     if (queryConversationId) {
@@ -179,9 +185,24 @@ const MessageViewContent = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleNewConversationMessage = () => {
+    const handleNewConversationMessage = (data?: { conversationId: string; message: Message }) => {
       // Invalidate RTK query cache to pull fresh conversation previews
       dispatch(messageApi.util.invalidateTags(['Conversations']));
+
+      if (data && data.message) {
+        const isSelf = data.message.senderId === currentUser?.id;
+        if (isSelf) return;
+
+        const isCurrentActive = data.conversationId === selectedConversationRef.current;
+        const isTabFocused = document.hasFocus() && document.visibilityState === 'visible';
+
+        // Suppress incoming message sound if the message belongs to the conversation currently open AND tab is focused
+        if (isCurrentActive && isTabFocused) {
+          return;
+        }
+
+        playReceived();
+      }
     };
 
     socket.on('new_conversation_message', handleNewConversationMessage);
@@ -189,7 +210,7 @@ const MessageViewContent = () => {
     return () => {
       socket.off('new_conversation_message', handleNewConversationMessage);
     };
-  }, [socket, dispatch]);
+  }, [socket, dispatch, currentUser?.id]);
 
   // Conversation-specific Socket event listeners
   useEffect(() => {
@@ -454,6 +475,9 @@ const MessageViewContent = () => {
             fileSize: fileSize || undefined,
           }).unwrap();
         }
+
+        // Play send sound ONLY after successful server delivery confirmation
+        playSent();
       } catch (err: unknown) {
         console.error('Error sending message:', err);
         const e = err as { data?: { message?: string }; message?: string };
