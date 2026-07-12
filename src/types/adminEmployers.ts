@@ -1,4 +1,4 @@
-export type AdminEmployerStatus = "Verified" | "Pending" | "Suspended";
+export type AdminEmployerStatus = 'Verified' | 'Pending' | 'Suspended';
 
 export interface AdminEmployerRow {
   id: string; // companyId
@@ -14,6 +14,8 @@ export interface AdminEmployerRow {
   joinedDate: string;
   isCompanyVerified: boolean;
   isOwnerActive: boolean;
+  failedLoginAttempts: number;
+  lockedUntil: string | null;
 }
 
 export interface AdminEmployerStats {

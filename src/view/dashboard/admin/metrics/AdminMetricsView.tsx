@@ -106,12 +106,13 @@ export default function AdminMetricsView() {
                   <CardDescription className="text-xs">Physical memory utilization</CardDescription>
                 </div>
                 <Badge
-                  variant={
+                  variant={m.resources.memory.ratio > 85 ? 'destructive' : 'secondary'}
+                  className={
                     m.resources.memory.ratio > 85
-                      ? 'destructive'
+                      ? ''
                       : m.resources.memory.ratio > 65
-                        ? 'warning'
-                        : 'success'
+                        ? 'bg-amber-500/10 text-amber-500 dark:bg-amber-500/20'
+                        : 'bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20'
                   }
                 >
                   {m.resources.memory.ratio}%
@@ -226,7 +227,12 @@ export default function AdminMetricsView() {
                     <div className="text-right">
                       <Badge
                         variant={
-                          m.dependencies.database.status === 'UP' ? 'success' : 'destructive'
+                          m.dependencies.database.status === 'UP' ? 'secondary' : 'destructive'
+                        }
+                        className={
+                          m.dependencies.database.status === 'UP'
+                            ? 'bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20'
+                            : ''
                         }
                       >
                         {m.dependencies.database.status}
@@ -249,7 +255,12 @@ export default function AdminMetricsView() {
                     </div>
                     <div className="text-right">
                       <Badge
-                        variant={m.dependencies.redis.status === 'UP' ? 'success' : 'destructive'}
+                        variant={m.dependencies.redis.status === 'UP' ? 'secondary' : 'destructive'}
+                        className={
+                          m.dependencies.redis.status === 'UP'
+                            ? 'bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20'
+                            : ''
+                        }
                       >
                         {m.dependencies.redis.status === 'UP' ? 'CONNECTED' : 'OFFLINE'}
                       </Badge>

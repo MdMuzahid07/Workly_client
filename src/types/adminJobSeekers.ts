@@ -1,4 +1,4 @@
-export type AdminJobSeekerStatus = "Hired" | "Looking" | "Active" | "Suspended";
+export type AdminJobSeekerStatus = 'Hired' | 'Looking' | 'Active' | 'Suspended';
 
 export interface AdminJobSeekerRow {
   id: string; // userId
@@ -11,6 +11,8 @@ export interface AdminJobSeekerRow {
   primarySkill: string;
   joinedDate: string;
   hasResume: boolean;
+  failedLoginAttempts: number;
+  lockedUntil: string | null;
   socials: {
     github?: string;
     linkedin?: string;

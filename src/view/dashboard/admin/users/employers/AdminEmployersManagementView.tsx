@@ -357,7 +357,7 @@ const AdminEmployersManagementView = () => {
                               <DropdownMenuItem
                                 className="cursor-pointer font-bold text-emerald-600"
                                 disabled={busy}
-                                onClick={() => handleClearLockout(emp.ownerId)}
+                                onClick={() => emp.ownerId && handleClearLockout(emp.ownerId)}
                               >
                                 <LockOpen className="mr-2 h-4 w-4" />
                                 Clear Lockout
