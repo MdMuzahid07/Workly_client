@@ -1,52 +1,53 @@
-import { Award, Briefcase, Building2, Users } from "lucide-react";
-import { motion } from "motion/react";
-import { useGetLandingStatsQuery } from "../../redux/feature/statistics/statisticsApi";
-import AnimatedCounter from "../shared/AnimatedCounter";
+import { Award, Briefcase, Building2, Users } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { useGetLandingStatsQuery } from '../../redux/feature/statistics/statisticsApi';
+import AnimatedCounter from '../shared/AnimatedCounter';
 
 const LandingStatus = () => {
   const { data: statsRes, isLoading } = useGetLandingStatsQuery();
   const stats = statsRes?.data;
+  const shouldReduceMotion = useReducedMotion();
 
   const getFormatType = (val: number, isPercent = false) => {
-    if (isPercent) return "percent" as const;
-    if (val >= 1000000) return "M" as const;
-    if (val >= 1000) return "K" as const;
-    return "commas" as const;
+    if (isPercent) return 'percent' as const;
+    if (val >= 1000000) return 'M' as const;
+    if (val >= 1000) return 'K' as const;
+    return 'commas' as const;
   };
 
   const statItems = [
     {
       icon: Briefcase,
       value: stats?.activeJobs ?? 0,
-      label: "Active Jobs",
-      color: "primary",
+      label: 'Active Jobs',
+      color: 'primary',
       formatType: getFormatType(stats?.activeJobs ?? 0),
     },
     {
       icon: Building2,
       value: stats?.companies ?? 0,
-      label: "Companies",
-      color: "accent",
+      label: 'Companies',
+      color: 'accent',
       formatType: getFormatType(stats?.companies ?? 0),
     },
     {
       icon: Users,
       value: stats?.jobSeekers ?? 0,
-      label: "Job Seekers",
-      color: "primary",
+      label: 'Job Seekers',
+      color: 'primary',
       formatType: getFormatType(stats?.jobSeekers ?? 0),
     },
     {
       icon: Award,
       value: stats?.successRate ?? 95,
-      label: "Success Rate",
-      color: "accent",
+      label: 'Success Rate',
+      color: 'accent',
       formatType: getFormatType(stats?.successRate ?? 95, true),
     },
   ];
 
   return (
-    <section className="bg-background relative overflow-hidden py-10 sm:py-16 lg:py-24">
+    <section className="bg-dot-grid relative overflow-hidden py-10 sm:py-16 lg:py-24">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-[0.08]" />
 
@@ -58,7 +59,7 @@ const LandingStatus = () => {
           transition={{
             duration: 15,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
           className="bg-primary/8 absolute top-1/2 left-1/4 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
         />
@@ -70,7 +71,7 @@ const LandingStatus = () => {
           transition={{
             duration: 18,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
             delay: 1,
           }}
           className="bg-accent/6 absolute top-1/2 right-1/4 h-96 w-96 translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
@@ -79,9 +80,9 @@ const LandingStatus = () => {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
           className="mb-8 text-center sm:mb-12 lg:mb-16"
         >
@@ -97,9 +98,9 @@ const LandingStatus = () => {
           {statItems.map((stat, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
               className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative overflow-hidden rounded-2xl border p-6 text-center backdrop-blur-sm transition-all duration-500 sm:p-8"
             >
@@ -109,19 +110,17 @@ const LandingStatus = () => {
                 {(() => {
                   const colorMap = {
                     primary: {
-                      bg: "bg-primary/10",
-                      text: "text-primary",
-                      hoverBg: "group-hover:bg-primary",
+                      bg: 'bg-primary/10',
+                      text: 'text-primary',
+                      hoverBg: 'group-hover:bg-primary',
                     },
                     accent: {
-                      bg: "bg-accent/10",
-                      text: "text-accent",
-                      hoverBg: "group-hover:bg-accent",
+                      bg: 'bg-accent/10',
+                      text: 'text-accent',
+                      hoverBg: 'group-hover:bg-accent',
                     },
                   };
-                  const colors =
-                    colorMap[stat.color as "primary" | "accent"] ||
-                    colorMap.primary;
+                  const colors = colorMap[stat.color as 'primary' | 'accent'] || colorMap.primary;
                   return (
                     <div
                       className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-500 will-change-transform group-hover:scale-110 group-hover:text-white sm:h-16 sm:w-16 ${colors.bg} ${colors.text} ${colors.hoverBg}`}
@@ -135,10 +134,7 @@ const LandingStatus = () => {
                   <div className="bg-muted/60 mx-auto my-2.5 h-8 w-20 animate-pulse rounded" />
                 ) : (
                   <div className="text-foreground mb-2 text-3xl font-bold transition-all duration-500 sm:text-4xl lg:text-5xl">
-                    <AnimatedCounter
-                      value={stat.value}
-                      formatType={stat.formatType}
-                    />
+                    <AnimatedCounter value={stat.value} formatType={stat.formatType} />
                   </div>
                 )}
 

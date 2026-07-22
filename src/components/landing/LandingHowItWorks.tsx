@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import {
   ArrowRight,
   CheckSquare,
@@ -11,59 +11,59 @@ import {
   UserPlus,
   Users2,
   Workflow,
-} from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
 
 const seekerSteps = [
   {
-    number: "01",
+    number: '01',
     icon: UserPlus,
-    title: "Create Account",
-    desc: "Register a high-fidelity job seeker account and fill out your professional profile to highlight your strengths.",
+    title: 'Create Account',
+    desc: 'Register a high-fidelity job seeker account and fill out your professional profile to highlight your strengths.',
   },
   {
-    number: "02",
+    number: '02',
     icon: FileText,
-    title: "Upload CV / Resume",
-    desc: "Attach your updated curriculum vitae to make it visible to hiring managers looking for matching qualifications.",
+    title: 'Upload CV / Resume',
+    desc: 'Attach your updated curriculum vitae to make it visible to hiring managers looking for matching qualifications.',
   },
   {
-    number: "03",
+    number: '03',
     icon: CheckSquare,
-    title: "Apply to Jobs",
-    desc: "Browse dynamic vetted careers and send applications instantly with a highly optimized one-click pipeline.",
+    title: 'Apply to Jobs',
+    desc: 'Browse dynamic vetted careers and send applications instantly with a highly optimized one-click pipeline.',
   },
 ];
 
 const employerSteps = [
   {
-    number: "01",
+    number: '01',
     icon: PlusCircle,
-    title: "Post Careers",
-    desc: "Draft professional job listings specifying active skill requirements, salary brackets, and location options.",
+    title: 'Post Careers',
+    desc: 'Draft professional job listings specifying active skill requirements, salary brackets, and location options.',
   },
   {
-    number: "02",
+    number: '02',
     icon: Users2,
-    title: "Review Applicants",
-    desc: "Manage submitted seeker resumes inside a collaborative, clean, status-based application pipeline.",
+    title: 'Review Applicants',
+    desc: 'Manage submitted seeker resumes inside a collaborative, clean, status-based application pipeline.',
   },
   {
-    number: "03",
+    number: '03',
     icon: UserCheck,
-    title: "Secure Talent",
-    desc: "Schedule automated interviews, conduct secure evaluations, and lock in industry-grade elite hires.",
+    title: 'Secure Talent',
+    desc: 'Schedule automated interviews, conduct secure evaluations, and lock in industry-grade elite hires.',
   },
 ];
 
 const LandingHowItWorks = () => {
-  const [activeTab, setActiveTab] = useState<"seeker" | "employer">("seeker");
+  const [activeTab, setActiveTab] = useState<'seeker' | 'employer'>('seeker');
 
-  const steps = activeTab === "seeker" ? seekerSteps : employerSteps;
+  const steps = activeTab === 'seeker' ? seekerSteps : employerSteps;
 
   return (
-    <section className="bg-background/95 relative overflow-hidden py-14 sm:py-24 lg:py-32">
+    <section className="bg-workly-mesh relative overflow-hidden py-14 sm:py-24 lg:py-32">
       {/* Premium Atmospheric Background */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-primary/5 absolute right-1/4 bottom-1/4 h-[500px] w-[500px] rounded-full blur-[130px]" />
@@ -93,10 +93,10 @@ const LandingHowItWorks = () => {
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
           >
-            How Does{" "}
+            How Does{' '}
             <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
               {`Workly`}
-            </span>{" "}
+            </span>{' '}
             Work?
           </motion.h2>
 
@@ -107,42 +107,42 @@ const LandingHowItWorks = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-muted-foreground mx-auto mt-3 max-w-2xl text-xs sm:text-lg"
           >
-            Get matching opportunities in just three quick steps. Choose your
-            journey to get started.
+            Get matching opportunities in just three quick steps. Choose your journey to get
+            started.
           </motion.p>
 
           {/* Interactive Stepper Navigation Tabs with Sliding pill animation */}
           <div className="bg-muted/65 border-border/30 relative mt-10 inline-flex items-center gap-1 rounded-2xl border p-1.5 shadow-xs backdrop-blur-md">
             <button
-              onClick={() => setActiveTab("seeker")}
+              onClick={() => setActiveTab('seeker')}
               className={`relative cursor-pointer rounded-xl px-4 py-2 text-xs font-extrabold transition-all duration-300 sm:px-6 sm:py-3 sm:text-sm ${
-                activeTab === "seeker"
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                activeTab === 'seeker'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {activeTab === "seeker" && (
+              {activeTab === 'seeker' && (
                 <motion.div
                   layoutId="active-step-tab"
                   className="bg-card border-border/50 absolute inset-0 -z-1 rounded-xl border shadow-xs"
-                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                 />
               )}
               For Candidates
             </button>
             <button
-              onClick={() => setActiveTab("employer")}
+              onClick={() => setActiveTab('employer')}
               className={`relative cursor-pointer rounded-xl px-4 py-2 text-xs font-extrabold transition-all duration-300 sm:px-6 sm:py-3 sm:text-sm ${
-                activeTab === "employer"
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                activeTab === 'employer'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {activeTab === "employer" && (
+              {activeTab === 'employer' && (
                 <motion.div
                   layoutId="active-step-tab"
                   className="bg-card border-border/50 absolute inset-0 -z-1 rounded-xl border shadow-xs"
-                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                 />
               )}
               For Employers
@@ -198,7 +198,7 @@ const LandingHowItWorks = () => {
                         transition={{
                           repeat: Infinity,
                           duration: 2,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                         }}
                       >
                         <ArrowRight className="h-5 w-5" />

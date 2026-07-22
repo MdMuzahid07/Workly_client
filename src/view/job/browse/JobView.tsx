@@ -2,7 +2,7 @@
 'use client';
 import { motion } from 'motion/react';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import FeaturedJobsSlider from '../../../components/main/jobs/FeaturedJobsSlider';
 import Industries from '../../../components/main/jobs/Industries';
@@ -137,7 +137,7 @@ const JobView = () => {
     return p;
   }, [filters, currentPage, categories?.data]);
 
-  const { data, isLoading, error } = useGetJobsQuery(params);
+  const { data, isLoading, isFetching, error } = useGetJobsQuery(params);
 
   // Fetch premium/featured jobs for the slider directly from the backend
   const { data: featuredData, isLoading: featuredLoading } = useGetJobsQuery({
@@ -151,10 +151,26 @@ const JobView = () => {
     return featuredData?.data || [];
   }, [featuredData]);
 
+  const resultsRef = useRef<HTMLElement>(null);
+  const shouldScrollRef = useRef(false);
+
+  const scrollToResults = () => {
+    if (resultsRef.current) {
+      const topOffset = resultsRef.current.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: Math.max(0, topOffset), behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     if (data?.data) {
       if (currentPage === 1) {
         setAllJobs(data.data);
+        if (shouldScrollRef.current) {
+          shouldScrollRef.current = false;
+          setTimeout(() => {
+            scrollToResults();
+          }, 100);
+        }
       } else {
         setAllJobs((prev) => {
           const combined = [...prev, ...data.data];
@@ -167,6 +183,7 @@ const JobView = () => {
   }, [data, currentPage]);
 
   const handleSearch = (searchData: { search: string; location: string }) => {
+    shouldScrollRef.current = true;
     setFilters((prev) => ({
       ...prev,
       search: searchData.search,
@@ -183,12 +200,14 @@ const JobView = () => {
   };
 
   const handleFiltersChange = (newFilters: Filters) => {
+    shouldScrollRef.current = true;
     setFilters(newFilters);
     setCurrentPage(1);
     setAllJobs([]);
   };
 
   const handleCategorySelect = (selectedCategoryIds: (string | number)[]) => {
+    shouldScrollRef.current = true;
     setFilters((prev) => ({
       ...prev,
       categories: selectedCategoryIds,
@@ -229,7 +248,7 @@ const JobView = () => {
         </section>
 
         {/* Main Job Listing Grid/List with Sidebar */}
-        <section className="border-border/30 border-t pt-8 sm:pt-10 lg:pt-12">
+        <section ref={resultsRef} className="border-border/30 border-t pt-8 sm:pt-10 lg:pt-12">
           {/* Header Row */}
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
             <div>
@@ -289,8 +308,8 @@ const JobView = () => {
                       : 'flex flex-col gap-3 sm:gap-3.5 lg:gap-4'
                   }
                 >
-                  {isLoading &&
-                    currentPage === 1 &&
+                  {(isLoading || isFetching) &&
+                    allJobs.length === 0 &&
                     [...Array(viewType === 'grid' ? 12 : 6)].map((_, index) => (
                       <JobCardSkeleton key={index} />
                     ))}
@@ -301,7 +320,7 @@ const JobView = () => {
                     </div>
                   )}
 
-                  {allJobs.length === 0 && !isLoading && !error && (
+                  {allJobs.length === 0 && !isLoading && !isFetching && !error && (
                     <div className="py-20 text-center font-medium opacity-50">No jobs found.</div>
                   )}
 

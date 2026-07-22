@@ -1,10 +1,12 @@
-import { Badge } from "@/components/ui/badge";
-import { Zap } from "lucide-react";
-import { motion } from "motion/react";
-import { features } from "../../constants";
-import { Card } from "../ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Zap } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { features } from '../../constants';
+import { Card } from '../ui/card';
 
 const LandingFeatures = () => {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <section className="bg-background relative overflow-hidden px-4 py-14 sm:py-24 lg:py-32">
       {/* Background Atmosphere */}
@@ -17,16 +19,16 @@ const LandingFeatures = () => {
       <div className="relative mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
           className="mb-10 text-center sm:mb-16 lg:mb-20"
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
             className="mb-6 inline-flex"
           >
@@ -37,16 +39,16 @@ const LandingFeatures = () => {
           </motion.div>
 
           <h2 className="text-foreground mb-6 text-2xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Everything You Need to{" "}
+            Everything You Need to{' '}
             <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
               Elevate
-            </span>{" "}
+            </span>{' '}
             Your Career
           </h2>
 
           <p className="text-muted-foreground mx-auto max-w-2xl text-xs leading-relaxed sm:text-xl">
-            Empowering professionals with state-of-the-art tools to find, apply,
-            and succeed in the modern job market.
+            Empowering professionals with state-of-the-art tools to find, apply, and succeed in the
+            modern job market.
           </p>
         </motion.div>
 
@@ -55,9 +57,9 @@ const LandingFeatures = () => {
           {features?.map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 40 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{
                 delay: index * 0.15,
                 duration: 0.7,

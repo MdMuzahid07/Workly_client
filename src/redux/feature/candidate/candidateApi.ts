@@ -1,40 +1,41 @@
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 const candidateApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getCandidates: builder.query({
       query: (params) => ({
-        url: "/candidate",
-        method: "GET",
+        url: '/candidate',
+        method: 'GET',
         params,
       }),
-      providesTags: ["candidates"],
+      providesTags: ['candidates'],
     }),
 
     getCandidateById: builder.query({
       query: (id: string) => ({
         url: `/candidate/${id}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: (_result, _error, id) => [{ type: "candidates", id }],
+      providesTags: (_result, _error, id) => [{ type: 'candidates', id }],
     }),
 
     toggleSaveCandidate: builder.mutation({
       query: (candidateId: string) => ({
-        url: "/candidate/save",
-        method: "POST",
+        url: '/candidate/save',
+        method: 'POST',
         body: { candidateId },
       }),
-      invalidatesTags: ["candidates"],
+      invalidatesTags: ['candidates'],
     }),
 
     getSavedCandidates: builder.query({
       query: (params) => ({
-        url: "/candidate/saved",
-        method: "GET",
+        url: '/candidate/saved',
+        method: 'GET',
         params,
       }),
-      providesTags: ["candidates"],
+      providesTags: ['candidates'],
     }),
   }),
 });

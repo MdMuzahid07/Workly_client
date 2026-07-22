@@ -1,38 +1,39 @@
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 const resumeApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     listResumes: builder.query({
       query: () => ({
-        url: "/resume/resumes",
-        method: "GET",
+        url: '/resume/resumes',
+        method: 'GET',
       }),
-      providesTags: ["resume"],
+      providesTags: ['resume'],
     }),
 
     uploadResume: builder.mutation({
       query: (data) => ({
-        url: "/resume/resumes",
-        method: "POST",
+        url: '/resume/resumes',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["resume", "profile"],
+      invalidatesTags: ['resume', 'profile'],
     }),
 
     setDefaultResume: builder.mutation({
       query: (resumeId) => ({
         url: `/resume/resumes/${resumeId}/default`,
-        method: "PATCH",
+        method: 'PATCH',
       }),
-      invalidatesTags: ["resume", "profile"],
+      invalidatesTags: ['resume', 'profile'],
     }),
 
     deleteResume: builder.mutation({
       query: (resumeId) => ({
         url: `/resume/resumes/${resumeId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["resume", "profile"],
+      invalidatesTags: ['resume', 'profile'],
     }),
   }),
 });

@@ -1,20 +1,21 @@
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 const messageApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getConversations: builder.query({
       query: () => ({
-        url: "/message/conversations",
-        method: "GET",
+        url: '/message/conversations',
+        method: 'GET',
       }),
-      providesTags: ["Conversations"],
+      providesTags: ['Conversations'],
     }),
     getMessageHistory: builder.query({
       query: (conversationId: string) => ({
         url: `/message/history/${conversationId}`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: (result, error, arg) => [{ type: "Messages", id: arg }],
+      providesTags: (result, error, arg) => [{ type: 'Messages', id: arg }],
     }),
     sendMessage: builder.mutation({
       query: ({
@@ -27,7 +28,7 @@ const messageApi = baseApi.injectEndpoints({
         fileSize,
       }) => ({
         url: `/message/send/${conversationId}`,
-        method: "POST",
+        method: 'POST',
         body: {
           content,
           recipientId,
@@ -38,45 +39,45 @@ const messageApi = baseApi.injectEndpoints({
         },
       }),
       invalidatesTags: (result, error, arg) => [
-        "Conversations",
-        { type: "Messages", id: arg.conversationId },
+        'Conversations',
+        { type: 'Messages', id: arg.conversationId },
       ],
     }),
     createConversation: builder.mutation({
       query: (data) => ({
-        url: "/message/create-conversation",
-        method: "POST",
+        url: '/message/create-conversation',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["Conversations"],
+      invalidatesTags: ['Conversations'],
     }),
     markAsRead: builder.mutation({
       query: (conversationId) => ({
         url: `/message/read/${conversationId}`,
-        method: "PATCH",
+        method: 'PATCH',
       }),
-      invalidatesTags: ["Conversations"],
+      invalidatesTags: ['Conversations'],
     }),
     blockUser: builder.mutation({
       query: (conversationId) => ({
         url: `/message/block/${conversationId}`,
-        method: "POST",
+        method: 'POST',
       }),
-      invalidatesTags: ["Conversations"],
+      invalidatesTags: ['Conversations'],
     }),
     deleteConversation: builder.mutation({
       query: (conversationId) => ({
         url: `/message/delete/${conversationId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["Conversations"],
+      invalidatesTags: ['Conversations'],
     }),
     deleteMessage: builder.mutation({
       query: (messageId: string) => ({
         url: `/message/message/${messageId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["Conversations"],
+      invalidatesTags: ['Conversations'],
     }),
   }),
 });

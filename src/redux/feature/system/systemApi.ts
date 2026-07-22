@@ -1,4 +1,4 @@
-import baseApi from "@/redux/api/baseApi";
+import baseApi from '@/redux/api/baseApi';
 
 interface PublicStatus {
   maintenanceMode: boolean;
@@ -34,35 +34,31 @@ interface ToggleMaintenancePayload {
 }
 
 const systemApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     // Public — no auth required. Polled as Socket.io fallback.
     getPublicStatus: builder.query<PublicStatus, void>({
-      query: () => "/public/status",
-      transformResponse: (res: { success: boolean; data: PublicStatus }) =>
-        res.data,
-      providesTags: ["admin"],
+      query: () => '/public/status',
+      transformResponse: (res: { success: boolean; data: PublicStatus }) => res.data,
+      providesTags: ['admin'],
       keepUnusedDataFor: 30,
     }),
 
     // Admin only
     getAdminSettings: builder.query<SystemSettings, void>({
-      query: () => "/admin/settings",
-      transformResponse: (res: { success: boolean; data: SystemSettings }) =>
-        res.data,
-      providesTags: ["admin"],
+      query: () => '/admin/settings',
+      transformResponse: (res: { success: boolean; data: SystemSettings }) => res.data,
+      providesTags: ['admin'],
     }),
 
     // Admin only — the toggle
-    toggleMaintenanceMode: builder.mutation<
-      SystemSettings,
-      ToggleMaintenancePayload
-    >({
+    toggleMaintenanceMode: builder.mutation<SystemSettings, ToggleMaintenancePayload>({
       query: (body) => ({
-        url: "/admin/settings/maintenance",
-        method: "PATCH",
+        url: '/admin/settings/maintenance',
+        method: 'PATCH',
         body,
       }),
-      invalidatesTags: ["admin"],
+      invalidatesTags: ['admin'],
     }),
   }),
 });

@@ -1,6 +1,7 @@
 import baseApi from '../../api/baseApi';
 
 const jobApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     createJob: builder.mutation({
       query: (data) => ({
@@ -78,6 +79,34 @@ const jobApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+
+    getSkillFacets: builder.query({
+      query: (params?: {
+        industry?: string;
+        location?: string;
+        search?: string;
+        limit?: number;
+      }) => ({
+        url: '/job/skills/facets',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['jobs'],
+    }),
+
+    getLocationFacets: builder.query({
+      query: (params?: {
+        industry?: string;
+        skills?: string;
+        search?: string;
+        limit?: number;
+      }) => ({
+        url: '/job/locations/facets',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['jobs'],
+    }),
   }),
 });
 
@@ -91,5 +120,7 @@ export const {
   useDeleteJobMutation,
   useGetSearchSuggestionsQuery,
   useReportJobMutation,
+  useGetSkillFacetsQuery,
+  useGetLocationFacetsQuery,
 } = jobApi;
 export default jobApi;

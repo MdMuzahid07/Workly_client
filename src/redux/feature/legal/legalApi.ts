@@ -1,21 +1,21 @@
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 export const legalApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getLegalDocument: builder.query({
       query: (slug: string) => `/legal/${slug}`,
-      providesTags: ["legal"],
+      providesTags: ['legal'],
     }),
     upsertLegalDocument: builder.mutation({
       query: ({ slug, ...data }) => ({
         url: `/legal/${slug}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["legal"],
+      invalidatesTags: ['legal'],
     }),
   }),
 });
 
-export const { useGetLegalDocumentQuery, useUpsertLegalDocumentMutation } =
-  legalApi;
+export const { useGetLegalDocumentQuery, useUpsertLegalDocumentMutation } = legalApi;

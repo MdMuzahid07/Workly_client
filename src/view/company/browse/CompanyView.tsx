@@ -111,9 +111,7 @@ const CompanyView = ({ companies: initialCompanies }: { companies?: any[] }) => 
     [currentPage, currentSearch, currentLocation, currentIndustry, currentSize],
   );
 
-  const { data, isLoading } = useGetCompaniesQuery(params, {
-    skip: currentPage === 1 && !!initialCompanies,
-  });
+  const { data, isLoading } = useGetCompaniesQuery(params);
 
   const { data: featuredData, isLoading: featuredLoading } = useGetCompaniesQuery({
     isVerified: true,
@@ -127,13 +125,18 @@ const CompanyView = ({ companies: initialCompanies }: { companies?: any[] }) => 
   }, [featuredData, allCompanies]);
 
   useEffect(() => {
-    if (data?.data && currentPage > 1) {
-      setAllCompanies((prev) => {
-        const combined = [...prev, ...data.data];
-        return combined.filter(
-          (company, index, self) => self.findIndex((c) => c.id === company.id) === index,
-        );
-      });
+    if (data?.data) {
+      const fetchedCompanies = Array.isArray(data.data) ? data.data : data.data.result || [];
+      if (currentPage === 1) {
+        setAllCompanies(fetchedCompanies);
+      } else {
+        setAllCompanies((prev) => {
+          const combined = [...prev, ...fetchedCompanies];
+          return combined.filter(
+            (company, index, self) => self.findIndex((c) => c.id === company.id) === index,
+          );
+        });
+      }
     }
   }, [data, currentPage]);
 
@@ -153,24 +156,22 @@ const CompanyView = ({ companies: initialCompanies }: { companies?: any[] }) => 
     else p.delete('q');
     if (searchData.location) p.set('location', searchData.location);
     else p.delete('location');
+    setCurrentPage(1);
     router.push(`${pathname}?${p.toString()}`);
   };
 
   const handleFilterChange = (value: string) => {
+    setCurrentPage(1);
     router.push(`${pathname}?${createQueryString('industry', value)}`);
   };
 
   const loadMoreCompanies = () => {
     if (data?.meta && currentPage < data.meta.pages) {
       setCurrentPage((prev) => prev + 1);
-    } else if (!data && initialCompanies && initialCompanies.length === limit) {
-      setCurrentPage(2);
     }
   };
 
-  const hasMoreCompanies = data?.meta
-    ? currentPage < data.meta.pages
-    : initialCompanies?.length === limit;
+  const hasMoreCompanies = data?.meta ? currentPage < data.meta.pages : false;
 
   /* ==================== Render ==================== */
   return (

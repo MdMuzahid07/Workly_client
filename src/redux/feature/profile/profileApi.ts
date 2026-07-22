@@ -48,6 +48,7 @@ export interface SavedJobsResponseMeta {
 }
 
 const profileApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     createProfile: builder.mutation({
       query: (data) => ({

@@ -137,6 +137,7 @@ export interface SystemMetrics {
 }
 
 const adminApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getEmployerStats: builder.query<Envelope<AdminEmployerStats>, void>({
       query: () => ({ url: '/admin/employers/stats', method: 'GET' }),

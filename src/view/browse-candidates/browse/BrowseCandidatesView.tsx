@@ -143,10 +143,8 @@ const BrowseCandidatesView = () => {
   });
 
   const featuredCandidates = useMemo(() => {
-    const list = featuredData?.data || [];
-    if (list.length >= 2) return list;
-    return allCandidates.slice(0, 6);
-  }, [featuredData, allCandidates]);
+    return featuredData?.data || [];
+  }, [featuredData]);
 
   console.log('Candidates Data:', data);
 
