@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { useFormContext } from "react-hook-form";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn, getNestedValue } from '@/lib/utils';
+import { useFormContext } from 'react-hook-form';
 
 interface WKInputProps {
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   required?: boolean;
-  type?: "text" | "email" | "password" | "number";
+  type?: 'text' | 'email' | 'password' | 'number';
   label: string;
   name: string;
   className?: string;
@@ -18,9 +18,9 @@ interface WKInputProps {
 }
 
 const WKInput = ({
-  size = "lg",
+  size = 'lg',
   required = false,
-  type = "text",
+  type = 'text',
   label,
   name,
   className,
@@ -34,16 +34,17 @@ const WKInput = ({
   } = useFormContext();
 
   const sizeClasses = {
-    sm: "h-8 text-sm",
-    md: "h-9 text-sm",
-    lg: "h-10",
+    sm: 'h-8 text-sm',
+    md: 'h-9 text-sm',
+    lg: 'h-10',
   };
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
     <div className="w-full space-y-2">
-      <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
+      <Label htmlFor={name} className={hasError ? 'text-destructive' : ''}>
         {labelIcon && <span className="mr-1 inline-block">{labelIcon}</span>}
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
@@ -58,15 +59,11 @@ const WKInput = ({
         disabled={disabled}
         className={cn(
           sizeClasses[size],
-          hasError && "border-destructive focus-visible:ring-destructive",
+          hasError && 'border-destructive focus-visible:ring-destructive',
           className,
         )}
       />
-      {hasError && (
-        <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
-        </p>
-      )}
+      {hasError && <p className="text-destructive text-sm">{fieldError?.message as string}</p>}
     </div>
   );
 };

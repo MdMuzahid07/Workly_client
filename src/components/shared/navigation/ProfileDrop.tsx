@@ -1,27 +1,38 @@
-"use client";
+'use client';
 
-import { AnimatePresence, motion } from "framer-motion";
-import { JwtPayload, jwtDecode } from "jwt-decode";
+import { AnimatePresence, motion } from 'motion/react';
+import { JwtPayload, jwtDecode } from 'jwt-decode';
 import {
+  Bookmark,
   Briefcase,
   Building2,
   ChevronDown,
   FileText,
-  Heart,
   LogOut,
+  Settings,
+  ShieldCheck,
   User,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "../../ui/button";
-import ThemeSwitcher from "../ThemeSwitcher";
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGetSavedJobsQuery } from '@/redux/feature/profile/profileApi';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   href: string;
   badge?: number;
+  color?: string;
 }
 
 interface AuthTokenPayload extends JwtPayload {
@@ -33,287 +44,215 @@ interface UserProfile {
   fullName: string;
   email: string;
   avatar?: string;
-  initials: string;
+  profilePicture?: string;
+  avatarUrl?: string;
+  initials?: string;
   role?: string;
   companyId?: string | number;
+  profile?: {
+    avatarUrl?: string | null;
+  } | null;
 }
 
 interface ProfileDropProps {
   user?: UserProfile;
   onSignOut?: () => void;
   className?: string;
-  isMobile?: boolean;
 }
 
-const ProfileDrop: React.FC<ProfileDropProps> = ({
-  user,
-  onSignOut,
-  isMobile,
-  className = "",
-}) => {
+const ProfileDrop: React.FC<ProfileDropProps> = ({ user, onSignOut, className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node) &&
-      buttonRef.current &&
-      !buttonRef.current.contains(event.target as Node)
-    ) {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
       setIsOpen(false);
-    }
-  }, []);
-
-  const handleEscapeKey = useCallback((event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      setIsOpen(false);
-      buttonRef.current?.focus();
     }
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscapeKey);
+      document.addEventListener('mousedown', handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [isOpen, handleClickOutside, handleEscapeKey]);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, handleClickOutside]);
 
   let decodedToken: AuthTokenPayload | null = null;
   try {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (token) decodedToken = jwtDecode<AuthTokenPayload>(token);
   } catch {
     decodedToken = null;
   }
-  const isEmployer =
-    decodedToken?.role === "EMPLOYER" ||
-    user?.role === "EMPLOYER" ||
-    (user?.role as string) === "EMPLOYER";
-  const isAdmin = decodedToken?.role === "ADMIN" || user?.role === "ADMIN";
-  const isSuperAdmin =
-    decodedToken?.role === "SUPER_ADMIN" || user?.role === "SUPER_ADMIN";
-  const hasCompany =
-    Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
+
+  const isEmployer = decodedToken?.role === 'EMPLOYER' || user?.role === 'EMPLOYER';
+  const isAdmin = decodedToken?.role === 'ADMIN' || user?.role === 'ADMIN';
+  const isSuperAdmin = decodedToken?.role === 'SUPER_ADMIN' || user?.role === 'SUPER_ADMIN';
+  const hasCompany = Boolean(decodedToken?.companyId) || Boolean(user?.companyId);
+
+  const skipSavedJobs = typeof window === 'undefined' || isEmployer || isAdmin || isSuperAdmin;
+  const { data: savedJobsResponse } = useGetSavedJobsQuery(undefined, {
+    skip: skipSavedJobs,
+  });
+  const savedJobsCount = savedJobsResponse?.meta?.total ?? savedJobsResponse?.data?.length ?? 0;
 
   const menuItems: MenuItem[] = [
+    ...(!isAdmin && !isSuperAdmin
+      ? [
+          {
+            icon: User,
+            label: 'Profile',
+            href: isEmployer ? '/employer/company-profile' : '/dashboard/profile',
+          },
+        ]
+      : []),
+    ...(isAdmin || isSuperAdmin ? [{ icon: ShieldCheck, label: 'Admin', href: '/admin' }] : []),
+    ...(isEmployer
+      ? hasCompany
+        ? [{ icon: FileText, label: 'Dashboard', href: '/employer' }]
+        : [{ icon: Building2, label: 'Add Company', href: '/create-company' }]
+      : []),
+    ...(!isEmployer && !isAdmin && !isSuperAdmin
+      ? [
+          { icon: Briefcase, label: 'Dashboard', href: '/dashboard' },
+          {
+            icon: Bookmark,
+            label: 'Saved Jobs',
+            href: '/dashboard/saved-jobs',
+            badge: savedJobsCount,
+          },
+        ]
+      : []),
     {
-      icon: User,
-      label: "My Profile",
-      href: isEmployer ? "/profile" : "/dashboard/profile",
+      icon: Settings,
+      label: 'Settings',
+      href: isEmployer
+        ? '/employer/settings'
+        : isAdmin || isSuperAdmin
+          ? '/admin/settings'
+          : '/dashboard/settings',
     },
-    ...(!isEmployer
-      ? [{ icon: Briefcase, label: "My Dashboard", href: "/dashboard" }]
-      : []),
-    ...(!isEmployer && !hasCompany
-      ? [
-          {
-            icon: Briefcase,
-            label: "Applied Jobs",
-            href: "/dashboard/applied-jobs",
-            badge: 3,
-          },
-        ]
-      : []),
-    ...(!isEmployer && hasCompany
-      ? [
-          {
-            icon: Heart,
-            label: "Saved Jobs",
-            href: "/dashboard/saved-jobs",
-            badge: 12,
-          },
-        ]
-      : []),
-    ...(!hasCompany && isEmployer
-      ? [{ icon: Building2, label: "Create Company", href: "/create-company" }]
-      : []),
-    ...((isEmployer && hasCompany) || isAdmin || isSuperAdmin
-      ? [{ icon: FileText, label: "Company Dashboard", href: "/employer" }]
-      : []),
   ];
 
-  const handleSignOut = async () => {
-    if (onSignOut) {
-      await onSignOut();
-    }
-    setIsOpen(false);
-  };
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  const avatarSrc =
+    user?.avatar || user?.profilePicture || user?.avatarUrl || user?.profile?.avatarUrl;
+  const hasAvatar = Boolean(avatarSrc && avatarSrc.trim() && !avatarSrc.includes('placeholder'));
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      {!isMobile ? (
-        <Button
-          ref={buttonRef}
-          onClick={toggleDropdown}
-          variant="ghost"
-          className={`group bg-background hover:bg-accent/50 relative flex h-10 cursor-pointer items-center gap-2 rounded-full border px-2 transition-all duration-200 ${
-            isOpen
-              ? "border-primary/20 text-primary"
-              : "text-muted-foreground hover:text-foreground border-transparent"
-          }`}
-          aria-expanded={isOpen}
-          aria-haspopup="true"
-          aria-label="User menu"
-        >
-          <div className="relative">
-            {user?.avatar ? (
-              <Image
-                src={user?.avatar}
-                alt={user?.fullName}
-                className="h-6 w-6 rounded-full border-2 border-white object-cover shadow-sm"
-                width={25}
-                height={25}
-                priority
-              />
-            ) : (
-              <div className="text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-[10px] font-semibold shadow-sm">
-                {user?.fullName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()}
-              </div>
-            )}
-            <div className="bg-primary absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white shadow-sm"></div>
-          </div>
-          <ChevronDown
-            className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            } group-hover:text-muted-foreground`}
-          />
-        </Button>
-      ) : (
-        <button
-          ref={buttonRef}
-          onClick={toggleDropdown}
-          className={`text-muted-foreground hover:text-foreground flex flex-col items-center rounded-lg p-1 text-xs font-medium transition-colors`}
-          aria-expanded={isOpen}
-          aria-haspopup="true"
-          aria-label="User menu"
-        >
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 * 0.05 }}
-            className="flex flex-col items-center sm:gap-1 sm:p-2"
-          >
-            <User className="h-5 w-5" />
-          </motion.div>
-        </button>
-      )}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="group flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80"
+      >
+        <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 dark:border-slate-800">
+          {hasAvatar ? (
+            <Image
+              src={avatarSrc!}
+              alt={user?.fullName || 'User'}
+              fill
+              className="object-cover"
+              sizes="32px"
+            />
+          ) : (
+            <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-[10px] font-bold uppercase">
+              {user?.fullName
+                ?.split(' ')
+                .filter(Boolean)
+                .map((n) => n[0])
+                .join('') || 'U'}
+            </div>
+          )}
+        </div>
+        <ChevronDown
+          className={`text-muted-foreground h-3 w-3 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -12 }}
-            transition={{
-              duration: 0.28,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className={`bg-card z-9999 overflow-hidden rounded-2xl border drop-shadow-2xl ${
-              isMobile
-                ? "absolute right-0 bottom-full mb-4 h-fit min-h-[65vh] w-full max-w-[82.5vw] min-w-[84vw]"
-                : "absolute top-full right-0 mt-8 w-72"
-            }`}
-            role="menu"
-            aria-orientation="vertical"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute right-0 mt-3 w-56 origin-top-right overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-950"
           >
-            <div className="border-b border-gray-100/80 p-4">
-              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-start">
-                <div className="relative">
-                  {user?.avatar ? (
-                    <Image
-                      src={user?.avatar}
-                      alt={user?.fullName}
-                      className="h-20 w-20 rounded-full border-2 border-white object-cover sm:h-12 sm:w-12"
-                      width={48}
-                      height={48}
-                      priority
-                    />
-                  ) : (
-                    <div className="from-primary/50 border-primary/20 to-primary text-muted-foreground flex h-20 w-20 items-center justify-center rounded-full border text-lg font-semibold sm:h-12 sm:w-12">
-                      {user?.fullName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()}
-                    </div>
-                  )}
-                  {/* <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-primary shadow-sm"></div> */}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-muted-foreground truncate text-center font-semibold sm:text-start">
-                    {user?.fullName}
-                  </p>
-                  <p className="text-muted-foreground truncate text-center text-sm sm:text-start">
-                    {user?.email}
-                  </p>
-                  <div className="mt-1 flex items-center gap-1">
-                    <div className="bg-primary h-2 w-2 rounded-full"></div>
-                    <span className="text-xs font-medium text-green-600">
-                      Online
-                    </span>
-                  </div>
-                </div>
-              </div>
+            <div className="border-b border-gray-50 bg-gray-50/50 p-4 dark:border-slate-900 dark:bg-slate-900/50">
+              <p className="text-foreground truncate text-sm font-bold">{user?.fullName}</p>
+              <p className="text-muted-foreground truncate text-xs">{user?.email}</p>
             </div>
 
-            <div className="py-2">
+            <div className="p-1.5">
               {menuItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group hover:bg-primary/2/80 focus:bg-primary/2/80 text-muted-foreground flex items-center justify-between px-4 py-3 text-sm transition-all duration-150 focus:outline-none"
-                  role="menuitem"
                   onClick={() => setIsOpen(false)}
+                  className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-slate-900"
                 >
-                  <div className="flex items-center gap-3">
-                    <item.icon className="group-hover:text-primary dark:group-hover:text-muted-foreground text-primary h-4 w-4 transition-colors" />
-                    <span className="text-muted-foreground group-hover:text-primary text-xs font-medium dark:group-hover:text-white">
-                      {item.label}
-                    </span>
-                  </div>
-                  {item.badge && (
-                    <span className="bg-primary/10 text-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
-                      {item.badge > 99 ? "99+" : item.badge}
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="bg-primary/10 text-primary ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold">
+                      {item.badge}
                     </span>
                   )}
                 </Link>
               ))}
             </div>
 
-            {isMobile ? <ThemeSwitcher isMobile={isMobile} /> : ""}
-            <div className="border-t border-gray-100/80">
+            <div className="border-t border-gray-50 p-1.5 dark:border-slate-900">
               <button
-                onClick={handleSignOut}
-                className="group flex w-full cursor-pointer items-center gap-3 px-4 py-4 text-left text-sm font-medium text-red-600 transition-all duration-150 hover:bg-red-50/80 focus:bg-red-50/80 focus:outline-none"
-                role="menuitem"
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowLogoutModal(true);
+                }}
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-50 dark:hover:bg-red-950/20"
               >
-                <LogOut className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-                <span>Sign Out</span>
+                <LogOut className="h-4 w-4" />
+                Log Out
               </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Dialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
+        <DialogContent className="max-w-[340px] gap-0 rounded-2xl border-zinc-100 bg-white/95 p-6 shadow-2xl backdrop-blur-xl sm:max-w-md dark:border-zinc-800 dark:bg-zinc-950/95">
+          <DialogHeader className="gap-2">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-zinc-900 dark:text-zinc-50">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 text-red-500 dark:bg-red-500/20">
+                <LogOut className="h-4 w-4" />
+              </span>
+              Confirm Log Out
+            </DialogTitle>
+            <DialogDescription className="text-left text-sm text-zinc-500 dark:text-zinc-400">
+              Are you sure you want to log out? You will need to sign in again to access your
+              profile, saved jobs, and applications.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutModal(false)}
+              className="w-full cursor-pointer rounded-xl border-zinc-200 text-sm font-semibold transition-colors duration-200 hover:bg-zinc-50 sm:w-auto dark:border-zinc-800 dark:hover:bg-zinc-900"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowLogoutModal(false);
+                onSignOut?.();
+              }}
+              className="w-full cursor-pointer rounded-xl bg-red-600 text-sm font-semibold text-white transition-all hover:bg-red-700 active:scale-95 sm:w-auto"
+            >
+              Log Out
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

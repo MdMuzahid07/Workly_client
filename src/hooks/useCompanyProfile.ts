@@ -1,22 +1,40 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import { MOCK_COMPANY } from "@/constants/company-mock-data";
 import {
   useGetMyCompanyQuery,
   useUpdateCompanyByIdMutation,
-} from "@/redux/feature/company/companyApi";
-import { CompanyBenefit } from "@/types/company-benefit";
-import { CompanyProfile, SocialLink } from "@/types/company-profile";
+} from '@/redux/feature/company/companyApi';
+import { CompanyBenefit } from '@/types/company-benefit';
+import { CompanyProfile, SocialLink } from '@/types/company-profile';
 import {
   calculateProfileCompletion,
   extractIndustryId,
   mapApiDataToProfile,
   parseBenefitsFromApi,
   prepareBenefitsForApi,
-} from "@/utils/company-profile-utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+} from '@/utils/company-profile-utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+
+/** Typed payload for the company update API call */
+interface UpdateCompanyPayload {
+  companyId: string;
+  name: string;
+  description: string;
+  location: string;
+  websiteUrl: string;
+  contactEmail: string;
+  contactPhone: string;
+  founded: string | number | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  size: string | null;
+  mission: string | null;
+  values: string[];
+  socialLinks: { id?: string; platform: string; url: string }[];
+  benefits: CompanyBenefit[];
+  industryId?: string;
+}
 
 /**
  * Custom hook for managing company profile state and operations
@@ -24,19 +42,13 @@ import { toast } from "sonner";
  */
 export const useCompanyProfile = () => {
   // ===== State Management =====
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
-  const [companyProfile, setCompanyProfile] =
-    useState<CompanyProfile>(MOCK_COMPANY);
-  const [editedProfile, setEditedProfile] =
-    useState<CompanyProfile>(MOCK_COMPANY);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
-    MOCK_COMPANY.socialLinks || [],
-  );
-  const [benefits, setBenefits] = useState<CompanyBenefit[]>(
-    MOCK_COMPANY.benefits || [],
-  );
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+  const [editedProfile, setEditedProfile] = useState<CompanyProfile | null>(null);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [benefits, setBenefits] = useState<CompanyBenefit[]>([]);
 
   // ===== API Integration =====
   const {
@@ -44,12 +56,9 @@ export const useCompanyProfile = () => {
     isLoading: isLoadingCompany,
     error: companyError,
     refetch: refetchCompany,
-  } = useGetMyCompanyQuery(undefined, {
-    skip: true, // Skip API fetching for now as we use mock data
-  });
+  } = useGetMyCompanyQuery(undefined);
 
-  const [updateCompany, { isLoading: isSaving }] =
-    useUpdateCompanyByIdMutation();
+  const [updateCompany, { isLoading: isSaving }] = useUpdateCompanyByIdMutation();
 
   // ===== Initialize data from API =====
   useEffect(() => {
@@ -73,11 +82,13 @@ export const useCompanyProfile = () => {
    */
   const handleSave = useCallback(async () => {
     if (!companyId) {
-      toast.error("Company not found");
+      toast.error('Company not found');
       return;
     }
 
     try {
+      if (!editedProfile) return;
+
       // Prepare social links
       const socialLinksData = socialLinks.map(({ id, platform, url }) => ({
         id,
@@ -88,7 +99,8 @@ export const useCompanyProfile = () => {
       const benefitsData = prepareBenefitsForApi(benefits);
 
       // Prepare update payload
-      const updatePayload: any = {
+      const updatePayload: UpdateCompanyPayload = {
+        companyId,
         name: editedProfile.name,
         description: editedProfile.description,
         location: editedProfile.location,
@@ -99,74 +111,76 @@ export const useCompanyProfile = () => {
         logoUrl: editedProfile.logoUrl,
         coverUrl: editedProfile.coverUrl,
         size: editedProfile.size,
-        mission: editedProfile.mission,
-        cultureSummary: editedProfile.cultureSummary,
-        values: editedProfile.values || [],
+        mission: editedProfile.mission ?? null,
+        values: editedProfile.values ?? [],
         socialLinks: socialLinksData,
         benefits: benefitsData,
+        industryId: undefined,
       };
 
-      // Add industry ID if present
+      // Resolve industry
       const industryId = extractIndustryId(editedProfile.industry);
       if (industryId) {
         updatePayload.industryId = industryId;
       }
 
       // Update company
-      await updateCompany({
-        companyId,
-        ...updatePayload,
-      }).unwrap();
+      await updateCompany(updatePayload).unwrap();
 
       // Refetch to get updated data
       await refetchCompany();
 
-      toast.success("Company profile updated successfully");
+      toast.success('Company profile updated successfully');
       setIsEditing(false);
-    } catch (error: any) {
-      console.error("Update error:", error);
+    } catch (error: unknown) {
+      console.error('Update error:', error);
+      const err = error as {
+        data?: { message?: string; errorSources?: { message?: string } };
+        message?: string;
+      };
       toast.error(
-        error?.data?.message ||
-          error?.data?.errorSources?.message ||
-          error?.message ||
-          "Failed to update company profile",
+        err?.data?.message ||
+          err?.data?.errorSources?.message ||
+          err?.message ||
+          'Failed to update company profile',
       );
     }
-  }, [
-    companyId,
-    socialLinks,
-    benefits,
-    editedProfile,
-    updateCompany,
-    refetchCompany,
-  ]);
+  }, [companyId, socialLinks, benefits, editedProfile, updateCompany, refetchCompany]);
 
   /**
    * Cancels editing and reverts to saved profile
    */
   const handleCancel = useCallback(() => {
-    setEditedProfile(companyProfile);
-    setSocialLinks(companyProfile.socialLinks || []);
-    setBenefits(companyProfile.benefits || []);
+    if (companyProfile) {
+      setEditedProfile(companyProfile);
+      setSocialLinks(companyProfile.socialLinks || []);
+      setBenefits(companyProfile.benefits || []);
+    }
     setIsEditing(false);
   }, [companyProfile]);
 
   /**
    * Updates a specific field in the edited profile
    */
-  const updateField = useCallback((field: keyof CompanyProfile, value: any) => {
-    setEditedProfile((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  }, []);
+  const updateField = useCallback(
+    (field: keyof CompanyProfile, value: CompanyProfile[keyof CompanyProfile]) => {
+      setEditedProfile((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          [field]: value,
+        } as CompanyProfile;
+      });
+    },
+    [],
+  );
 
   /**
    * Updates the company mission statement
    */
   const handleMissionChange = useCallback(
     (mission: string) => {
-      updateField("mission", mission);
+      updateField('mission', mission);
     },
     [updateField],
   );
@@ -174,19 +188,13 @@ export const useCompanyProfile = () => {
   /**
    * Updates the company culture summary
    */
-  const handleCultureSummaryChange = useCallback(
-    (cultureSummary: string) => {
-      updateField("cultureSummary", cultureSummary);
-    },
-    [updateField],
-  );
 
   /**
    * Updates the company values
    */
   const handleValuesChange = useCallback(
     (values: string[]) => {
-      updateField("values", values);
+      updateField('values', values);
     },
     [updateField],
   );
@@ -197,7 +205,7 @@ export const useCompanyProfile = () => {
   const handleBenefitsChange = useCallback(
     (updatedBenefits: CompanyBenefit[]) => {
       setBenefits(updatedBenefits);
-      updateField("benefits", updatedBenefits);
+      updateField('benefits', updatedBenefits);
     },
     [updateField],
   );
@@ -208,7 +216,7 @@ export const useCompanyProfile = () => {
   const handleSocialLinksChange = useCallback(
     (links: SocialLink[]) => {
       setSocialLinks(links);
-      updateField("socialLinks", links);
+      updateField('socialLinks', links);
     },
     [updateField],
   );
@@ -221,7 +229,7 @@ export const useCompanyProfile = () => {
   const currentProfile = useMemo(
     () => (isEditing ? editedProfile : companyProfile),
     [isEditing, editedProfile, companyProfile],
-  );
+  ) as CompanyProfile;
 
   /**
    * Profile completion percentage
@@ -255,7 +263,6 @@ export const useCompanyProfile = () => {
     handleCancel,
     updateField,
     handleMissionChange,
-    handleCultureSummaryChange,
     handleValuesChange,
     handleBenefitsChange,
     handleSocialLinksChange,

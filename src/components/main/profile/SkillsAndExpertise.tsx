@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@react-three/drei";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 interface Skill {
   skillName: string;
@@ -13,21 +13,16 @@ interface SkillsSectionProps {
 
 const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
   const getSkillLevel = (years: number) => {
-    if (years >= 5)
-      return { level: "Expert", color: "bg-primary", progress: 100 };
-    if (years >= 3)
-      return { level: "Advanced", color: "bg-chart-2", progress: 80 };
-    if (years >= 1)
-      return { level: "Intermediate", color: "bg-chart-3", progress: 60 };
-    return { level: "Beginner", color: "bg-muted-foreground", progress: 30 };
+    if (years >= 5) return { level: 'Expert', color: 'bg-primary', progress: 100 };
+    if (years >= 3) return { level: 'Advanced', color: 'bg-chart-2', progress: 80 };
+    if (years >= 1) return { level: 'Intermediate', color: 'bg-chart-3', progress: 60 };
+    return { level: 'Beginner', color: 'bg-muted-foreground', progress: 30 };
   };
 
   return (
     <Card className="bg-card border-0">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold">
-          Skills & Expertise
-        </CardTitle>
+        <CardTitle className="text-lg font-semibold">Skills & Expertise</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -47,20 +42,12 @@ const SkillsAndExpertise = ({ skills }: SkillsSectionProps) => {
                       {skill.experienceYears}y
                     </Badge>
                   </div>
-                  <Badge
-                    variant="secondary"
-                    className="bg-muted text-muted-foreground text-xs"
-                  >
+                  <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
                     {skillInfo.level}
                   </Badge>
                 </div>
                 <div className="space-y-2">
-                  <Progress
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    //@ts-ignore
-                    value={skillInfo.progress}
-                    className="bg-muted h-2"
-                  />
+                  <Progress value={skillInfo.progress} className="bg-muted h-2" />
                   <div className="text-muted-foreground flex justify-between text-xs">
                     <span>Beginner</span>
                     <span>Expert</span>

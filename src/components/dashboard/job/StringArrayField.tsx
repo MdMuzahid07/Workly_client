@@ -1,12 +1,12 @@
-"use client";
-import { Plus, Trash2 } from "lucide-react";
-import { useFormContext } from "react-hook-form";
-import { Button } from "../../ui/button";
-import { Input } from "../../ui/input";
-import { JobFormData } from "./CreateNewJobForm";
+'use client';
+import { Plus, Trash2 } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { JobFormData } from './create-job-form';
 
 interface StringArrayFieldProps {
-  fieldName: "benefits" | "requirements";
+  fieldName: 'benefits' | 'requirements';
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -22,7 +22,7 @@ const StringArrayField = ({
   const items = watch(fieldName) || [];
 
   const addItem = () => {
-    setValue(fieldName, ["", ...items]);
+    setValue(fieldName, ['', ...items]);
   };
 
   const removeItem = (index: number) => {
@@ -43,13 +43,7 @@ const StringArrayField = ({
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </h3>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={addItem}
-          className="h-8"
-        >
+        <Button type="button" variant="outline" size="sm" onClick={addItem} className="h-8">
           <Plus className="mr-1 h-4 w-4" />
           Add {label}
         </Button>
@@ -57,8 +51,7 @@ const StringArrayField = ({
 
       {items.length === 0 ? (
         <div className="text-muted-foreground border-primary/20 rounded-lg border border-dashed p-4 text-center text-sm">
-          No {label.toLowerCase()} added yet. Click {`"Add ${label}"`} to get
-          started.
+          No {label.toLowerCase()} added yet. Click {`"Add ${label}"`} to get started.
         </div>
       ) : (
         <div className="space-y-3">

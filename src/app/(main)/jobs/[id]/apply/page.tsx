@@ -1,4 +1,4 @@
-import ApplyJobView from "../../../../../view/job/ApplyJobView";
+import ApplyJobView from '../../../../../view/job/apply/ApplyJobView';
 
 interface PageProps {
   params: Promise<{

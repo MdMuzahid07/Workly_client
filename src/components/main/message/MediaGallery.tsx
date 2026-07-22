@@ -1,820 +1,344 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { format } from 'date-fns';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  ExternalLink,
+  DownloadIcon,
+  ExternalLinkIcon,
+  FileIcon,
+  FilterIcon,
+  ImageIcon,
+  LinkIcon,
+  SearchIcon,
   Eye,
-  FileArchive,
-  FileCode,
-  FileText,
-  Filter,
-  HardDrive,
-  Image as ImageIcon,
-  Link as LinkIcon,
-  MoreVertical,
-  Search,
-  Share2,
-  Trash2,
-  X,
-  ZoomIn,
-} from "lucide-react";
-import Image from "next/image";
-import { JSX, useCallback, useEffect, useRef, useState } from "react";
-import type { Swiper as SwiperType } from "swiper";
-import "swiper/css";
-import "swiper/css/navigation";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-import "swiper/css/pagination";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-import "swiper/css/zoom";
-import { Keyboard, Navigation, Pagination, Zoom } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+} from 'lucide-react';
+import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
+import type { Message } from '@/types/message';
+import { normalizeCloudinaryPdfUrl, downloadMessageAttachment } from '@/lib/pdfSource';
+import dynamic from 'next/dynamic';
 
-/* ========================================
-   TYPE DEFINITIONS
-======================================== */
-
-interface MediaItem {
-  id: number;
-  url: string;
-  name: string;
-  size: string;
-  date: string;
-  thumbnail: string;
-}
-
-interface DocumentItem {
-  id: number;
-  type: string;
-  name: string;
-  size: string;
-  date: string;
-}
-
-interface LinkItem {
-  id: number;
-  title: string;
-  url: string;
-  date: string;
-  description: string;
-}
+const MessagePdfViewer = dynamic(() => import('@/components/shared/MessagePdfViewer'), {
+  ssr: false,
+});
 
 interface MediaGalleryProps {
   isOpen: boolean;
   onClose: () => void;
+  messages: Message[];
   participantName: string;
+  onImageClick?: (index: number) => void;
 }
 
-const MOCK_MEDIA = {
-  images: [
-    {
-      id: 1,
-      url: "/mock-media/ui-preview.png",
-      name: "UI Design Preview.png",
-      size: "2.4 MB",
-      date: "Feb 05, 2026",
-      thumbnail:
-        "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=400",
-    },
-    {
-      id: 2,
-      url: "/mock-media/dashboard.png",
-      name: "Dashboard Prototype.png",
-      size: "1.8 MB",
-      date: "Feb 04, 2026",
-      thumbnail:
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
-    },
-    {
-      id: 3,
-      url: "/mock-media/landing-page.png",
-      name: "Landing Page.png",
-      size: "3.2 MB",
-      date: "Feb 02, 2026",
-      thumbnail:
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400",
-    },
-    {
-      id: 4,
-      url: "/mock-media/mobile-app.png",
-      name: "Mobile App Design.png",
-      size: "1.5 MB",
-      date: "Feb 01, 2026",
-      thumbnail:
-        "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400",
-    },
-    {
-      id: 5,
-      url: "/mock-media/components.png",
-      name: "Component Library.png",
-      size: "2.1 MB",
-      date: "Jan 30, 2026",
-      thumbnail:
-        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400",
-    },
-    {
-      id: 6,
-      url: "/mock-media/wireframe.png",
-      name: "Wireframe.png",
-      size: "890 KB",
-      date: "Jan 28, 2026",
-      thumbnail:
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400",
-    },
-  ],
-  documents: [
-    {
-      id: 1,
-      type: "pdf",
-      name: "Job Proposal.pdf",
-      size: "450 KB",
-      date: "Feb 05, 2026",
-    },
-    {
-      id: 2,
-      type: "zip",
-      name: "Asset_Package.zip",
-      size: "12.5 MB",
-      date: "Feb 03, 2026",
-    },
-    {
-      id: 3,
-      type: "docx",
-      name: "Agreement.docx",
-      size: "120 KB",
-      date: "Feb 01, 2026",
-    },
-    {
-      id: 4,
-      type: "pdf",
-      name: "Project_Requirements.pdf",
-      size: "680 KB",
-      date: "Jan 30, 2026",
-    },
-  ],
-  links: [
-    {
-      id: 1,
-      title: "GitHub Repository",
-      url: "https://github.com/workly/project",
-      date: "Feb 05, 2026",
-      description: "Main project repository",
-    },
-    {
-      id: 2,
-      title: "Figma Design",
-      url: "https://figma.com/file/...",
-      date: "Feb 04, 2026",
-      description: "UI/UX design files",
-    },
-    {
-      id: 3,
-      title: "Portfolio Website",
-      url: "https://muzahid.dev",
-      date: "Feb 02, 2026",
-      description: "Personal portfolio",
-    },
-    {
-      id: 4,
-      title: "API Documentation",
-      url: "https://docs.api.example.com",
-      date: "Jan 29, 2026",
-      description: "REST API docs",
-    },
-  ],
-};
-
-/* ========================================
-   UTILITY FUNCTIONS
-======================================== */
-
-const getFileIcon = (type: string) => {
-  const icons: Record<string, JSX.Element> = {
-    pdf: <FileText className="h-5 w-5 text-red-500" />,
-    zip: <FileArchive className="h-5 w-5 text-yellow-500" />,
-    docx: <FileCode className="h-5 w-5 text-blue-500" />,
-  };
-  return icons[type] || <FileText className="text-muted-foreground h-5 w-5" />;
-};
-
-const calculateTotalSize = (images: MediaItem[]): string => {
-  const totalKB = images.reduce((acc, img) => {
-    const sizeNum = parseFloat(img.size);
-    const multiplier = img.size.includes("KB") ? 1 : 1024;
-    return acc + sizeNum * multiplier;
-  }, 0);
-  return (totalKB / 1024).toFixed(1);
-};
-
-const downloadImage = (url: string, filename: string) => {
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-};
-
-/* ========================================
-   COMPONENT: ImageLightbox
-   Swiper-based fullscreen image viewer
-======================================== */
-
-interface ImageLightboxProps {
-  images: MediaItem[];
-  currentIndex: number;
-  onClose: () => void;
-}
-
-function ImageLightbox({ images, currentIndex, onClose }: ImageLightboxProps) {
-  const swiperRef = useRef<SwiperType | null>(null);
-  const [activeIndex, setActiveIndex] = useState(currentIndex);
-  const currentImage = images[activeIndex];
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  return (
-    <div className="animate-in fade-in fixed inset-0 z-100 bg-black/95 backdrop-blur-sm duration-200">
-      {/* Header */}
-      <div className="absolute top-0 right-0 left-0 z-10 flex items-center justify-between bg-linear-to-b from-black/80 to-transparent p-3 md:p-4">
-        <div className="min-w-0 flex-1 text-white">
-          <h3 className="truncate text-sm font-semibold md:text-base">
-            {currentImage.name}
-          </h3>
-          <p className="text-xs text-white/70 md:text-sm">
-            {currentImage.size} • {currentImage.date}
-          </p>
-        </div>
-        <div className="ml-4 flex items-center gap-2">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-9 w-9 rounded-full text-white hover:bg-white/10"
-            onClick={() =>
-              downloadImage(currentImage.thumbnail, currentImage.name)
-            }
-          >
-            <Download className="h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-9 w-9 rounded-full text-white hover:bg-white/10"
-            onClick={onClose}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Swiper */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Swiper
-          modules={[Navigation, Keyboard, Zoom, Pagination]}
-          initialSlide={currentIndex}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          onSlideChange={(swiper) => {
-            setActiveIndex(swiper.activeIndex);
-          }}
-          spaceBetween={30}
-          navigation={{
-            prevEl: ".swiper-button-prev-custom",
-            nextEl: ".swiper-button-next-custom",
-          }}
-          keyboard={{ enabled: true }}
-          zoom={{ maxRatio: 3, minRatio: 1 }}
-          pagination={{ type: "fraction", el: ".swiper-pagination-custom" }}
-          className="h-full w-full"
-          style={{ padding: "80px 60px" }}
-        >
-          {images.map((image) => (
-            <SwiperSlide
-              key={image.id}
-              className="flex items-center justify-center"
-            >
-              <div className="swiper-zoom-container">
-                <Image
-                  src={image.thumbnail}
-                  alt={image.name}
-                  className="max-h-full max-w-full rounded-lg object-contain shadow-2xl select-none"
-                  draggable={false}
-                  fill
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        {/* Navigation Buttons */}
-        <button
-          className="swiper-button-prev-custom absolute top-1/2 left-2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 md:left-4"
-          disabled={activeIndex === 0}
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <button
-          className="swiper-button-next-custom absolute top-1/2 right-2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 md:right-4"
-          disabled={activeIndex === images.length - 1}
-        >
-          <ChevronRight className="h-6 w-6" />
-        </button>
-      </div>
-
-      {/* Counter */}
-      <div className="swiper-pagination-custom absolute bottom-6 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm" />
-
-      {/* Zoom Hint */}
-      <div className="absolute bottom-20 left-1/2 hidden -translate-x-1/2 text-xs text-white/60 md:block">
-        Double-click or pinch to zoom
-      </div>
-    </div>
-  );
-}
-
-/* ========================================
-   COMPONENT: EmptyState
-======================================== */
-
-interface EmptyStateProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function EmptyState({ icon, title, description }: EmptyStateProps) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 text-center md:py-16">
-      <div className="bg-muted mb-4 rounded-full p-4 md:p-6">{icon}</div>
-      <p className="text-foreground text-sm font-medium md:text-base">
-        {title}
-      </p>
-      <p className="text-muted-foreground mt-1 text-xs md:text-sm">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-/* ========================================
-   COMPONENT: MediaGrid
-======================================== */
-
-interface MediaGridProps {
-  items: MediaItem[];
-  onImageClick: (index: number) => void;
-  searchQuery: string;
-}
-
-function MediaGrid({ items, onImageClick, searchQuery }: MediaGridProps) {
-  if (items.length === 0) {
-    return (
-      <EmptyState
-        icon={
-          <ImageIcon className="text-muted-foreground/50 h-8 w-8 md:h-12 md:w-12" />
-        }
-        title={searchQuery ? "No matching media files" : "No media files"}
-        description={
-          searchQuery
-            ? "Try adjusting your search"
-            : "Images and videos will appear here"
-        }
-      />
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4 xl:grid-cols-5">
-      {items.map((item, index) => (
-        <div
-          key={item.id}
-          className="group border-border bg-muted hover:border-primary/50 relative aspect-square cursor-pointer overflow-hidden rounded-lg border transition-all hover:shadow-lg active:scale-95"
-          onClick={() => onImageClick(index)}
-        >
-          <div className="from-primary/5 to-accent/5 absolute inset-0 bg-linear-to-br">
-            <Image
-              src={item.thumbnail}
-              alt={item.name}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-              loading="lazy"
-              fill
-            />
-          </div>
-          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <div className="absolute right-0 bottom-0 left-0 p-2 md:p-3">
-              <p className="mb-1 truncate text-xs font-medium text-white">
-                {item.name}
-              </p>
-              <div className="flex items-center justify-between text-[10px] text-white/80 md:text-xs">
-                <span>{item.size}</span>
-                <span className="hidden sm:inline">{item.date}</span>
-              </div>
-            </div>
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-              <Button
-                size="icon"
-                variant="secondary"
-                className="h-7 w-7 md:h-8 md:w-8"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onImageClick(index);
-                }}
-              >
-                <Eye className="h-3 w-3 md:h-3.5 md:w-3.5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="h-7 w-7 md:h-8 md:w-8"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  downloadImage(item.thumbnail, item.name);
-                }}
-              >
-                <Download className="h-3 w-3 md:h-3.5 md:w-3.5" />
-              </Button>
-            </div>
-          </div>
-          <div className="absolute top-2 left-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <div className="rounded-full bg-black/50 p-1.5 backdrop-blur-sm">
-              <ZoomIn className="h-3 w-3 text-white" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ========================================
-   COMPONENT: DocumentsList
-======================================== */
-
-interface DocumentsListProps {
-  items: DocumentItem[];
-  searchQuery: string;
-}
-
-function DocumentsList({ items, searchQuery }: DocumentsListProps) {
-  if (items.length === 0) {
-    return (
-      <EmptyState
-        icon={
-          <FileText className="text-muted-foreground/50 h-8 w-8 md:h-12 md:w-12" />
-        }
-        title={searchQuery ? "No matching documents" : "No documents"}
-        description={
-          searchQuery
-            ? "Try adjusting your search"
-            : "Shared documents will appear here"
-        }
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-2 md:space-y-3">
-      {items.map((doc) => (
-        <div
-          key={doc.id}
-          className="group border-border bg-card hover:border-primary/50 flex items-center gap-3 rounded-lg border p-3 transition-all hover:shadow-md active:scale-[0.98] md:gap-4 md:p-4"
-        >
-          <div className="bg-muted group-hover:bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors md:h-12 md:w-12">
-            {getFileIcon(doc.type)}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-foreground truncate text-sm font-medium md:text-base">
-              {doc.name}
-            </p>
-            <div className="text-muted-foreground mt-1 flex items-center gap-2 text-xs md:gap-3 md:text-sm">
-              <span className="flex items-center gap-1">
-                <HardDrive className="h-3 w-3" />
-                {doc.size}
-              </span>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden items-center gap-1 sm:flex">
-                <Calendar className="h-3 w-3" />
-                {doc.date}
-              </span>
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-1 md:gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="hidden h-8 text-xs sm:flex md:h-9 md:text-sm"
-            >
-              <Download className="mr-1.5 h-3.5 w-3.5 md:h-4 md:w-4" />
-              Download
-            </Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8 md:hidden">
-              <Download className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-8 w-8">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Eye className="mr-2 h-4 w-4" />
-                  Preview
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ========================================
-   COMPONENT: LinksList
-======================================== */
-
-interface LinksListProps {
-  items: LinkItem[];
-  searchQuery: string;
-}
-
-function LinksList({ items, searchQuery }: LinksListProps) {
-  if (items.length === 0) {
-    return (
-      <EmptyState
-        icon={
-          <LinkIcon className="text-muted-foreground/50 h-8 w-8 md:h-12 md:w-12" />
-        }
-        title={searchQuery ? "No matching links" : "No links"}
-        description={
-          searchQuery
-            ? "Try adjusting your search"
-            : "Shared links will appear here"
-        }
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-2 md:space-y-3">
-      {items.map((link) => (
-        <div
-          key={link.id}
-          className="group border-border bg-card hover:border-primary/50 flex items-start gap-3 rounded-lg border p-3 transition-all hover:shadow-md active:scale-[0.98] md:gap-4 md:p-4"
-        >
-          <div className="from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br transition-all md:h-12 md:w-12">
-            <LinkIcon className="text-primary h-4 w-4 md:h-5 md:w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-foreground text-sm font-medium md:text-base">
-              {link.title}
-            </p>
-            {link.description && (
-              <p className="text-muted-foreground mt-0.5 line-clamp-1 text-xs md:text-sm">
-                {link.description}
-              </p>
-            )}
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary mt-1.5 flex items-center gap-1 truncate text-xs hover:underline md:mt-2 md:text-sm"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="truncate">{link.url}</span>
-              <ExternalLink className="h-3 w-3 shrink-0" />
-            </a>
-            <p className="text-muted-foreground mt-1.5 flex items-center gap-1 text-xs md:mt-2 md:text-sm">
-              <Calendar className="h-3 w-3" />
-              <span className="hidden sm:inline">Shared on</span> {link.date}
-            </p>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 shrink-0 text-xs md:h-9 md:text-sm"
-            asChild
-            onClick={(e) => e.stopPropagation()}
-          >
-            <a href={link.url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="mr-1.5 h-3.5 w-3.5 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Visit</span>
-              <span className="sm:hidden">Go</span>
-            </a>
-          </Button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ========================================
-   MAIN COMPONENT: MediaGallery
-======================================== */
-
-export function MediaGallery({
+const MediaGallery: React.FC<MediaGalleryProps> = ({
   isOpen,
   onClose,
+  messages,
   participantName,
-}: MediaGalleryProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null,
-  );
-  const [activeTab, setActiveTab] = useState("media");
+  onImageClick,
+}) => {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedPdf, setSelectedPdf] = useState<{
+    url: string;
+    name: string;
+    messageId?: string;
+  } | null>(null);
 
-  const totalItems =
-    MOCK_MEDIA.images.length +
-    MOCK_MEDIA.documents.length +
-    MOCK_MEDIA.links.length;
-  const totalSize = calculateTotalSize(MOCK_MEDIA.images);
+  const filteredItems = useMemo(() => {
+    const media = messages.filter((m) => m.messageType === 'IMAGE' && m.status !== 'DELETED');
+    const docs = messages.filter((m) => m.messageType === 'FILE' && m.status !== 'DELETED');
+    const links = messages.filter(
+      (m) =>
+        (m.messageType === 'LINK' ||
+          (m.messageType === 'TEXT' && m.content.match(/https?:\/\/[^\s]+/))) &&
+        m.status !== 'DELETED',
+    );
 
-  const filterItems = useCallback(
-    <T extends { name?: string; title?: string }>(items: T[]): T[] => {
-      if (!searchQuery.trim()) return items;
-      return items.filter((item) => {
-        const searchText = (
-          "name" in item ? item.name || "" : item.title || ""
-        ).toLowerCase();
-        return searchText.includes(searchQuery.toLowerCase());
-      });
-    },
-    [searchQuery],
-  );
+    const filterFn = (m: Message) =>
+      (m.fileName || m.content || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-  const filteredImages = filterItems(MOCK_MEDIA.images);
-  const filteredDocuments = filterItems(MOCK_MEDIA.documents);
-  const filteredLinks = filterItems(MOCK_MEDIA.links);
+    return {
+      media: media.filter(filterFn),
+      docs: docs.filter(filterFn),
+      links: links.filter(filterFn),
+    };
+  }, [messages, searchQuery]);
 
-  const handleImageClick = (index: number) => setSelectedImageIndex(index);
-  const closeLightbox = () => setSelectedImageIndex(null);
+  const totalSize = useMemo(() => {
+    const bytes = messages.reduce((acc, m) => acc + (m.fileSize || 0), 0);
+    return (bytes / (1024 * 1024)).toFixed(1);
+  }, [messages]);
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="h-screen max-w-7xl gap-0 overflow-hidden rounded-none p-0 sm:rounded-xl md:h-[85vh] xl:min-w-7xl">
-          {/* Header */}
-          <DialogHeader className="border-border shrink-0 border-b px-4 pt-4 pb-3 md:px-6 md:pt-6 md:pb-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <DialogTitle className="text-foreground truncate text-xl font-bold md:text-2xl">
-                  Shared Media
-                </DialogTitle>
-                <p className="text-muted-foreground mt-1 truncate text-xs md:text-sm">
-                  {participantName} • {totalItems} items
-                </p>
-              </div>
+        <DialogContent className="bg-background/95 sm:border-border/40 [&_[data-slot=dialog-close]]:border-border/60 [&_[data-slot=dialog-close]]:bg-muted/40 [&_[data-slot=dialog-close]]:hover:bg-muted/80 fixed top-0 left-0 flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-0 shadow-2xl backdrop-blur-xl sm:top-[50%] sm:left-[50%] sm:h-[85vh] sm:w-[90vw] sm:max-w-5xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border md:w-[85vw] lg:w-[70vw] xl:w-[60vw] [&_[data-slot=dialog-close]]:top-4 [&_[data-slot=dialog-close]]:right-4 [&_[data-slot=dialog-close]]:flex [&_[data-slot=dialog-close]]:h-8 [&_[data-slot=dialog-close]]:w-8 [&_[data-slot=dialog-close]]:items-center [&_[data-slot=dialog-close]]:justify-center [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border [&_[data-slot=dialog-close]]:transition-all">
+          <DialogHeader className="p-4 pb-0 sm:p-6 sm:pb-0">
+            <div className="mb-2 flex flex-wrap items-center gap-2 pr-12 sm:pr-0">
+              <DialogTitle className="text-xl font-black tracking-tight sm:text-2xl">
+                Shared Media
+              </DialogTitle>
               <Badge
                 variant="secondary"
-                className="h-7 shrink-0 text-xs md:h-auto md:text-sm"
+                className="bg-success/10 text-success border-success/20 shrink-0 px-2 py-0.5 text-[10px] font-bold sm:px-3 sm:py-1 sm:text-xs"
               >
-                <HardDrive className="mr-1 h-3 w-3 md:mr-1.5 md:h-3.5 md:w-3.5" />
-                <span className="hidden sm:inline">{totalSize} MB</span>
-                <span className="sm:hidden">{totalSize}MB</span>
+                <DownloadIcon className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
+                {totalSize} MB
               </Badge>
+            </div>
+            <p className="text-muted-foreground text-xs font-medium sm:text-sm">
+              {participantName} •{' '}
+              {filteredItems.media.length + filteredItems.docs.length + filteredItems.links.length}{' '}
+              Items
+            </p>
+
+            <div className="group relative mt-4 sm:mt-6">
+              <SearchIcon className="text-muted-foreground group-focus-within:text-primary absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors sm:left-4 sm:h-4.5 sm:w-4.5" />
+              <Input
+                placeholder="Search files, images, links..."
+                className="bg-muted/30 border-muted-foreground/10 focus-visible:ring-primary/20 h-10 rounded-xl pl-10 text-xs sm:h-12 sm:pl-11 sm:text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <FilterIcon className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 cursor-pointer transition-colors sm:right-4 sm:h-4.5 sm:w-4.5" />
             </div>
           </DialogHeader>
 
-          {/* Search Bar */}
-          <div className="border-border bg-muted/30 shrink-0 border-b px-4 py-3 md:px-6 md:py-4">
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="relative flex-1">
-                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-                <Input
-                  placeholder="Search files, images, links..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-background h-9 rounded-full pl-9 text-sm md:h-10"
-                />
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 shrink-0 md:h-10 md:w-10"
-              >
-                <Filter className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="flex min-h-0 flex-1 flex-col"
-          >
-            <div className="border-border shrink-0 border-b">
-              <TabsList className="mx-4 mt-3 mb-0 grid h-9 w-full max-w-md grid-cols-3 md:mx-6 md:mt-4 md:h-10">
+          <Tabs defaultValue="media" className="mt-4 flex flex-1 flex-col overflow-hidden sm:mt-6">
+            <div className="px-4 sm:px-6">
+              <TabsList className="bg-muted/40 flex h-10 w-full justify-start gap-1 rounded-full p-1 sm:w-fit">
                 <TabsTrigger
                   value="media"
-                  className="gap-1.5 text-xs md:gap-2 md:text-sm"
+                  className="text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-1 rounded-full px-3 py-1 text-xs font-bold transition-all data-[state=active]:shadow-xs sm:flex-initial sm:px-4 sm:py-1.5 sm:text-sm"
                 >
-                  <ImageIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Media</span>
-                  <span className="sm:hidden">({filteredImages.length})</span>
-                  <span className="hidden sm:inline">
-                    ({filteredImages.length})
-                  </span>
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <ImageIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span>Media ({filteredItems.media.length})</span>
+                  </div>
                 </TabsTrigger>
                 <TabsTrigger
-                  value="documents"
-                  className="gap-1.5 text-xs md:gap-2 md:text-sm"
+                  value="docs"
+                  className="text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-1 rounded-full px-3 py-1 text-xs font-bold transition-all data-[state=active]:shadow-xs sm:flex-initial sm:px-4 sm:py-1.5 sm:text-sm"
                 >
-                  <FileText className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Docs</span>
-                  <span className="sm:hidden">
-                    ({filteredDocuments.length})
-                  </span>
-                  <span className="hidden sm:inline">
-                    ({filteredDocuments.length})
-                  </span>
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <FileIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span>Docs ({filteredItems.docs.length})</span>
+                  </div>
                 </TabsTrigger>
                 <TabsTrigger
                   value="links"
-                  className="gap-1.5 text-xs md:gap-2 md:text-sm"
+                  className="text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-1 rounded-full px-3 py-1 text-xs font-bold transition-all data-[state=active]:shadow-xs sm:flex-initial sm:px-4 sm:py-1.5 sm:text-sm"
                 >
-                  <LinkIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Links</span>
-                  <span className="sm:hidden">({filteredLinks.length})</span>
-                  <span className="hidden sm:inline">
-                    ({filteredLinks.length})
-                  </span>
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span>Links ({filteredItems.links.length})</span>
+                  </div>
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            {/* Content */}
-            <div className="min-h-0 flex-1 px-4 pb-4 md:px-6 md:pb-6">
-              <ScrollArea className="mt-3 h-full md:mt-4">
-                <TabsContent value="media" className="mt-0">
-                  <MediaGrid
-                    items={filteredImages}
-                    onImageClick={handleImageClick}
-                    searchQuery={searchQuery}
-                  />
-                </TabsContent>
-                <TabsContent value="documents" className="mt-0">
-                  <DocumentsList
-                    items={filteredDocuments}
-                    searchQuery={searchQuery}
-                  />
-                </TabsContent>
-                <TabsContent value="links" className="mt-0">
-                  <LinksList items={filteredLinks} searchQuery={searchQuery} />
-                </TabsContent>
-              </ScrollArea>
-            </div>
+            <ScrollArea className="flex-1 p-4 sm:p-6">
+              <TabsContent value="media" className="m-0 focus-visible:ring-0">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                  {filteredItems.media.map((item: Message, idx: number) => (
+                    <div
+                      key={item.id}
+                      onClick={() => onImageClick && onImageClick(idx)}
+                      className="group border-border/50 hover:border-primary/30 relative aspect-square cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-xl"
+                    >
+                      <Image
+                        src={item.fileUrl || '/placeholder.svg'}
+                        alt={item.fileName || 'Shared media'}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        unoptimized={
+                          item.fileUrl?.startsWith('data:') || item.fileUrl?.startsWith('blob:')
+                        }
+                      />
+                      <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/20 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                        <p className="mb-1 truncate text-[10px] font-bold text-white/90">
+                          {item.fileName}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-medium text-white/60">
+                            {item.fileSize ? (item.fileSize / 1024).toFixed(1) : '0.0'} KB
+                          </span>
+                          <a
+                            href={item.fileUrl ?? undefined}
+                            download
+                            className="rounded-lg bg-white/20 p-1.5 backdrop-blur-md transition-colors hover:bg-white/40"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <DownloadIcon className="h-3.5 w-3.5 text-white" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredItems.media.length === 0 && (
+                    <div className="text-muted-foreground col-span-full py-20 text-center font-medium">
+                      No shared images found.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="docs" className="m-0 focus-visible:ring-0">
+                <div className="space-y-3">
+                  {filteredItems.docs.map((item: Message) => (
+                    <div
+                      key={item.id}
+                      className="group bg-muted/20 hover:bg-muted/40 border-border/40 flex flex-col gap-3.5 rounded-2xl border p-3.5 transition-all hover:translate-x-1 sm:flex-row sm:items-center sm:justify-between sm:p-4"
+                    >
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="bg-primary/10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105 sm:h-12 sm:w-12 sm:group-hover:scale-110">
+                          <FileIcon className="text-primary h-5.5 w-5.5 sm:h-6 sm:w-6" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          {item.fileName?.toLowerCase().endsWith('.pdf') ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedPdf({
+                                  url: item.fileUrl ? normalizeCloudinaryPdfUrl(item.fileUrl) : '',
+                                  name: item.fileName ?? 'Document',
+                                  messageId: item.id,
+                                })
+                              }
+                              className="text-primary xs:max-w-[250px] block max-w-[200px] cursor-pointer truncate text-left text-sm font-black hover:underline md:max-w-[320px]"
+                            >
+                              {item.fileName}
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                downloadMessageAttachment(item.id, item.fileName || 'Document')
+                              }
+                              className="text-foreground xs:max-w-[250px] max-w-[200px] cursor-pointer truncate text-left text-sm font-black hover:underline md:max-w-[320px]"
+                            >
+                              {item.fileName}
+                            </button>
+                          )}
+                          <div className="mt-0.5 flex items-center gap-2">
+                            <span className="text-muted-foreground text-[10px] font-bold uppercase">
+                              {item.fileSize ? (item.fileSize / 1024).toFixed(1) : '0.0'} KB
+                            </span>
+                            <span className="text-muted-foreground/30">•</span>
+                            <span className="text-muted-foreground text-[10px] font-bold uppercase">
+                              {format(new Date(item.createdAt), 'MMM dd, yyyy')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex w-full items-center gap-2 sm:w-auto">
+                        {item.fileName?.toLowerCase().endsWith('.pdf') && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedPdf({
+                                url: item.fileUrl ? normalizeCloudinaryPdfUrl(item.fileUrl) : '',
+                                name: item.fileName ?? 'Document',
+                                messageId: item.id,
+                              })
+                            }
+                            className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/20 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold shadow-sm transition-all sm:flex-initial sm:px-4"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            View
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            downloadMessageAttachment(item.id, item.fileName || 'Document')
+                          }
+                          className="bg-background hover:bg-primary hover:text-primary-foreground border-border/50 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold shadow-sm transition-all sm:flex-initial sm:px-4"
+                        >
+                          <DownloadIcon className="h-3.5 w-3.5" />
+                          Download
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredItems.docs.length === 0 && (
+                    <div className="text-muted-foreground py-20 text-center font-medium">
+                      No shared documents found.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="links" className="m-0 focus-visible:ring-0">
+                <div className="space-y-3">
+                  {filteredItems.links.map((item: Message) => {
+                    const urlMatch = item.content.match(/https?:\/\/[^\s]+/);
+                    const url = urlMatch ? urlMatch[0] : '#';
+                    return (
+                      <div
+                        key={item.id}
+                        className="group bg-muted/20 hover:bg-muted/40 border-border/40 flex items-center justify-between rounded-2xl border p-4 transition-all hover:translate-x-1"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl transition-transform group-hover:scale-110">
+                            <LinkIcon className="text-primary h-6 w-6" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="max-w-[400px] truncate text-sm font-black">
+                              Shared Link
+                            </h4>
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary mt-0.5 block truncate text-xs font-bold hover:underline"
+                            >
+                              {url}
+                            </a>
+                            <div className="mt-1 flex items-center gap-2">
+                              <span className="text-muted-foreground text-[10px] font-bold uppercase">
+                                Shared on {format(new Date(item.createdAt), 'MMM dd, yyyy')}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-background hover:bg-primary hover:text-primary-foreground border-border/50 rounded-xl border p-2.5 shadow-sm transition-all"
+                        >
+                          <ExternalLinkIcon className="h-4 w-4" />
+                        </a>
+                      </div>
+                    );
+                  })}
+                  {filteredItems.links.length === 0 && (
+                    <div className="text-muted-foreground py-20 text-center font-medium">
+                      No shared links found.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </ScrollArea>
           </Tabs>
         </DialogContent>
       </Dialog>
 
-      {selectedImageIndex !== null && (
-        <ImageLightbox
-          images={filteredImages}
-          currentIndex={selectedImageIndex}
-          onClose={closeLightbox}
+      {/* Inline PDF viewer — opens on top when a PDF View button is clicked */}
+      {selectedPdf && (
+        <MessagePdfViewer
+          isOpen={!!selectedPdf}
+          onClose={() => setSelectedPdf(null)}
+          pdfUrl={selectedPdf.url}
+          messageId={selectedPdf.messageId}
+          title={selectedPdf.name}
         />
       )}
     </>
   );
-}
+};
+
+export default MediaGallery;

@@ -1,53 +1,45 @@
-"use client";
-import { Plus, Trash2 } from "lucide-react";
-import { useFormContext } from "react-hook-form";
-import WKCheckbox from "../../form/WKCheckbox";
-import WKInput from "../../form/WkInput";
-import WKSelect from "../../form/WkSelect";
-import WKTextArea from "../../form/WkTextArea";
-import { Button } from "../../ui/button";
-import { JobFormData } from "./CreateNewJobForm";
+'use client';
+import { Plus, Trash2 } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+import WKCheckbox from '@/components/form/WKCheckbox';
+import WKInput from '@/components/form/WkInput';
+import WKSelect from '@/components/form/WkSelect';
+import WKTextArea from '@/components/form/WkTextArea';
+import { Button } from '@/components/ui/button';
+import { JobFormData } from './create-job-form';
 
 export interface SkillRequired {
   skillName: string;
   experienceYears: number;
   isRequired: boolean;
-  priority: "HIGH" | "MEDIUM" | "GOOD_TO_HAVE";
-  description: string;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW' | 'GOOD_TO_HAVE';
+  description?: string;
 }
 const CreateJobFromSkillSection = () => {
   const { watch, setValue } = useFormContext<JobFormData>();
-  const skills = watch("skillsRequired") || [];
+  const skills = watch('skillsRequired') || [];
 
   const addSkill = () => {
     const newSkill: SkillRequired = {
-      skillName: "",
+      skillName: '',
       experienceYears: 1,
       isRequired: true,
-      priority: "MEDIUM",
-      description: "",
+      priority: 'MEDIUM',
+      description: '',
     };
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    setValue("skillsRequired", [...skills, newSkill]);
+    setValue('skillsRequired', [...skills, newSkill]);
   };
 
   const removeSkill = (index: number) => {
     const updatedSkills = skills.filter((_, i) => i !== index);
-    setValue("skillsRequired", updatedSkills);
+    setValue('skillsRequired', updatedSkills);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">Required Skills</h3>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={addSkill}
-          className="h-8"
-        >
+        <Button type="button" variant="outline" size="sm" onClick={addSkill} className="h-8">
           <Plus className="mr-1 h-4 w-4" />
           Add Skill
         </Button>
@@ -60,10 +52,7 @@ const CreateJobFromSkillSection = () => {
       ) : (
         <div className="space-y-4">
           {skills.map((skill, index) => (
-            <div
-              key={index}
-              className="space-y-3 rounded-lg border border-gray-200 p-4"
-            >
+            <div key={index} className="space-y-3 rounded-lg border border-gray-200 p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Skill {index + 1}</span>
                 <Button
@@ -102,17 +91,14 @@ const CreateJobFromSkillSection = () => {
                   required
                   size="md"
                   options={[
-                    { value: "HIGH", label: "High" },
-                    { value: "MEDIUM", label: "Medium" },
-                    { value: "GOOD_TO_HAVE", label: "Good to Have" },
+                    { value: 'HIGH', label: 'High' },
+                    { value: 'MEDIUM', label: 'Medium' },
+                    { value: 'GOOD_TO_HAVE', label: 'Good to Have' },
                   ]}
                 />
 
                 <div className="pt-7">
-                  <WKCheckbox
-                    name={`skillsRequired.${index}.isRequired`}
-                    label="Required"
-                  />
+                  <WKCheckbox name={`skillsRequired.${index}.isRequired`} label="Required" />
                 </div>
               </div>
 

@@ -1,13 +1,7 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -15,9 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { TabsContent } from "@/components/ui/tabs";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { TabsContent } from '@/components/ui/tabs';
 import {
   Facebook,
   Github,
@@ -28,9 +22,9 @@ import {
   Plus,
   Trash2,
   Twitter,
-} from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import AddCompanySocialLink from "../AddCompanySocialLink";
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import AddCompanySocialLink from '../AddCompanySocialLink';
 
 interface SocialLink {
   id?: string;
@@ -52,16 +46,13 @@ const SocialLinkSettingTab = ({
 
   const getIconForPlatform = (platform: string) => {
     const platformLower = platform.toLowerCase();
-    if (platformLower.includes("linkedin"))
-      return <Linkedin className="h-4 w-4" />;
-    if (platformLower.includes("twitter") || platformLower.includes("x"))
+    if (platformLower.includes('linkedin')) return <Linkedin className="h-4 w-4" />;
+    if (platformLower.includes('twitter') || platformLower.includes('x'))
       return <Twitter className="h-4 w-4" />;
-    if (platformLower.includes("github")) return <Github className="h-4 w-4" />;
-    if (platformLower.includes("facebook"))
-      return <Facebook className="h-4 w-4" />;
-    if (platformLower.includes("instagram"))
-      return <Instagram className="h-4 w-4" />;
-    if (platformLower.includes("website") || platformLower.includes("web"))
+    if (platformLower.includes('github')) return <Github className="h-4 w-4" />;
+    if (platformLower.includes('facebook')) return <Facebook className="h-4 w-4" />;
+    if (platformLower.includes('instagram')) return <Instagram className="h-4 w-4" />;
+    if (platformLower.includes('website') || platformLower.includes('web'))
       return <Globe className="h-4 w-4" />;
     return <Link className="h-4 w-4" />;
   };
@@ -76,9 +67,7 @@ const SocialLinkSettingTab = ({
   // =========== create a stable dependency string based on actual data (without React elements) ======>
   const linksKey = useMemo(
     () =>
-      initialSocialLinks
-        .map((link) => `${link.id || ""}-${link.platform}-${link.url}`)
-        .join(","),
+      initialSocialLinks.map((link) => `${link.id || ''}-${link.platform}-${link.url}`).join(','),
     [initialSocialLinks],
   );
 
@@ -92,12 +81,12 @@ const SocialLinkSettingTab = ({
   }, [linksKey, initialSocialLinks]);
 
   const availablePlatforms = [
-    { name: "LinkedIn", icon: <Linkedin className="h-4 w-4" /> },
-    { name: "Twitter", icon: <Twitter className="h-4 w-4" /> },
-    { name: "GitHub", icon: <Github className="h-4 w-4" /> },
-    { name: "Facebook", icon: <Facebook className="h-4 w-4" /> },
-    { name: "Instagram", icon: <Instagram className="h-4 w-4" /> },
-    { name: "Website", icon: <Globe className="h-4 w-4" /> },
+    { name: 'LinkedIn', icon: <Linkedin className="h-4 w-4" /> },
+    { name: 'Twitter', icon: <Twitter className="h-4 w-4" /> },
+    { name: 'GitHub', icon: <Github className="h-4 w-4" /> },
+    { name: 'Facebook', icon: <Facebook className="h-4 w-4" /> },
+    { name: 'Instagram', icon: <Instagram className="h-4 w-4" /> },
+    { name: 'Website', icon: <Globe className="h-4 w-4" /> },
   ];
 
   const addSocialLink = (platform: string, url: string) => {
@@ -123,9 +112,7 @@ const SocialLinkSettingTab = ({
   };
 
   const updateSocialLink = (id: string, url: string) => {
-    const updatedLinks = socialLinks.map((link) =>
-      link.id === id ? { ...link, url } : link,
-    );
+    const updatedLinks = socialLinks.map((link) => (link.id === id ? { ...link, url } : link));
     setSocialLinks(updatedLinks);
     onSocialLinksChange?.(updatedLinks);
   };
@@ -140,9 +127,7 @@ const SocialLinkSettingTab = ({
                 <Link className="mr-2 h-5 w-5" />
                 Social Media Links
               </CardTitle>
-              <CardDescription>
-                Add your {`company's`} social media profiles
-              </CardDescription>
+              <CardDescription>Add your {`company's`} social media profiles</CardDescription>
             </div>
             <Dialog open={isAddSocialOpen} onOpenChange={setIsAddSocialOpen}>
               <DialogTrigger asChild>
@@ -151,7 +136,7 @@ const SocialLinkSettingTab = ({
                   Add Link
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card mx-4 max-w-md">
+              <DialogContent className="bg-card sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Add Social Media Link</DialogTitle>
                   <DialogDescription>
@@ -180,16 +165,14 @@ const SocialLinkSettingTab = ({
                 <div className="flex-1">
                   <Input
                     value={link.url}
-                    onChange={(e) =>
-                      updateSocialLink(link.id || "", e.target.value)
-                    }
+                    onChange={(e) => updateSocialLink(link.id || '', e.target.value)}
                     placeholder={`Enter ${link.platform} URL`}
                   />
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeSocialLink(link.id || "")}
+                  onClick={() => removeSocialLink(link.id || '')}
                   className="text-destructive hover:text-destructive w-full sm:w-auto"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -199,12 +182,9 @@ const SocialLinkSettingTab = ({
             {socialLinks.length === 0 && (
               <div className="py-8 text-center">
                 <Link className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                <h3 className="text-foreground mb-2 text-lg font-medium">
-                  No social links added
-                </h3>
+                <h3 className="text-foreground mb-2 text-lg font-medium">No social links added</h3>
                 <p className="text-muted-foreground">
-                  Add your {`company's`} social media profiles to increase
-                  visibility
+                  Add your {`company's`} social media profiles to increase visibility
                 </p>
               </div>
             )}

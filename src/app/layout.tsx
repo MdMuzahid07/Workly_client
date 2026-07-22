@@ -1,28 +1,25 @@
-import type { Metadata } from "next";
-import { Barlow } from "next/font/google";
-import { Toaster } from "sonner";
-import ReduxProvider from "../provider/ReduxProvider";
-import ThemeProvider from "../provider/ThemeProvider";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-import "./globals.css";
-
-const barlow = Barlow({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
-  variable: "--font-barlow",
-});
+import type { Metadata } from 'next';
+import { Toaster } from 'sonner';
+import ThemeChangeNotification from '../components/shared/ThemeChangeNotification';
+import ReduxProvider from '../provider/ReduxProvider';
+import SocketProvider from '../provider/SocketProvider';
+import ThemeProvider from '../provider/ThemeProvider';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: "Workly_job",
-    template: "%s | Workly_job",
+    default: 'Workly_job',
+    template: '%s | Workly_job',
   },
-  description: "Find the perfect job for you",
+  description: 'Find the perfect job for you',
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
   },
 };
+
+import MaintenanceModeProvider from '../provider/MaintenanceModeProvider';
+import NotificationProvider from '../provider/NotificationProvider';
+import ContentProtection from '@/components/shared/ContentProtection';
 
 export default function RootLayout({
   children,
@@ -35,25 +32,30 @@ export default function RootLayout({
       // fix theme style mismatch
       suppressHydrationWarning
     >
-      <body
-        className={` ${barlow.variable} antialiased`}
-        suppressHydrationWarning
-      >
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange={false}
+          disableTransitionOnChange
           storageKey="workly-theme"
         >
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <SocketProvider>
+              <NotificationProvider>
+                <MaintenanceModeProvider>{children}</MaintenanceModeProvider>
+              </NotificationProvider>
+            </SocketProvider>
+          </ReduxProvider>
+          <ThemeChangeNotification />
+          <ContentProtection />
         </ThemeProvider>
         <Toaster
           position="top-center"
           expand={true}
           richColors
           closeButton
-          theme="light"
+          theme="system"
           duration={3000}
         />
       </body>

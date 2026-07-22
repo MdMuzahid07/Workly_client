@@ -1,27 +1,30 @@
-"use client";
-import WKDatePicker from "@/components/form/WKDatePicker";
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { BookOpen } from "lucide-react";
-import { PublicationFormData, publicationSchema } from "./profile.validation";
-import WKTextArea from "../../../form/WkTextArea";
+'use client';
+import WKDatePicker from '@/components/form/WKDatePicker';
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { BookOpen } from 'lucide-react';
+import { PublicationFormData, publicationSchema } from './profile.validation';
+import WKTextArea from '../../../form/WkTextArea';
 
 interface PublicationFormProps {
   onSubmit: (data: PublicationFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<PublicationFormData>;
 }
 
 export const PublicationForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: PublicationFormProps) => {
   return (
     <WkForm<PublicationFormData>
       onSubmit={onSubmit}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(publicationSchema)}
     >
       <div className="space-y-4">
@@ -57,7 +60,7 @@ export const PublicationForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Publication"}
+          {isLoading ? 'Saving...' : 'Save Publication'}
         </Button>
       </div>
     </WkForm>

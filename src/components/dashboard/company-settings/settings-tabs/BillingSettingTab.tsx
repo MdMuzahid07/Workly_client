@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,38 +6,36 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@radix-ui/react-alert-dialog";
-import { Label } from "@radix-ui/react-label";
-import { Switch } from "@radix-ui/react-switch";
-import { TabsContent } from "@radix-ui/react-tabs";
-import { Trash2 } from "lucide-react";
-import { AlertDialogFooter, AlertDialogHeader } from "../../../ui/alert-dialog";
-import { Badge } from "../../../ui/badge";
-import { Button } from "../../../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../ui/card";
-import { Input } from "../../../ui/input";
+} from '@radix-ui/react-alert-dialog';
+import { Label } from '@radix-ui/react-label';
+import { Switch } from '@radix-ui/react-switch';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { Trash2 } from 'lucide-react';
+import { AlertDialogFooter, AlertDialogHeader } from '../../../ui/alert-dialog';
+import { Badge } from '../../../ui/badge';
+import { Button } from '../../../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../ui/card';
+import { Input } from '../../../ui/input';
+
+import type { CompanySettings } from '@/types/company-settings';
 
 const BillingSettingTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <K extends keyof CompanySettings, F extends keyof CompanySettings[K]>(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="billing" className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Billing Information</CardTitle>
-          <CardDescription>
-            Manage your subscription and billing details
-          </CardDescription>
+          <CardDescription>Manage your subscription and billing details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -55,9 +52,7 @@ const BillingSettingTab = ({
               id="billingEmail"
               type="email"
               value={settings.billing.billingEmail}
-              onChange={(e) =>
-                updateSettings("billing", "billingEmail", e.target.value)
-              }
+              onChange={(e) => updateSettings('billing', 'billingEmail', e.target.value)}
             />
           </div>
 
@@ -70,9 +65,7 @@ const BillingSettingTab = ({
             </div>
             <Switch
               checked={settings.billing.autoRenew}
-              onCheckedChange={(checked) =>
-                updateSettings("billing", "autoRenew", checked)
-              }
+              onCheckedChange={(checked) => updateSettings('billing', 'autoRenew', checked)}
             />
           </div>
 
@@ -92,9 +85,7 @@ const BillingSettingTab = ({
       <Card className="border-destructive/20">
         <CardHeader>
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
-          <CardDescription>
-            Irreversible actions for your company account
-          </CardDescription>
+          <CardDescription>Irreversible actions for your company account</CardDescription>
         </CardHeader>
         <CardContent>
           <AlertDialog>
@@ -108,9 +99,9 @@ const BillingSettingTab = ({
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your company account and remove all associated data including
-                  jobs, applications, and employee records.
+                  This action cannot be undone. This will permanently delete your company account
+                  and remove all associated data including jobs, applications, and team member
+                  records.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

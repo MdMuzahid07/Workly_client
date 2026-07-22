@@ -1,27 +1,25 @@
-"use client";
+'use client';
 
-import WKDatePicker from "@/components/form/WKDatePicker";
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Award } from "lucide-react";
-import { AwardFormData, awardSchema } from "./profile.validation";
+import WKDatePicker from '@/components/form/WKDatePicker';
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Award } from 'lucide-react';
+import { AwardFormData, awardSchema } from './profile.validation';
 
 interface AwardFormProps {
   onSubmit: (data: AwardFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<AwardFormData>;
 }
 
-export const AwardForm = ({
-  onSubmit,
-  onCancel,
-  isLoading,
-}: AwardFormProps) => {
+export const AwardForm = ({ onSubmit, onCancel, isLoading, defaultValues }: AwardFormProps) => {
   return (
     <WkForm<AwardFormData>
       onSubmit={onSubmit}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(awardSchema)}
     >
       <div className="space-y-4">
@@ -55,7 +53,7 @@ export const AwardForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Award"}
+          {isLoading ? 'Saving...' : 'Save Award'}
         </Button>
       </div>
     </WkForm>

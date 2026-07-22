@@ -1,14 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Application, ApplicationStatus } from "@/data/mockApplications";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { ApplicationStatus, MyAppliedJob } from '@/types/application';
 import {
   AlertCircle,
   ArrowRight,
@@ -20,56 +19,60 @@ import {
   MapPin,
   MoreVertical,
   XCircle,
-} from "lucide-react";
-import Image from "next/image";
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const getStatusConfig = (status: ApplicationStatus) => {
   switch (status) {
-    case "pending":
+    case 'SUBMITTED':
       return {
-        badge:
-          "bg-yellow-500/10 text-yellow-600 border-yellow-200/50 dark:border-yellow-900/30",
+        badge: 'bg-yellow-500/10 text-yellow-600 border-yellow-200/50 dark:border-yellow-900/30',
         icon: Clock,
-        label: "Pending",
+        label: 'Submitted',
       };
-    case "under_review":
+    case 'REVIEWING':
+    case 'SHORTLISTED':
       return {
-        badge:
-          "bg-blue-500/10 text-blue-600 border-blue-200/50 dark:border-blue-900/30",
+        badge: 'bg-blue-500/10 text-blue-600 border-blue-200/50 dark:border-blue-900/30',
         icon: AlertCircle,
-        label: "Under Review",
+        label: status === 'SHORTLISTED' ? 'Shortlisted' : 'Reviewing',
       };
-    case "interviewing":
+    case 'INTERVIEWED':
       return {
-        badge:
-          "bg-purple-500/10 text-purple-600 border-purple-200/50 dark:border-purple-900/30",
+        badge: 'bg-purple-500/10 text-purple-600 border-purple-200/50 dark:border-purple-900/30',
         icon: Clock,
-        label: "Interviewing",
+        label: 'Interviewing',
       };
-    case "offer":
+    case 'OFFERED':
       return {
-        badge:
-          "bg-green-500/10 text-green-600 border-green-200/50 dark:border-green-900/30",
+        badge: 'bg-green-500/10 text-green-600 border-green-200/50 dark:border-green-900/30',
         icon: CheckCircle,
-        label: "Offer Received",
+        label: 'Offer Received',
       };
-    case "accepted":
+    case 'ACCEPTED':
       return {
         badge:
-          "bg-emerald-500/10 text-emerald-600 border-emerald-200/50 dark:border-emerald-900/30",
+          'bg-emerald-500/10 text-emerald-600 border-emerald-200/50 dark:border-emerald-900/30',
         icon: CheckCircle,
-        label: "Accepted",
+        label: 'Accepted',
       };
-    case "rejected":
+    case 'REJECTED':
       return {
-        badge:
-          "bg-red-500/10 text-red-600 border-red-200/50 dark:border-red-900/30",
+        badge: 'bg-red-500/10 text-red-600 border-red-200/50 dark:border-red-900/30',
         icon: XCircle,
-        label: "Rejected",
+        label: 'Rejected',
+      };
+    case 'WITHDRAWN':
+      return {
+        badge: 'bg-muted text-muted-foreground border-border',
+        icon: XCircle,
+        label: 'Withdrawn',
       };
     default:
       return {
-        badge: "bg-muted text-muted-foreground border-border",
+        badge: 'bg-muted text-muted-foreground border-border',
         icon: Clock,
         label: status,
       };
@@ -79,12 +82,20 @@ const getStatusConfig = (status: ApplicationStatus) => {
 const ApplicationCard = ({
   app,
   index = 0,
+  isWithdrawing,
+  onWithdraw,
 }: {
-  app: Application;
+  app: MyAppliedJob;
   index?: number;
+  isWithdrawing?: boolean;
+  onWithdraw?: (applicationId: string) => void;
 }) => {
   const statusConfig = getStatusConfig(app.status);
   const StatusIcon = statusConfig.icon;
+  const location = `${app.job.location}${app.job.isRemote ? ' (Remote)' : ''}`;
+  const salary = app.job.salaryMax
+    ? `${app.job.currency || '$'}${Math.round(app.job.salaryMax / 1000)}k`
+    : 'Not disclosed';
 
   return (
     <motion.div
@@ -101,12 +112,12 @@ const ApplicationCard = ({
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <div className="from-muted/50 to-muted border-border/60 group-hover:border-primary/40 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border bg-linear-to-br p-2 shadow-inner transition-colors duration-300">
-                    {app.company.logo ? (
+                  <div className="from-muted/50 to-muted border-border/60 group-hover:border-primary/40 relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border bg-linear-to-br p-0 shadow-inner transition-colors duration-300">
+                    {app.job.company.logoUrl ? (
                       <Image
-                        src={app.company.logo}
-                        alt={app.company.name}
-                        className="h-full w-full object-contain"
+                        src={app.job.company.logoUrl}
+                        alt={app.job.company.name}
+                        className="h-full w-full rounded-2xl object-cover"
                         fill
                       />
                     ) : (
@@ -114,18 +125,16 @@ const ApplicationCard = ({
                     )}
                   </div>
                   <div className="border-background bg-card absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 shadow-sm">
-                    <StatusIcon
-                      className={statusConfig.badge.split(" ")[1] + " h-3 w-3"}
-                    />
+                    <StatusIcon className={statusConfig.badge.split(' ')[1] + ' h-3 w-3'} />
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <h3 className="text-foreground group-hover:text-primary text-xl leading-tight font-bold tracking-tight transition-colors">
-                    {app.title}
+                    {app.job.title}
                   </h3>
                   <p className="text-muted-foreground flex items-center gap-1.5 text-sm font-semibold tracking-wider uppercase">
-                    {app.company.name}
+                    {app.job.company.name}
                   </p>
                 </div>
               </div>
@@ -144,15 +153,27 @@ const ApplicationCard = ({
                   align="end"
                   className="border-border/60 w-56 rounded-xl p-2 backdrop-blur-xl"
                 >
-                  <DropdownMenuItem className="h-10 rounded-lg font-medium">
-                    View Application
+                  <DropdownMenuItem asChild className="h-10 rounded-lg font-medium">
+                    <Link href={`/jobs/${app.job.id}`} className="w-full">
+                      View Job
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="h-10 rounded-lg font-medium">
-                    Company Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive focus:text-destructive h-10 rounded-lg font-medium">
-                    Withdraw
-                  </DropdownMenuItem>
+                  {app.job.company.slug && (
+                    <DropdownMenuItem asChild className="h-10 rounded-lg font-medium">
+                      <Link href={`/companies/${app.job.company.slug}`} className="w-full">
+                        Company Profile
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {onWithdraw && app.status !== 'WITHDRAWN' && (
+                    <DropdownMenuItem
+                      disabled={isWithdrawing}
+                      onClick={() => onWithdraw(app.id)}
+                      className="text-destructive focus:text-destructive h-10 rounded-lg font-medium"
+                    >
+                      {isWithdrawing ? 'Withdrawing...' : 'Withdraw'}
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -168,32 +189,27 @@ const ApplicationCard = ({
                 <div className="bg-muted/30 flex h-8 w-8 items-center justify-center rounded-lg">
                   <MapPin className="h-4 w-4" />
                 </div>
-                {app.location}
+                {location}
               </div>
               <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
                 <div className="bg-muted/30 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
                   <DollarSign className="h-4 w-4" />
                 </div>
-                <span className="text-foreground/90 font-bold">
-                  ${app.salaryMax / 1000}k
-                </span>
-                <span className="text-muted-foreground text-[10px] opacity-50">
-                  /yr
-                </span>
+                <span className="text-foreground/90 font-bold">{salary}</span>
               </div>
               <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
                 <div className="bg-muted/30 flex h-8 w-8 items-center justify-center rounded-lg">
                   <Clock className="h-4 w-4" />
                 </div>
-                {app.jobType}
+                {app.job.jobType.replaceAll('_', ' ')}
               </div>
               <div className="text-muted-foreground/80 flex items-center gap-3 font-medium">
                 <div className="bg-muted/30 flex h-8 w-8 items-center justify-center rounded-lg">
                   <Calendar className="h-4 w-4" />
                 </div>
-                {new Date(app.appliedDate).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
+                {new Date(app.createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
                 })}
               </div>
             </div>
@@ -202,25 +218,28 @@ const ApplicationCard = ({
             <div className="border-border/40 mt-2 flex items-center justify-between border-t pt-6">
               <div
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold shadow-sm transition-all",
+                  'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold shadow-sm transition-all',
                   statusConfig.badge,
                 )}
               >
                 <div
                   className={cn(
-                    "h-1.5 w-1.5 animate-pulse rounded-full",
-                    statusConfig.badge.split(" ")[1],
+                    'h-1.5 w-1.5 animate-pulse rounded-full',
+                    statusConfig.badge.split(' ')[1],
                   )}
                 />
                 {statusConfig.label}
               </div>
 
               <Button
+                asChild
                 variant="outline"
                 className="border-primary/20 hover:bg-primary/5 hover:border-primary/40 group/btn h-10 gap-2 rounded-xl px-5 text-xs font-bold transition-all"
               >
-                View Details
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                <Link href={`/jobs/${app.job.id}`}>
+                  View Details
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </Link>
               </Button>
             </div>
           </div>

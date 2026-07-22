@@ -1,26 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import WKCheckbox from "@/components/form/WKCheckbox";
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import { Button } from "@/components/ui/button";
+'use client';
+import WKCheckbox from '@/components/form/WKCheckbox';
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { useUpdateProfileMutation } from '@/redux/feature/profile/profileApi';
+import { Check, FileText, Upload, X } from 'lucide-react';
+import Image from 'next/image';
+import { useCallback, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { useUpdateProfileMutation } from "@/redux/feature/profile/profileApi";
-import { Check, FileText, Upload, X } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
-import { useUploadSingleFileMutation } from "../../../redux/feature/upload/uploadApi";
-import WKSelect from "../../form/WkSelect";
-import WKTextArea from "../../form/WkTextArea";
-import ProfileSkillManagement from "./ProfileSkillManagement";
+  useUploadSingleFileMutation,
+  useUploadAvatarMutation,
+} from '../../../redux/feature/upload/uploadApi';
+import { useCompressedUpload } from '@/hooks/useCompressedUpload';
+import WKSelect from '../../form/WkSelect';
+import WKTextArea from '../../form/WkTextArea';
+import ProfileSkillManagement from './ProfileSkillManagement';
 
 // ========== Types =============>
 interface Skill {
@@ -82,40 +80,36 @@ interface EditProfileDialogProps {
 }
 
 const JOB_TYPE_OPTIONS = [
-  { value: "FULL_TIME", label: "Full Time" },
-  { value: "PART_TIME", label: "Part Time" },
-  { value: "CONTRACT", label: "Contract" },
-  { value: "FREELANCE", label: "Freelance" },
-  { value: "INTERNSHIP", label: "Internship" },
-  { value: "REMOTE", label: "Remote" },
+  { value: 'FULL_TIME', label: 'Full Time' },
+  { value: 'PART_TIME', label: 'Part Time' },
+  { value: 'CONTRACT', label: 'Contract' },
+  { value: 'FREELANCE', label: 'Freelance' },
+  { value: 'INTERNSHIP', label: 'Internship' },
+  { value: 'REMOTE', label: 'Remote' },
 ] as const;
 
 const EXPERIENCE_OPTIONS = [
-  { value: "Entry Level", label: "Entry Level (0-2 years)" },
-  { value: "Mid Level", label: "Mid Level (3-5 years)" },
-  { value: "Senior Level", label: "Senior Level (6-10 years)" },
-  { value: "Executive", label: "Executive (10+ years)" },
+  { value: 'Entry Level', label: 'Entry Level (0-2 years)' },
+  { value: 'Mid Level', label: 'Mid Level (3-5 years)' },
+  { value: 'Senior Level', label: 'Senior Level (6-10 years)' },
+  { value: 'Executive', label: 'Executive (10+ years)' },
 ] as const;
 
 // ==================== main component ================>
 
-const EditProfileDialog = ({
-  isOpen,
-  onClose,
-  user,
-}: EditProfileDialogProps) => {
+const EditProfileDialog = ({ isOpen, onClose, user }: EditProfileDialogProps) => {
   const [skills, setSkills] = useState<Skill[]>(user?.profile?.skills || []);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
-  const [avatar, setAvatar] = useState<string | null>(
-    user?.profile?.avatarUrl || null,
-  );
+  const [avatar, setAvatar] = useState<string | null>(user?.profile?.avatarUrl || null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [uploadedResumeUrl, setUploadedResumeUrl] = useState<string | null>(
     user?.profile?.resumeUrl || null,
   );
 
-  const [uploadSingleFile, { isLoading: isUploading }] =
-    useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadSingleFileMutation();
+  const [uploadAvatar] = useUploadAvatarMutation();
+  const { upload: uploadCompressedAvatar, isProcessing: isUploadingAvatar } =
+    useCompressedUpload('avatar');
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -126,16 +120,15 @@ const EditProfileDialog = ({
   const handleAvatarUpload = async (file: File | null) => {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const result = await uploadSingleFile(formData).unwrap();
+      const result = await uploadCompressedAvatar(
+        file,
+        (formData) => uploadAvatar(formData).unwrap(),
+        'Avatar uploaded successfully',
+      );
       setAvatar(result.data.url);
-      toast.success("Avatar uploaded successfully");
     } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload avatar. Please try again.");
+      console.error('Upload error:', error);
     }
   };
 
@@ -143,34 +136,34 @@ const EditProfileDialog = ({
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
-      const validTypes = [".pdf", ".doc", ".docx"];
-      const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
+      const validTypes = ['.pdf', '.doc', '.docx'];
+      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
 
       if (!validTypes.includes(fileExtension)) {
-        toast.error("Please upload a valid resume file (PDF, DOC, DOCX)");
+        toast.error('Please upload a valid resume file (PDF, DOC, DOCX)');
         return;
       }
 
       // Validate file size (5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size must be less than 5MB");
+        toast.error('File size must be less than 5MB');
         return;
       }
 
       setResumeFile(file);
-      toast.success("Resume file selected");
+      toast.success('Resume file selected');
     }
   };
 
   const handleRemoveResumeFile = () => {
     setResumeFile(null);
     setUploadedResumeUrl(null);
-    toast.success("Resume removed");
+    toast.success('Resume removed');
   };
 
   const handleSubmit = async (data: ProfileFormData) => {
     if (skills.length === 0) {
-      toast.error("Please add at least one skill");
+      toast.error('Please add at least one skill');
       return;
     }
 
@@ -180,7 +173,7 @@ const EditProfileDialog = ({
       // Upload resume file if a new one is selected
       if (resumeFile) {
         const formData = new FormData();
-        formData.append("file", resumeFile);
+        formData.append('file', resumeFile);
 
         const resumeResult = await uploadSingleFile(formData).unwrap();
         if (resumeResult.success) {
@@ -190,8 +183,8 @@ const EditProfileDialog = ({
       }
 
       //==================== helper function to convert empty string to null ================>
-      const sanitizeValue = (value: any) => {
-        if (value === "" || value === undefined) return null;
+      const sanitizeValue = (value: unknown) => {
+        if (value === '' || value === undefined) return null;
         return value;
       };
 
@@ -219,29 +212,28 @@ const EditProfileDialog = ({
 
       await updateProfile(updatePayload).unwrap();
 
-      toast.success("Profile updated successfully!");
+      toast.success('Profile updated successfully!');
       onClose();
     } catch (error) {
-      console.error("Failed to update profile:", error);
-      toast.error("Failed to update profile. Please try again.");
+      console.error('Failed to update profile:', error);
+      toast.error('Failed to update profile. Please try again.');
     }
   };
 
   const defaultValues: ProfileFormData = useMemo(
     () => ({
-      fullName: user?.fullName || "",
-      phone: user?.phone || "",
-      bio: user?.profile?.bio || "",
-      location: user?.profile?.location || "",
-      websiteUrl: user?.profile?.websiteUrl || "",
-      linkedInUrl: user?.profile?.linkedInUrl || "",
-      resumeUrl: user?.profile?.resumeUrl || "",
-      jobType: user?.profile?.preference?.jobType || "FULL_TIME",
+      fullName: user?.fullName || '',
+      phone: user?.phone || '',
+      bio: user?.profile?.bio || '',
+      location: user?.profile?.location || '',
+      websiteUrl: user?.profile?.websiteUrl || '',
+      linkedInUrl: user?.profile?.linkedInUrl || '',
+      resumeUrl: user?.profile?.resumeUrl || '',
+      jobType: user?.profile?.preference?.jobType || 'FULL_TIME',
       expectedSalary: user?.profile?.preference?.expectedSalary || 0,
-      industry: user?.profile?.preference?.industry || "",
-      workExperience:
-        user?.profile?.preference?.workExperience || "Entry Level",
-      preferredLocation: user?.profile?.preference?.preferredLocation || "",
+      industry: user?.profile?.preference?.industry || '',
+      workExperience: user?.profile?.preference?.workExperience || 'Entry Level',
+      preferredLocation: user?.profile?.preference?.preferredLocation || '',
       remoteWork: user?.profile?.preference?.remoteWork || false,
     }),
     [user],
@@ -258,36 +250,27 @@ const EditProfileDialog = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-card h-[90dvh] max-h-[900px] w-[95dvw] max-w-5xl p-0 md:h-[85dvh]">
         <DialogHeader className="border-border border-b p-6 pb-4">
-          <DialogTitle className="text-foreground text-2xl font-bold">
-            Edit Profile
-          </DialogTitle>
+          <DialogTitle className="text-foreground text-2xl font-bold">Edit Profile</DialogTitle>
           <p className="text-muted-foreground text-sm">
             Update your profile information and preferences
           </p>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto px-6">
-          <WkForm<ProfileFormData>
-            onSubmit={handleSubmit}
-            defaultValues={defaultValues}
-          >
+          <WkForm<ProfileFormData> onSubmit={handleSubmit} defaultValues={defaultValues}>
             <div className="space-y-8 pb-6">
               {/* Basic Information */}
               <section className="space-y-6">
-                <h3 className="text-foreground text-xl font-semibold">
-                  Basic Information
-                </h3>
+                <h3 className="text-foreground text-xl font-semibold">Basic Information</h3>
                 <div>
-                  <Label className="text-foreground text-sm font-medium">
-                    Profile Picture
-                  </Label>
+                  <Label className="text-foreground text-sm font-medium">Profile Picture</Label>
 
                   <div className="mt-2 flex items-center gap-4">
                     {user?.profile?.avatarUrl || avatar ? (
                       <Image
                         src={avatar || user.profile.avatarUrl!}
-                        alt={`${user.fullName || "User"} avatar`}
-                        className={`h-16 w-16 rounded-full border object-cover ${isUploading ? "animate-pulse" : ""}`}
+                        alt={`${user.fullName || 'User'} avatar`}
+                        className={`h-16 w-16 rounded-full border object-cover ${isUploadingAvatar ? 'animate-pulse' : ''}`}
                         width={100}
                         height={100}
                       />
@@ -295,12 +278,12 @@ const EditProfileDialog = ({
                       <div className="bg-muted flex h-20 w-20 items-center justify-center rounded-full text-lg font-semibold">
                         {user?.fullName
                           ? user.fullName
-                              .split(" ")
+                              .split(' ')
                               .map((n) => n[0])
                               .slice(0, 2)
-                              .join("")
+                              .join('')
                               .toUpperCase()
-                          : "U"}
+                          : 'U'}
                       </div>
                     )}
 
@@ -316,9 +299,7 @@ const EditProfileDialog = ({
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) =>
-                          handleAvatarUpload(e.target.files?.[0] || null)
-                        }
+                        onChange={(e) => handleAvatarUpload(e.target.files?.[0] || null)}
                       />
                     </div>
                   </div>
@@ -346,9 +327,7 @@ const EditProfileDialog = ({
 
                 {/* Resume Upload Section */}
                 <div className="space-y-4">
-                  <Label className="text-foreground text-sm font-medium">
-                    Resume
-                  </Label>
+                  <Label className="text-foreground text-sm font-medium">Resume</Label>
 
                   {/* Upload Area */}
                   {!resumeFile && !uploadedResumeUrl && (
@@ -363,14 +342,10 @@ const EditProfileDialog = ({
 
                         <div className="space-y-2 text-center">
                           <p className="text-foreground font-medium">
-                            Drop your resume here or{" "}
-                            <span className="text-primary underline">
-                              browse
-                            </span>
+                            Drop your resume here or{' '}
+                            <span className="text-primary underline">browse</span>
                           </p>
-                          <p className="text-muted-foreground text-sm">
-                            PDF, DOC, DOCX up to 5MB
-                          </p>
+                          <p className="text-muted-foreground text-sm">PDF, DOC, DOCX up to 5MB</p>
                         </div>
 
                         <input
@@ -428,9 +403,7 @@ const EditProfileDialog = ({
                             <FileText className="text-muted-foreground h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-foreground text-sm font-medium">
-                              Current Resume
-                            </p>
+                            <p className="text-foreground text-sm font-medium">Current Resume</p>
                             <a
                               href={uploadedResumeUrl}
                               target="_blank"
@@ -480,25 +453,18 @@ const EditProfileDialog = ({
               <Separator />
 
               {/* Skills */}
-              <ProfileSkillManagement
-                skills={skills}
-                onSkillsChange={setSkills}
-              />
+              <ProfileSkillManagement skills={skills} onSkillsChange={setSkills} />
 
               <Separator />
 
               {/* Job Preferences */}
               <section className="space-y-6">
-                <h3 className="text-foreground text-xl font-semibold">
-                  Job Preferences
-                </h3>
+                <h3 className="text-foreground text-xl font-semibold">Job Preferences</h3>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <WKSelect
                     name="jobType"
                     label="Preferred Job Type"
                     placeholder="Select job type"
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
                     options={JOB_TYPE_OPTIONS}
                   />
                   <WKInput
@@ -513,20 +479,12 @@ const EditProfileDialog = ({
                     name="workExperience"
                     label="Experience Level"
                     placeholder="Select experience level"
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
                     options={EXPERIENCE_OPTIONS}
                   />
                 </div>
-                <WKInput
-                  name="preferredLocation"
-                  label="Preferred Work Location"
-                />
+                <WKInput name="preferredLocation" label="Preferred Work Location" />
                 <div className="bg-primary/5 border-primary/20 rounded-lg border p-4">
-                  <WKCheckbox
-                    name="remoteWork"
-                    label="I'm open to remote work opportunities"
-                  />
+                  <WKCheckbox name="remoteWork" label="I'm open to remote work opportunities" />
                 </div>
               </section>
             </div>
@@ -547,7 +505,7 @@ const EditProfileDialog = ({
                 disabled={isLoading || skills.length === 0}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground w-full shadow-lg sm:w-auto"
               >
-                {isLoading ? "Saving..." : "Save Changes"}
+                {isLoading ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </WkForm>

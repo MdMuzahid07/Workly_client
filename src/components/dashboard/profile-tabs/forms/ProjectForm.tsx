@@ -1,33 +1,33 @@
-"use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
-import { useFormContext } from "react-hook-form";
-import WKDatePicker from "../../../form/WKDatePicker";
-import WkForm from "../../../form/WkForm";
-import WKInput from "../../../form/WkInput";
-import WKTextArea from "../../../form/WkTextArea";
-import { Badge } from "../../../ui/badge";
-import { Button } from "../../../ui/button";
-import { ProjectFormData, projectSchema } from "./profile.validation";
+'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { X } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+import WKDatePicker from '../../../form/WKDatePicker';
+import WkForm from '../../../form/WkForm';
+import WKInput from '../../../form/WkInput';
+import WKTextArea from '../../../form/WkTextArea';
+import { Badge } from '../../../ui/badge';
+import { Button } from '../../../ui/button';
+import { ProjectFormData, projectSchema } from './profile.validation';
 
 const TechnologiesInput = () => {
   const { watch, setValue } = useFormContext();
-  const currentTechs = watch("technologies") || [];
+  const currentTechs = watch('technologies') || [];
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       const val = e.currentTarget.value.trim();
       if (val && !currentTechs.includes(val)) {
-        setValue("technologies", [...currentTechs, val]);
-        e.currentTarget.value = "";
+        setValue('technologies', [...currentTechs, val]);
+        e.currentTarget.value = '';
       }
     }
   };
 
   const removeTag = (tech: string) => {
     setValue(
-      "technologies",
+      'technologies',
       currentTechs.filter((t: string) => t !== tech),
     );
   };
@@ -53,9 +53,7 @@ const TechnologiesInput = () => {
         placeholder="Type technology and press Enter (e.g. React)"
         onKeyDown={handleKeyDown}
       />
-      <p className="text-muted-foreground text-[0.8rem]">
-        Press Enter to add tags
-      </p>
+      <p className="text-muted-foreground text-[0.8rem]">Press Enter to add tags</p>
     </div>
   );
 };
@@ -67,12 +65,7 @@ interface ProjectFormProps {
   isLoading?: boolean;
 }
 
-export const ProjectForm = ({
-  onSubmit,
-  onCancel,
-  defaultValues,
-  isLoading,
-}: ProjectFormProps) => {
+export const ProjectForm = ({ onSubmit, onCancel, defaultValues, isLoading }: ProjectFormProps) => {
   return (
     <WkForm<ProjectFormData>
       onSubmit={onSubmit}
@@ -80,8 +73,7 @@ export const ProjectForm = ({
         {
           ...defaultValues,
           technologies: defaultValues?.technologies || [],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any
+        } as unknown as ProjectFormData
       }
       resolver={zodResolver(projectSchema)}
     >
@@ -96,11 +88,7 @@ export const ProjectForm = ({
         </div>
 
         <WKInput name="projectUrl" label="Live URL" placeholder="https://..." />
-        <WKInput
-          name="repoUrl"
-          label="Repository URL"
-          placeholder="https://github.com/..."
-        />
+        <WKInput name="repoUrl" label="Repository URL" placeholder="https://github.com/..." />
 
         <WKDatePicker name="startDate" label="Start Date" />
         <WKDatePicker name="endDate" label="End Date" />
@@ -124,7 +112,7 @@ export const ProjectForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Project"}
+          {isLoading ? 'Saving...' : 'Save Project'}
         </Button>
       </div>
     </WkForm>

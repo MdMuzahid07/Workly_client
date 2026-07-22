@@ -1,22 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Label } from "@radix-ui/react-label";
-import { Switch } from "@radix-ui/react-switch";
-import { TabsContent } from "@radix-ui/react-tabs";
-import { Shield } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../ui/card";
+import { Label } from '@radix-ui/react-label';
+import { Switch } from '@radix-ui/react-switch';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { Shield } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../ui/card';
+
+import type { CompanySettings } from '@/types/company-settings';
 
 const PrivacySettingTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <K extends keyof CompanySettings, F extends keyof CompanySettings[K]>(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="privacy" className="space-y-6">
@@ -26,9 +25,7 @@ const PrivacySettingTab = ({
             <Shield className="mr-2 h-5 w-5" />
             Privacy Settings
           </CardTitle>
-          <CardDescription>
-            Control your {`company's`} privacy and visibility
-          </CardDescription>
+          <CardDescription>Control your {`company's`} privacy and visibility</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -39,12 +36,12 @@ const PrivacySettingTab = ({
                   type="radio"
                   name="visibility"
                   value="public"
-                  checked={settings.privacy.profileVisibility === "public"}
+                  checked={settings.privacy.profileVisibility === 'public'}
                   onChange={(e) =>
                     updateSettings(
-                      "privacy",
-                      "profileVisibility",
-                      e.target.value,
+                      'privacy',
+                      'profileVisibility',
+                      e.target.value as 'public' | 'private',
                     )
                   }
                   className="text-primary"
@@ -56,12 +53,12 @@ const PrivacySettingTab = ({
                   type="radio"
                   name="visibility"
                   value="private"
-                  checked={settings.privacy.profileVisibility === "private"}
+                  checked={settings.privacy.profileVisibility === 'private'}
                   onChange={(e) =>
                     updateSettings(
-                      "privacy",
-                      "profileVisibility",
-                      e.target.value,
+                      'privacy',
+                      'profileVisibility',
+                      e.target.value as 'public' | 'private',
                     )
                   }
                   className="text-primary"
@@ -70,38 +67,32 @@ const PrivacySettingTab = ({
               </label>
             </div>
             <p className="text-muted-foreground text-sm">
-              Public profiles are visible to all users, private profiles are
-              only visible to logged-in users
+              Public profiles are visible to all users, private profiles are only visible to
+              logged-in users
             </p>
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Show employee count</Label>
+              <Label>Show team member count</Label>
               <p className="text-muted-foreground text-sm">
-                Display the number of employees on your profile
+                Display how many employer accounts are linked to your company
               </p>
             </div>
             <Switch
               checked={settings.privacy.showEmployeeCount}
-              onCheckedChange={(checked) =>
-                updateSettings("privacy", "showEmployeeCount", checked)
-              }
+              onCheckedChange={(checked) => updateSettings('privacy', 'showEmployeeCount', checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Show salary ranges</Label>
-              <p className="text-muted-foreground text-sm">
-                Display salary ranges on job postings
-              </p>
+              <p className="text-muted-foreground text-sm">Display salary ranges on job postings</p>
             </div>
             <Switch
               checked={settings.privacy.showSalaryRanges}
-              onCheckedChange={(checked) =>
-                updateSettings("privacy", "showSalaryRanges", checked)
-              }
+              onCheckedChange={(checked) => updateSettings('privacy', 'showSalaryRanges', checked)}
             />
           </div>
 
@@ -115,7 +106,7 @@ const PrivacySettingTab = ({
             <Switch
               checked={settings.privacy.allowDirectMessages}
               onCheckedChange={(checked) =>
-                updateSettings("privacy", "allowDirectMessages", checked)
+                updateSettings('privacy', 'allowDirectMessages', checked)
               }
             />
           </div>

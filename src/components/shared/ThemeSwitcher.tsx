@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { Monitor, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 interface ThemeSwitcherProps {
   isMobile?: boolean;
@@ -35,9 +35,9 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
     return (
       <Button
         variant="ghost"
-        size={isMobile ? "sm" : "icon"}
+        size={isMobile ? 'sm' : 'icon'}
         disabled
-        className={cn("rounded-full border border-transparent", className)}
+        className={cn('rounded-full border border-transparent', className)}
       >
         <Sun className="h-[1.2rem] w-[1.2rem]" />
         <span className="sr-only">Loading theme</span>
@@ -48,9 +48,9 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   const getCurrentIcon = () => {
     const currentTheme = resolvedTheme || theme;
     switch (currentTheme) {
-      case "dark":
+      case 'dark':
         return <Moon className="h-[1.2rem] w-[1.2rem]" />;
-      case "system":
+      case 'system':
         return <Monitor className="h-[1.2rem] w-[1.2rem]" />;
       default:
         return <Sun className="h-[1.2rem] w-[1.2rem]" />;
@@ -59,31 +59,31 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
 
   const getThemeLabel = (themeName: string) => {
     switch (themeName) {
-      case "light":
-        return "Light";
-      case "dark":
-        return "Dark";
-      case "system":
-        return "System";
+      case 'light':
+        return 'Light';
+      case 'dark':
+        return 'Dark';
+      case 'system':
+        return 'System';
       default:
-        return "Light";
+        return 'Light';
     }
   };
 
   const cycleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
     } else {
-      setTheme("light");
+      setTheme('light');
     }
   };
 
   return (
     <>
       {isMobile ? (
-        <div className={cn("pb-3 pl-4", className)}>
+        <div className={cn('pb-3 pl-4', className)}>
           <Button
             className="dark:hover:text-accent dark:hover:border-accent"
             variant="outline"
@@ -91,19 +91,17 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             onClick={cycleTheme}
           >
             {getCurrentIcon()}
-            {showLabel && (
-              <span className="ml-2">{getThemeLabel(theme || "light")}</span>
-            )}
+            {showLabel && <span className="ml-2">{getThemeLabel(theme || 'light')}</span>}
           </Button>
         </div>
       ) : (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="h-8 w-8">
             <Button
               variant="ghost"
               size="icon"
               className={cn(
-                "hover:bg-accent/50 hover:text-foreground text-muted-foreground bg-background rounded-full border border-transparent transition-all duration-200",
+                'hover:bg-accent/50 hover:text-foreground text-muted-foreground bg-background rounded-full border border-transparent transition-all duration-200',
                 className,
               )}
             >
@@ -112,32 +110,32 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className={`z-9999 mt-6 ${isMobile ? "" : ""} rounded-2xl`}
-            align={isMobile ? "start" : "end"}
+            className={`z-9999 mt-6 ${isMobile ? '' : ''} rounded-2xl`}
+            align={isMobile ? 'start' : 'end'}
             sideOffset={8}
           >
             <DropdownMenuItem
               className="group cursor-pointer rounded-lg"
-              onClick={() => setTheme("light")}
+              onClick={() => setTheme('light')}
             >
               <Sun className="group-hover:text-accent-foreground mr-2 h-4 w-4" />
               <span>Light</span>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setTheme("dark")}
+              onClick={() => setTheme('dark')}
               className={cn(
-                "group cursor-pointer rounded-lg transition-colors duration-200",
-                theme === "dark" && "bg-accent text-accent-foreground",
+                'group cursor-pointer rounded-lg transition-colors duration-200',
+                theme === 'dark' && 'bg-accent text-accent-foreground',
               )}
             >
               <Moon className="group-hover:text-accent-foreground mr-2 h-4 w-4" />
               <span>Dark</span>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setTheme("system")}
+              onClick={() => setTheme('system')}
               className={cn(
-                "group cursor-pointer rounded-lg transition-colors duration-200",
-                theme === "system" && "bg-accent text-accent-foreground",
+                'group cursor-pointer rounded-lg transition-colors duration-200',
+                theme === 'system' && 'bg-accent text-accent-foreground',
               )}
             >
               <Monitor className="group-hover:text-accent-foreground mr-2 h-4 w-4" />

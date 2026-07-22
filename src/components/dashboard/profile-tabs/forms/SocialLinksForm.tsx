@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Facebook, Github, Globe, Linkedin, Twitter } from "lucide-react";
-import { SocialLinksFormData, socialLinksSchema } from "./profile.validation";
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Facebook, Github, Globe, Linkedin, Twitter } from 'lucide-react';
+import { SocialLinksFormData, socialLinksSchema } from './profile.validation';
 
 interface SocialLinksFormProps {
   onSubmit: (data: SocialLinksFormData) => void;
@@ -23,8 +23,7 @@ export const SocialLinksForm = ({
   return (
     <WkForm<SocialLinksFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
+      defaultValues={defaultValues as unknown as SocialLinksFormData}
       resolver={zodResolver(socialLinksSchema)}
     >
       <div className="space-y-4">
@@ -65,7 +64,7 @@ export const SocialLinksForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Links"}
+          {isLoading ? 'Saving...' : 'Save Links'}
         </Button>
       </div>
     </WkForm>

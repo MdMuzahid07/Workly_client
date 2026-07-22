@@ -1,31 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Label } from "@radix-ui/react-label";
-import { Switch } from "@radix-ui/react-switch";
-import { TabsContent } from "@radix-ui/react-tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../ui/card";
-import { Input } from "../../../ui/input";
+import { Label } from '@radix-ui/react-label';
+import { Switch } from '@radix-ui/react-switch';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../ui/card';
+import { Input } from '../../../ui/input';
+
+import type { CompanySettings } from '@/types/company-settings';
 
 const JobPostingManagementTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <K extends keyof CompanySettings, F extends keyof CompanySettings[K]>(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="general" className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Job Posting Settings</CardTitle>
-          <CardDescription>
-            Configure how your job postings behave
-          </CardDescription>
+          <CardDescription>Configure how your job postings behave</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
@@ -37,9 +34,7 @@ const JobPostingManagementTab = ({
             </div>
             <Switch
               checked={settings.jobPosting.autoExpireJobs}
-              onCheckedChange={(checked) =>
-                updateSettings("jobPosting", "autoExpireJobs", checked)
-              }
+              onCheckedChange={(checked) => updateSettings('jobPosting', 'autoExpireJobs', checked)}
             />
           </div>
 
@@ -51,11 +46,7 @@ const JobPostingManagementTab = ({
                 type="number"
                 value={settings.jobPosting.jobExpiryDays}
                 onChange={(e) =>
-                  updateSettings(
-                    "jobPosting",
-                    "jobExpiryDays",
-                    parseInt(e.target.value),
-                  )
+                  updateSettings('jobPosting', 'jobExpiryDays', parseInt(e.target.value))
                 }
                 className="w-32"
               />
@@ -72,7 +63,7 @@ const JobPostingManagementTab = ({
             <Switch
               checked={settings.jobPosting.requireApproval}
               onCheckedChange={(checked) =>
-                updateSettings("jobPosting", "requireApproval", checked)
+                updateSettings('jobPosting', 'requireApproval', checked)
               }
             />
           </div>
@@ -84,11 +75,7 @@ const JobPostingManagementTab = ({
               type="number"
               value={settings.jobPosting.maxActiveJobs}
               onChange={(e) =>
-                updateSettings(
-                  "jobPosting",
-                  "maxActiveJobs",
-                  parseInt(e.target.value),
-                )
+                updateSettings('jobPosting', 'maxActiveJobs', parseInt(e.target.value))
               }
               className="w-32"
             />

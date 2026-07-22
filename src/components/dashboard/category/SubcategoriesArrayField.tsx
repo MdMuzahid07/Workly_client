@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { Plus, Trash2 } from "lucide-react";
-import { useFormContext } from "react-hook-form";
-import { Button } from "../../ui/button";
-import { Input } from "../../ui/input";
-import { ScrollArea } from "../../ui/scroll-area";
+import { LayoutGrid, Plus, Trash2 } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
 
 interface SubcategoriesArrayFieldProps {
   name: string;
@@ -14,16 +13,14 @@ interface SubcategoriesArrayFieldProps {
 
 const SubcategoriesArrayField = ({
   name,
-  label = "subcategories",
-  placeholder = "Enter subcategory name...",
+  label = 'Sub-categories',
+  placeholder = 'Enter subcategory name...',
 }: SubcategoriesArrayFieldProps) => {
   const { watch, setValue } = useFormContext();
   const items = watch(name) || [];
 
-  console.log(items, "from array fields ");
-
   const addItem = () => {
-    setValue(name, ["", ...items], { shouldValidate: true });
+    setValue(name, ['', ...items], { shouldValidate: true });
   };
 
   const removeItem = (index: number) => {
@@ -38,58 +35,56 @@ const SubcategoriesArrayField = ({
   };
 
   return (
-    <ScrollArea className="max-h-[70vh]">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">{label}</h3>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addItem}
-            className="h-8"
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            Add Subcategory
-          </Button>
-        </div>
-
-        {items.length === 0 ? (
-          <div className="text-muted-foreground border-primary/20 rounded-lg border border-dashed p-4 text-center text-sm">
-            No subcategories added yet. Click {`"Add Subcategory"`} to get
-            started.
-          </div>
-        ) : (
-          <ScrollArea className="max-h-72 pr-2">
-            <div className="space-y-3">
-              {items.map((item: string, index: number) => (
-                <div
-                  key={index}
-                  className="border-primary/30 flex items-center gap-2 rounded-lg border p-3"
-                >
-                  <Input
-                    type="text"
-                    value={item}
-                    onChange={(e) => updateItem(index, e.target.value)}
-                    placeholder={placeholder}
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeItem(index)}
-                    className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        )}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between border-b pb-2">
+        <h3 className="text-muted-foreground flex items-center gap-1.5 text-sm font-bold tracking-wider uppercase">
+          <LayoutGrid className="text-primary h-4 w-4" />
+          {label}
+        </h3>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addItem}
+          className="border-primary/25 hover:bg-primary/5 hover:text-primary h-8 rounded-full text-xs font-bold transition-all"
+        >
+          <Plus className="mr-1 h-3.5 w-3.5" />
+          Add Subcategory
+        </Button>
       </div>
-    </ScrollArea>
+
+      {items.length === 0 ? (
+        <div className="text-muted-foreground bg-muted/20 border-muted-foreground/20 rounded-xl border border-dashed p-6 text-center text-sm font-medium">
+          No subcategories added yet. Click &quot;Add Subcategory&quot; to get started.
+        </div>
+      ) : (
+        <div className="grid max-h-[220px] scrollbar-thin grid-cols-1 gap-2 overflow-y-auto pr-1.5">
+          {items.map((item: string, index: number) => (
+            <div
+              key={index}
+              className="border-input hover:border-primary/30 bg-muted/5 focus-within:border-primary focus-within:ring-primary/20 flex items-center gap-2 rounded-xl border p-2 transition-all focus-within:ring-1"
+            >
+              <Input
+                type="text"
+                value={item}
+                onChange={(e) => updateItem(index, e.target.value)}
+                placeholder={placeholder}
+                className="flex-1 border-0 bg-transparent px-2 py-1 text-sm font-semibold focus-visible:ring-0"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeItem(index)}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 shrink-0 rounded-lg transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

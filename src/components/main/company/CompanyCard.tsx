@@ -1,19 +1,12 @@
-"use client";
+'use client';
 
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Bookmark,
-  Building2,
-  MapPin,
-  Users,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { startTransition, useOptimistic } from "react";
-import { Badge } from "../../ui/badge";
-import { Button } from "../../ui/button";
-import { Card } from "../../ui/card";
+import { ArrowRight, ArrowUpRight, Bookmark, Building2, MapPin, Users } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { startTransition, useOptimistic } from 'react';
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card } from '../../ui/card';
 
 interface Company {
   id: string;
@@ -32,20 +25,19 @@ interface Company {
 
 interface CompanyCardProps {
   company: Company;
-  viewType?: "grid" | "list";
+  viewType?: 'grid' | 'list';
   onBookmark?: (companyId: string) => Promise<void>;
   isBookmarked?: boolean;
 }
 
 export function CompanyCard({
   company,
-  viewType = "list",
+  viewType = 'list',
   onBookmark,
   isBookmarked = false,
 }: CompanyCardProps) {
   // Use optimistic UI for bookmark state
-  const [optimisticBookmarked, setOptimisticBookmarked] =
-    useOptimistic(isBookmarked);
+  const [optimisticBookmarked, setOptimisticBookmarked] = useOptimistic(isBookmarked);
 
   const handleBookmark = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -61,14 +53,14 @@ export function CompanyCard({
     try {
       await onBookmark(company.id);
     } catch (error) {
-      console.error("Failed to bookmark company:", error);
+      console.error('Failed to bookmark company:', error);
     }
   };
 
   // Grid View Card
-  if (viewType === "grid") {
+  if (viewType === 'grid') {
     return (
-      <Card className="group hover:border-primary/50 from-primary/25 via-primary/8 to-primary/15 relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white bg-linear-to-r p-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+      <Card className="group hover:border-primary/50 bg-card relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 p-5 transition-all duration-300 dark:border-slate-800">
         <Link
           href={`/companies/${company.slug}`}
           className="relative flex h-full flex-col"
@@ -76,14 +68,14 @@ export function CompanyCard({
         >
           {/* Top section: Logo, Title, Featured */}
           <div className="mb-4 flex gap-3">
-            <div className="border-border/30 relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm dark:bg-slate-800">
+            <div className="border-border/30 relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-slate-800">
               {company.logo ? (
                 <Image
                   src={company.logo}
                   alt={`${company.name} logo`}
                   fill
                   sizes="56px"
-                  className="object-contain p-2"
+                  className="rounded-xl object-cover"
                   loading="lazy"
                 />
               ) : (
@@ -101,20 +93,20 @@ export function CompanyCard({
                   </h3>
                 </div>
                 {company.featured && (
-                  <Badge className="bg-primary shrink-0 text-xs whitespace-nowrap text-white">
+                  <Badge className="bg-primary shrink-0 rounded-md text-xs whitespace-nowrap text-white">
                     Featured
                   </Badge>
                 )}
               </div>
               <p className="text-primary mt-1 text-xs font-medium">
-                {company.industry?.name ?? "Industry"}
+                {company.industry?.name ?? 'Industry'}
               </p>
             </div>
           </div>
 
           {/* Description */}
           <p className="text-muted-foreground mb-4 line-clamp-2 flex-1 text-sm leading-relaxed">
-            {company.description ?? "No description available"}
+            {company.description ?? 'No description available'}
           </p>
 
           {/* Info pills */}
@@ -125,7 +117,7 @@ export function CompanyCard({
             </Badge>
             <Badge variant="outline" className="gap-1.5">
               <Users className="h-3 w-3" />
-              <span className="text-xs">{company.size ?? "N/A"} employees</span>
+              <span className="text-xs">{company.size ?? 'N/A'} staff</span>
             </Badge>
           </div>
 
@@ -135,13 +127,10 @@ export function CompanyCard({
               {company.openJobs > 0 ? (
                 <span className="text-primary inline-flex items-center gap-1 text-xs font-semibold">
                   <span className="bg-primary h-2 w-2 rounded-full" />
-                  {company.openJobs}{" "}
-                  {company.openJobs === 1 ? "Opening" : "Openings"}
+                  {company.openJobs} {company.openJobs === 1 ? 'Opening' : 'Openings'}
                 </span>
               ) : (
-                <span className="text-muted-foreground text-xs">
-                  No openings
-                </span>
+                <span className="text-muted-foreground text-xs">No openings</span>
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -164,14 +153,14 @@ export function CompanyCard({
   }
 
   return (
-    <Card className="group hover:border-primary/50 from-primary/15 via-primary/8 to-primary/15 relative overflow-hidden rounded-3xl border border-gray-100 bg-linear-to-r transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/50">
+    <Card className="group hover:border-primary/50 bg-card relative overflow-hidden rounded-2xl border border-gray-100 transition-all duration-300 dark:border-slate-800">
       <div className="relative flex items-start justify-between gap-3 p-3 sm:gap-5 sm:p-5">
         {/* Left section */}
         <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-4">
           {/* Logo */}
           <Link
             href={`/companies/${company.slug}`}
-            className="border-border/20 relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm sm:h-16 sm:w-16 dark:bg-slate-800"
+            className="border-border/20 relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border bg-white shadow-sm sm:h-16 sm:w-16 dark:bg-slate-800"
             prefetch={false}
           >
             {company.logo ? (
@@ -180,7 +169,7 @@ export function CompanyCard({
                 alt={`${company.name} logo`}
                 fill
                 sizes="(max-width: 640px) 40px, 64px"
-                className="object-contain p-1 sm:p-1.5"
+                className="rounded-xl object-cover"
                 loading="lazy"
               />
             ) : (
@@ -205,34 +194,28 @@ export function CompanyCard({
                 </Link>
               </div>
               {company.featured && (
-                <Badge className="bg-primary shrink-0 text-[9px] whitespace-nowrap text-white sm:text-xs">
+                <Badge className="bg-primary shrink-0 rounded-md text-[9px] whitespace-nowrap text-white sm:text-xs">
                   Featured
                 </Badge>
               )}
             </div>
 
             <p className="text-primary mb-1 text-[10px] font-semibold sm:mb-2 sm:text-xs">
-              {company.industry?.name ?? "Industry"}
+              {company.industry?.name ?? 'Industry'}
             </p>
 
             <p className="text-muted-foreground mb-1.5 line-clamp-1 text-[11px] sm:mb-2.5 sm:line-clamp-2 sm:text-sm">
-              {company.description ?? "No description available"}
+              {company.description ?? 'No description available'}
             </p>
 
             <div className="text-muted-foreground flex flex-wrap gap-2 text-[10px] sm:gap-3 sm:text-xs">
               <span className="flex items-center gap-0.5 sm:gap-1">
-                <MapPin
-                  className="h-3 w-3 sm:h-3.5 sm:w-3.5"
-                  aria-hidden="true"
-                />
+                <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                 <span className="truncate">{company.location}</span>
               </span>
               <span className="flex items-center gap-0.5 sm:gap-1">
-                <Users
-                  className="h-3 w-3 sm:h-3.5 sm:w-3.5"
-                  aria-hidden="true"
-                />
-                {company.size ?? "N/A"} emp
+                <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+                {company.size ?? 'N/A'} emp
               </span>
             </div>
           </div>
@@ -254,17 +237,13 @@ export function CompanyCard({
                 size="icon"
                 variant="ghost"
                 className="h-7 w-7 sm:h-8 sm:w-8"
-                aria-label={
-                  optimisticBookmarked ? "Remove bookmark" : "Bookmark company"
-                }
+                aria-label={optimisticBookmarked ? 'Remove bookmark' : 'Bookmark company'}
                 onClick={handleBookmark}
                 type="button"
               >
                 <Bookmark
                   className={`h-3.5 w-3.5 transition-colors sm:h-4 sm:w-4 ${
-                    optimisticBookmarked
-                      ? "fill-primary text-primary"
-                      : "text-muted-foreground"
+                    optimisticBookmarked ? 'fill-primary text-primary' : 'text-muted-foreground'
                   }`}
                 />
               </Button>

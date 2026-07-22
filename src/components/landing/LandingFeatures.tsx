@@ -1,12 +1,14 @@
-import { Badge } from "@/components/ui/badge";
-import { Zap } from "lucide-react";
-import { motion } from "motion/react";
-import { features } from "../../constants";
-import { Card } from "../ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Zap } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { features } from '../../constants';
+import { Card } from '../ui/card';
 
 const LandingFeatures = () => {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <section className="bg-background relative overflow-hidden px-4 py-24 sm:py-32">
+    <section className="bg-background relative overflow-hidden px-4 py-14 sm:py-24 lg:py-32">
       {/* Background Atmosphere */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-primary/5 absolute h-[500px] w-[500px] rounded-full blur-[120px]" />
@@ -17,68 +19,71 @@ const LandingFeatures = () => {
       <div className="relative mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-16 text-center sm:mb-24"
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="mb-10 text-center sm:mb-16 lg:mb-20"
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
             className="mb-6 inline-flex"
           >
-            <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-2 border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all">
-              <Zap className="fill-primary/20 h-4 w-4" />
+            <Badge className="border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-1.5 border px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm transition-all sm:px-4 sm:py-2 sm:text-sm">
+              <Zap className="fill-primary/20 h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Platform Superpowers
             </Badge>
           </motion.div>
 
-          <h2 className="text-foreground mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Everything You Need to{" "}
+          <h2 className="text-foreground mb-6 text-2xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+            Everything You Need to{' '}
             <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
               Elevate
-            </span>{" "}
+            </span>{' '}
             Your Career
           </h2>
 
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed sm:text-xl">
-            Empowering professionals with state-of-the-art tools to find, apply,
-            and succeed in the modern job market.
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs leading-relaxed sm:text-xl">
+            Empowering professionals with state-of-the-art tools to find, apply, and succeed in the
+            modern job market.
           </p>
         </motion.div>
 
         {/* Features Grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-8 lg:grid-cols-4">
           {features?.map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 40 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{
                 delay: index * 0.15,
                 duration: 0.7,
                 ease: [0.21, 1.02, 0.47, 0.98],
               }}
+              className="h-full"
             >
-              <Card className="group border-border/40 bg-card/40 hover:border-primary/40 hover:bg-card/60 hover:shadow-primary/10 relative h-full overflow-hidden p-8 backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                {/* Interactive Background Glow */}
-                <div className="from-primary/10 pointer-events-none absolute -inset-px bg-linear-to-br to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <Card className="group border-border/40 bg-card/50 hover:border-primary hover:bg-card/80 relative h-full overflow-hidden rounded-2xl border p-4 backdrop-blur-md transition-all duration-500 sm:p-8">
+                {/* Dynamic Gradient Overlay */}
+                <div className="from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                <div className="relative z-10 flex h-full flex-col">
-                  {/* Premium Icon Container */}
-                  <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary group-hover:shadow-primary/30 mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl ring-1 transition-all duration-500 group-hover:scale-110 group-hover:text-white group-hover:shadow-xl">
-                    <feature.icon className="h-8 w-8 transition-transform duration-500 group-hover:rotate-12" />
+                <div className="relative z-10 flex h-full flex-col justify-between">
+                  <div>
+                    {/* Premium Icon Container */}
+                    <div className="bg-primary/10 text-primary ring-primary/20 group-hover:bg-primary mb-4 inline-flex h-10 w-10 origin-center items-center justify-center rounded-xl ring-1 transition-all duration-500 will-change-transform group-hover:scale-110 group-hover:text-white sm:mb-8 sm:h-16 sm:w-16 sm:rounded-2xl">
+                      <feature.icon className="h-5 w-5 sm:h-8 sm:w-8" />
+                    </div>
+
+                    {/* Content */}
+                    <h3 className="text-foreground group-hover:text-primary mb-2 text-sm font-bold tracking-tight transition-all duration-500 sm:mb-4 sm:text-2xl">
+                      {feature.title}
+                    </h3>
                   </div>
-
-                  {/* Content */}
-                  <h3 className="text-foreground group-hover:text-primary mb-4 text-2xl font-bold tracking-tight transition-colors duration-300">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground group-hover:text-foreground/80 text-base leading-relaxed transition-colors duration-300">
+                  <p className="text-muted-foreground group-hover:text-foreground/80 text-[10px] leading-relaxed transition-colors duration-300 sm:text-base">
                     {feature.description}
                   </p>
 

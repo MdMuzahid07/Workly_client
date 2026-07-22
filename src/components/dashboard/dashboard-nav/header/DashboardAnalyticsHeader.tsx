@@ -1,46 +1,92 @@
-import { ChartNoAxesCombined, Download } from "lucide-react";
-import { Button } from "../../../ui/button";
-import DashboardHeaderContainer from "./DashboardHeaderContainer";
+import { useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { Download, LayoutDashboard } from 'lucide-react';
+import type { EmployerAnalyticsPeriod } from '@/types/employerAnalytics';
+import WKSelect from '@/components/form/WkSelect';
+import { Button } from '../../../ui/button';
+import DashboardHeaderContainer from './DashboardHeaderContainer';
+
+type DashboardAnalyticsHeaderProps = {
+  timeRange: EmployerAnalyticsPeriod | string;
+  setTimeRange: (range: EmployerAnalyticsPeriod) => void;
+  onExportReport?: () => void;
+  exportDisabled?: boolean;
+  isExporting?: boolean;
+};
 
 const DashboardAnalyticsHeader = ({
   timeRange,
   setTimeRange,
-}: {
-  timeRange: string;
-  setTimeRange: (range: string) => void;
-}) => {
+  onExportReport,
+  exportDisabled,
+  isExporting = false,
+}: DashboardAnalyticsHeaderProps) => {
+  const methods = useForm({
+    defaultValues: {
+      period: timeRange,
+    },
+  });
+
+  const periodValue = methods.watch('period');
+
+  useEffect(() => {
+    if (timeRange && methods.getValues('period') !== timeRange) {
+      methods.setValue('period', timeRange);
+    }
+  }, [timeRange, methods]);
+
+  useEffect(() => {
+    if (periodValue && periodValue !== timeRange) {
+      setTimeRange(periodValue as EmployerAnalyticsPeriod);
+    }
+  }, [periodValue, timeRange, setTimeRange]);
   return (
     <DashboardHeaderContainer>
-      <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="bg-primary/10 ring-primary/5 rounded-lg p-2 ring-4">
-            <ChartNoAxesCombined className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+      <div className="flex w-full items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <div className="bg-primary/10 ring-primary/5 shrink-0 rounded-lg p-2 ring-4">
+            <LayoutDashboard className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
           </div>
-          <div>
-            <h1 className="text-foreground text-sm font-bold tracking-tight sm:text-xl md:text-2xl">
-              Analytics
+          <div className="min-w-0">
+            <h1 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-xl md:text-2xl">
+              Performance Analytics
             </h1>
-            <p className="text-muted-foreground inline-flex text-xs font-medium opacity-80 sm:text-sm">
-              Track your hiring performance
-              <span className="hidden sm:block">&nbsp;and key metrics</span>
+            <p className="text-muted-foreground hidden text-xs font-medium opacity-80 sm:block sm:text-sm">
+              Monitor hiring efficiency and key metrics
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="border-input bg-background text-foreground rounded-lg border px-3 py-2 text-sm"
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="1y">Last year</option>
-          </select>
+        <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:gap-3">
+          <FormProvider {...methods}>
+            <WKSelect
+              name="period"
+              label="Reporting period"
+              hideLabel
+              options={[
+                { value: '7d', label: 'Last 7 days' },
+                { value: '30d', label: 'Last 30 days' },
+                { value: '90d', label: 'Last 90 days' },
+                { value: '1y', label: 'Last year' },
+              ]}
+              className="bg-muted/50 h-9 w-full flex-1 cursor-pointer rounded-full border-none px-4 text-xs font-bold shadow-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-10 sm:w-[160px] sm:flex-none sm:text-sm"
+            />
+          </FormProvider>
 
-          <Button variant="outline" className="gap-2 bg-transparent">
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Export</span>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={exportDisabled || isExporting}
+            className="hover:bg-primary/5 hover:text-primary bg-muted/50 flex h-9 w-9 items-center justify-center rounded-full border-none p-0 font-bold transition-all sm:h-10 sm:w-auto sm:px-6"
+            onClick={onExportReport}
+          >
+            {isExporting ? (
+              <span className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+            ) : (
+              <Download className="h-4 w-4" aria-hidden />
+            )}
+            <span className="hidden sm:inline">
+              {isExporting ? 'Exporting...' : 'Export Report'}
+            </span>
           </Button>
         </div>
       </div>

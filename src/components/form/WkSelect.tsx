@@ -1,36 +1,38 @@
-"use client";
+'use client';
 
-import { Label } from "@/components/ui/label";
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { Controller, useFormContext } from "react-hook-form";
+} from '@/components/ui/select';
+import { cn, getNestedValue } from '@/lib/utils';
+import { Controller, useFormContext } from 'react-hook-form';
 
 interface WKSelectProps {
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
-  options: { value: string; label: string }[];
+  options: readonly { value: string; label: string }[];
   required?: boolean;
   className?: string;
   disabled?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
+  hideLabel?: boolean;
 }
 
 const WKSelect = ({
   name,
-  label,
+  label = '',
   placeholder,
   options,
   required = false,
   className,
-  size = "lg",
+  size = 'lg',
   disabled = false,
+  hideLabel = false,
 }: WKSelectProps) => {
   const {
     control,
@@ -38,34 +40,38 @@ const WKSelect = ({
   } = useFormContext();
 
   const sizeClasses = {
-    sm: "h-8 text-sm",
-    md: "h-9 text-sm",
-    lg: "h-10",
+    sm: 'h-8 text-sm',
+    md: 'h-9 text-sm',
+    lg: 'h-10',
   };
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+    <div className="w-full space-y-2">
+      {label && !hideLabel && (
+        <Label htmlFor={name} className={hasError ? 'text-destructive' : ''}>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
       <Controller
         name={name}
         control={control}
-        rules={{ required: required ? `${label} is required` : false }}
+        rules={{ required: required ? `${label || name} is required` : false }}
         render={({ field }) => (
           <Select
             onValueChange={field.onChange}
-            value={field.value}
+            value={field.value || undefined}
             disabled={disabled}
           >
             <SelectTrigger
               id={name}
               className={cn(
+                'w-full',
                 sizeClasses[size],
-                hasError && "border-destructive focus:ring-destructive",
+                hasError && 'border-destructive focus:ring-destructive',
                 className,
               )}
             >
@@ -81,11 +87,7 @@ const WKSelect = ({
           </Select>
         )}
       />
-      {hasError && (
-        <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
-        </p>
-      )}
+      {hasError && <p className="text-destructive text-sm">{fieldError?.message as string}</p>}
     </div>
   );
 };

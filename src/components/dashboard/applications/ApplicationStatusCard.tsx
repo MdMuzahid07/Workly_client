@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Clock, FileText, XCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle, Clock, FileText, XCircle } from 'lucide-react';
 
 interface ApplicationStatusCardsProps {
   totalApplications: number;
@@ -16,28 +16,28 @@ const ApplicationStatusCards = ({
 }: ApplicationStatusCardsProps) => {
   const stats = [
     {
-      label: "Total Applications",
+      label: 'Total Applications',
       value: totalApplications,
       icon: FileText,
-      subtext: "+12 from last month",
+      subtext: 'All received applications',
     },
     {
-      label: "New This Week",
+      label: 'New This Week',
       value: newThisWeek,
       icon: Clock,
-      subtext: "Pending review",
+      subtext: 'Pending review',
     },
     {
-      label: "In Review",
+      label: 'In Review',
       value: inReview,
       icon: CheckCircle,
-      subtext: "Active candidates",
+      subtext: 'Active candidates',
     },
     {
-      label: "Rejected",
+      label: 'Rejected',
       value: rejected,
       icon: XCircle,
-      subtext: "This month",
+      subtext: 'Rejected applications',
     },
   ];
 
@@ -48,15 +48,11 @@ const ApplicationStatusCards = ({
         return (
           <Card key={stat.label} className="bg-card border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium sm:text-sm">
-                {stat.label}
-              </CardTitle>
+              <CardTitle className="text-xs font-medium sm:text-sm">{stat.label}</CardTitle>
               <Icon className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-primary text-xl font-bold sm:text-2xl">
-                {stat.value}
-              </div>
+              <div className="text-primary text-xl font-bold sm:text-2xl">{stat.value}</div>
               <p className="text-muted-foreground text-xs">{stat.subtext}</p>
             </CardContent>
           </Card>

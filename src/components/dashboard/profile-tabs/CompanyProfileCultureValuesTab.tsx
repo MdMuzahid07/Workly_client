@@ -1,82 +1,71 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import WKTextArea from "@/components/form/WkTextArea";
-import { SectionCard } from "@/components/main/profile/SectionCard";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { TabsContent } from "@radix-ui/react-tabs";
-import {
-  Heart,
-  Lightbulb,
-  Plus,
-  Shield,
-  Star,
-  Target,
-  Users,
-  X,
-  Zap,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+'use client';
+import WKTextArea from '@/components/form/WkTextArea';
+import { SectionCard } from '@/components/main/profile/SectionCard';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { Heart, Lightbulb, Plus, Shield, Star, Target, Users, X, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 const VALUE_OPTIONS = [
   {
-    value: "Innovation",
+    value: 'Innovation',
     icon: Zap,
-    color: "text-blue-500",
-    bgColor: "bg-blue-50 dark:bg-blue-950/30",
-    borderColor: "border-blue-200 dark:border-blue-900/50",
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-50 dark:bg-blue-950/30',
+    borderColor: 'border-blue-200 dark:border-blue-900/50',
   },
   {
-    value: "Collaboration",
+    value: 'Collaboration',
     icon: Users,
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-    borderColor: "border-emerald-200 dark:border-emerald-900/50",
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
+    borderColor: 'border-emerald-200 dark:border-emerald-900/50',
   },
   {
-    value: "Customer First",
+    value: 'Customer First',
     icon: Heart,
-    color: "text-rose-500",
-    bgColor: "bg-rose-50 dark:bg-rose-950/30",
-    borderColor: "border-rose-200 dark:border-rose-900/50",
+    color: 'text-rose-500',
+    bgColor: 'bg-rose-50 dark:bg-rose-950/30',
+    borderColor: 'border-rose-200 dark:border-rose-900/50',
   },
   {
-    value: "Excellence",
+    value: 'Excellence',
     icon: Star,
-    color: "text-amber-500",
-    bgColor: "bg-amber-50 dark:bg-amber-950/30",
-    borderColor: "border-amber-200 dark:border-amber-900/50",
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-50 dark:bg-amber-950/30',
+    borderColor: 'border-amber-200 dark:border-amber-900/50',
   },
   {
-    value: "Integrity",
+    value: 'Integrity',
     icon: Shield,
-    color: "text-violet-500",
-    bgColor: "bg-violet-50 dark:bg-violet-950/30",
-    borderColor: "border-violet-200 dark:border-violet-900/50",
+    color: 'text-violet-500',
+    bgColor: 'bg-violet-50 dark:bg-violet-950/30',
+    borderColor: 'border-violet-200 dark:border-violet-900/50',
   },
   {
-    value: "Agility",
+    value: 'Agility',
     icon: Zap,
-    color: "text-cyan-500",
-    bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
-    borderColor: "border-cyan-200 dark:border-cyan-900/50",
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-50 dark:bg-cyan-950/30',
+    borderColor: 'border-cyan-200 dark:border-cyan-900/50',
   },
   {
-    value: "Impact",
+    value: 'Impact',
     icon: Target,
-    color: "text-orange-500",
-    bgColor: "bg-orange-50 dark:bg-orange-950/30",
-    borderColor: "border-orange-200 dark:border-orange-900/50",
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50 dark:bg-orange-950/30',
+    borderColor: 'border-orange-200 dark:border-orange-900/50',
   },
   {
-    value: "Growth",
+    value: 'Growth',
     icon: RocketIcon,
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-    borderColor: "border-indigo-200 dark:border-indigo-900/50",
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50 dark:bg-indigo-950/30',
+    borderColor: 'border-indigo-200 dark:border-indigo-900/50',
   },
 ] as const;
 
@@ -102,73 +91,64 @@ function RocketIcon({ className }: { className?: string }) {
   );
 }
 
+import type { CompanyProfile } from '@/types/company-profile';
+
 const CompanyProfileCultureValuesTab = ({
   currentProfile,
   isEditing,
   onMissionChange,
-  onCultureSummaryChange,
   onValuesChange,
   initialValues = [],
 }: {
-  currentProfile: any;
+  currentProfile: CompanyProfile;
   isEditing: boolean;
   onMissionChange?: (mission: string) => void;
-  onCultureSummaryChange?: (cultureSummary: string) => void;
   onValuesChange?: (values: string[]) => void;
   initialValues?: string[];
 }) => {
-  const [newValue, setNewValue] = useState("");
+  const [newValue, setNewValue] = useState('');
   const [selectedValues, setSelectedValues] = useState<string[]>(
     initialValues || currentProfile.values || [],
   );
 
   const methods = useForm({
-    mode: "onChange",
+    mode: 'onChange',
     values: {
-      mission: currentProfile.mission || "",
-      cultureSummary: currentProfile.cultureSummary || "",
+      mission: currentProfile?.mission || '',
     },
   });
 
   useEffect(() => {
     const subscription = methods.watch((value, { name }) => {
-      if (name === "mission" && value.mission !== undefined) {
+      if (name === 'mission' && value.mission !== undefined) {
         onMissionChange?.(value.mission);
-      }
-      if (name === "cultureSummary" && value.cultureSummary !== undefined) {
-        onCultureSummaryChange?.(value.cultureSummary);
       }
     });
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [methods, onMissionChange]);
 
   const handleAddValue = (valueToAdd: string) => {
     if (valueToAdd.trim() && !selectedValues.includes(valueToAdd.trim())) {
       const updatedValues = [...selectedValues, valueToAdd.trim()];
       setSelectedValues(updatedValues);
-      setNewValue("");
+      setNewValue('');
       onValuesChange?.(updatedValues);
     }
   };
 
   const handleRemoveValue = (valueToRemove: string) => {
-    const updatedValues = selectedValues.filter(
-      (value) => value !== valueToRemove,
-    );
+    const updatedValues = selectedValues.filter((value) => value !== valueToRemove);
     setSelectedValues(updatedValues);
     onValuesChange?.(updatedValues);
   };
 
   const getValueMetadata = (valueName: string) => {
-    const option = VALUE_OPTIONS.find(
-      (opt) => opt.value.toLowerCase() === valueName.toLowerCase(),
-    );
+    const option = VALUE_OPTIONS.find((opt) => opt.value.toLowerCase() === valueName.toLowerCase());
     return {
       icon: option?.icon || Target,
-      color: option?.color || "text-primary",
-      bgColor: option?.bgColor || "bg-primary/5",
-      borderColor: option?.borderColor || "border-primary/10",
+      color: option?.color || 'text-primary',
+      bgColor: option?.bgColor || 'bg-primary/5',
+      borderColor: option?.borderColor || 'border-primary/10',
     };
   };
 
@@ -187,9 +167,7 @@ const CompanyProfileCultureValuesTab = ({
                 <Target className="text-primary h-5 w-5" />
               </div>
               <div className="space-y-1">
-                <p className="text-foreground text-sm font-semibold">
-                  Purpose & Strategic Intent
-                </p>
+                <p className="text-foreground text-sm font-semibold">Purpose & Strategic Intent</p>
                 <p className="text-muted-foreground text-xs">
                   Define what your company exists to achieve.
                 </p>
@@ -237,20 +215,14 @@ const CompanyProfileCultureValuesTab = ({
         </SectionCard>
 
         {/* Company Values */}
-        <SectionCard
-          title="Core Values"
-          isCompleted={selectedValues.length > 0}
-          className="h-full"
-        >
+        <SectionCard title="Core Values" isCompleted={selectedValues.length > 0} className="h-full">
           <div className="space-y-6">
             <div className="flex items-start gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
                 <Heart className="h-5 w-5 text-emerald-600" />
               </div>
               <div className="space-y-1">
-                <p className="text-foreground text-sm font-semibold">
-                  Culture & Principles
-                </p>
+                <p className="text-foreground text-sm font-semibold">Culture & Principles</p>
                 <p className="text-muted-foreground text-xs">
                   The beliefs that guide your {`team's`} conduct.
                 </p>
@@ -267,7 +239,7 @@ const CompanyProfileCultureValuesTab = ({
                       setNewValue(e.target.value)
                     }
                     onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
-                      e.key === "Enter" && handleAddValue(newValue)
+                      e.key === 'Enter' && handleAddValue(newValue)
                     }
                     className="h-10"
                   />
@@ -292,14 +264,12 @@ const CompanyProfileCultureValuesTab = ({
                           key={opt.value}
                           type="button"
                           onClick={() =>
-                            isSelected
-                              ? handleRemoveValue(opt.value)
-                              : handleAddValue(opt.value)
+                            isSelected ? handleRemoveValue(opt.value) : handleAddValue(opt.value)
                           }
                           className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-all ${
                             isSelected
-                              ? "bg-primary/10 border-primary ring-primary/20 scale-95 ring-2"
-                              : "bg-muted/50 hover:border-muted-foreground/30 border-transparent"
+                              ? 'bg-primary/10 border-primary ring-primary/20 scale-95 ring-2'
+                              : 'bg-muted/50 hover:border-muted-foreground/30 border-transparent'
                           }`}
                         >
                           <opt.icon className={`h-5 w-5 ${opt.color}`} />
@@ -348,9 +318,7 @@ const CompanyProfileCultureValuesTab = ({
                           <meta.icon className={`h-5 w-5 ${meta.color}`} />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-foreground font-bold tracking-tight">
-                            {val}
-                          </h4>
+                          <h4 className="text-foreground font-bold tracking-tight">{val}</h4>
                           <p className="text-muted-foreground text-xs">
                             Fundamental principle driving our culture.
                           </p>
@@ -361,9 +329,7 @@ const CompanyProfileCultureValuesTab = ({
                 ) : (
                   <div className="text-muted-foreground flex flex-col items-center justify-center rounded-3xl border-2 border-dashed py-12">
                     <Heart className="mb-3 h-12 w-12 opacity-20" />
-                    <p className="text-sm">
-                      No values specified for this profile.
-                    </p>
+                    <p className="text-sm">No values specified for this profile.</p>
                   </div>
                 )}
               </div>
@@ -378,25 +344,13 @@ const CompanyProfileCultureValuesTab = ({
           <div className="bg-primary/10 text-primary mb-2 inline-flex rounded-2xl p-3">
             <Users className="h-6 w-6" />
           </div>
-          <h3 className="text-2xl font-bold tracking-tight">
-            Our Living Culture
-          </h3>
+          <h3 className="text-2xl font-bold tracking-tight">Our Living Culture</h3>
 
-          {isEditing ? (
-            <FormProvider {...methods}>
-              <WKTextArea
-                name="cultureSummary"
-                label="Culture Summary"
-                placeholder="Culture isn't just what we say; it's what we do..."
-                className="min-h-[150px] resize-none border-white/10 bg-white/5 text-center"
-              />
-            </FormProvider>
-          ) : (
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              {currentProfile.cultureSummary ||
-                "Culture isn't just what we say; it's what we do. By defining our mission and values, we create a compass that guides every hire, every meeting, and every line of code."}
-            </p>
-          )}
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            Culture isn&apos;t just what we say; it&apos;s what we do. By defining our mission and
+            values, we create a compass that guides every hire, every meeting, and every line of
+            code.
+          </p>
         </div>
       </div>
     </TabsContent>

@@ -1,16 +1,14 @@
-"use client";
+'use client';
 
-import { COMPARISON_FEATURES } from "@/constants/pricing";
-import { cn } from "@/lib/utils";
-import { Check, Minus } from "lucide-react";
+import { COMPARISON_FEATURES } from '@/constants/pricing';
+import { cn } from '@/lib/utils';
+import { Check, Minus } from 'lucide-react';
 
 export default function FeatureComparisonTable() {
   return (
     <div className="mt-20 space-y-12">
       <div className="text-center">
-        <h2 className="text-foreground text-3xl font-bold tracking-tight">
-          Compare features
-        </h2>
+        <h2 className="text-foreground text-3xl font-bold tracking-tight">Compare features</h2>
         <p className="text-muted-foreground mt-4">
           Detailed breakdown of what you get with each plan.
         </p>
@@ -49,13 +47,18 @@ export default function FeatureComparisonTable() {
                       {section.category}
                     </td>
                   </tr>
-                  {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    section.features.map((feature: any, fIdx) => (
-                      <tr
-                        key={fIdx}
-                        className="hover:bg-muted/5 transition-colors"
-                      >
+                  {section.features.map(
+                    (
+                      feature: {
+                        name: string;
+                        free: boolean | string;
+                        starter: boolean | string;
+                        pro: boolean | string;
+                        enterprise: boolean | string;
+                      },
+                      fIdx: number,
+                    ) => (
+                      <tr key={fIdx} className="hover:bg-muted/5 transition-colors">
                         <td className="px-6 py-4">
                           <span className="text-foreground text-sm font-medium">
                             {feature.name}
@@ -71,14 +74,11 @@ export default function FeatureComparisonTable() {
                           <ComparisonCell value={feature.pro} />
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <ComparisonCell
-                            value={feature.enterprise}
-                            isEnterprise
-                          />
+                          <ComparisonCell value={feature.enterprise} isEnterprise />
                         </td>
                       </tr>
-                    ))
-                  }
+                    ),
+                  )}
                 </React.Fragment>
               ))}
             </tbody>
@@ -93,33 +93,25 @@ function ComparisonCell({
   value,
   isEnterprise,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
+  value: boolean | string | number;
   isEnterprise?: boolean;
 }) {
   if (value === true)
     return (
       <Check
-        className={cn(
-          "mx-auto h-5 w-5",
-          isEnterprise ? "text-primary" : "text-emerald-500",
-        )}
+        className={cn('mx-auto h-5 w-5', isEnterprise ? 'text-primary' : 'text-emerald-500')}
       />
     );
-  if (value === false)
-    return <Minus className="text-muted-foreground/30 mx-auto h-5 w-5" />;
-  if (value === "-") return <span className="text-muted-foreground/30">-</span>;
+  if (value === false) return <Minus className="text-muted-foreground/30 mx-auto h-5 w-5" />;
+  if (value === '-') return <span className="text-muted-foreground/30">-</span>;
 
   return (
     <span
-      className={cn(
-        "text-sm font-semibold",
-        isEnterprise ? "text-primary" : "text-foreground",
-      )}
+      className={cn('text-sm font-semibold', isEnterprise ? 'text-primary' : 'text-foreground')}
     >
       {value}
     </span>
   );
 }
 
-import React from "react";
+import React from 'react';

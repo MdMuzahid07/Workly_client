@@ -1,20 +1,21 @@
-"use client";
-import WKCheckbox from "@/components/form/WKCheckbox";
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import WKSelect from "@/components/form/WkSelect";
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EducationFormData, educationSchema } from "./profile.validation";
+'use client';
+import WKCheckbox from '@/components/form/WKCheckbox';
+import WKDatePicker from '@/components/form/WKDatePicker';
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import WKSelect from '@/components/form/WkSelect';
+import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EducationFormData, educationSchema } from './profile.validation';
 
 const EDUCATION_LEVELS = [
-  { value: "Secondary", label: "Secondary School / High School" },
-  { value: "Higher Secondary", label: "Higher Secondary / College" },
-  { value: "Bachelor", label: "Bachelor's Degree" },
-  { value: "Master", label: "Master's Degree" },
-  { value: "PhD", label: "Doctorate / PhD" },
-  { value: "Diploma", label: "Diploma" },
-  { value: "Other", label: "Other" },
+  { value: 'Secondary', label: 'Secondary School / High School' },
+  { value: 'Higher Secondary', label: 'Higher Secondary / College' },
+  { value: 'Bachelor', label: "Bachelor's Degree" },
+  { value: 'Master', label: "Master's Degree" },
+  { value: 'PhD', label: 'Doctorate / PhD' },
+  { value: 'Diploma', label: 'Diploma' },
+  { value: 'Other', label: 'Other' },
 ];
 
 interface EducationFormProps {
@@ -33,8 +34,7 @@ export const EducationForm = ({
   return (
     <WkForm<EducationFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
+      defaultValues={defaultValues as unknown as EducationFormData}
       resolver={zodResolver(educationSchema)}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -61,25 +61,11 @@ export const EducationForm = ({
           />
         </div>
 
-        <WKInput
-          name="year"
-          label="Year of Passing"
-          placeholder="e.g. 2024"
-          type="number"
-          required
-        />
-        <WKInput
-          name="result"
-          label="Result / GPA"
-          placeholder="e.g. 3.8/4.0"
-          required
-        />
+        <WKDatePicker name="year" label="Year of Passing" required />
+        <WKInput name="result" label="Result / GPA" placeholder="e.g. 3.8/4.0" required />
 
         <div className="flex items-center pt-2 md:col-span-2">
-          <WKCheckbox
-            name="currentlyStudying"
-            label="I am currently studying here"
-          />
+          <WKCheckbox name="currentlyStudying" label="I am currently studying here" />
         </div>
       </div>
 
@@ -88,7 +74,7 @@ export const EducationForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Education"}
+          {isLoading ? 'Saving...' : 'Save Education'}
         </Button>
       </div>
     </WkForm>

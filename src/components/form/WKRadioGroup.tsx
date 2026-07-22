@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { cn } from "@/lib/utils";
-import { Controller, useFormContext } from "react-hook-form";
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn, getNestedValue } from '@/lib/utils';
+import { Controller, useFormContext } from 'react-hook-form';
 
 interface WKRadioGroupProps {
   name: string;
@@ -11,7 +11,7 @@ interface WKRadioGroupProps {
   options: { value: string; label: string }[];
   required?: boolean;
   className?: string;
-  orientation?: "horizontal" | "vertical";
+  orientation?: 'horizontal' | 'vertical';
 }
 
 const WKRadioGroup = ({
@@ -20,18 +20,19 @@ const WKRadioGroup = ({
   options,
   required = false,
   className,
-  orientation = "vertical",
+  orientation = 'vertical',
 }: WKRadioGroupProps) => {
   const {
     control,
     formState: { errors },
   } = useFormContext();
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <Label className={hasError ? "text-destructive" : ""}>
+    <div className={cn('space-y-2', className)}>
+      <Label className={hasError ? 'text-destructive' : ''}>
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
@@ -44,20 +45,14 @@ const WKRadioGroup = ({
             onValueChange={field.onChange}
             value={field.value}
             className={cn(
-              orientation === "horizontal" && "flex gap-4",
-              hasError && "text-destructive",
+              orientation === 'horizontal' && 'flex gap-4',
+              hasError && 'text-destructive',
             )}
           >
             {options.map((option) => (
               <div key={option.value} className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={option.value}
-                  id={`${name}-${option.value}`}
-                />
-                <Label
-                  htmlFor={`${name}-${option.value}`}
-                  className="cursor-pointer font-normal"
-                >
+                <RadioGroupItem value={option.value} id={`${name}-${option.value}`} />
+                <Label htmlFor={`${name}-${option.value}`} className="cursor-pointer font-normal">
                   {option.label}
                 </Label>
               </div>
@@ -65,11 +60,7 @@ const WKRadioGroup = ({
           </RadioGroup>
         )}
       />
-      {hasError && (
-        <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
-        </p>
-      )}
+      {hasError && <p className="text-destructive text-sm">{fieldError?.message as string}</p>}
     </div>
   );
 };

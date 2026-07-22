@@ -1,47 +1,39 @@
-"use client";
+'use client';
 
-import { UserRole } from "@/redux/feature/auth/authSlice";
-import { useAppSelector } from "@/redux/hooks";
-import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
-import AdminSidebar from "./dashboard-nav/AdminSidebar";
-import EmployerSidebar from "./dashboard-nav/EmployerSidebar";
-import JobSeekerSidebar from "./dashboard-nav/JobSeekerSidebar";
+import { UserRole } from '@/redux/feature/auth/authSlice';
+import { useAppSelector } from '@/redux/hooks';
+import { usePathname, useRouter } from 'next/navigation';
+import { ReactNode, useEffect, useState } from 'react';
+import AdminSidebar from './dashboard-nav/AdminSidebar';
+import EmployerSidebar from './dashboard-nav/EmployerSidebar';
+import JobSeekerSidebar from './dashboard-nav/JobSeekerSidebar';
+import SubscriptionExpiryModal from './SubscriptionExpiryModal';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 
-export default function DashboardLayoutClient({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function DashboardLayoutClient({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, accessToken } = useAppSelector((state) => state.auth) || {};
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const isEmployer =
-    user?.role === UserRole.EMPLOYER || (user?.role as number) === 1;
-  const isAdmin = user?.role === UserRole.ADMIN || (user?.role as number) === 2;
+  const isEmployer = user?.role === UserRole.EMPLOYER;
+  const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isJobSeeker =
-    user?.role === UserRole.JOB_SEEKER ||
-    (user?.role as number) === 0 ||
-    (!isEmployer && !isAdmin);
+  const isJobSeeker = user?.role === UserRole.JOB_SEEKER || (!isEmployer && !isAdmin);
 
-  const isEmployerPath = pathname?.startsWith("/employer");
-  const isDashboardPath = pathname?.startsWith("/dashboard");
-  const isAdminPath = pathname?.startsWith("/admin");
+  const isEmployerPath = pathname?.startsWith('/employer');
+  const isDashboardPath = pathname?.startsWith('/dashboard');
+  const isAdminPath = pathname?.startsWith('/admin');
 
   useEffect(() => {
     if (!isMounted) return;
 
     // Check for token in localStorage (Redux Persist stores auth there)
-    const hasStoredToken =
-      typeof window !== "undefined" && localStorage.getItem("accessToken");
+    const hasStoredToken = typeof window !== 'undefined' && localStorage.getItem('accessToken');
     const hasToken = accessToken || hasStoredToken;
 
     // Check if user exists (check for email or id since login might not include id)
@@ -49,22 +41,22 @@ export default function DashboardLayoutClient({
 
     // If no user and no token, user is not authenticated - redirect to home
     if (!hasUser && !hasToken) {
-      router.replace("/");
+      router.replace('/');
       return;
     }
 
     // If user exists, handle role-based redirects
     if (hasUser) {
       if (isEmployerPath && !isEmployer) {
-        router.replace(isAdmin ? "/admin" : "/dashboard");
+        router.replace(isAdmin ? '/admin' : '/dashboard');
         return;
       }
       if (isDashboardPath && (isEmployer || isAdmin)) {
-        router.replace(isEmployer ? "/employer" : "/admin");
+        router.replace(isEmployer ? '/employer' : '/admin');
         return;
       }
       if (isAdminPath && !isAdmin) {
-        router.replace(isEmployer ? "/employer" : "/dashboard");
+        router.replace(isEmployer ? '/employer' : '/dashboard');
         return;
       }
     }
@@ -88,11 +80,10 @@ export default function DashboardLayoutClient({
     if (!isMounted) return;
 
     const timeout = setTimeout(() => {
-      const hasStoredToken =
-        typeof window !== "undefined" && localStorage.getItem("accessToken");
+      const hasStoredToken = typeof window !== 'undefined' && localStorage.getItem('accessToken');
       const hasUser = user && (user.email || user.id);
       if (!hasUser && !hasStoredToken) {
-        router.replace("/");
+        router.replace('/');
       }
     }, 3000);
 
@@ -109,8 +100,7 @@ export default function DashboardLayoutClient({
   }
 
   // Check if user should be authenticated (has token but user not loaded yet = rehydrating)
-  const hasStoredToken =
-    typeof window !== "undefined" && localStorage.getItem("accessToken");
+  const hasStoredToken = typeof window !== 'undefined' && localStorage.getItem('accessToken');
   const hasUser = user && (user.email || user.id);
   const isRehydrating = hasStoredToken && !hasUser;
 
@@ -133,38 +123,42 @@ export default function DashboardLayoutClient({
 
   if (isEmployerPath) {
     return (
-      <div className="bg-background min-h-screen">
-        <EmployerSidebar
-          isOpen={isSidebarOpen}
-          onOpenChange={setIsSidebarOpen}
-        />
-        <div className="bg-background lg:pl-64">
-          <main className="min-h-screen w-full">{children}</main>
-        </div>
-      </div>
+      <SidebarProvider>
+        <EmployerSidebar />
+        <SidebarInset className="dark:bg-background min-h-screen w-full min-w-0 bg-slate-100">
+          {children}
+        </SidebarInset>
+        <SubscriptionExpiryModal />
+      </SidebarProvider>
     );
   }
 
   if (isAdminPath) {
-    return (
-      <div className="bg-background min-h-screen">
-        <AdminSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
-        <div className="bg-background lg:pl-64">
-          <main className="min-h-screen w-full">{children}</main>
+    if (!isAdmin) {
+      return (
+        <div className="bg-primary/2 flex min-h-screen items-center justify-center">
+          <p className="text-muted-foreground">Redirecting...</p>
         </div>
-      </div>
+      );
+    }
+
+    return (
+      <SidebarProvider>
+        <AdminSidebar />
+        <SidebarInset className="dark:bg-background min-h-screen w-full min-w-0 bg-slate-100">
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <JobSeekerSidebar
-        isOpen={isSidebarOpen}
-        onOpenChange={setIsSidebarOpen}
-      />
-      <div className="bg-background lg:pl-64">
-        <main className="min-h-screen w-full">{children}</main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <JobSeekerSidebar />
+      <SidebarInset className="dark:bg-background min-h-screen w-full min-w-0 bg-slate-100">
+        {children}
+      </SidebarInset>
+      <SubscriptionExpiryModal />
+    </SidebarProvider>
   );
 }

@@ -1,25 +1,25 @@
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { Button } from "../../../ui/button";
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '../../../ui/button';
 
 const ApplyJobHeader = ({ jobTitle }: { jobTitle: string }) => {
   return (
-    <div className="border-border bg-background/95 supports-backdrop-filter:bg-background/60 border-b backdrop-blur">
-      <div className="container mx-auto px-4 py-4 sm:px-6">
-        <div className="flex items-center gap-4">
-          <Link href="/jobs">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-10 w-10 bg-transparent"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Apply for Job</h1>
-            <p className="text-muted-foreground text-sm">{jobTitle}</p>
-          </div>
+    <div className="bg-card rounded-xl border p-4 sm:p-6">
+      <div className="flex items-center gap-4 sm:gap-5">
+        <Link href="/jobs">
+          <Button
+            variant="outline"
+            size="icon"
+            className="hover:bg-accent hover:text-accent-foreground h-10 w-10 rounded-full transition-all sm:h-12 sm:w-12"
+          >
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl">
+            Apply for Job
+          </h1>
+          <p className="text-muted-foreground mt-1 text-xs font-medium sm:text-sm">{jobTitle}</p>
         </div>
       </div>
     </div>

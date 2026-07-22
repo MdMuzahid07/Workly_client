@@ -39,6 +39,3 @@ next-env.d.ts
 # OS artifacts
 .DS_Store
 Thumbs.db
-
-# Scripts
-/scripts/precommit.mjs

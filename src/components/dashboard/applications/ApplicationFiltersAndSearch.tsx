@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Search } from "lucide-react";
+} from '@/components/ui/select';
+import { Search } from 'lucide-react';
 
 interface ApplicationFiltersAndSearchProps {
   searchQuery: string;
@@ -19,6 +19,9 @@ interface ApplicationFiltersAndSearchProps {
   selectedStatus: string;
   onStatusChange: (value: string) => void;
   onClearFilters: () => void;
+  jobs?: Array<{ id: string; title: string }>;
+  statuses?: Array<{ value: string; label: string }>;
+  hasActiveFilters?: boolean;
 }
 
 const ApplicationFiltersAndSearch = ({
@@ -29,6 +32,9 @@ const ApplicationFiltersAndSearch = ({
   selectedStatus,
   onStatusChange,
   onClearFilters,
+  jobs = [],
+  statuses = [],
+  hasActiveFilters = false,
 }: ApplicationFiltersAndSearchProps) => {
   return (
     <div className="bg-card flex flex-col gap-4 rounded-2xl border p-4 md:flex-row md:items-center md:justify-between md:p-6">
@@ -50,18 +56,11 @@ const ApplicationFiltersAndSearch = ({
             <SelectItem className="cursor-pointer" value="all">
               All Jobs
             </SelectItem>
-            <SelectItem className="cursor-pointer" value="senior-frontend">
-              Senior Frontend Developer
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="backend-engineer">
-              Backend Engineer
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="product-manager">
-              Product Manager
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="ux-designer">
-              UX Designer
-            </SelectItem>
+            {jobs.map((job) => (
+              <SelectItem className="cursor-pointer" key={job.id} value={job.id}>
+                {job.title}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -73,31 +72,15 @@ const ApplicationFiltersAndSearch = ({
             <SelectItem className="cursor-pointer" value="all">
               All Statuses
             </SelectItem>
-            <SelectItem className="cursor-pointer" value="submitted">
-              Submitted
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="reviewing">
-              Reviewing
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="shortlisted">
-              Shortlisted
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="interviewed">
-              Interviewed
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="rejected">
-              Rejected
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="offered">
-              Offered
-            </SelectItem>
-            <SelectItem className="cursor-pointer" value="accepted">
-              Accepted
-            </SelectItem>
+            {statuses.map((status) => (
+              <SelectItem className="cursor-pointer" key={status.value} value={status.value}>
+                {status.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
-        <Button variant="outline" onClick={onClearFilters}>
+        <Button variant="outline" onClick={onClearFilters} disabled={!hasActiveFilters}>
           Clear Filters
         </Button>
       </div>

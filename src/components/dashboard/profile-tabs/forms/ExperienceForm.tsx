@@ -1,27 +1,24 @@
-"use client";
-import WKCheckbox from "@/components/form/WKCheckbox";
-import WKDatePicker from "@/components/form/WKDatePicker";
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import WKSelect from "@/components/form/WkSelect";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
+import WKCheckbox from '@/components/form/WKCheckbox';
+import WKDatePicker from '@/components/form/WKDatePicker';
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import WKSelect from '@/components/form/WkSelect';
 
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useWatch } from "react-hook-form";
-import {
-  EMPLOYMENT_TYPES,
-  ExperienceFormData,
-  experienceSchema,
-} from "./profile.validation";
-import WKTextArea from "../../../form/WkTextArea";
+import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useWatch } from 'react-hook-form';
+import { EMPLOYMENT_TYPES, ExperienceFormData, experienceSchema } from './profile.validation';
+import WKTextArea from '../../../form/WkTextArea';
 
 // Helper component to conditionally disable end date
 const ExperienceDateFields = () => {
-  const currentlyWorking = useWatch({ name: "currentlyWorking" });
+  const currentlyWorking = useWatch({ name: 'currentlyWorking' });
   return (
     <>
       <WKDatePicker name="startDate" label="Start Date" required />
-      <div className={currentlyWorking ? "pointer-events-none opacity-50" : ""}>
+      <div className={currentlyWorking ? 'pointer-events-none opacity-50' : ''}>
         <WKDatePicker name="endDate" label="End Date" />
       </div>
     </>
@@ -49,10 +46,8 @@ export const ExperienceForm = ({
   return (
     <WkForm<ExperienceFormData>
       onSubmit={onSubmit}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultValues={defaultValues as any}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      resolver={zodResolver(experienceSchema as any)}
+      defaultValues={defaultValues as unknown as ExperienceFormData}
+      resolver={zodResolver(experienceSchema) as any}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <WKInput
@@ -74,19 +69,12 @@ export const ExperienceForm = ({
           placeholder="Select Type"
           options={employmentTypeOptions}
         />
-        <WKInput
-          name="location"
-          label="Location"
-          placeholder="e.g. Remote / New York"
-        />
+        <WKInput name="location" label="Location" placeholder="e.g. Remote / New York" />
 
         <ExperienceDateFields />
 
         <div className="pt-2 md:col-span-2">
-          <WKCheckbox
-            name="currentlyWorking"
-            label="I am currently working here"
-          />
+          <WKCheckbox name="currentlyWorking" label="I am currently working here" />
         </div>
 
         <div className="md:col-span-2">
@@ -104,7 +92,7 @@ export const ExperienceForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Experience"}
+          {isLoading ? 'Saving...' : 'Save Experience'}
         </Button>
       </div>
     </WkForm>

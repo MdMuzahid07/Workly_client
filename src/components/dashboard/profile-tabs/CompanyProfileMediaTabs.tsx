@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-import { SectionCard } from "@/components/main/profile/SectionCard";
-import { useUploadSingleFileMutation } from "@/redux/feature/upload/uploadApi";
-import { TabsContent } from "@radix-ui/react-tabs";
+'use client';
+import { SectionCard } from '@/components/main/profile/SectionCard';
+import { useUploadLogoMutation, useUploadCoverMutation } from '@/redux/feature/upload/uploadApi';
+import { useCompressedUpload } from '@/hooks/useCompressedUpload';
+import { TabsContent } from '@radix-ui/react-tabs';
 import {
   Camera,
   Image as ImageIcon,
@@ -12,12 +12,13 @@ import {
   ShieldCheck,
   Upload,
   X,
-} from "lucide-react";
-import Image from "next/image";
-import { useRef } from "react";
-import { toast } from "sonner";
-import { Button } from "../../ui/button";
-import { CardDescription } from "../../ui/card";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useRef } from 'react';
+import { Button } from '../../ui/button';
+import { CardDescription } from '../../ui/card';
+
+import type { CompanyProfile } from '@/types/company-profile';
 
 const CompanyProfileMediaTabs = ({
   isEditing,
@@ -26,64 +27,66 @@ const CompanyProfileMediaTabs = ({
   editedProfile,
 }: {
   isEditing: boolean;
-  currentProfile: any;
-  updateField: (field: string, value: any) => void;
-  editedProfile: any;
+  currentProfile: CompanyProfile;
+  updateField: (field: string, value: unknown) => void;
+  editedProfile: Partial<CompanyProfile>;
 }) => {
-  const [uploadFile, { isLoading: isUploading }] =
-    useUploadSingleFileMutation();
+  const [uploadLogo] = useUploadLogoMutation();
+  const [uploadCover] = useUploadCoverMutation();
+  const { upload: uploadLogoCompressed, isProcessing: isUploadingLogo } =
+    useCompressedUpload('logo');
+  const { upload: uploadCoverCompressed, isProcessing: isUploadingCover } =
+    useCompressedUpload('cover');
+  const isUploading = isUploadingLogo || isUploadingCover;
+
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: "logoUrl" | "coverUrl",
+    field: 'logoUrl' | 'coverUrl',
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size should be less than 5MB");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Only image files are allowed");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await uploadFile(formData).unwrap();
-      if (res.success && res.data?.url) {
-        updateField(field, res.data.url);
-        toast.success(
-          `${field === "logoUrl" ? "Logo" : "Cover image"} updated`,
+      let res;
+      if (field === 'logoUrl') {
+        res = await uploadLogoCompressed(
+          file,
+          (formData) => uploadLogo(formData).unwrap(),
+          'Logo updated',
           {
-            description: "Changes will be permanent once you save the profile.",
+            description: 'Changes will be permanent once you save the profile.',
+          },
+        );
+      } else {
+        res = await uploadCoverCompressed(
+          file,
+          (formData) => uploadCover(formData).unwrap(),
+          'Cover image updated',
+          {
+            description: 'Changes will be permanent once you save the profile.',
           },
         );
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+      if (res.success && res.data?.url) {
+        updateField(field, res.data.url);
+      }
     } catch (error) {
-      toast.error("Upload failed. Please try again.");
+      console.error('Upload error:', error);
     }
   };
 
-  const logoUrl = editedProfile.logoUrl || currentProfile.logoUrl;
-  const coverUrl = editedProfile.coverUrl || currentProfile.coverUrl;
+  const logoUrl = editedProfile?.logoUrl || currentProfile?.logoUrl;
+  const coverUrl = editedProfile?.coverUrl || currentProfile?.coverUrl;
 
   return (
     <TabsContent value="media" className="space-y-10 focus:outline-none">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Logo Section */}
-        <SectionCard
-          title="Brand Logo"
-          isCompleted={!!logoUrl}
-          className="lg:col-span-1"
-        >
+        <SectionCard title="Brand Logo" isCompleted={!!logoUrl} className="lg:col-span-1">
           <div className="space-y-6">
             <CardDescription>
               Your logo appears on job listings and your public profile.
@@ -110,9 +113,7 @@ const CompanyProfileMediaTabs = ({
                       className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100"
                     >
                       <Camera className="mb-1 h-8 w-8" />
-                      <span className="text-[10px] font-bold uppercase">
-                        Update
-                      </span>
+                      <span className="text-[10px] font-bold uppercase">Update</span>
                     </div>
                   )}
 
@@ -124,7 +125,7 @@ const CompanyProfileMediaTabs = ({
                 </div>
                 {isEditing && logoUrl && (
                   <button
-                    onClick={() => updateField("logoUrl", "")}
+                    onClick={() => updateField('logoUrl', '')}
                     className="bg-destructive absolute -top-2 -right-2 rounded-full p-1.5 text-white shadow-lg transition-transform hover:scale-110"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -139,8 +140,7 @@ const CompanyProfileMediaTabs = ({
                   onClick={() => logoInputRef.current?.click()}
                   className="w-full gap-2 rounded-xl"
                 >
-                  <Upload className="h-4 w-4" />{" "}
-                  {logoUrl ? "Change Logo" : "Upload Logo"}
+                  <Upload className="h-4 w-4" /> {logoUrl ? 'Change Logo' : 'Upload Logo'}
                 </Button>
               )}
               <p className="text-muted-foreground text-center text-[10px] font-bold tracking-widest uppercase">
@@ -150,7 +150,7 @@ const CompanyProfileMediaTabs = ({
             <input
               type="file"
               ref={logoInputRef}
-              onChange={(e) => handleFileChange(e, "logoUrl")}
+              onChange={(e) => handleFileChange(e, 'logoUrl')}
               accept="image/*"
               className="hidden"
             />
@@ -158,26 +158,16 @@ const CompanyProfileMediaTabs = ({
         </SectionCard>
 
         {/* Cover Section */}
-        <SectionCard
-          title="Profile Header"
-          isCompleted={!!coverUrl}
-          className="lg:col-span-2"
-        >
+        <SectionCard title="Profile Header" isCompleted={!!coverUrl} className="lg:col-span-2">
           <div className="space-y-6">
             <CardDescription>
-              Set a background image to convey your company culture and
-              atmosphere.
+              Set a background image to convey your company culture and atmosphere.
             </CardDescription>
 
             <div className="group relative">
               <div className="border-primary/20 bg-primary/5 group-hover:border-primary/50 group-hover:bg-primary/10 flex aspect-3/1 items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed transition-all">
                 {coverUrl ? (
-                  <Image
-                    src={coverUrl}
-                    alt="Cover"
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={coverUrl} alt="Cover" fill className="object-cover" />
                 ) : (
                   <div className="text-primary/20 flex flex-col items-center gap-3">
                     <ImageIcon className="h-16 w-16" />
@@ -207,7 +197,7 @@ const CompanyProfileMediaTabs = ({
               </div>
               {isEditing && coverUrl && (
                 <button
-                  onClick={() => updateField("coverUrl", "")}
+                  onClick={() => updateField('coverUrl', '')}
                   className="bg-destructive absolute top-4 right-4 rounded-full p-2 text-white shadow-lg transition-transform hover:scale-110"
                 >
                   <X className="h-4 w-4" />
@@ -231,7 +221,7 @@ const CompanyProfileMediaTabs = ({
             <input
               type="file"
               ref={coverInputRef}
-              onChange={(e) => handleFileChange(e, "coverUrl")}
+              onChange={(e) => handleFileChange(e, 'coverUrl')}
               accept="image/*"
               className="hidden"
             />
@@ -245,16 +235,14 @@ const CompanyProfileMediaTabs = ({
           <ShieldCheck className="text-primary h-6 w-6" />
           <h4 className="text-sm font-bold">Verified Assets</h4>
           <p className="text-muted-foreground text-xs">
-            Uploaded media is scanned for security and optimized for
-            performance.
+            Uploaded media is scanned for security and optimized for performance.
           </p>
         </div>
         <div className="space-y-3 rounded-3xl border border-blue-500/10 bg-blue-500/5 p-6">
           <Palette className="h-6 w-6 text-blue-500" />
           <h4 className="text-sm font-bold">Color Consistency</h4>
           <p className="text-muted-foreground text-xs">
-            Our platform automatically adapts UI colors to complement your
-            branding.
+            Our platform automatically adapts UI colors to complement your branding.
           </p>
         </div>
         <div className="space-y-3 rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6">

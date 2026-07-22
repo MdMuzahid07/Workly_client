@@ -1,5 +1,5 @@
-import { Metadata } from "next";
-import CompanyDetailsView from "../../../../view/company/CompanyDetailsView";
+import { Metadata } from 'next';
+import CompanyDetailsView from '../../../../view/company/details/CompanyDetailsView';
 
 export const revalidate = 3600;
 
@@ -12,6 +12,8 @@ export type CompanyDetails = {
   logoUrl: string;
   coverUrl: string;
   location: string;
+  mission: string;
+  values: string[];
   industry: {
     id: string;
     name: string;
@@ -21,6 +23,7 @@ export type CompanyDetails = {
   contactEmail: string;
   contactPhone: string;
   isVerified: boolean;
+  founded: string;
   socialLinks: Array<{
     id: string;
     platform: string;
@@ -53,6 +56,8 @@ export type CompanyDetails = {
   createdAt: string;
 };
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
 export async function generateMetadata({
   params,
 }: {
@@ -61,16 +66,13 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/company/company/${slug}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: revalidate },
+    const res = await fetch(`${BACKEND_URL}/api/v1/company/company/${slug}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      next: { revalidate: revalidate },
+    });
 
     if (res.ok) {
       const data = await res.json();
@@ -87,64 +89,20 @@ export async function generateMetadata({
       };
     }
   } catch (error) {
-    console.error("Error generating metadata:", error);
+    console.error('Error generating metadata:', error);
   }
 
   return {
-    title: "Company Details",
+    title: 'Company Details',
   };
 }
 
-const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
-  const { slug } = await params;
-
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/company/company/${slug}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: revalidate },
-      },
-    );
-
-    if (!res.ok) {
-      return (
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600">
-              Failed to load company
-            </h1>
-            <p className="text-gray-600">Status: {res.status}</p>
-          </div>
-        </div>
-      );
-    }
-
-    const company = await res.json();
-    const companyDetails = company.data as CompanyDetails;
-
-    return (
-      <>
-        <CompanyDetailsView companyDetails={companyDetails} />
-      </>
-    );
-  } catch (error) {
-    console.error("Error fetching company:", error);
-
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">
-            Something went wrong
-          </h1>
-          <p className="text-gray-600">Please try again later</p>
-        </div>
-      </div>
-    );
-  }
+const page = () => {
+  return (
+    <>
+      <CompanyDetailsView />
+    </>
+  );
 };
 
 export default page;

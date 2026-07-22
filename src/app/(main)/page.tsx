@@ -1,9 +1,9 @@
-import { Metadata } from "next";
-import LandingView from "../../view/landing/LandingView";
+import { Metadata } from 'next';
+import LandingView from '../../view/landing/home/LandingView';
 
 export const metadata: Metadata = {
-  title: "Workly_job",
-  description: "Find the perfect job for you",
+  title: 'Workly_job',
+  description: 'Find the perfect job for you',
 };
 
 const page = () => {

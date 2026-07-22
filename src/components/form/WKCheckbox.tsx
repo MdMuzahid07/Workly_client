@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { Controller, useFormContext } from "react-hook-form";
+import { Label } from '@/components/ui/label';
+import { cn, getNestedValue } from '@/lib/utils';
+import { Controller, useFormContext } from 'react-hook-form';
 
 interface WKCheckboxProps {
   name: string;
@@ -12,22 +12,17 @@ interface WKCheckboxProps {
   description?: string;
 }
 
-const WKCheckbox = ({
-  name,
-  label,
-  className,
-  disabled = false,
-  description,
-}: WKCheckboxProps) => {
+const WKCheckbox = ({ name, label, className, disabled = false, description }: WKCheckboxProps) => {
   const {
     control,
     formState: { errors },
   } = useFormContext();
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn('space-y-2', className)}>
       <div className="flex items-center gap-2">
         <Controller
           name={name}
@@ -37,9 +32,9 @@ const WKCheckbox = ({
               type="checkbox"
               id={name}
               className={cn(
-                "h-4 w-4 cursor-pointer rounded text-green-600",
-                disabled && "cursor-not-allowed opacity-50",
-                hasError && "border-destructive",
+                'h-4 w-4 cursor-pointer rounded text-green-600',
+                disabled && 'cursor-not-allowed opacity-50',
+                hasError && 'border-destructive',
               )}
               checked={field.value || false}
               onChange={field.onChange}
@@ -50,9 +45,9 @@ const WKCheckbox = ({
         <Label
           htmlFor={name}
           className={cn(
-            "cursor-pointer font-normal",
-            disabled && "cursor-not-allowed opacity-50",
-            hasError && "text-destructive",
+            'cursor-pointer font-normal',
+            disabled && 'cursor-not-allowed opacity-50',
+            hasError && 'text-destructive',
           )}
         >
           {label}
@@ -61,11 +56,7 @@ const WKCheckbox = ({
       {description && !hasError && (
         <p className="text-muted-foreground ml-6 text-sm">{description}</p>
       )}
-      {hasError && (
-        <p className="text-destructive ml-6 text-sm">
-          {errors[name]?.message as string}
-        </p>
-      )}
+      {hasError && <p className="text-destructive ml-6 text-sm">{fieldError?.message as string}</p>}
     </div>
   );
 };

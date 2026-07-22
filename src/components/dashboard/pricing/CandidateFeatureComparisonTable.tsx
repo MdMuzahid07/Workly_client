@@ -1,0 +1,114 @@
+'use client';
+
+import { CANDIDATE_COMPARISON_FEATURES } from '@/constants/pricing';
+import { cn } from '@/lib/utils';
+import { Check, Minus } from 'lucide-react';
+import React from 'react';
+
+export default function CandidateFeatureComparisonTable() {
+  return (
+    <div className="mt-20 space-y-12">
+      <div className="text-center">
+        <h2 className="text-foreground text-3xl font-bold tracking-tight">
+          Compare Seeker features
+        </h2>
+        <p className="text-muted-foreground mt-4">
+          Detailed breakdown of what you get with each subscription package.
+        </p>
+      </div>
+
+      <div className="bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="bg-muted/30 border-b">
+                <th className="text-muted-foreground px-6 py-5 text-sm font-bold tracking-wider uppercase">
+                  Capabilities
+                </th>
+                <th className="text-muted-foreground px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
+                  Free
+                </th>
+                <th className="text-primary px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
+                  Starter
+                </th>
+                <th className="text-muted-foreground px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
+                  Pro
+                </th>
+                <th className="text-muted-foreground px-6 py-5 text-center text-sm font-bold tracking-wider uppercase">
+                  Premium
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {CANDIDATE_COMPARISON_FEATURES.map((section, sIdx) => (
+                <React.Fragment key={sIdx}>
+                  <tr className="bg-muted/10">
+                    <td
+                      colSpan={5}
+                      className="text-primary/60 px-6 py-3 text-xs font-black tracking-widest uppercase"
+                    >
+                      {section.category}
+                    </td>
+                  </tr>
+                  {section.features.map(
+                    (
+                      feature: {
+                        name: string;
+                        free: boolean | string;
+                        starter: boolean | string;
+                        pro: boolean | string;
+                        premium: boolean | string;
+                      },
+                      fIdx: number,
+                    ) => (
+                      <tr key={fIdx} className="hover:bg-muted/5 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="text-foreground text-sm font-medium">
+                            {feature.name}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <ComparisonCell value={feature.free} />
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <ComparisonCell value={feature.starter} isPrimary />
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <ComparisonCell value={feature.pro} />
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <ComparisonCell value={feature.premium} />
+                        </td>
+                      </tr>
+                    ),
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ComparisonCell({
+  value,
+  isPrimary,
+}: {
+  value: boolean | string | number;
+  isPrimary?: boolean;
+}) {
+  if (value === true)
+    return (
+      <Check className={cn('mx-auto h-5 w-5', isPrimary ? 'text-primary' : 'text-emerald-500')} />
+    );
+  if (value === false) return <Minus className="text-muted-foreground/30 mx-auto h-5 w-5" />;
+  if (value === '-') return <span className="text-muted-foreground/30">-</span>;
+
+  return (
+    <span className={cn('text-sm font-semibold', isPrimary ? 'text-primary' : 'text-foreground')}>
+      {value}
+    </span>
+  );
+}

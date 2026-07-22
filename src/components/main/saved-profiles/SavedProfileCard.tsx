@@ -1,21 +1,22 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { SavedProfile } from "@/data/mockSavedProfiles";
-import { motion } from "framer-motion";
+} from '@/components/ui/dropdown-menu';
+import type { Availability, Skill, UserProfileData } from '@/types/profile';
 import {
   Bookmark,
   BookmarkCheck,
   ExternalLink,
+  Facebook,
   FileText,
+  Github,
   Globe,
   Linkedin,
   Mail,
@@ -23,30 +24,75 @@ import {
   MoreVertical,
   Phone,
   Trash2,
+  Twitter,
   User,
-} from "lucide-react";
-import Image from "next/image";
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+const availabilityLabels: Record<Availability, string> = {
+  immediate: 'Immediate',
+  '2_weeks': '2 Weeks',
+  '1_month': '1 Month',
+  not_available: 'Not Available',
+};
+
+const availabilityColors: Record<Availability, string> = {
+  immediate: 'bg-success/10 text-success border-success/20',
+  '2_weeks': 'bg-primary/10 text-primary border-primary/20',
+  '1_month': 'bg-warning/10 text-warning border-warning/20',
+  not_available: 'bg-muted text-muted-foreground border-border',
+};
 
 interface SavedProfileCardProps {
-  profile: SavedProfile;
+  profile: UserProfileData;
   index: number;
+  onRemove?: () => void;
+  onShortlist?: () => void;
 }
 
-const availabilityLabels = {
-  immediate: "Immediate",
-  "2_weeks": "2 Weeks",
-  "1_month": "1 Month",
-  not_available: "Not Available",
-};
+const SavedProfileCard = ({
+  profile: rawProfile,
+  index,
+  onRemove,
+  onShortlist,
+}: SavedProfileCardProps) => {
+  // Map real user data to the expected profile structure
+  const profile = {
+    id: rawProfile.id,
+    candidateName: rawProfile.fullName,
+    candidateAvatar: rawProfile.profile?.avatarUrl,
+    currentPosition: rawProfile.profile?.headline || 'Professional Candidate',
+    location: rawProfile.profile?.location || 'Not Specified',
+    experience: `${rawProfile.profile?.totalExperienceYears || 0} Years`,
+    savedDate: rawProfile.savedAt || new Date().toISOString(),
+    email: rawProfile.email,
+    phone: rawProfile.profile?.phone,
+    skills: rawProfile.profile?.skills || [],
+    education: rawProfile.profile?.education?.[0]
+      ? `${rawProfile.profile.education[0].degree} - ${rawProfile.profile.education[0].institution ?? rawProfile.profile.education[0].institute}`
+      : 'Not Specified',
+    summary: rawProfile.profile?.bio || 'No biography provided.',
+    resumeUrl: rawProfile.profile?.resumeUrl,
+    videoResumeUrl: rawProfile.profile?.videoResumeUrl,
+    linkedinUrl: rawProfile.profile?.linkedInUrl,
+    portfolioUrl: rawProfile.profile?.websiteUrl,
+    githubUrl: rawProfile.profile?.githubUrl,
+    twitterUrl: rawProfile.profile?.twitterUrl,
+    facebookUrl: rawProfile.profile?.facebookUrl,
+    availability: ((rawProfile.profile?.preference?.availability?.toLowerCase() as Availability) ||
+      'immediate') satisfies Availability,
+    salaryExpectation: rawProfile.profile?.preference?.expectedSalary
+      ? {
+          min: rawProfile.profile.preference.expectedSalary,
+          max: rawProfile.profile.preference.expectedSalary,
+          currency: '$',
+        }
+      : undefined,
+    tags: rawProfile.profile?.preference?.tags || [],
+  };
 
-const availabilityColors = {
-  immediate: "bg-success/10 text-success border-success/20",
-  "2_weeks": "bg-primary/10 text-primary border-primary/20",
-  "1_month": "bg-warning/10 text-warning border-warning/20",
-  not_available: "bg-muted text-muted-foreground border-border",
-};
-
-const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -98,20 +144,22 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
             {/* Actions Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-muted h-8 w-8 rounded-full"
-                >
+                <Button variant="ghost" size="icon" className="hover:bg-muted h-8 w-8 rounded-full">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
-                <DropdownMenuItem className="h-10 cursor-pointer rounded-lg font-medium">
+                <DropdownMenuItem
+                  onClick={onShortlist}
+                  className="h-10 cursor-pointer rounded-lg font-medium"
+                >
                   <BookmarkCheck className="mr-2 h-4 w-4" />
                   Move to Shortlist
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium">
+                <DropdownMenuItem
+                  onClick={onRemove}
+                  className="text-destructive focus:text-destructive h-10 cursor-pointer rounded-lg font-medium"
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Remove Profile
                 </DropdownMenuItem>
@@ -128,9 +176,9 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
 
           {/* Skills */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {profile.skills.slice(0, 5).map((skill) => (
+            {profile.skills.slice(0, 5).map((skill: Skill) => (
               <Badge
-                key={skill.id}
+                key={skill.id ?? skill.skillName}
                 variant="secondary"
                 className="bg-primary/10 text-primary rounded-lg border-none px-2.5 py-1 text-xs font-bold"
               >
@@ -138,10 +186,7 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
               </Badge>
             ))}
             {profile.skills.length > 5 && (
-              <Badge
-                variant="outline"
-                className="rounded-lg px-2.5 py-1 text-xs font-bold"
-              >
+              <Badge variant="outline" className="rounded-lg px-2.5 py-1 text-xs font-bold">
                 +{profile.skills.length - 5} more
               </Badge>
             )}
@@ -150,7 +195,7 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
           {/* Tags */}
           {profile.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
-              {profile.tags.map((tag, idx) => (
+              {profile.tags.map((tag: string, idx: number) => (
                 <div
                   key={idx}
                   className="bg-muted/50 text-muted-foreground rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase"
@@ -170,9 +215,7 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
               <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
                 Education
               </span>
-              <p className="line-clamp-1 text-xs font-bold">
-                {profile.education}
-              </p>
+              <p className="line-clamp-1 text-xs font-bold">{profile.education}</p>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
@@ -194,7 +237,7 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
               </span>
               <p className="text-primary mt-1 text-sm font-bold">
                 {profile.salaryExpectation.currency}
-                {profile.salaryExpectation.min.toLocaleString()} -{" "}
+                {profile.salaryExpectation.min.toLocaleString()} -{' '}
                 {profile.salaryExpectation.currency}
                 {profile.salaryExpectation.max.toLocaleString()}
               </p>
@@ -207,7 +250,6 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
           {/* Contact & Links */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
-              {/* Email */}
               <a
                 href={`mailto:${profile.email}`}
                 className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
@@ -215,8 +257,6 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
                 <Mail className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Email</span>
               </a>
-
-              {/* Phone */}
               {profile.phone && (
                 <a
                   href={`tel:${profile.phone}`}
@@ -226,8 +266,6 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
                   <span className="hidden sm:inline">Call</span>
                 </a>
               )}
-
-              {/* LinkedIn */}
               {profile.linkedinUrl && (
                 <a
                   href={profile.linkedinUrl}
@@ -239,8 +277,17 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
                   <span className="hidden sm:inline">LinkedIn</span>
                 </a>
               )}
-
-              {/* Portfolio */}
+              {profile.githubUrl && (
+                <a
+                  href={profile.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
+                >
+                  <Github className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">GitHub</span>
+                </a>
+              )}
               {profile.portfolioUrl && (
                 <a
                   href={profile.portfolioUrl}
@@ -252,6 +299,28 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
                   <span className="hidden sm:inline">Portfolio</span>
                 </a>
               )}
+              {profile.twitterUrl && (
+                <a
+                  href={profile.twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
+                >
+                  <Twitter className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Twitter</span>
+                </a>
+              )}
+              {profile.facebookUrl && (
+                <a
+                  href={profile.facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-medium transition-colors"
+                >
+                  <Facebook className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Facebook</span>
+                </a>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -261,18 +330,18 @@ const SavedProfileCard = ({ profile, index }: SavedProfileCardProps) => {
                   size="sm"
                   variant="outline"
                   className="h-9 rounded-full px-4 text-xs font-bold"
+                  onClick={() => window.open(profile.resumeUrl!, '_blank')}
                 >
                   <FileText className="mr-1.5 h-3.5 w-3.5" />
                   View Resume
                 </Button>
               )}
-              <Button
-                size="sm"
-                className="h-9 rounded-full px-4 text-xs font-bold shadow-sm"
-              >
-                <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                View Full Profile
-              </Button>
+              <Link href={`/browse-candidates/${profile.id}`}>
+                <Button size="sm" className="h-9 rounded-full px-4 text-xs font-bold shadow-sm">
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                  View Full Profile
+                </Button>
+              </Link>
             </div>
           </div>
 

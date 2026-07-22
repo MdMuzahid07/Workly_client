@@ -1,4 +1,4 @@
-import { CompanyBenefit } from "./company-benefit";
+import { CompanyBenefit } from './company-benefit';
 
 /**
  * Social media link interface
@@ -13,7 +13,7 @@ export interface SocialLink {
  * Company statistics interface
  */
 export interface CompanyStats {
-  totalEmployees: number;
+  totalTeamMembers: number;
   totalJobs: number;
   totalApplications: number;
   profileViews: number;
@@ -84,28 +84,28 @@ export interface ApiCompanyData {
  * Default empty company profile
  */
 export const DEFAULT_PROFILE: CompanyProfile = {
-  id: "",
-  name: "",
-  slug: "",
-  description: "",
+  id: '',
+  name: '',
+  slug: '',
+  description: '',
   industry: null,
-  size: "",
-  location: "",
-  websiteUrl: "",
-  contactEmail: "",
-  contactPhone: "",
-  founded: "",
-  logoUrl: "",
-  coverUrl: "",
+  size: '',
+  location: '',
+  websiteUrl: '',
+  contactEmail: '',
+  contactPhone: '',
+  founded: '',
+  logoUrl: '',
+  coverUrl: '',
   isVerified: false,
   verifiedAt: null,
-  mission: "",
-  cultureSummary: "",
+  mission: '',
+  cultureSummary: '',
   values: [],
   benefits: [],
   socialLinks: [],
   stats: {
-    totalEmployees: 0,
+    totalTeamMembers: 0,
     totalJobs: 0,
     totalApplications: 0,
     profileViews: 0,

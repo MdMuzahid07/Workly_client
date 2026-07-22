@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 
 export interface JobData {
   id: string;
@@ -28,14 +28,14 @@ const JobInfoCard = ({
   label: string;
   value: string;
 }) => (
-  <Card>
-    <CardContent className="flex items-start gap-3 pt-6">
-      <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
+  <Card className="bg-card rounded-xl border shadow-none">
+    <CardContent className="flex items-start gap-4 p-5">
+      <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
         <Icon className="text-primary h-5 w-5" />
       </div>
       <div>
-        <p className="text-muted-foreground text-xs font-medium">{label}</p>
-        <p className="font-medium">{value}</p>
+        <p className="text-muted-foreground text-xs font-bold tracking-wider uppercase">{label}</p>
+        <p className="text-foreground mt-1 text-sm font-semibold sm:text-base">{value}</p>
       </div>
     </CardContent>
   </Card>

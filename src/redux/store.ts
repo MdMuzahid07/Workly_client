@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
 import {
   FLUSH,
   PAUSE,
@@ -8,22 +8,30 @@ import {
   PURGE,
   REGISTER,
   REHYDRATE,
-} from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import baseApi from "./api/baseApi";
-import authSlice from "./feature/auth/authSlice";
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import baseApi from './api/baseApi';
+import authSlice from './feature/auth/authSlice';
+import notificationSoundSlice from './feature/notification/notificationSoundSlice';
 
 const persistConfig = {
-  key: "auth",
+  key: 'auth',
+  storage,
+};
+
+const soundPersistConfig = {
+  key: 'notificationSound',
   storage,
 };
 
 const persistedReducer = persistReducer(persistConfig, authSlice);
+const persistedSoundReducer = persistReducer(soundPersistConfig, notificationSoundSlice);
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
     auth: persistedReducer,
+    notificationSound: persistedSoundReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

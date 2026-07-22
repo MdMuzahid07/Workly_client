@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   AlertDialog,
@@ -7,11 +7,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DeleteConfirmationModalProps {
   open: boolean;
@@ -26,8 +26,8 @@ const DeleteConfirmationModal = ({
   open,
   onOpenChange,
   onConfirm,
-  title = "Are you absolutely sure?",
-  description = "This action cannot be undone.",
+  title = 'Are you absolutely sure?',
+  description = 'This action cannot be undone.',
   itemName,
 }: DeleteConfirmationModalProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -38,10 +38,10 @@ const DeleteConfirmationModal = ({
     try {
       await onConfirm();
       onOpenChange(false);
-      toast.success("Successfully deleted!");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to delete. Please try again.");
+      toast.success('Successfully deleted!');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to delete. Please try again.';
+      toast.error(msg);
     } finally {
       setIsDeleting(false);
     }
@@ -64,10 +64,7 @@ const DeleteConfirmationModal = ({
           <AlertDialogDescription className="text-center">
             {itemName ? (
               <>
-                {description}{" "}
-                <span className="text-foreground font-semibold">
-                  {itemName}
-                </span>
+                {description} <span className="text-foreground font-semibold">{itemName}</span>
               </>
             ) : (
               description
@@ -79,18 +76,14 @@ const DeleteConfirmationModal = ({
           <Button variant="outline" onClick={handleClose} disabled={isDeleting}>
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isDeleting}
-          >
+          <Button variant="destructive" onClick={handleConfirm} disabled={isDeleting}>
             {isDeleting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Deleting...
               </>
             ) : (
-              "Delete"
+              'Delete'
             )}
           </Button>
         </AlertDialogFooter>

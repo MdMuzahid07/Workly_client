@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { Controller, useFormContext } from "react-hook-form";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn, getNestedValue } from '@/lib/utils';
+import { Controller, useFormContext } from 'react-hook-form';
 
 interface WKDatePickerProps {
   name: string;
@@ -29,11 +29,12 @@ const WKDatePicker = ({
     formState: { errors },
   } = useFormContext();
 
-  const hasError = !!errors[name];
+  const fieldError = getNestedValue(errors, name);
+  const hasError = !!fieldError;
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={name} className={hasError ? "text-destructive" : ""}>
+      <Label htmlFor={name} className={hasError ? 'text-destructive' : ''}>
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
@@ -50,18 +51,14 @@ const WKDatePicker = ({
             max={max}
             disabled={disabled}
             className={cn(
-              "h-10",
-              hasError && "border-destructive focus-visible:ring-destructive",
+              'h-10',
+              hasError && 'border-destructive focus-visible:ring-destructive',
               className,
             )}
           />
         )}
       />
-      {hasError && (
-        <p className="text-destructive text-sm">
-          {errors[name]?.message as string}
-        </p>
-      )}
+      {hasError && <p className="text-destructive text-sm">{fieldError?.message as string}</p>}
     </div>
   );
 };

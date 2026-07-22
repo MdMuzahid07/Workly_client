@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { CompanyBenefit } from "@/types/company-benefit";
-import { TabsContent } from "@radix-ui/react-tabs";
+} from '@/components/ui/dialog';
+import { CompanyBenefit } from '@/types/company-benefit';
+import { TabsContent } from '@radix-ui/react-tabs';
 import {
   Award,
   Briefcase,
@@ -23,25 +22,23 @@ import {
   Smile,
   Trash2,
   Zap,
-} from "lucide-react";
-import { useMemo, useState } from "react";
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { LucideIcon } from 'lucide-react';
 
-import WKCheckbox from "@/components/form/WKCheckbox";
-import WkForm from "@/components/form/WkForm";
-import { SectionCard } from "@/components/main/profile/SectionCard";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  benefitCategories,
-  benefitIcons,
-} from "../../../constants/companyBenefits";
-import WKInput from "../../form/WkInput";
-import WKSelect from "../../form/WkSelect";
-import WKTextArea from "../../form/WkTextArea";
+import WKCheckbox from '@/components/form/WKCheckbox';
+import WkForm from '@/components/form/WkForm';
+import { SectionCard } from '@/components/main/profile/SectionCard';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { benefitCategories, benefitIcons } from '../../../constants/companyBenefits';
+import WKInput from '../../form/WkInput';
+import WKSelect from '../../form/WkSelect';
+import WKTextArea from '../../form/WkTextArea';
 
 const benefitFormSchema = z.object({
-  title: z.string().min(1, "Title is required").max(60, "Title too long"),
-  description: z.string().max(300, "Description too long").optional(),
+  title: z.string().min(1, 'Title is required').max(60, 'Title too long'),
+  description: z.string().max(300, 'Description too long').optional(),
   category: z.string().optional(),
   icon: z.string().optional(),
   isActive: z.boolean(),
@@ -49,7 +46,7 @@ const benefitFormSchema = z.object({
 
 type BenefitFormData = z.infer<typeof benefitFormSchema>;
 
-const ICON_MAP: Record<string, any> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   award: Award,
   heart: Heart,
   zap: Zap,
@@ -66,30 +63,39 @@ const CompanyProfileBenefitsTab = ({
   isEditing,
   onBenefitsChange,
 }: {
-  currentProfile: any;
+  currentProfile: {
+    benefits?: (
+      | {
+          id?: string;
+          title?: string;
+          description?: string;
+          category?: string;
+          icon?: string;
+          isActive?: boolean;
+        }
+      | string
+    )[];
+  };
   isEditing: boolean;
   onBenefitsChange: (benefits: CompanyBenefit[]) => void;
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingBenefit, setEditingBenefit] = useState<CompanyBenefit | null>(
-    null,
-  );
+  const [editingBenefit, setEditingBenefit] = useState<CompanyBenefit | null>(null);
   const [isFormLoading, setIsFormLoading] = useState(false);
 
   const benefits: CompanyBenefit[] = useMemo(() => {
-    return (currentProfile.benefits || []).map((b: any) => {
-      if (typeof b === "string")
-        return { id: Math.random().toString(), title: b, isActive: true };
+    return (currentProfile?.benefits || []).map((b) => {
+      if (typeof b === 'string') return { id: Math.random().toString(), title: b, isActive: true };
       return {
         id: b.id || Math.random().toString(),
-        title: b.title || "",
-        description: b.description || "",
-        category: b.category || "",
-        icon: b.icon || "award",
+        title: b.title || '',
+        description: b.description || '',
+        category: b.category || '',
+        icon: b.icon || 'award',
         isActive: b.isActive ?? true,
       };
     });
-  }, [currentProfile.benefits]);
+  }, [currentProfile?.benefits]);
 
   const activeBenefits = benefits.filter((b) => b.isActive);
   const inactiveBenefits = benefits.filter((b) => !b.isActive);
@@ -115,7 +121,7 @@ const CompanyProfileBenefitsTab = ({
   return (
     <TabsContent value="benefits" className="space-y-10 focus:outline-none">
       <SectionCard
-        title="Employee Perks & Benefits"
+        title="Company perks & benefits"
         isCompleted={activeBenefits.length > 0}
         onAdd={
           isEditing
@@ -134,8 +140,7 @@ const CompanyProfileBenefitsTab = ({
             <div>
               <h4 className="text-foreground font-bold">Talent Magnet</h4>
               <p className="text-muted-foreground text-sm">
-                Comprehensive benefits packages increase candidate application
-                rates by up to 40%.
+                Comprehensive benefits packages increase candidate application rates by up to 40%.
               </p>
             </div>
           </div>
@@ -143,7 +148,7 @@ const CompanyProfileBenefitsTab = ({
           {activeBenefits.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {activeBenefits.map((benefit) => {
-                const Icon = ICON_MAP[benefit.icon || "award"] || Award;
+                const Icon = ICON_MAP[benefit.icon || 'award'] || Award;
                 return (
                   <div
                     key={benefit.id}
@@ -167,9 +172,7 @@ const CompanyProfileBenefitsTab = ({
                             variant="ghost"
                             size="icon"
                             onClick={() =>
-                              onBenefitsChange(
-                                benefits.filter((b) => b.id !== benefit.id),
-                              )
+                              onBenefitsChange(benefits.filter((b) => b.id !== benefit.id))
                             }
                             className="hover:bg-destructive/10 hover:text-destructive h-8 w-8"
                           >
@@ -187,11 +190,10 @@ const CompanyProfileBenefitsTab = ({
                           {benefit.title}
                         </h4>
                         <p className="text-muted-foreground mb-3 text-xs font-bold tracking-widest uppercase">
-                          {benefit.category || "General"}
+                          {benefit.category || 'General'}
                         </p>
                         <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed">
-                          {benefit.description ||
-                            "Exciting perk for our amazing team members."}
+                          {benefit.description || 'Exciting perk for our amazing team members.'}
                         </p>
                       </div>
                     </div>
@@ -203,9 +205,7 @@ const CompanyProfileBenefitsTab = ({
             <div className="text-muted-foreground bg-muted/20 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed py-20">
               <Award className="mb-4 h-16 w-16 opacity-10" />
               <p className="text-lg font-medium">No perks listed yet.</p>
-              <p className="text-sm opacity-60">
-                Add some benefits to stand out!
-              </p>
+              <p className="text-sm opacity-60">Add some benefits to stand out!</p>
             </div>
           )}
 
@@ -235,9 +235,7 @@ const CompanyProfileBenefitsTab = ({
                         onClick={() =>
                           onBenefitsChange(
                             benefits.map((b) =>
-                              b.id === benefit.id
-                                ? { ...b, isActive: true }
-                                : b,
+                              b.id === benefit.id ? { ...b, isActive: true } : b,
                             ),
                           )
                         }
@@ -249,9 +247,7 @@ const CompanyProfileBenefitsTab = ({
                         variant="ghost"
                         size="sm"
                         onClick={() =>
-                          onBenefitsChange(
-                            benefits.filter((b) => b.id !== benefit.id),
-                          )
+                          onBenefitsChange(benefits.filter((b) => b.id !== benefit.id))
                         }
                         className="text-destructive h-8 w-8 p-0"
                       >
@@ -267,10 +263,10 @@ const CompanyProfileBenefitsTab = ({
       </SectionCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              {editingBenefit ? "Refine Benefit" : "New Company Perk"}
+              {editingBenefit ? 'Refine Benefit' : 'New Company Perk'}
             </DialogTitle>
             <DialogDescription>
               Define the details of this offering to attract candidates.
@@ -288,15 +284,25 @@ const CompanyProfileBenefitsTab = ({
   );
 };
 
-const BenefitForm = ({ initialValues, onSubmit, onCancel, isLoading }: any) => {
+const BenefitForm = ({
+  initialValues,
+  onSubmit,
+  onCancel,
+  isLoading,
+}: {
+  initialValues?: CompanyBenefit;
+  onSubmit: (data: BenefitFormData) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}) => {
   return (
     <WkForm<BenefitFormData>
       defaultValues={
         initialValues || {
-          title: "",
-          description: "",
-          category: "Health & Wellness",
-          icon: "award",
+          title: '',
+          description: '',
+          category: 'Health & Wellness',
+          icon: 'award',
           isActive: true,
         }
       }
@@ -305,12 +311,7 @@ const BenefitForm = ({ initialValues, onSubmit, onCancel, isLoading }: any) => {
     >
       <div className="space-y-6 pt-4">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <WKInput
-            name="title"
-            label="Benefit Name"
-            placeholder="e.g. Health Coverage"
-            required
-          />
+          <WKInput name="title" label="Benefit Name" placeholder="e.g. Health Coverage" required />
           <WKSelect
             name="category"
             label="Category"
@@ -326,12 +327,7 @@ const BenefitForm = ({ initialValues, onSubmit, onCancel, isLoading }: any) => {
           rows={3}
         />
         <div className="grid grid-cols-1 items-end gap-6 sm:grid-cols-2">
-          <WKSelect
-            placeholder=""
-            name="icon"
-            label="Visual Icon"
-            options={benefitIcons}
-          />
+          <WKSelect placeholder="" name="icon" label="Visual Icon" options={benefitIcons} />
           <div className="pb-2">
             <WKCheckbox name="isActive" label="Make publicly visible" />
           </div>
@@ -341,7 +337,7 @@ const BenefitForm = ({ initialValues, onSubmit, onCancel, isLoading }: any) => {
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Processing..." : "Save Benefit"}
+            {isLoading ? 'Processing...' : 'Save Benefit'}
           </Button>
         </div>
       </div>

@@ -1,8 +1,8 @@
-import { Metadata } from "next";
-import JobDetailsView from "../../../../view/job/JobDetailsView";
+import { Metadata } from 'next';
+import JobDetailsView from '../../../../view/job/details/JobDetailsView';
 
 export const metadata: Metadata = {
-  title: "Job Details",
+  title: 'Job Details',
 };
 
 const page = () => {

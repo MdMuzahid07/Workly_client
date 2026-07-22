@@ -1,105 +1,101 @@
-import { ImageIcon, Mail, Phone, Upload, X } from "lucide-react";
-import Image from "next/image";
-import { useRef, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { toast } from "sonner";
-import { useUploadMultipleFilesMutation } from "../../../../redux/feature/upload/uploadApi";
-import { CompanyFormData } from "../../../../view/dashboard/CompanyCreationView";
-import WKInput from "../../../form/WkInput";
-import { Button } from "../../../ui/button";
+import { ImageIcon, Mail, Phone, Upload, X } from 'lucide-react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../ui/card";
+  useUploadLogoMutation,
+  useUploadCoverMutation,
+} from '../../../../redux/feature/upload/uploadApi';
+import { useCompressedUpload } from '@/hooks/useCompressedUpload';
+import { CompanyFormData } from '../../../../view/dashboard/employer/company-creation/CompanyCreationView';
+import WKInput from '../../../form/WkInput';
+import { Button } from '../../../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../ui/card';
 
 const MediaContactStep = () => {
   const { watch, setValue } = useFormContext<CompanyFormData>();
-  const [uploadMultipleFiles, { isLoading }] = useUploadMultipleFilesMutation();
   const formData = watch();
+  const [uploadLogo] = useUploadLogoMutation();
+  const [uploadCover] = useUploadCoverMutation();
+  const { upload: uploadLogoCompressed, isProcessing: compressingLogo } =
+    useCompressedUpload('logo');
+  const { upload: uploadCoverCompressed, isProcessing: compressingCover } =
+    useCompressedUpload('cover');
 
-  const [logoPreview, setLogoPreview] = useState<string | null>(
-    watch("logoUrl") || null,
-  );
-  const [coverPreview, setCoverPreview] = useState<string | null>(
-    watch("coverUrl") || null,
-  );
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [uploadingCover, setUploadingCover] = useState(false);
+  const uploadingLogo = compressingLogo;
+  const uploadingCover = compressingCover;
+
+  const [logoPreview, setLogoPreview] = useState<string | null>(watch('logoUrl') || null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(watch('coverUrl') || null);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (
-    file: File,
-    fieldName: "logoUrl" | "coverUrl",
-    setPreview: (preview: string | null) => void,
-    setUploading: (uploading: boolean) => void,
-    maxSize: number,
-  ) => {
+  const handleLogoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size
-    if (file.size > maxSize * 1024 * 1024) {
-      toast.error(`File size must be less than ${maxSize}MB`);
-      return;
-    }
 
     // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPreview(reader.result as string);
+      setLogoPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
 
-    setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("files", file);
-      const response = await uploadMultipleFiles(formData).unwrap();
-
-      if (response.success && response.data.urls?.[0]) {
-        setValue(fieldName, response.data.urls[0]);
-        toast.success("File uploaded successfully");
+      const res = await uploadLogoCompressed(
+        file,
+        (formData) => uploadLogo(formData).unwrap(),
+        'Logo uploaded successfully',
+      );
+      if (res.success && res.data?.url) {
+        setValue('logoUrl', res.data.url);
       }
     } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload file");
-      setPreview(null);
-    } finally {
-      setUploading(false);
+      console.error('Upload logo error:', error);
+      setLogoPreview(null);
     }
   };
 
-  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      handleFileUpload(file, "logoUrl", setLogoPreview, setUploadingLogo, 2);
-    }
-  };
+    if (!file) return;
 
-  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileUpload(file, "coverUrl", setCoverPreview, setUploadingCover, 5);
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoverPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      const res = await uploadCoverCompressed(
+        file,
+        (formData) => uploadCover(formData).unwrap(),
+        'Cover image uploaded successfully',
+      );
+      if (res.success && res.data?.url) {
+        setValue('coverUrl', res.data.url);
+      }
+    } catch (error) {
+      console.error('Upload cover error:', error);
+      setCoverPreview(null);
     }
   };
 
   const handleRemoveLogo = () => {
     setLogoPreview(null);
-    setValue("logoUrl", "");
+    setValue('logoUrl', '');
     if (logoInputRef.current) {
-      logoInputRef.current.value = "";
+      logoInputRef.current.value = '';
     }
   };
 
   const handleRemoveCover = () => {
     setCoverPreview(null);
-    setValue("coverUrl", "");
+    setValue('coverUrl', '');
     if (coverInputRef.current) {
-      coverInputRef.current.value = "";
+      coverInputRef.current.value = '';
     }
   };
 
@@ -110,9 +106,7 @@ const MediaContactStep = () => {
           <Upload className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           Media & Contact Information
         </CardTitle>
-        <CardDescription className="text-sm">
-          Add your logo and contact details
-        </CardDescription>
+        <CardDescription className="text-sm">Add your logo and contact details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
@@ -150,7 +144,7 @@ const MediaContactStep = () => {
             {logoPreview ? (
               <div className="relative">
                 <div className="border-border overflow-hidden rounded-lg border">
-                  {isLoading ? (
+                  {uploadingLogo ? (
                     <div className="bg-primary/20 flex h-32 w-full animate-pulse items-center justify-center">
                       <Upload className="text-muted-foreground h-6 w-6 animate-bounce" />
                     </div>
@@ -213,13 +207,11 @@ const MediaContactStep = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Cover Image (Optional)
-            </label>
+            <label className="text-sm font-medium">Cover Image (Optional)</label>
             {coverPreview ? (
               <div className="relative">
                 <div className="border-border overflow-hidden rounded-lg border">
-                  {isLoading ? (
+                  {uploadingCover ? (
                     <div className="bg-primary/20 flex h-32 w-full animate-pulse items-center justify-center">
                       <Upload className="text-muted-foreground h-6 w-6 animate-bounce" />
                     </div>
@@ -248,8 +240,7 @@ const MediaContactStep = () => {
               <div className="border-border rounded-lg border-2 border-dashed p-4 text-center sm:p-6">
                 <ImageIcon className="text-muted-foreground mx-auto mb-2 h-6 w-6 sm:h-8 sm:w-8" />
                 <p className="text-muted-foreground mb-2 text-xs sm:text-sm">
-                  Upload a cover image for your company profile (PNG, JPG up to
-                  5MB)
+                  Upload a cover image for your company profile (PNG, JPG up to 5MB)
                 </p>
                 <Button
                   type="button"
@@ -284,42 +275,32 @@ const MediaContactStep = () => {
         </div>
 
         <div className="bg-primary/20 rounded-lg p-3 sm:p-4">
-          <h4 className="mb-2 text-sm font-medium sm:text-base">
-            📋 Review Your Information
-          </h4>
+          <h4 className="mb-2 text-sm font-medium sm:text-base">📋 Review Your Information</h4>
           <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 sm:gap-4 sm:text-sm">
             <div className="space-y-1">
               <p>
-                <strong>Company:</strong>{" "}
-                <span className="wrap-break-words">
-                  {formData.name || "Not set"}
-                </span>
+                <strong>Company:</strong>{' '}
+                <span className="wrap-break-words">{formData.name || 'Not set'}</span>
               </p>
               <p>
-                <strong>Industry:</strong> {formData.industryId || "Not set"}
+                <strong>Industry:</strong> {formData.industryId || 'Not set'}
               </p>
               <p>
-                <strong>Size:</strong> {formData.size || "Not set"}
+                <strong>Size:</strong> {formData.size || 'Not set'}
               </p>
             </div>
             <div className="space-y-1">
               <p>
-                <strong>Location:</strong>{" "}
-                <span className="wrap-break-words">
-                  {formData.location || "Not set"}
-                </span>
+                <strong>Location:</strong>{' '}
+                <span className="wrap-break-words">{formData.location || 'Not set'}</span>
               </p>
               <p>
-                <strong>Website:</strong>{" "}
-                <span className="break-all">
-                  {formData.websiteUrl || "Not set"}
-                </span>
+                <strong>Website:</strong>{' '}
+                <span className="break-all">{formData.websiteUrl || 'Not set'}</span>
               </p>
               <p>
-                <strong>Email:</strong>{" "}
-                <span className="break-all">
-                  {formData.contactEmail || "Not set"}
-                </span>
+                <strong>Email:</strong>{' '}
+                <span className="break-all">{formData.contactEmail || 'Not set'}</span>
               </p>
             </div>
           </div>

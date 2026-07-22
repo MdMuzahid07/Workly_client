@@ -1,86 +1,95 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import Image from 'next/image';
 
 export default function Loading() {
   return (
-    <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-white dark:bg-black">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 h-full w-full">
-        <div className="bg-primary/5 absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[120px]" />
-        <div className="bg-primary/5 absolute right-[-10%] bottom-[-10%] h-[40%] w-[40%] rounded-full blur-[120px]" />
+    <div className="bg-background relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
+      {/* Inline styles for custom premium loading animations */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @keyframes pulse-glow {
+          0%, 100% {
+            transform: scale(0.97);
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.12));
+            opacity: 0.85;
+          }
+          50% {
+            transform: scale(1.03);
+            filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.28));
+            opacity: 1;
+          }
+        }
+        @keyframes bg-orb-float {
+          0%, 100% {
+            transform: translateY(0px) scale(1);
+          }
+          50% {
+            transform: translateY(-15px) scale(1.03);
+          }
+        }
+        .animate-pulse-glow {
+          animation: pulse-glow 2.5s infinite ease-in-out;
+        }
+        .animate-orb-1 {
+          animation: bg-orb-float 6s infinite ease-in-out;
+        }
+        .animate-orb-2 {
+          animation: bg-orb-float 8s infinite ease-in-out 1s;
+        }
+      `,
+        }}
+      />
+
+      {/* Floating background glowing ambient lights */}
+      <div className="bg-background absolute inset-0 -z-10">
+        {/* Top-Right Soft Green Glow */}
+        <div className="animate-orb-1 absolute -top-[20%] -right-[10%] h-[60vw] w-[60vw] rounded-full bg-emerald-500/[0.04] blur-[120px] dark:bg-emerald-500/[0.08]" />
+        {/* Bottom-Left Soft Teal Glow */}
+        <div className="animate-orb-2 absolute -bottom-[20%] -left-[10%] h-[50vw] w-[50vw] rounded-full bg-teal-500/[0.03] blur-[100px] dark:bg-teal-500/[0.06]" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center">
-        {/* Main Loader Animation */}
-        <div className="relative flex h-20 w-20 items-center justify-center">
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
-              borderRadius: ["20%", "50%", "20%"],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="bg-primary shadow-primary/20 h-12 w-12 shadow-lg"
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.5, 0.2, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="bg-primary/20 absolute h-full w-full rounded-full blur-xl"
-          />
-        </div>
-
-        {/* Loading Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-8 flex flex-col items-center"
-        >
-          <p className="font-barlow text-foreground text-lg font-bold tracking-tight">
-            {`Preparing your experience...`}
-          </p>
-          <div className="mt-2 flex gap-1">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                animate={{
-                  opacity: [0.3, 1, 0.3],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                }}
-                className="bg-primary h-1.5 w-1.5 rounded-full"
-              />
-            ))}
+      {/* Loading Box Container */}
+      <div className="relative z-10 flex flex-col items-center gap-8">
+        {/* Centered Circular Progress Wrapper */}
+        <div className="relative flex h-24 w-24 items-center justify-center">
+          {/* Inner Pulsing Logo */}
+          <div className="animate-pulse-glow pointer-events-none absolute z-10 select-none">
+            <Image
+              src="/logo/workly_job-logo.png"
+              alt="Workly"
+              width={52}
+              height={52}
+              priority
+              className="object-contain"
+            />
           </div>
-        </motion.div>
-      </div>
 
-      {/* Brand Watermark */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.3 }}
-        transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-8"
-      >
-        <p className="font-barlow text-muted-foreground text-sm font-bold tracking-widest uppercase">
-          WorklyJob
-        </p>
-      </motion.div>
+          {/* Premium Thick Gradient Spinner Arc (Fades out completely with rounded caps) */}
+          <svg className="absolute h-full w-full animate-spin" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="thick-spinner-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
+                <stop offset="50%" stopColor="#10b981" stopOpacity="0.45" />
+                <stop offset="90%" stopColor="#10b981" stopOpacity="0.05" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <circle
+              cx="50"
+              cy="50"
+              r="42"
+              fill="transparent"
+              stroke="url(#thick-spinner-grad)"
+              strokeWidth="5.5"
+              strokeLinecap="round"
+              strokeDasharray="264"
+              strokeDashoffset="115"
+            />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }

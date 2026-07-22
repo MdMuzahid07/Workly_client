@@ -1,26 +1,29 @@
-"use client";
+'use client';
 
-import WkForm from "@/components/form/WkForm";
-import WKInput from "@/components/form/WkInput";
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { UserCheck } from "lucide-react";
-import { ReferenceFormData, referenceSchema } from "./profile.validation";
+import WkForm from '@/components/form/WkForm';
+import WKInput from '@/components/form/WkInput';
+import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { UserCheck } from 'lucide-react';
+import { ReferenceFormData, referenceSchema } from './profile.validation';
 
 interface ReferenceFormProps {
   onSubmit: (data: ReferenceFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultValues?: Partial<ReferenceFormData>;
 }
 
 export const ReferenceForm = ({
   onSubmit,
   onCancel,
   isLoading,
+  defaultValues,
 }: ReferenceFormProps) => {
   return (
     <WkForm<ReferenceFormData>
       onSubmit={onSubmit}
+      defaultValues={defaultValues || {}}
       resolver={zodResolver(referenceSchema)}
     >
       <div className="space-y-4">
@@ -32,12 +35,7 @@ export const ReferenceForm = ({
           labelIcon={<UserCheck className="text-primary h-4 w-4" />}
         />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <WKInput
-            name="company"
-            label="Company"
-            placeholder="e.g. Tech Corp"
-            required
-          />
+          <WKInput name="company" label="Company" placeholder="e.g. Tech Corp" required />
           <WKInput
             name="position"
             label="Position"
@@ -61,11 +59,7 @@ export const ReferenceForm = ({
             required
             type="email"
           />
-          <WKInput
-            name="phone"
-            label="Phone (Optional)"
-            placeholder="+1234567890"
-          />
+          <WKInput name="phone" label="Phone (Optional)" placeholder="+1234567890" />
         </div>
       </div>
 
@@ -74,7 +68,7 @@ export const ReferenceForm = ({
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Reference"}
+          {isLoading ? 'Saving...' : 'Save Reference'}
         </Button>
       </div>
     </WkForm>

@@ -1,41 +1,38 @@
-"use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+'use client';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Sidebar, useSidebar } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { useLogoutUserMutation } from '@/redux/feature/auth/authApi';
+import { logout } from '@/redux/feature/auth/authSlice';
+import { useGetProfileQuery } from '@/redux/feature/profile/profileApi';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
-import { useLogoutUserMutation } from "@/redux/feature/auth/authApi";
-import { logout } from "@/redux/feature/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
+  Activity,
   AlertTriangle,
   Bell,
   CheckCircle2,
+  ChevronLeft,
   CreditCard,
   FileText,
   LayoutDashboard,
   LogOut,
   Menu,
-  MessageSquare,
   Package,
   Settings,
   ShieldCheck,
   Tags,
   Users,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { memo, useState } from "react";
-import SignOutModal from "../../shared/SignOutModal";
-import ThemeToggleButtonCompact from "../../shared/ThemeToggleButtonCompact";
-import WJLogo from "../../shared/WJLogo";
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React, { useState } from 'react';
+import SignOutModal from '../../shared/SignOutModal';
+import ThemeToggleButtonCompact from '../../shared/ThemeToggleButtonCompact';
+import WJLogo from '../../shared/WJLogo';
 
 interface SidebarItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -50,7 +47,7 @@ interface SidebarGroupProps {
   items: SidebarItemProps[];
 }
 
-const AdminSidebarItem = memo(function AdminSidebarItem({
+const AdminSidebarItem = function AdminSidebarItem({
   icon: Icon,
   label,
   href,
@@ -64,66 +61,112 @@ const AdminSidebarItem = memo(function AdminSidebarItem({
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
-  const normalizedPath = pathname ? pathname.replace(/\/$/, "") : "";
-  const normalizedHref = href.replace(/\/$/, "");
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = state === 'collapsed' && !isMobile;
+
+  const normalizedPath = pathname ? pathname.replace(/\/$/, '') : '';
+  const normalizedHref = href.replace(/\/$/, '');
   const isExact = normalizedPath === normalizedHref;
-  const isSection =
-    normalizedHref !== "/admin" &&
-    normalizedPath.startsWith(normalizedHref + "/");
+  const isSection = normalizedHref !== '/admin' && normalizedPath.startsWith(normalizedHref + '/');
   const isActive = isExact || isSection;
 
-  if (signOut) {
-    return (
-      <button
-        type="button"
-        onClick={onSignOut}
-        className={cn(
-          "text-muted-foreground hover:bg-destructive/5 hover:text-destructive active:bg-destructive/10 group flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none",
-        )}
-      >
-        <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-105" />
-        <span className="flex-1 truncate text-left">{label}</span>
-      </button>
-    );
-  }
-
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "group flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none",
-        isActive
-          ? "bg-primary/10 text-primary border-primary rounded-r-none border-r-2"
-          : "text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary rounded-r-none hover:border-r-2",
-      )}
-      onClick={onItemClick}
-    >
+  const innerContent = (
+    <>
       <Icon
         className={cn(
-          "h-4 w-4 shrink-0 transition-transform group-hover:scale-105",
-          isActive
-            ? "text-primary"
-            : "text-muted-foreground/70 group-hover:text-primary",
+          'h-4 w-4 shrink-0 transition-transform group-hover:scale-105',
+          isActive ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-primary',
         )}
       />
-      <span className="flex-1 truncate text-left">{label}</span>
+      <span
+        className={cn(
+          'ease-apple flex-1 origin-left truncate overflow-hidden text-left whitespace-nowrap transition-all duration-300',
+          isCollapsed
+            ? 'pointer-events-none ml-0 max-w-0 opacity-0'
+            : 'ml-3 max-w-[150px] opacity-100',
+        )}
+      >
+        {label}
+      </span>
       {badge != null && (
         <Badge
-          variant="secondary"
-          className="bg-muted text-muted-foreground shrink-0 px-1.5 py-0 text-[10px]"
+          variant={isActive ? 'default' : 'secondary'}
+          className={cn(
+            'ease-apple shrink-0 scale-90 transition-all duration-300',
+            isCollapsed
+              ? 'pointer-events-none max-w-0 p-0 opacity-0'
+              : 'bg-muted text-muted-foreground max-w-10 px-1.5 py-0 text-[10px] opacity-100',
+          )}
         >
           {badge}
         </Badge>
       )}
+    </>
+  );
+
+  const itemLink = signOut ? (
+    <button
+      type="button"
+      onClick={onSignOut}
+      className={cn(
+        'group ease-apple flex cursor-pointer items-center transition-all duration-300 outline-none',
+        isCollapsed
+          ? 'mx-auto h-9 w-9 justify-center rounded-lg p-0'
+          : 'w-full justify-start rounded-md px-3 py-2 text-sm font-medium',
+        'text-muted-foreground hover:bg-destructive/5 hover:text-destructive active:bg-destructive/10',
+      )}
+    >
+      {innerContent}
+    </button>
+  ) : (
+    <Link
+      href={href}
+      className={cn(
+        'group ease-apple flex items-center transition-all duration-300 outline-none',
+        isCollapsed
+          ? 'mx-auto h-9 w-9 justify-center rounded-lg p-0'
+          : 'w-full justify-start rounded-md px-3 py-2 text-sm font-medium',
+        isCollapsed
+          ? isActive
+            ? 'bg-primary/10 text-primary'
+            : 'text-muted-foreground hover:bg-primary/20 hover:text-primary'
+          : isActive
+            ? 'bg-primary/10 text-primary border-primary rounded-r-none border-r-2'
+            : 'text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary rounded-r-none hover:border-r-2',
+      )}
+      onClick={onItemClick}
+    >
+      {innerContent}
     </Link>
   );
-});
 
-const AdminSidebarContent = memo(function AdminSidebarContent({
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{itemLink}</TooltipTrigger>
+      <TooltipContent side="right" className="text-xs font-semibold" hidden={!isCollapsed}>
+        <div className="flex items-center gap-1.5">
+          <span>{label}</span>
+          {badge != null && (
+            <Badge
+              variant="secondary"
+              className="bg-primary/10 text-primary px-1 py-0 text-[9px] font-black"
+            >
+              {badge}
+            </Badge>
+          )}
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
+const AdminSidebarContent = function AdminSidebarContent({
   navGroups,
   bottomItems,
   pathname,
   user,
+  profile,
+  profileData,
   onSignOut,
   onItemClick,
 }: {
@@ -131,47 +174,131 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
   bottomItems: SidebarItemProps[];
   pathname: string;
   user: { fullName?: string; profilePicture?: string } | null;
+  profile: { avatarUrl?: string | null } | undefined;
+  profileData?: {
+    data?: {
+      fullName?: string;
+      profile?: {
+        avatarUrl?: string | null;
+      };
+    };
+  };
   onSignOut: () => void;
   onItemClick: () => void;
 }) {
+  const { state, isMobile, toggleSidebar } = useSidebar();
+  const isCollapsed = state === 'collapsed' && !isMobile;
+
   return (
-    <div className="bg-sidebar flex h-full min-h-0 flex-col">
-      <div className="flex h-14 items-center justify-between px-4 sm:h-16">
-        <WJLogo />
-        <span className="pr-10 lg:pr-0">
-          <ThemeToggleButtonCompact />
-        </span>
+    <div className="group bg-sidebar flex h-full max-h-full min-h-0 flex-col overflow-hidden">
+      {/* Header */}
+      <div
+        className={cn(
+          'flex shrink-0 items-center transition-all duration-200',
+          isCollapsed ? 'px-1.5' : 'px-4',
+          isCollapsed ? 'h-16 justify-center pt-2' : 'h-12 justify-between sm:h-14 lg:h-16',
+        )}
+      >
+        {!isCollapsed ? (
+          <>
+            <WJLogo />
+            <div className="flex items-center gap-1">
+              <ThemeToggleButtonCompact />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                className="text-muted-foreground hover:bg-muted hidden h-8 w-8 rounded-md md:flex"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            </div>
+          </>
+        ) : (
+          <Link href="/" className="relative block h-5 w-8 shrink-0 overflow-hidden">
+            <Image
+              src="/logo/workly_job-logo.png"
+              alt="W"
+              className="absolute top-0 left-0 h-8 w-8 max-w-none"
+              width={100}
+              height={100}
+            />
+          </Link>
+        )}
       </div>
 
-      <Separator className="opacity-50" />
+      <Separator className="shrink-0" />
 
-      <div className="px-4 py-4">
-        <div className="group border-border/50 bg-card/30 flex items-center gap-3 rounded-lg border p-3">
-          <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={user?.profilePicture} alt={user?.fullName} />
+      {/* Admin Profile Section */}
+      <div
+        className={cn(
+          'shrink-0 py-3 transition-all duration-200',
+          isCollapsed ? 'flex justify-center px-1.5' : 'px-4',
+        )}
+      >
+        <div
+          className={cn(
+            'flex items-center transition-all duration-200',
+            isCollapsed ? 'gap-0' : 'gap-3 px-1 py-1',
+          )}
+        >
+          <Avatar
+            className={cn(
+              'shrink-0 transition-all duration-200',
+              isCollapsed ? 'h-9 w-9' : 'h-10 w-10',
+            )}
+          >
+            <AvatarImage
+              src={profile?.avatarUrl || user?.profilePicture}
+              alt={profileData?.data?.fullName || user?.fullName}
+            />
             <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-              {user?.fullName?.charAt(0) || "A"}
+              {(profileData?.data?.fullName || user?.fullName)?.charAt(0) || 'A'}
             </AvatarFallback>
           </Avatar>
-          <div className="min-w-0 flex-1">
+          <div
+            className={cn(
+              'min-w-0 flex-1 overflow-hidden whitespace-nowrap transition-all duration-200 ease-in-out',
+              isCollapsed ? 'pointer-events-none max-w-0 opacity-0' : 'max-w-[200px] opacity-100',
+            )}
+          >
             <p className="text-foreground truncate text-sm font-semibold">
-              {user?.fullName || "Admin"}
+              {profileData?.data?.fullName || user?.fullName || 'Admin'}
             </p>
-            <p className="text-muted-foreground truncate text-xs">
-              System Administrator
-            </p>
+            <p className="text-muted-foreground truncate text-xs">System Administrator</p>
           </div>
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
-        <nav className="space-y-6">
+      {/* Navigation */}
+      <div
+        className={cn(
+          'min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain py-2 [-webkit-overflow-scrolling:touch]',
+          isCollapsed ? 'scrollbar-hover-visible px-1.5' : 'scrollbar-thin px-3',
+        )}
+      >
+        <nav className="space-y-6 pb-2">
           {navGroups.map((group, index) => (
             <div key={index}>
               {group.title && (
-                <h4 className="text-muted-foreground mb-2 px-3 text-xs font-semibold tracking-wider uppercase opacity-70">
-                  {group.title}
-                </h4>
+                <div className="ease-apple relative overflow-hidden transition-all duration-300">
+                  <h4
+                    className={cn(
+                      'text-muted-foreground ease-apple overflow-hidden px-3 text-xs font-semibold tracking-wider whitespace-nowrap uppercase opacity-70 transition-all duration-300',
+                      isCollapsed
+                        ? 'pointer-events-none mb-0 max-h-0 opacity-0'
+                        : 'mb-2 max-h-8 opacity-70',
+                    )}
+                  >
+                    {group.title}
+                  </h4>
+                  <Separator
+                    className={cn(
+                      'ease-apple shrink-0 transition-all duration-300',
+                      isCollapsed ? 'my-3 opacity-100' : 'pointer-events-none my-0 h-0 opacity-0',
+                    )}
+                  />
+                </div>
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => (
@@ -189,8 +316,13 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
         </nav>
       </div>
 
-      <div className="mt-auto p-3">
-        <Separator className="mb-3 opacity-50" />
+      {/* Footer / Bottom Items */}
+      <div
+        className={cn(
+          'bg-sidebar border-border/40 mt-auto shrink-0 border-t py-3',
+          isCollapsed ? 'px-1.5' : 'p-3',
+        )}
+      >
         <nav className="space-y-1">
           {bottomItems.map((item) => (
             <AdminSidebarItem
@@ -205,26 +337,40 @@ const AdminSidebarContent = memo(function AdminSidebarContent({
       </div>
     </div>
   );
-});
+};
 
-export default function AdminSidebarView({
-  isOpen: controlledIsOpen,
-  onOpenChange,
-}: {
-  isOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-} = {}) {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
+import {
+  useGetActiveJobsAdminQuery,
+  useGetJobReportStatsQuery,
+} from '@/redux/feature/admin/adminApi';
+import { useGetUnreadCountQuery } from '@/redux/feature/notification/notificationApi';
+import Image from 'next/image';
+
+export default function AdminSidebarView() {
   const pathname = usePathname();
-  const isOpen =
-    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-  const setIsOpen = onOpenChange || setInternalIsOpen;
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { toggleSidebar, openMobile, setOpenMobile } = useSidebar();
   const dispatch = useAppDispatch();
   const [logoutUser, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const { user } = useAppSelector((state) => state.auth) || {};
+  const { data: profileData } = useGetProfileQuery(undefined, {
+    skip: !user?.id,
+  });
+  const profile = profileData?.data?.profile;
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+
+  // Live sidebar counters
+  const { data: pendingJobsData } = useGetActiveJobsAdminQuery({
+    status: 'DRAFT',
+    limit: 1,
+  });
+  const { data: reportStatsData } = useGetJobReportStatsQuery();
+  const { data: unreadNotificationsData } = useGetUnreadCountQuery();
+
+  const pendingCount = (pendingJobsData as { meta?: { total?: number } })?.meta?.total ?? 0;
+  const reportedCount = reportStatsData?.data?.openReports ?? 0;
+  const unreadCount = unreadNotificationsData?.data?.unreadCount ?? 0;
 
   const handleSignOutClick = () => {
     setIsSignOutModalOpen(true);
@@ -237,66 +383,97 @@ export default function AdminSidebarView({
       console.log(error);
     } finally {
       dispatch(logout());
-      window.location.href = "/";
+      window.location.href = '/';
     }
   };
 
   const handleItemClick = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      setIsOpen(false);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setOpenMobile(false);
     }
   };
 
   const navGroups: SidebarGroupProps[] = [
     {
-      title: "System Control",
+      title: 'System Control',
       items: [
-        { icon: LayoutDashboard, label: "Overview", href: "/admin" },
-        { icon: MessageSquare, label: "All Messages", href: "/admin/messages" },
+        { icon: LayoutDashboard, label: 'Overview', href: '/admin' },
+        { icon: Activity, label: 'System Metrics', href: '/admin-metrics' },
       ],
     },
     {
-      title: "User Management",
+      title: 'User Management',
       items: [
-        { icon: Users, label: "Employers", href: "/admin/users/employers" },
-        { icon: Users, label: "Job Seekers", href: "/admin/users/job-seekers" },
+        { icon: Users, label: 'Employers', href: '/admin/users/employers' },
+        { icon: Users, label: 'Job Seekers', href: '/admin/users/job-seekers' },
         {
           icon: ShieldCheck,
-          label: "Administrators",
-          href: "/admin/users/admins",
+          label: 'Administrators',
+          href: '/admin/users/admins',
         },
       ],
     },
     {
-      title: "Content Moderation",
+      title: 'Content Moderation',
       items: [
-        { icon: FileText, label: "Active Jobs", href: "/admin/jobs/active" },
+        { icon: FileText, label: 'Active Jobs', href: '/admin/jobs/active' },
         {
           icon: CheckCircle2,
-          label: "Pending Approvals",
-          href: "/admin/jobs/pending",
-          badge: 5,
+          label: 'Pending Approvals',
+          href: '/admin/jobs/pending',
+          badge: pendingCount > 0 ? pendingCount : undefined,
         },
         {
           icon: AlertTriangle,
-          label: "Reported",
-          href: "/admin/jobs/reported",
+          label: 'Reported',
+          href: '/admin/jobs/reported',
+          badge: reportedCount > 0 ? reportedCount : undefined,
         },
-        { icon: Tags, label: "Categories", href: "/admin/categories" },
+        { icon: Tags, label: 'Categories', href: '/admin/categories' },
       ],
     },
     {
-      title: "Financials & Plans",
+      title: 'Financials & Plans',
       items: [
         {
           icon: CreditCard,
-          label: "Transactions",
-          href: "/admin/billing/transactions",
+          label: 'Transactions',
+          href: '/admin/billing/transactions',
         },
         {
           icon: Package,
-          label: "Subscription Plans",
-          href: "/admin/billing/plans",
+          label: 'Subscription Plans',
+          href: '/admin/billing/plans',
+        },
+      ],
+    },
+    {
+      title: 'Legal & Compliance',
+      items: [
+        {
+          icon: ShieldCheck,
+          label: 'Privacy Policy',
+          href: '/admin/legal/privacy-policy',
+        },
+        {
+          icon: ShieldCheck,
+          label: 'Terms of Service',
+          href: '/admin/legal/terms-of-service',
+        },
+        {
+          icon: ShieldCheck,
+          label: 'Accessibility Statement',
+          href: '/admin/legal/accessibility-statement',
+        },
+        {
+          icon: ShieldCheck,
+          label: 'Cookie Policy',
+          href: '/admin/legal/cookie-policy',
+        },
+        {
+          icon: ShieldCheck,
+          label: 'User Agreements',
+          href: '/admin/legal/user-agreements',
         },
       ],
     },
@@ -305,55 +482,39 @@ export default function AdminSidebarView({
   const bottomItems: SidebarItemProps[] = [
     {
       icon: Bell,
-      label: "Notifications",
-      href: "/admin/notifications",
-      badge: 8,
+      label: 'Notifications',
+      href: '/admin/notifications',
+      badge: unreadCount > 0 ? unreadCount : undefined,
     },
-    { icon: Settings, label: "Settings", href: "/admin/settings" },
-    { icon: LogOut, label: "Logout", href: "#", signOut: true },
+    { icon: Settings, label: 'Settings', href: '/admin/settings' },
+    { icon: LogOut, label: 'Logout', href: '#', signOut: true },
   ];
 
   return (
-    <div className="relative">
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
-        <div className="border-sidebar-border bg-sidebar flex flex-1 flex-col border-r shadow-sm">
-          <AdminSidebarContent
-            navGroups={navGroups}
-            bottomItems={bottomItems}
-            pathname={pathname ?? ""}
-            user={user}
-            onSignOut={handleSignOutClick}
-            onItemClick={handleItemClick}
-          />
-        </div>
-      </div>
+    <>
+      <Sidebar collapsible="icon" className="border-sidebar-border bg-sidebar border-r">
+        <AdminSidebarContent
+          navGroups={navGroups}
+          bottomItems={bottomItems}
+          pathname={pathname ?? ''}
+          user={user}
+          profile={profile}
+          profileData={profileData}
+          onSignOut={handleSignOutClick}
+          onItemClick={handleItemClick}
+        />
+      </Sidebar>
 
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild className="lg:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-primary/10 hover:bg-background fixed top-1 right-4 z-999 h-10 w-10 rounded-lg border transition-all sm:top-2"
-          >
-            <Menu className="text-primary h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="z-9999 w-[280px] p-0 sm:w-[320px]">
-          <SheetHeader className="sr-only">
-            <SheetTitle>Admin Menu</SheetTitle>
-          </SheetHeader>
-          <AdminSidebarContent
-            navGroups={navGroups}
-            bottomItems={bottomItems}
-            pathname={pathname ?? ""}
-            user={user}
-            onSignOut={handleSignOutClick}
-            onItemClick={handleItemClick}
-          />
-        </SheetContent>
-      </Sheet>
-
-      <div className="hidden lg:block lg:w-64" />
+      {/* Mobile Sidebar Burger Button Trigger */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-999 flex h-9 w-9 items-center justify-center rounded-md border transition-all sm:top-6 sm:right-6 md:hidden"
+        onClick={toggleSidebar}
+        aria-label="Open sidebar"
+      >
+        <Menu className="text-primary h-5 w-5" />
+      </Button>
 
       <SignOutModal
         open={isSignOutModalOpen}
@@ -361,6 +522,6 @@ export default function AdminSidebarView({
         onConfirm={handleConfirmSignOut}
         isLoading={isLoggingOut}
       />
-    </div>
+    </>
   );
 }

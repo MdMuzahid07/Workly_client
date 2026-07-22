@@ -1,9 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 export enum UserRole {
-  JOB_SEEKER,
-  EMPLOYER,
-  ADMIN,
+  JOB_SEEKER = 'JOB_SEEKER',
+  EMPLOYER = 'EMPLOYER',
+  ADMIN = 'ADMIN',
+  SUPER_ADMIN = 'SUPER_ADMIN',
 }
 
 export interface IUser {
@@ -14,6 +15,7 @@ export interface IUser {
   role: UserRole;
   isVerified: boolean;
   isActive: boolean;
+  isPremium: boolean;
   profileId?: string;
   companyId?: string;
   lastLogin?: Date;
@@ -37,7 +39,7 @@ const initialState: any = {
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     setCredentials: (state, action) => {
@@ -65,6 +67,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, setLoading, updateUser, logout } =
-  authSlice.actions;
+export const { setCredentials, setLoading, updateUser, logout } = authSlice.actions;
 export default authSlice.reducer;

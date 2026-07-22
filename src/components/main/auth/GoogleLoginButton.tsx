@@ -1,26 +1,18 @@
-"use client";
+'use client';
 
-import { Button } from "../../ui/button";
+import { Button } from '../../ui/button';
 
 interface GoogleLoginButtonProps {
-  role?: "EMPLOYER" | "JOB_SEEKER";
+  role?: 'EMPLOYER' | 'JOB_SEEKER';
 }
 
-export const GoogleLoginButton = ({
-  role = "JOB_SEEKER",
-}: GoogleLoginButtonProps) => {
+export const GoogleLoginButton = ({ role = 'JOB_SEEKER' }: GoogleLoginButtonProps) => {
   const handleGoogleLogin = () => {
     // Get base URL - handle both cases: with or without /api/v1
-    let serverUrl: string;
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "production") {
-      serverUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-    } else {
-      serverUrl = "http://localhost:5000";
-    }
+    const serverUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
     // Remove /api/v1 if it exists to avoid duplication, then add it back
-    const cleanServerUrl = serverUrl.replace(/\/api\/v1\/?$/, "");
+    const cleanServerUrl = serverUrl.replace(/\/api\/v1\/?$/, '');
     const apiBaseUrl = `${cleanServerUrl}/api/v1`;
 
     // Pass role as state parameter in OAuth flow
@@ -32,8 +24,8 @@ export const GoogleLoginButton = ({
     <Button
       type="button"
       onClick={handleGoogleLogin}
-      variant="ghost"
-      className="text-card-foreground flex h-11 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-white/5 bg-white/3 font-bold transition-all duration-200 hover:scale-105 hover:border hover:bg-white/8 hover:text-white md:h-14"
+      variant="outline"
+      className="text-foreground border-border/80 bg-card hover:bg-muted hover:text-foreground flex h-11 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl font-bold transition-all duration-200 hover:scale-[1.02] md:h-14"
     >
       <svg className="h-5 w-5" viewBox="0 0 24 24">
         <path

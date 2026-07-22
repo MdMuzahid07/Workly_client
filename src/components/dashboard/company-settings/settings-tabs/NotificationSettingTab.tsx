@@ -1,22 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Label } from "@radix-ui/react-label";
-import { Switch } from "@radix-ui/react-switch";
-import { TabsContent } from "@radix-ui/react-tabs";
-import { Bell } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../ui/card";
+import { Label } from '@radix-ui/react-label';
+import { Switch } from '@radix-ui/react-switch';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { Bell } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../ui/card';
+
+import type { CompanySettings } from '@/types/company-settings';
 
 const NotificationSettingTab = ({
   updateSettings,
   settings,
 }: {
-  updateSettings: any;
-  settings: any;
+  updateSettings: <K extends keyof CompanySettings, F extends keyof CompanySettings[K]>(
+    section: K,
+    field: F,
+    value: CompanySettings[K][F],
+  ) => void;
+  settings: CompanySettings;
 }) => {
   return (
     <TabsContent value="notifications" className="space-y-6">
@@ -26,22 +25,18 @@ const NotificationSettingTab = ({
             <Bell className="mr-2 h-5 w-5" />
             Notification Preferences
           </CardTitle>
-          <CardDescription>
-            Choose what notifications you want to receive
-          </CardDescription>
+          <CardDescription>Choose what notifications you want to receive</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Email notifications</Label>
-              <p className="text-muted-foreground text-sm">
-                Receive general email notifications
-              </p>
+              <p className="text-muted-foreground text-sm">Receive general email notifications</p>
             </div>
             <Switch
               checked={settings.notifications.emailNotifications}
               onCheckedChange={(checked) =>
-                updateSettings("notifications", "emailNotifications", checked)
+                updateSettings('notifications', 'emailNotifications', checked)
               }
             />
           </div>
@@ -56,7 +51,7 @@ const NotificationSettingTab = ({
             <Switch
               checked={settings.notifications.applicationAlerts}
               onCheckedChange={(checked) =>
-                updateSettings("notifications", "applicationAlerts", checked)
+                updateSettings('notifications', 'applicationAlerts', checked)
               }
             />
           </div>
@@ -71,7 +66,7 @@ const NotificationSettingTab = ({
             <Switch
               checked={settings.notifications.jobExpiryReminders}
               onCheckedChange={(checked) =>
-                updateSettings("notifications", "jobExpiryReminders", checked)
+                updateSettings('notifications', 'jobExpiryReminders', checked)
               }
             />
           </div>
@@ -86,7 +81,7 @@ const NotificationSettingTab = ({
             <Switch
               checked={settings.notifications.weeklyReports}
               onCheckedChange={(checked) =>
-                updateSettings("notifications", "weeklyReports", checked)
+                updateSettings('notifications', 'weeklyReports', checked)
               }
             />
           </div>

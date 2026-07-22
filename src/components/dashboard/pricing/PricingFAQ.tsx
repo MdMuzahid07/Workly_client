@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import { PRICING_FAQ } from "@/constants/pricing";
-import { HelpCircle } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { PRICING_FAQ } from '@/constants/pricing';
+import { HelpCircle } from 'lucide-react';
 
 export default function PricingFAQ() {
   return (
@@ -21,9 +22,7 @@ export default function PricingFAQ() {
       <div className="mx-auto grid max-w-4xl gap-8 sm:grid-cols-2">
         {PRICING_FAQ.map((item, idx) => (
           <div key={idx} className="bg-card space-y-3 rounded-xl border p-6">
-            <h4 className="text-foreground text-sm font-bold">
-              {item.question}
-            </h4>
+            <h4 className="text-foreground text-sm font-bold">{item.question}</h4>
             <p className="text-muted-foreground text-sm leading-relaxed italic">
               &quot;{item.answer}&quot;
             </p>
@@ -32,16 +31,16 @@ export default function PricingFAQ() {
       </div>
 
       <div className="bg-primary/5 border-primary/20 mt-12 rounded-3xl border border-dashed p-8 text-center">
-        <h3 className="text-foreground text-lg font-bold">
-          Still have questions?
-        </h3>
+        <h3 className="text-foreground text-lg font-bold">Still have questions?</h3>
         <p className="text-muted-foreground mt-2 text-sm">
-          Our support team is always here to help. Contact us for a custom
-          walkthrough.
+          Our support team is always here to help. Contact us for a custom walkthrough.
         </p>
-        <button className="text-primary mt-6 cursor-pointer font-bold hover:underline">
+        <Button
+          variant="outline"
+          className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground mt-6 rounded-full font-bold transition-all"
+        >
           Chat with Support →
-        </button>
+        </Button>
       </div>
     </div>
   );

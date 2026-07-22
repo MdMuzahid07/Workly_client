@@ -1,16 +1,10 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 import {
   BarChart3,
   Bell,
@@ -26,11 +20,11 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { memo, useState } from "react";
-import WJLogo from "../../shared/WJLogo";
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React, { memo, useState } from 'react';
+import WJLogo from '../../shared/WJLogo';
 
 interface SidebarItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -52,76 +46,76 @@ const DashboardSidebar = () => {
 
   const navigationSections: NavigationSection[] = [
     {
-      title: "Main",
+      title: 'Main',
       items: [
         {
           icon: Home,
-          label: "Overview",
-          href: "/dashboard",
+          label: 'Overview',
+          href: '/dashboard',
         },
         {
           icon: Building2,
-          label: "My Company",
-          href: "/dashboard/profile",
+          label: 'My Company',
+          href: '/dashboard/profile',
         },
         {
           icon: Briefcase,
-          label: "Jobs",
-          href: "/dashboard/jobs",
-          badge: "12",
+          label: 'Jobs',
+          href: '/dashboard/jobs',
+          badge: '12',
         },
 
         {
           icon: Users,
-          label: "Employees",
-          href: "/dashboard/employees",
-          badge: "250",
+          label: 'Employees',
+          href: '/dashboard/employees',
+          badge: '250',
         },
         {
           icon: FileText,
-          label: "Applications",
-          href: "/dashboard/applications",
-          badge: "156",
+          label: 'Applications',
+          href: '/dashboard/applications',
+          badge: '156',
         },
         {
           icon: UserCheck,
-          href: "/dashboard/hiring-pipeline",
-          label: "Hiring Pipeline",
+          href: '/dashboard/hiring-pipeline',
+          label: 'Hiring Pipeline',
         },
       ],
     },
     {
-      title: "Analytics",
+      title: 'Analytics',
       items: [
         {
           icon: BarChart3,
-          label: "Analytics",
-          href: "/dashboard/analytics",
+          label: 'Analytics',
+          href: '/dashboard/analytics',
         },
         {
           icon: TrendingUp,
-          label: "Reports",
-          href: "/dashboard/reports",
+          label: 'Reports',
+          href: '/dashboard/reports',
         },
         {
           icon: Calendar,
-          label: "Schedule",
-          href: "/dashboard/schedule",
+          label: 'Schedule',
+          href: '/dashboard/schedule',
         },
       ],
     },
     {
-      title: "Management",
+      title: 'Management',
       items: [
         {
           icon: Plus,
-          label: "Post Job",
-          href: "/dashboard/post-job",
+          label: 'Post Job',
+          href: '/dashboard/post-job',
         },
         {
           icon: Tag,
-          label: "Job Categories",
-          href: "/dashboard/categories",
+          label: 'Job Categories',
+          href: '/dashboard/categories',
         },
       ],
     },
@@ -130,15 +124,15 @@ const DashboardSidebar = () => {
   const bottomItems: SidebarItemProps[] = [
     {
       icon: Bell,
-      label: "Notifications",
-      href: "/dashboard/notifications",
+      label: 'Notifications',
+      href: '/dashboard/notifications',
       hasDropdown: true,
-      badge: "3",
+      badge: '3',
     },
   ];
 
   const handleItemClick = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsOpen(false);
     }
   };
@@ -151,23 +145,21 @@ const DashboardSidebar = () => {
     badge,
     onClick,
   }) => {
-    const normalizedPath = pathname ? pathname.replace(/\/$/, "") : "";
-    const normalizedHref = href.replace(/\/$/, "");
+    const normalizedPath = pathname ? pathname.replace(/\/$/, '') : '';
+    const normalizedHref = href.replace(/\/$/, '');
     const isExact = normalizedPath === normalizedHref;
     const isSection =
-      normalizedHref !== "/dashboard" &&
-      normalizedPath.startsWith(normalizedHref + "/");
+      normalizedHref !== '/dashboard' && normalizedPath.startsWith(normalizedHref + '/');
     const isActive = isExact || isSection;
 
     return (
       <Link
         href={href}
         className={cn(
-          "h-auto w-full justify-start gap-3 px-3 py-2.5 font-normal",
-          isActive &&
-            "bg-secondary text-secondary-foreground hover:bg-secondary font-medium",
+          'h-auto w-full justify-start gap-3 px-3 py-2.5 font-normal',
+          isActive && 'bg-secondary text-secondary-foreground hover:bg-secondary font-medium',
           !isActive &&
-            "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
           "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         )}
         onClick={() => {
@@ -183,15 +175,13 @@ const DashboardSidebar = () => {
               {badge}
             </Badge>
           )}
-          {hasDropdown && (
-            <ChevronDown className="text-muted-foreground h-4 w-4" />
-          )}
+          {hasDropdown && <ChevronDown className="text-muted-foreground h-4 w-4" />}
         </div>
       </Link>
     );
   };
 
-  SidebarItemBase.displayName = "SidebarItem";
+  SidebarItemBase.displayName = 'SidebarItem';
   const SidebarItem = memo(SidebarItemBase);
 
   const SidebarContentBase: React.FC = () => (
@@ -200,9 +190,7 @@ const DashboardSidebar = () => {
         <div className="flex items-center gap-3">
           <WJLogo />
           <div className="flex-1">
-            <h2 className="text-sidebar-foreground font-semibold">
-              TechFlow Inc.
-            </h2>
+            <h2 className="text-sidebar-foreground font-semibold">TechFlow Inc.</h2>
             <p className="text-muted-foreground text-xs">Technology</p>
           </div>
           <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
@@ -237,7 +225,7 @@ const DashboardSidebar = () => {
     </div>
   );
 
-  SidebarContentBase.displayName = "SidebarContent";
+  SidebarContentBase.displayName = 'SidebarContent';
   const SidebarContent = memo(SidebarContentBase);
 
   return (
@@ -253,9 +241,9 @@ const DashboardSidebar = () => {
           <Button
             variant="outline"
             size="icon"
-            className="border-sidebar-border bg-sidebar fixed top-4 left-4 z-50 shadow-lg"
+            className="bg-primary/10 hover:bg-background fixed top-3 right-4 z-50 flex h-9 w-9 items-center justify-center rounded-md border transition-all sm:top-6 sm:right-6"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="text-primary h-5 w-5" />
             <span className="sr-only">Open sidebar</span>
           </Button>
         </SheetTrigger>
@@ -274,4 +262,4 @@ const DashboardSidebar = () => {
 
 export default DashboardSidebar;
 
-DashboardSidebar.displayName = "DashboardSidebar";
+DashboardSidebar.displayName = 'DashboardSidebar';
