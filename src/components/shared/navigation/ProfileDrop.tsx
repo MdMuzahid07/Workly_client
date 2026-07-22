@@ -49,6 +49,9 @@ interface UserProfile {
   initials?: string;
   role?: string;
   companyId?: string | number;
+  profile?: {
+    avatarUrl?: string | null;
+  } | null;
 }
 
 interface ProfileDropProps {
