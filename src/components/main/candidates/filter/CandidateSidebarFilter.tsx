@@ -1,20 +1,24 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { useMemo, useState } from "react";
-import FilterBySkill from "../../jobs/filter/FilterBySkill";
-import LocationWise from "../../jobs/filter/LocationWise";
-import ExperienceRange from "./ExperienceRange";
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { useMemo, useState } from 'react';
+import {
+  useGetCandidateLocationFacetsQuery,
+  useGetCandidateSkillFacetsQuery,
+} from '../../../../redux/feature/candidate/candidateApi';
+import FilterBySkill from '../../jobs/filter/FilterBySkill';
+import LocationWise from '../../jobs/filter/LocationWise';
+import ExperienceRange from './ExperienceRange';
 
 interface FilterState {
   location: string;
@@ -29,113 +33,66 @@ interface CandidateFilterSidebarProps {
 }
 
 const INDUSTRY_OPTIONS = [
-  "Software Development",
-  "Healthcare",
-  "Finance",
-  "Marketing",
-  "Design",
-  "Sales",
-  "Education",
+  'Software Development',
+  'Healthcare',
+  'Finance',
+  'Marketing',
+  'Design',
+  'Sales',
+  'Education',
 ];
 
-const INDUSTRY_SKILLS_MAP: Record<string, string[]> = {
-  "Software Development": [
-    "React",
-    "Node.js",
-    "TypeScript",
-    "Python",
-    "JavaScript",
-    "PostgreSQL",
-    "MongoDB",
-    "AWS",
-    "Tailwind CSS",
-  ],
-  Healthcare: [
-    "Nursing",
-    "Patient Care",
-    "Medical Terminology",
-    "EMR",
-    "First Aid",
-    "CPR",
-    "Phlebotomy",
-  ],
-  Finance: [
-    "Accounting",
-    "Financial Analysis",
-    "Excel",
-    "QuickBooks",
-    "Tax Preparation",
-    "Auditing",
-    "Investment",
-  ],
-  Marketing: [
-    "SEO",
-    "Content Writing",
-    "Social Media Marketing",
-    "Google Analytics",
-    "Copywriting",
-    "Email Marketing",
-  ],
-  Design: [
-    "Figma",
-    "Adobe Photoshop",
-    "Adobe Illustrator",
-    "UI/UX Design",
-    "Graphic Design",
-    "Typography",
-  ],
-  Sales: [
-    "CRM",
-    "Lead Generation",
-    "Negotiation",
-    "Cold Calling",
-    "Sales Strategy",
-  ],
-  Education: [
-    "Curriculum Development",
-    "Teaching",
-    "Classroom Management",
-    "Special Education",
-    "Tutoring",
-    "E-learning",
-  ],
-};
-
-const locationOptions = [
-  "Remote",
-  "New York, NY",
-  "Los Angeles, CA",
-  "Chicago, IL",
-  "San Francisco, CA",
-  "Austin, TX",
-  "Seattle, WA",
-];
-
-const CandidateSidebarFilter = ({
-  onFiltersChange,
-  className,
-}: CandidateFilterSidebarProps) => {
+const CandidateSidebarFilter = ({ onFiltersChange, className }: CandidateFilterSidebarProps) => {
   const [filters, setFilters] = useState<FilterState>({
-    location: "",
+    location: '',
     experienceRange: [0, 30],
-    industry: "",
+    industry: '',
     skills: [],
   });
 
+  // Dynamic Skill Facets for Candidates
+  const skillFacetParams = useMemo(() => {
+    const p: Record<string, string | number> = { limit: 50 };
+    if (filters.location) p.location = filters.location;
+    if (filters.industry) p.industry = filters.industry;
+    return p;
+  }, [filters.location, filters.industry]);
+
+  const { data: skillFacetsData, isLoading: skillsLoading } =
+    useGetCandidateSkillFacetsQuery(skillFacetParams);
+
   const skillOptions = useMemo(() => {
-    if (!filters.industry)
-      return Object.values(INDUSTRY_SKILLS_MAP).flat().slice(0, 15);
-    return INDUSTRY_SKILLS_MAP[filters.industry] || [];
-  }, [filters.industry]);
+    if (!skillFacetsData?.data) return [];
+    return skillFacetsData.data.map((facet: { skillName: string; count: number }) => ({
+      name: facet.skillName,
+      count: facet.count,
+    }));
+  }, [skillFacetsData]);
+
+  // Dynamic Location Facets for Candidates
+  const locationFacetParams = useMemo(() => {
+    const p: Record<string, string | number> = { limit: 50 };
+    if (filters.skills.length > 0) p.skills = filters.skills.join(',');
+    if (filters.industry) p.industry = filters.industry;
+    return p;
+  }, [filters.skills, filters.industry]);
+
+  const { data: locationFacetsData, isLoading: locationsLoading } =
+    useGetCandidateLocationFacetsQuery(locationFacetParams);
+
+  const locationOptions = useMemo(() => {
+    if (!locationFacetsData?.data) return [];
+    return locationFacetsData.data.map((facet: { location: string; count: number }) => ({
+      name: facet.location,
+      count: facet.count,
+    }));
+  }, [locationFacetsData]);
 
   const updateFilters = (newFilters: Partial<FilterState>) => {
     const updated = { ...filters, ...newFilters };
 
     // Reset skills if industry changes
-    if (
-      newFilters.industry !== undefined &&
-      newFilters.industry !== filters.industry
-    ) {
+    if (newFilters.industry !== undefined && newFilters.industry !== filters.industry) {
       updated.skills = [];
     }
 
@@ -145,9 +102,9 @@ const CandidateSidebarFilter = ({
 
   const clearAllFilters = () => {
     const cleared: FilterState = {
-      location: "",
+      location: '',
       experienceRange: [0, 30],
-      industry: "",
+      industry: '',
       skills: [],
     };
     setFilters(cleared);
@@ -212,6 +169,7 @@ const CandidateSidebarFilter = ({
             updateFilters={updateFilters}
             filters={filters}
             locationOptions={locationOptions}
+            locationsLoading={locationsLoading}
           />
 
           <Separator className="bg-gray-100 dark:bg-slate-800" />
@@ -224,6 +182,7 @@ const CandidateSidebarFilter = ({
             filters={filters}
             removeSkill={removeSkill}
             skillOptions={skillOptions}
+            skillsLoading={skillsLoading}
             toggleSkill={toggleSkill}
           />
         </CardContent>

@@ -37,6 +37,34 @@ const candidateApi = baseApi.injectEndpoints({
       }),
       providesTags: ['candidates'],
     }),
+
+    getCandidateSkillFacets: builder.query({
+      query: (params?: {
+        location?: string;
+        industry?: string;
+        search?: string;
+        limit?: number;
+      }) => ({
+        url: '/candidate/skills/facets',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['candidates'],
+    }),
+
+    getCandidateLocationFacets: builder.query({
+      query: (params?: {
+        skills?: string;
+        industry?: string;
+        search?: string;
+        limit?: number;
+      }) => ({
+        url: '/candidate/locations/facets',
+        method: 'GET',
+        params,
+      }),
+      providesTags: ['candidates'],
+    }),
   }),
 });
 
@@ -45,4 +73,6 @@ export const {
   useGetCandidateByIdQuery,
   useToggleSaveCandidateMutation,
   useGetSavedCandidatesQuery,
+  useGetCandidateSkillFacetsQuery,
+  useGetCandidateLocationFacetsQuery,
 } = candidateApi;

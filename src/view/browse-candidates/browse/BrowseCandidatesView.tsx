@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -271,10 +271,26 @@ const BrowseCandidatesView = () => {
     );
   };
 
+  const resultsRef = useRef<HTMLElement>(null);
+  const shouldScrollRef = useRef(false);
+
+  const scrollToResults = () => {
+    if (resultsRef.current) {
+      const topOffset = resultsRef.current.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: Math.max(0, topOffset), behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     if (data?.data) {
       if (currentPage === 1) {
         setAllCandidates(data.data);
+        if (shouldScrollRef.current) {
+          shouldScrollRef.current = false;
+          setTimeout(() => {
+            scrollToResults();
+          }, 100);
+        }
       } else {
         setAllCandidates((prev) => {
           const combined = [...prev, ...data.data];
@@ -287,6 +303,7 @@ const BrowseCandidatesView = () => {
   }, [data, currentPage]);
 
   const handleSearch = (searchData: { search: string; location: string }) => {
+    shouldScrollRef.current = true;
     setFilters((prev) => ({
       ...prev,
       search: searchData.search,
@@ -303,6 +320,7 @@ const BrowseCandidatesView = () => {
   };
 
   const handleFiltersChange = (newFilters: any) => {
+    shouldScrollRef.current = true;
     setFilters((prev) => ({ ...prev, ...newFilters }));
     setCurrentPage(1);
     setAllCandidates([]);
@@ -399,7 +417,7 @@ const BrowseCandidatesView = () => {
         )}
 
         {/* ==================== Main Listing Grid/List with Sidebar ==================== */}
-        <section className="border-border/30 border-t pt-8 sm:pt-10 lg:pt-12">
+        <section ref={resultsRef} className="border-border/30 border-t pt-8 sm:pt-10 lg:pt-12">
           {/* Header Row */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
             <div className="flex items-center gap-3">
