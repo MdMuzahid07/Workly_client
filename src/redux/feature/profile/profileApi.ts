@@ -1,5 +1,5 @@
-import baseApi from "../../api/baseApi";
-import { updateUser } from "../auth/authSlice";
+import baseApi from '../../api/baseApi';
+import { updateUser } from '../auth/authSlice';
 
 export interface CompanyInfo {
   name: string;
@@ -51,19 +51,19 @@ const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createProfile: builder.mutation({
       query: (data) => ({
-        url: "/profile/create-profile",
-        method: "POST",
+        url: '/profile/create-profile',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
 
     getProfile: builder.query({
       query: () => ({
-        url: "/profile/profile",
-        method: "GET",
+        url: '/profile/profile',
+        method: 'GET',
       }),
-      providesTags: ["profile"],
+      providesTags: ['profile'],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -71,33 +71,30 @@ const profileApi = baseApi.injectEndpoints({
             dispatch(updateUser(data.data));
           }
         } catch (err) {
-          console.error("Failed to fetch profile", err);
+          console.error('Failed to fetch profile', err);
         }
       },
     }),
 
     updateProfile: builder.mutation({
       query: (data) => ({
-        url: "/profile/update-profile",
-        method: "PATCH",
+        url: '/profile/update-profile',
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
 
     toggleSaveUnsaveJob: builder.mutation({
       query: (jobId: string) => ({
-        url: "/profile/save-job",
-        method: "POST",
+        url: '/profile/save-job',
+        method: 'POST',
         body: { jobId },
       }),
       // Invalidate both the profile cache AND the specific job's cache entry.
       // This causes `getJobById(jobId)` to re-fetch, updating the `isSaved`
       // flag on the job details page without requiring a manual page refresh.
-      invalidatesTags: (result, error, jobId) => [
-        "profile",
-        { type: "jobs", id: jobId },
-      ],
+      invalidatesTags: (result, error, jobId) => ['profile', { type: 'jobs', id: jobId }],
     }),
 
     getSavedJobs: builder.query<
@@ -111,135 +108,135 @@ const profileApi = baseApi.injectEndpoints({
       } | void
     >({
       query: (params) => ({
-        url: "/profile/saved-jobs",
-        method: "GET",
+        url: '/profile/saved-jobs',
+        method: 'GET',
         params: params || {},
       }),
-      providesTags: ["profile"],
+      providesTags: ['profile'],
     }),
 
     updateSavedJob: builder.mutation({
       query: ({ jobId, ...data }) => ({
         url: `/profile/saved-jobs/${jobId}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
 
     // Education
     addEducation: builder.mutation({
       query: (data) => ({
-        url: "/education/add",
-        method: "POST",
+        url: '/education/add',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     updateEducation: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/education/update/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     deleteEducation: builder.mutation({
       query: (id) => ({
         url: `/education/delete/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
 
     // Work Experience
     addWorkExperience: builder.mutation({
       query: (data) => ({
-        url: "/work-experience/add",
-        method: "POST",
+        url: '/work-experience/add',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     updateWorkExperience: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/work-experience/update/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     deleteWorkExperience: builder.mutation({
       query: (id) => ({
         url: `/work-experience/delete/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
 
     // Certification
     addCertification: builder.mutation({
       query: (data) => ({
-        url: "/certification/add",
-        method: "POST",
+        url: '/certification/add',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     updateCertification: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/certification/update/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     deleteCertification: builder.mutation({
       query: (id) => ({
         url: `/certification/delete/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
 
     // Project
     addProject: builder.mutation({
       query: (data) => ({
-        url: "/project/add",
-        method: "POST",
+        url: '/project/add',
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     updateProject: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/project/update/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     deleteProject: builder.mutation({
       query: (id) => ({
         url: `/project/delete/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
     getUserSettings: builder.query({
       query: () => ({
-        url: "/profile/settings",
-        method: "GET",
+        url: '/profile/settings',
+        method: 'GET',
       }),
-      providesTags: ["profile"],
+      providesTags: ['profile'],
     }),
     updateUserSettings: builder.mutation({
       query: (data) => ({
-        url: "/profile/settings",
-        method: "PATCH",
+        url: '/profile/settings',
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ['profile'],
     }),
   }),
 });
@@ -266,3 +263,5 @@ export const {
   useGetUserSettingsQuery,
   useUpdateUserSettingsMutation,
 } = profileApi;
+
+export default profileApi;
