@@ -1,6 +1,6 @@
 export enum PlanType {
-  EMPLOYER = "EMPLOYER",
-  JOB_SEEKER = "JOB_SEEKER",
+  EMPLOYER = 'EMPLOYER',
+  JOB_SEEKER = 'JOB_SEEKER',
 }
 
 export interface PlanFeatureFlags {
@@ -46,6 +46,7 @@ export interface MySubscriptionResponse {
     jobsPosted: number;
     applicationsSubmitted: number;
     resumesUploaded: number;
+    teamMembers?: number;
   };
 }
 
@@ -58,7 +59,7 @@ export interface EntitlementErrorResponse {
   statusCode: number;
   message: string;
   error: {
-    code: "LIMIT_EXCEEDED" | "FEATURE_LOCKED";
+    code: 'LIMIT_EXCEEDED' | 'FEATURE_LOCKED';
     feature: keyof PlanFeatureFlags;
     limit?: number;
     current?: number;

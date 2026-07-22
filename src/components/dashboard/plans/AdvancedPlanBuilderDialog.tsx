@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Plus, Rocket, ShieldCheck, X } from "lucide-react";
-import { useState } from "react";
-import WkForm from "../../form/WkForm";
-import WkInput from "../../form/WkInput";
-import WkTextArea from "../../form/WkTextArea";
+} from '@/components/ui/dialog';
+import { Plus, Rocket, ShieldCheck, X } from 'lucide-react';
+import { useState } from 'react';
+import WkForm from '../../form/WkForm';
+import WkInput from '../../form/WkInput';
+import WkTextArea from '../../form/WkTextArea';
 
 interface AdvancedPlanBuilderDialogProps {
   open: boolean;
@@ -40,12 +40,12 @@ const AdvancedPlanBuilderDialog = ({
   onSuccess,
 }: AdvancedPlanBuilderDialogProps) => {
   const [features, setFeatures] = useState<string[]>([]);
-  const [newFeature, setNewFeature] = useState("");
+  const [newFeature, setNewFeature] = useState('');
 
   const handleAddFeature = () => {
     if (newFeature.trim()) {
       setFeatures([...features, newFeature.trim()]);
-      setNewFeature("");
+      setNewFeature('');
     }
   };
 
@@ -60,16 +60,19 @@ const AdvancedPlanBuilderDialog = ({
     maxActiveJobs?: string;
     maxUsers?: string;
   }) => {
+    const parsedJobs = data.maxActiveJobs ? parseInt(data.maxActiveJobs, 10) : 0;
+    const parsedUsers = data.maxUsers ? parseInt(data.maxUsers, 10) : 0;
+
     onSuccess({
       ...data,
       id: Math.random().toString(36).substr(2, 9),
       active: true,
       features,
       subscriberCount: 0,
-      color: "bg-indigo-600",
+      color: 'bg-indigo-600',
       icon: ShieldCheck,
-      maxActiveJobs: data.maxActiveJobs ? parseInt(data.maxActiveJobs) : null,
-      maxUsers: data.maxUsers ? parseInt(data.maxUsers) : null,
+      maxActiveJobs: parsedJobs > 0 ? parsedJobs : 95,
+      maxUsers: parsedUsers > 0 ? parsedUsers : 20,
     });
     setFeatures([]);
     onOpenChange(false);
@@ -86,8 +89,7 @@ const AdvancedPlanBuilderDialog = ({
             <div>
               <DialogTitle>Advanced Plan Builder</DialogTitle>
               <DialogDescription>
-                Create a high-tier or custom enterprise package for specialized
-                partners.
+                Create a high-tier or custom enterprise package for specialized partners.
               </DialogDescription>
             </div>
           </div>
@@ -96,10 +98,10 @@ const AdvancedPlanBuilderDialog = ({
         <WkForm
           onSubmit={handleFormSubmit}
           defaultValues={{
-            name: "Custom Enterprise",
-            price: "999",
-            maxActiveJobs: "0",
-            maxUsers: "0",
+            name: 'Custom Enterprise',
+            price: '999',
+            maxActiveJobs: '0',
+            maxUsers: '0',
           }}
         >
           <div className="custom-scrollbar grid max-h-[65vh] gap-6 overflow-y-auto px-1 py-6">
@@ -110,19 +112,10 @@ const AdvancedPlanBuilderDialog = ({
                 placeholder="e.g. Fortune 500 Specialist"
                 required
               />
-              <WkInput
-                name="price"
-                label="Base Monthly Price ($)"
-                type="number"
-                required
-              />
+              <WkInput name="price" label="Base Monthly Price ($)" type="number" required />
             </div>
 
-            <WkTextArea
-              name="description"
-              label="Value Proposition / Description"
-              required
-            />
+            <WkTextArea name="description" label="Value Proposition / Description" required />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -151,13 +144,8 @@ const AdvancedPlanBuilderDialog = ({
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-bold">
-                  Custom Feature Modules
-                </label>
-                <Badge
-                  variant="outline"
-                  className="text-[10px] font-bold tracking-wider uppercase"
-                >
+                <label className="text-sm font-bold">Custom Feature Modules</label>
+                <Badge variant="outline" className="text-[10px] font-bold tracking-wider uppercase">
                   {features.length} Modules
                 </Badge>
               </div>
@@ -169,7 +157,7 @@ const AdvancedPlanBuilderDialog = ({
                   placeholder="e.g. White-label Career Portal"
                   className="bg-muted/50 focus:ring-primary h-11 flex-1 rounded-xl border-none px-4 text-sm transition-all outline-none focus:ring-1"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === 'Enter') {
                       e.preventDefault();
                       handleAddFeature();
                     }
@@ -190,9 +178,7 @@ const AdvancedPlanBuilderDialog = ({
                     key={index}
                     className="bg-background group hover:border-primary/30 flex items-center justify-between rounded-xl border px-3 py-2.5 shadow-sm transition-all"
                   >
-                    <span className="truncate text-xs font-bold opacity-80">
-                      {feature}
-                    </span>
+                    <span className="truncate text-xs font-bold opacity-80">{feature}</span>
                     <Button
                       type="button"
                       variant="ghost"
