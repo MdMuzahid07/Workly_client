@@ -1,4 +1,4 @@
-import baseApi, { tagTypes } from "@/redux/api/baseApi";
+import baseApi, { tagTypes } from '@/redux/api/baseApi';
 
 export interface JobViewItem {
   id: string;
@@ -36,11 +36,12 @@ export interface JobViewHistoryResponse {
 }
 
 export const jobViewApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     logJobView: builder.mutation<unknown, string>({
       query: (jobId: string) => ({
         url: `/job-view/log/${jobId}`,
-        method: "POST",
+        method: 'POST',
       }),
       invalidatesTags: [tagTypes.job_views],
     }),
@@ -49,8 +50,8 @@ export const jobViewApi = baseApi.injectEndpoints({
       { searchTerm?: string; jobType?: string } | void
     >({
       query: (params) => ({
-        url: "/job-view/history",
-        method: "GET",
+        url: '/job-view/history',
+        method: 'GET',
         params: params || {},
       }),
       providesTags: [tagTypes.job_views],

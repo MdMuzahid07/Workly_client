@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { navLinks } from '../../../constants';
 import { useLogoutUserMutation } from '../../../redux/feature/auth/authApi';
 import { logout } from '../../../redux/feature/auth/authSlice';
+import { useGetProfileQuery } from '../../../redux/feature/profile/profileApi';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import ThemeSwitcher from '../ThemeSwitcher';
 import WJLogo from '../WJLogo';
@@ -21,6 +22,10 @@ const Navbar = () => {
   const { user, isVerified } = useAppSelector((state) => state.auth) || {
     email: null,
   };
+
+  const isLoggedIn = Boolean(user?.email && isVerified);
+  useGetProfileQuery(undefined, { skip: !isLoggedIn });
+
   const dispatch = useAppDispatch();
   const [logoutUser] = useLogoutUserMutation();
   const [isScrolled, setIsScrolled] = useState(false);

@@ -1,42 +1,38 @@
-import baseApi from "../../api/baseApi";
-import { ApiResponse } from "../../../types/api";
-import { MySubscriptionResponse } from "../../../types/subscription";
+import baseApi from '../../api/baseApi';
+import { ApiResponse } from '../../../types/api';
+import { MySubscriptionResponse } from '../../../types/subscription';
 
 export const subscriptionApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
-    getMySubscription: builder.query<ApiResponse<MySubscriptionResponse>, void>(
-      {
-        query: () => ({
-          url: "/subscriptions/me",
-          method: "GET",
-        }),
-        providesTags: ["subscriptions"],
-      },
-    ),
+    getMySubscription: builder.query<ApiResponse<MySubscriptionResponse>, void>({
+      query: () => ({
+        url: '/subscriptions/me',
+        method: 'GET',
+      }),
+      providesTags: ['subscriptions'],
+    }),
     cancelSubscription: builder.mutation<ApiResponse<null>, void>({
       query: () => ({
-        url: "/subscriptions/cancel",
-        method: "POST",
+        url: '/subscriptions/cancel',
+        method: 'POST',
       }),
-      invalidatesTags: ["subscriptions"],
+      invalidatesTags: ['subscriptions'],
     }),
     reactivateSubscription: builder.mutation<ApiResponse<null>, void>({
       query: () => ({
-        url: "/subscriptions/reactivate",
-        method: "POST",
+        url: '/subscriptions/reactivate',
+        method: 'POST',
       }),
-      invalidatesTags: ["subscriptions"],
+      invalidatesTags: ['subscriptions'],
     }),
-    adminAssignPlan: builder.mutation<
-      ApiResponse<null>,
-      { userId: string; planId: string }
-    >({
+    adminAssignPlan: builder.mutation<ApiResponse<null>, { userId: string; planId: string }>({
       query: (body) => ({
-        url: "/subscriptions/admin/assign",
-        method: "POST",
+        url: '/subscriptions/admin/assign',
+        method: 'POST',
         body,
       }),
-      invalidatesTags: ["subscriptions"],
+      invalidatesTags: ['subscriptions'],
     }),
   }),
 });

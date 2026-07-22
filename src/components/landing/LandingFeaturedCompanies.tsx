@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -10,54 +10,50 @@ import {
   Crown,
   MapPin,
   Rocket,
-} from "lucide-react";
-import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
-import "swiper/css";
-import { Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { useGetCompaniesQuery } from "../../redux/feature/company/companyApi";
-import type { CompanyListing, DisplayCompany } from "@/types/company";
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import 'swiper/css';
+import { Autoplay } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { useGetCompaniesQuery } from '../../redux/feature/company/companyApi';
+import type { CompanyListing, DisplayCompany } from '@/types/company';
 
 const logoBgOptions = [
-  "bg-primary/10 text-primary",
-  "bg-accent/10 text-accent",
-  "bg-blue-600/10 text-blue-600",
-  "bg-purple-600/10 text-purple-600",
-  "bg-orange-500/10 text-orange-500",
-  "bg-indigo-600/10 text-indigo-600",
+  'bg-primary/10 text-primary',
+  'bg-accent/10 text-accent',
+  'bg-blue-600/10 text-blue-600',
+  'bg-purple-600/10 text-purple-600',
+  'bg-orange-500/10 text-orange-500',
+  'bg-indigo-600/10 text-indigo-600',
 ] as const;
 
-const getIndustryName = (industry: CompanyListing["industry"]): string => {
-  if (!industry) return "Technology";
-  if (typeof industry === "string") return industry;
+const getIndustryName = (industry: CompanyListing['industry']): string => {
+  if (!industry) return 'Technology';
+  if (typeof industry === 'string') return industry;
   return industry.name;
 };
 
 const mapCompanyToDisplay = (comp: CompanyListing): DisplayCompany => {
-  const randomBg =
-    logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
+  const randomBg = logoBgOptions[Math.floor(Math.random() * logoBgOptions.length)];
   return {
     name: comp.name,
     slug: comp.slug || comp.id,
     industry: getIndustryName(comp.industry),
-    location: comp.location || "Remote",
-    jobsCount:
-      comp.openJobs !== undefined
-        ? `${comp.openJobs} active jobs`
-        : "Hiring actively",
-    initial: comp.name ? comp.name[0].toUpperCase() : "C",
+    location: comp.location || 'Remote',
+    jobsCount: comp.openJobs !== undefined ? `${comp.openJobs} active jobs` : 'Hiring actively',
+    initial: comp.name ? comp.name[0].toUpperCase() : 'C',
     logoBg: randomBg,
     tagline: comp.description
-      ? comp.description.slice(0, 75) + "..."
-      : "Building elite digital solutions.",
+      ? comp.description.slice(0, 75) + '...'
+      : 'Building elite digital solutions.',
     isReal: true,
   };
 };
 
 const LandingFeaturedCompaniesSkeleton = () => {
   return (
-    <section className="bg-background border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
+    <section className="section-tint border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center sm:mb-16 lg:mb-20">
           <div className="bg-muted mx-auto mb-4 h-9 w-44 animate-pulse rounded-full" />
@@ -65,10 +61,7 @@ const LandingFeaturedCompaniesSkeleton = () => {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, index) => (
-            <Card
-              key={index}
-              className="border-border/40 bg-card/50 animate-pulse rounded-2xl p-6"
-            >
+            <Card key={index} className="border-border/40 bg-card/50 animate-pulse rounded-2xl p-6">
               <div className="space-y-4">
                 <div className="bg-muted h-12 w-12 rounded-xl" />
                 <div className="bg-muted h-6 w-3/4 rounded" />
@@ -87,7 +80,7 @@ const LandingFeaturedCompaniesSkeleton = () => {
 const LandingFeaturedCompaniesEmpty = () => {
   const router = useRouter();
   return (
-    <section className="bg-background border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
+    <section className="section-tint border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-primary/5 absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full blur-[120px]" />
         <div className="bg-accent/5 absolute bottom-1/4 left-1/4 h-[300px] w-[300px] rounded-full blur-[100px]" />
@@ -115,7 +108,7 @@ const LandingFeaturedCompaniesEmpty = () => {
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
           >
-            Top Featured{" "}
+            Top Featured{' '}
             <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
               Employers
             </span>
@@ -128,8 +121,8 @@ const LandingFeaturedCompaniesEmpty = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-muted-foreground mx-auto mt-3 max-w-2xl text-xs sm:text-lg"
           >
-            Be the first verified employer on Workly and connect with thousands
-            of skilled professionals today.
+            Be the first verified employer on Workly and connect with thousands of skilled
+            professionals today.
           </motion.p>
         </div>
 
@@ -147,15 +140,12 @@ const LandingFeaturedCompaniesEmpty = () => {
               <div className="from-primary/10 to-accent/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br">
                 <Building2 className="text-primary h-10 w-10" />
               </div>
-              <h3 className="text-foreground mb-3 text-2xl font-bold">
-                Be a Pioneer Employer
-              </h3>
+              <h3 className="text-foreground mb-3 text-2xl font-bold">Be a Pioneer Employer</h3>
               <p className="text-muted-foreground mb-8 text-base leading-relaxed">
-                Post jobs, review applicants, and hire top talent — all from one
-                seamless platform.
+                Post jobs, review applicants, and hire top talent — all from one seamless platform.
               </p>
               <button
-                onClick={() => router.push("/employer/register")}
+                onClick={() => router.push('/employer/register')}
                 className="bg-primary hover:bg-primary/90 shadow-primary/20 hover:shadow-primary/30 inline-flex cursor-pointer items-center gap-2 rounded-xl px-8 py-4 text-sm font-bold text-white shadow-lg transition-all"
               >
                 <Rocket className="h-4 w-4" />
@@ -172,16 +162,13 @@ const LandingFeaturedCompaniesEmpty = () => {
 
 const LandingFeaturedCompanies = () => {
   const router = useRouter();
-  const { data: companiesData, isLoading: companiesLoading } =
-    useGetCompaniesQuery({ limit: 10 });
+  const { data: companiesData, isLoading: companiesLoading } = useGetCompaniesQuery({ limit: 10 });
 
   const fetchedCompanies: CompanyListing[] =
     companiesData?.data?.result || companiesData?.data || [];
 
   const displayCompanies: DisplayCompany[] =
-    fetchedCompanies.length > 0
-      ? fetchedCompanies.slice(0, 8).map(mapCompanyToDisplay)
-      : [];
+    fetchedCompanies.length > 0 ? fetchedCompanies.slice(0, 8).map(mapCompanyToDisplay) : [];
 
   const handleCompanyClick = (company: DisplayCompany) => {
     if (company.isReal) {
@@ -200,7 +187,7 @@ const LandingFeaturedCompanies = () => {
   }
 
   return (
-    <section className="bg-background border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
+    <section className="section-tint border-border/40 relative overflow-hidden border-b py-14 sm:py-24 lg:py-32">
       {/* Background Atmosphere */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-primary/5 absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full blur-[120px]" />
@@ -229,7 +216,7 @@ const LandingFeaturedCompanies = () => {
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-foreground text-2xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
           >
-            Top Featured{" "}
+            Top Featured{' '}
             <span className="from-primary via-primary to-accent bg-linear-to-r bg-clip-text text-transparent">
               Employers
             </span>
@@ -242,8 +229,8 @@ const LandingFeaturedCompanies = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-muted-foreground mx-auto mt-3 max-w-2xl text-xs sm:text-lg"
           >
-            Explore verified enterprise brands and premium hiring firms
-            currently looking for talent.
+            Explore verified enterprise brands and premium hiring firms currently looking for
+            talent.
           </motion.p>
         </div>
 

@@ -78,7 +78,7 @@ const mapJobToDisplay = (job: JobListing): DisplayJob => {
 
 const LandingFeaturedJobsSkeleton = () => {
   return (
-    <section className="bg-background relative overflow-hidden py-14 sm:py-24 lg:py-32">
+    <section className="section-tint relative overflow-hidden py-14 sm:py-24 lg:py-32">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 sm:mb-16 md:flex-row md:items-end lg:mb-20">
           <div className="w-full text-center md:text-left">
@@ -118,7 +118,7 @@ const LandingFeaturedJobsSkeleton = () => {
 const LandingFeaturedJobsEmpty = () => {
   const router = useRouter();
   return (
-    <section className="bg-background relative overflow-hidden py-14 sm:py-24 lg:py-32">
+    <section className="section-tint relative overflow-hidden py-14 sm:py-24 lg:py-32">
       {/* Background Atmosphere */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-accent/5 absolute bottom-0 left-1/4 h-[450px] w-[450px] rounded-full blur-[120px]" />
@@ -282,7 +282,7 @@ const LandingFeaturedJobs = () => {
   }
 
   return (
-    <section className="bg-background relative overflow-hidden py-14 sm:py-24 lg:py-32">
+    <section className="section-tint relative overflow-hidden py-14 sm:py-24 lg:py-32">
       {/* Dynamic Background Atmospheric Orbs */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="bg-accent/5 absolute bottom-0 left-1/4 h-[450px] w-[450px] rounded-full blur-[120px]" />

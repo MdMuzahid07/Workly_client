@@ -49,6 +49,9 @@ interface UserProfile {
   initials?: string;
   role?: string;
   companyId?: string | number;
+  profile?: {
+    avatarUrl?: string | null;
+  } | null;
 }
 
 interface ProfileDropProps {
@@ -132,6 +135,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({ user, onSignOut, className = 
     },
   ];
 
+  const avatarSrc =
+    user?.avatar || user?.profilePicture || user?.avatarUrl || user?.profile?.avatarUrl;
+  const hasAvatar = Boolean(avatarSrc && avatarSrc.trim() && !avatarSrc.includes('placeholder'));
+
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
@@ -139,10 +146,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({ user, onSignOut, className = 
         className="group flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80"
       >
         <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 dark:border-slate-800">
-          {user?.avatar || user?.profilePicture || user?.avatarUrl ? (
+          {hasAvatar ? (
             <Image
-              src={user?.avatar || user?.profilePicture || user?.avatarUrl || ''}
-              alt={user?.fullName}
+              src={avatarSrc!}
+              alt={user?.fullName || 'User'}
               fill
               className="object-cover"
               sizes="32px"
@@ -153,7 +160,7 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({ user, onSignOut, className = 
                 ?.split(' ')
                 .filter(Boolean)
                 .map((n) => n[0])
-                .join('')}
+                .join('') || 'U'}
             </div>
           )}
         </div>

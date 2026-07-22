@@ -1,5 +1,5 @@
-import baseApi from "../../api/baseApi";
-import { IUser } from "./authSlice";
+import baseApi from '../../api/baseApi';
+import { IUser } from './authSlice';
 
 interface ILoginResponse {
   accessToken: string;
@@ -12,7 +12,7 @@ interface IRegisterData {
   password: string;
   fullName: string;
   confirmPassword: string;
-  role: "EMPLOYER" | "JOB_SEEKER";
+  role: 'EMPLOYER' | 'JOB_SEEKER';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,47 +29,39 @@ interface IChangePasswordData {
 }
 
 const authApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     registerUser: builder.mutation<ILoginResponse, IRegisterData>({
       query: (data) => ({
-        url: "/auth/register",
-        method: "POST",
+        url: '/auth/register',
+        method: 'POST',
         body: data,
       }),
     }),
-    loginUser: builder.mutation<
-      ILoginResponse,
-      { email: string; password: string }
-    >({
+    loginUser: builder.mutation<ILoginResponse, { email: string; password: string }>({
       query: (data) => ({
-        url: "/auth/login",
-        method: "POST",
+        url: '/auth/login',
+        method: 'POST',
         body: data,
       }),
     }),
     logoutUser: builder.mutation<void, void>({
       query: () => ({
-        url: "/auth/logout",
-        method: "POST",
+        url: '/auth/logout',
+        method: 'POST',
       }),
     }),
-    verifyEmail: builder.mutation<
-      { message: string; user: IUser },
-      { token: string }
-    >({
+    verifyEmail: builder.mutation<{ message: string; user: IUser }, { token: string }>({
       query: (data) => ({
-        url: "/auth/verify-email",
-        method: "POST",
+        url: '/auth/verify-email',
+        method: 'POST',
         body: data,
       }),
     }),
-    resendVerification: builder.mutation<
-      { message: string; email: string },
-      { email: string }
-    >({
+    resendVerification: builder.mutation<{ message: string; email: string }, { email: string }>({
       query: (data) => ({
-        url: "/auth/resend-verification-email",
-        method: "POST",
+        url: '/auth/resend-verification-email',
+        method: 'POST',
         body: data,
       }),
     }),
@@ -78,8 +70,8 @@ const authApi = baseApi.injectEndpoints({
       { email: string }
     >({
       query: (data) => ({
-        url: "/auth/forgot-password",
-        method: "POST",
+        url: '/auth/forgot-password',
+        method: 'POST',
         body: data,
       }),
     }),
@@ -88,43 +80,37 @@ const authApi = baseApi.injectEndpoints({
       { token: string; newPassword: string; confirmPassword: string }
     >({
       query: (data) => ({
-        url: "/auth/reset-password",
-        method: "POST",
+        url: '/auth/reset-password',
+        method: 'POST',
         body: data,
       }),
     }),
-    refreshToken: builder.mutation<
-      { accessToken: string },
-      { refreshToken: string }
-    >({
+    refreshToken: builder.mutation<{ accessToken: string }, { refreshToken: string }>({
       query: (data) => ({
-        url: "/auth/refresh",
-        method: "POST",
+        url: '/auth/refresh',
+        method: 'POST',
         body: data,
       }),
     }),
     changePassword: builder.mutation<{ message: string }, IChangePasswordData>({
       query: (data) => ({
-        url: "/auth/change-password",
-        method: "POST",
+        url: '/auth/change-password',
+        method: 'POST',
         body: data,
       }),
     }),
     // Confirm role for new Google OAuth users — called from the callback page
-    confirmGoogleRole: builder.mutation<
-      { data: IUser },
-      { role: "EMPLOYER" | "JOB_SEEKER" }
-    >({
+    confirmGoogleRole: builder.mutation<{ data: IUser }, { role: 'EMPLOYER' | 'JOB_SEEKER' }>({
       query: (data) => ({
-        url: "/auth/confirm-google-role",
-        method: "PATCH",
+        url: '/auth/confirm-google-role',
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteMe: builder.mutation<void, void>({
       query: () => ({
-        url: "/users/me",
-        method: "DELETE",
+        url: '/users/me',
+        method: 'DELETE',
       }),
     }),
   }),

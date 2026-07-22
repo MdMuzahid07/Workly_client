@@ -1,23 +1,46 @@
-"use client";
+'use client';
 
-import { Card } from "@/components/ui/card";
-import { ArrowRight, CheckCircle2, Download, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Card } from '@/components/ui/card';
+import baseApi from '@/redux/api/baseApi';
+import profileApi from '@/redux/feature/profile/profileApi';
+import subscriptionApi from '@/redux/feature/subscription/subscriptionApi';
+import { useAppDispatch } from '@/redux/hooks';
+import { ArrowRight, CheckCircle2, Download, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
-  const tranId = searchParams.get("tranId") || "TXN-XXXXXX";
-  const amount = searchParams.get("amount") || "0.00";
+  const tranId = searchParams.get('tranId') || 'TXN-XXXXXX';
+  const amount = searchParams.get('amount') || '0.00';
   const [countdown, setCountdown] = useState(8);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // Immediately invalidate and refetch user subscription & profile state
+    // to ensure premium features are unlocked across the app without manual refresh
+    dispatch(baseApi.util.invalidateTags(['subscriptions', 'profile', 'user', 'payments']));
+    dispatch(
+      profileApi.endpoints.getProfile.initiate(undefined, {
+        subscribe: false,
+        forceRefetch: true,
+      }),
+    );
+    dispatch(
+      subscriptionApi.endpoints.getMySubscription.initiate(undefined, {
+        subscribe: false,
+        forceRefetch: true,
+      }),
+    );
+  }, [dispatch]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = "/dashboard";
+          window.location.href = '/dashboard';
           return 0;
         }
         return prev - 1;
@@ -42,8 +65,8 @@ export default function PaymentSuccessPage() {
           Payment Successful!
         </h1>
         <p className="text-muted-foreground text-md mt-2">
-          Thank you for your purchase. Your digital account privileges have been
-          successfully provisioned.
+          Thank you for your purchase. Your digital account privileges have been successfully
+          provisioned.
         </p>
 
         {/* Invoice Summary */}
@@ -54,9 +77,7 @@ export default function PaymentSuccessPage() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Transaction ID</span>
-              <span className="text-foreground font-mono font-bold">
-                {tranId}
-              </span>
+              <span className="text-foreground font-mono font-bold">{tranId}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Amount Paid</span>

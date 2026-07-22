@@ -1,53 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 export const planApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
-    getPlans: builder.query<
-      any,
-      { type?: "employer" | "candidate"; isActive?: boolean } | void
-    >({
+    getPlans: builder.query<any, { type?: 'employer' | 'candidate'; isActive?: boolean } | void>({
       query: (arg) => {
-        const type = arg && arg.type ? `type=${arg.type}` : "";
-        const isActive =
-          arg && arg.isActive !== undefined ? `isActive=${arg.isActive}` : "";
-        const queryParams = [type, isActive].filter(Boolean).join("&");
+        const type = arg && arg.type ? `type=${arg.type}` : '';
+        const isActive = arg && arg.isActive !== undefined ? `isActive=${arg.isActive}` : '';
+        const queryParams = [type, isActive].filter(Boolean).join('&');
         return {
           url: `/plans?${queryParams}`,
-          method: "GET",
+          method: 'GET',
         };
       },
-      providesTags: ["plans"],
+      providesTags: ['plans'],
     }),
     createPlan: builder.mutation({
       query: (planData) => ({
-        url: "/plans",
-        method: "POST",
+        url: '/plans',
+        method: 'POST',
         body: planData,
       }),
-      invalidatesTags: ["plans"],
+      invalidatesTags: ['plans'],
     }),
     updatePlan: builder.mutation({
       query: ({ id, ...planData }) => ({
         url: `/plans/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: planData,
       }),
-      invalidatesTags: ["plans"],
+      invalidatesTags: ['plans'],
     }),
     togglePlanStatus: builder.mutation({
       query: (id: string) => ({
         url: `/plans/${id}/toggle`,
-        method: "PATCH",
+        method: 'PATCH',
       }),
-      invalidatesTags: ["plans"],
+      invalidatesTags: ['plans'],
     }),
     deletePlan: builder.mutation({
       query: (id: string) => ({
         url: `/plans/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["plans"],
+      invalidatesTags: ['plans'],
     }),
   }),
 });

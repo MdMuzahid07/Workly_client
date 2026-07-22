@@ -1,39 +1,40 @@
-import baseApi from "../../api/baseApi";
+import baseApi from '../../api/baseApi';
 
 const uploadApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     uploadSingleFile: builder.mutation({
       query: (formData: FormData) => ({
-        url: "/upload/single",
-        method: "POST",
+        url: '/upload/single',
+        method: 'POST',
         body: formData,
       }),
     }),
     uploadMultipleFiles: builder.mutation({
       query: (data) => ({
-        url: "/upload/multiple",
-        method: "POST",
+        url: '/upload/multiple',
+        method: 'POST',
         body: data,
       }),
     }),
     uploadAvatar: builder.mutation({
       query: (formData: FormData) => ({
-        url: "/upload/avatar",
-        method: "POST",
+        url: '/upload/avatar',
+        method: 'POST',
         body: formData,
       }),
     }),
     uploadLogo: builder.mutation({
       query: (formData: FormData) => ({
-        url: "/upload/logo",
-        method: "POST",
+        url: '/upload/logo',
+        method: 'POST',
         body: formData,
       }),
     }),
     uploadCover: builder.mutation({
       query: (formData: FormData) => ({
-        url: "/upload/cover",
-        method: "POST",
+        url: '/upload/cover',
+        method: 'POST',
         body: formData,
       }),
     }),

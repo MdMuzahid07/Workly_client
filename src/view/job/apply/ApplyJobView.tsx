@@ -81,7 +81,7 @@ const ApplyJobView = ({ jobId }: ApplyJobViewProps) => {
     isLoading: isLimitLoading,
   } = useCanAccess('maxMonthlyApplications');
   const { planName } = useEntitlements();
-  const isPremium = planName === 'Premium';
+  const isPremium = (planName && planName.toLowerCase() !== 'free') || limit >= 9999;
 
   const limitReached = !isLimitLoading && monthlyCount >= limit;
   const closeToLimit = !isLimitLoading && monthlyCount >= limit - 5;

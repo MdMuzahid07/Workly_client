@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useAppSelector } from "@/redux/hooks";
-import { Bell, Menu, Search } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import ThemeSwitcher from "../shared/ThemeSwitcher";
-import NotificationDropdown from "../shared/navigation/NotificationDropdown";
-import ProfileDrop from "../shared/navigation/ProfileDrop";
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useAppSelector } from '@/redux/hooks';
+import { useGetProfileQuery } from '@/redux/feature/profile/profileApi';
+import { Bell, Menu, Search } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import ThemeSwitcher from '../shared/ThemeSwitcher';
+import NotificationDropdown from '../shared/navigation/NotificationDropdown';
+import ProfileDrop from '../shared/navigation/ProfileDrop';
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void;
@@ -21,6 +22,7 @@ export default function DashboardHeader({
 }: DashboardHeaderProps) {
   const pathname = usePathname();
   const { user } = useAppSelector((state) => state.auth) || {};
+  useGetProfileQuery(undefined, { skip: !user?.email });
   const [showSearch, setShowSearch] = useState(false);
 
   // Handle menu button click
@@ -30,36 +32,34 @@ export default function DashboardHeader({
 
   // Get page title from pathname
   const getPageTitle = () => {
-    if (!pathname) return "Dashboard";
+    if (!pathname) return 'Dashboard';
 
-    const pathSegments = pathname.split("/").filter(Boolean);
-    if (pathSegments.length === 0) return "Dashboard";
+    const pathSegments = pathname.split('/').filter(Boolean);
+    if (pathSegments.length === 0) return 'Dashboard';
 
     // Remove "dashboard" or "employer" prefix
-    const segments = pathSegments.filter(
-      (seg) => seg !== "dashboard" && seg !== "employer",
-    );
+    const segments = pathSegments.filter((seg) => seg !== 'dashboard' && seg !== 'employer');
 
-    if (segments.length === 0) return "Dashboard";
+    if (segments.length === 0) return 'Dashboard';
 
     const lastSegment = segments[segments.length - 1];
 
     // Special cases for better titles
     const titleMap: Record<string, string> = {
-      "applied-jobs": "Applied Jobs",
-      "saved-jobs": "Saved Jobs",
-      "recommended-jobs": "Recommended Jobs",
-      "post-job": "Post a Job",
-      "company-profile": "Company Profile",
-      "saved-profiles": "Saved Profiles",
-      "talent-management": "Talent Management",
-      "pricing-packages": "Pricing Packages",
-      "billing-details": "Billing Details",
-      "job-view-history": "Job View History",
-      "followed-company": "Followed Companies",
-      "profile-views": "Profile Views",
-      "cv-manager": "CV Manager",
-      "find-jobs": "Find Jobs",
+      'applied-jobs': 'Applied Jobs',
+      'saved-jobs': 'Saved Jobs',
+      'recommended-jobs': 'Recommended Jobs',
+      'post-job': 'Post a Job',
+      'company-profile': 'Company Profile',
+      'saved-profiles': 'Saved Profiles',
+      'talent-management': 'Talent Management',
+      'pricing-packages': 'Pricing Packages',
+      'billing-details': 'Billing Details',
+      'job-view-history': 'Job View History',
+      'followed-company': 'Followed Companies',
+      'profile-views': 'Profile Views',
+      'cv-manager': 'CV Manager',
+      'find-jobs': 'Find Jobs',
     };
 
     if (titleMap[lastSegment]) {
@@ -68,9 +68,9 @@ export default function DashboardHeader({
 
     // Convert kebab-case to Title Case
     return lastSegment
-      .split("-")
+      .split('-')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+      .join(' ');
   };
 
   const pageTitle = getPageTitle();
@@ -96,9 +96,7 @@ export default function DashboardHeader({
               {pageTitle}
             </h1>
             {pathname && (
-              <p className="text-muted-foreground hidden truncate text-xs sm:block">
-                {pathname}
-              </p>
+              <p className="text-muted-foreground hidden truncate text-xs sm:block">{pathname}</p>
             )}
           </div>
         </div>

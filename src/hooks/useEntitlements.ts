@@ -1,5 +1,5 @@
-import { useGetMySubscriptionQuery } from "../redux/feature/subscription/subscriptionApi";
-import { PlanFeatureFlags } from "../types/subscription";
+import { useGetMySubscriptionQuery } from '../redux/feature/subscription/subscriptionApi';
+import { PlanFeatureFlags } from '../types/subscription';
 
 export const useEntitlements = () => {
   const { data, isLoading, isError, refetch } = useGetMySubscriptionQuery();
@@ -29,18 +29,20 @@ export const useCanAccess = (feature: keyof PlanFeatureFlags) => {
 
   const value = features[feature];
 
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     return { hasAccess: value, limit: 0, current: 0, isLoading: false };
   }
 
   // Numeric limit check (maxActiveJobs, maxMonthlyApplications, maxResumes, maxUsers)
   let currentUsage = 0;
-  if (feature === "maxActiveJobs") {
+  if (feature === 'maxActiveJobs') {
     currentUsage = usage?.jobsPosted ?? 0;
-  } else if (feature === "maxMonthlyApplications") {
+  } else if (feature === 'maxMonthlyApplications') {
     currentUsage = usage?.applicationsSubmitted ?? 0;
-  } else if (feature === "maxResumes") {
+  } else if (feature === 'maxResumes') {
     currentUsage = usage?.resumesUploaded ?? 0;
+  } else if (feature === 'maxUsers') {
+    currentUsage = usage?.teamMembers ?? 1;
   }
 
   return {

@@ -1,4 +1,4 @@
-import baseApi, { tagTypes } from "@/redux/api/baseApi";
+import baseApi, { tagTypes } from '@/redux/api/baseApi';
 
 export interface ProfileViewStats {
   totalViews: number;
@@ -55,34 +55,29 @@ export interface LogProfileViewResponse {
 }
 
 export const profileViewApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     logProfileView: builder.mutation<LogProfileViewResponse, string>({
       query: (viewedUserId: string) => ({
         url: `/profile-view/log/${viewedUserId}`,
-        method: "POST",
+        method: 'POST',
       }),
       invalidatesTags: [tagTypes.profile_views],
     }),
 
-    getProfileViewStats: builder.query<
-      ProfileViewStatsResponse,
-      { period?: string } | void
-    >({
+    getProfileViewStats: builder.query<ProfileViewStatsResponse, { period?: string } | void>({
       query: (params) => ({
-        url: "/profile-view/stats",
-        method: "GET",
+        url: '/profile-view/stats',
+        method: 'GET',
         params: params || {},
       }),
       providesTags: [tagTypes.profile_views],
     }),
 
-    getRecentVisitors: builder.query<
-      RecentVisitorsResponse,
-      { period?: string } | void
-    >({
+    getRecentVisitors: builder.query<RecentVisitorsResponse, { period?: string } | void>({
       query: (params) => ({
-        url: "/profile-view/recent-visitors",
-        method: "GET",
+        url: '/profile-view/recent-visitors',
+        method: 'GET',
         params: params || {},
       }),
       providesTags: [tagTypes.profile_views],
@@ -90,8 +85,5 @@ export const profileViewApi = baseApi.injectEndpoints({
   }),
 });
 
-export const {
-  useLogProfileViewMutation,
-  useGetProfileViewStatsQuery,
-  useGetRecentVisitorsQuery,
-} = profileViewApi;
+export const { useLogProfileViewMutation, useGetProfileViewStatsQuery, useGetRecentVisitorsQuery } =
+  profileViewApi;
