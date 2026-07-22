@@ -2,34 +2,39 @@
 'use client';
 
 import { Loader2, MapPin, X } from 'lucide-react';
+import { useMemo } from 'react';
 import { Label } from '../../../ui/label';
 import { RadioGroup, RadioGroupItem } from '../../../ui/radio-group';
 
-interface LocationOption {
-  name: string;
-  count: number;
-}
+export type LocationOption = string | { name: string; count?: number };
 
 const LocationWise = ({
   updateFilters,
   filters,
   locationOptions,
-  locationsLoading,
+  locationsLoading = false,
 }: {
   updateFilters: any;
   filters: any;
   locationOptions: LocationOption[];
   locationsLoading?: boolean;
 }) => {
+  const normalizedOptions = useMemo(() => {
+    if (!locationOptions) return [];
+    return locationOptions.map((opt) =>
+      typeof opt === 'string' ? { name: opt, count: undefined } : opt,
+    );
+  }, [locationOptions]);
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label className="flex items-center gap-2 text-sm font-medium">
           <MapPin className="h-4 w-4" />
           Location
-          {locationOptions.length > 0 && (
+          {normalizedOptions.length > 0 && (
             <span className="text-muted-foreground text-xs font-normal">
-              ({locationOptions.length})
+              ({normalizedOptions.length})
             </span>
           )}
         </Label>
@@ -49,7 +54,7 @@ const LocationWise = ({
           <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
           <span className="text-muted-foreground ml-2 text-xs">Loading locations...</span>
         </div>
-      ) : locationOptions.length === 0 ? (
+      ) : normalizedOptions.length === 0 ? (
         <div className="text-muted-foreground py-2 text-xs">No locations available</div>
       ) : (
         <RadioGroup
@@ -59,7 +64,7 @@ const LocationWise = ({
           }
           className="max-h-48 space-y-1.5 overflow-y-auto pr-1"
         >
-          {locationOptions.map((item: LocationOption) => (
+          {normalizedOptions.map((item) => (
             <div key={item.name} className="flex items-center justify-between space-x-2">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value={item.name} id={`location-${item.name}`} />
@@ -70,7 +75,9 @@ const LocationWise = ({
                   {item.name}
                 </Label>
               </div>
-              <span className="text-muted-foreground text-xs tabular-nums">{item.count}</span>
+              {item.count !== undefined && (
+                <span className="text-muted-foreground text-xs tabular-nums">{item.count}</span>
+              )}
             </div>
           ))}
         </RadioGroup>

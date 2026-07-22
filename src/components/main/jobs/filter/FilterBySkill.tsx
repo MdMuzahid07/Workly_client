@@ -8,41 +8,47 @@ import { Badge } from '../../../ui/badge';
 import { Input } from '../../../ui/input';
 import { Label } from '../../../ui/label';
 
-interface SkillOption {
-  name: string;
-  count: number;
-}
+export type SkillOption = string | { name: string; count?: number };
 
 const FilterBySkill = ({
   filters,
   skillOptions,
-  skillsLoading,
+  skillsLoading = false,
   removeSkill,
   toggleSkill,
 }: {
   filters: any;
   skillOptions: SkillOption[];
-  skillsLoading: boolean;
+  skillsLoading?: boolean;
   removeSkill: (skill: string) => void;
   toggleSkill: (skill: string) => void;
 }) => {
   const [skillSearch, setSkillSearch] = useState('');
 
+  const normalizedSkills = useMemo(() => {
+    if (!skillOptions) return [];
+    return skillOptions.map((opt) =>
+      typeof opt === 'string' ? { name: opt, count: undefined } : opt,
+    );
+  }, [skillOptions]);
+
   // Filter skills based on search input
   const filteredSkills = useMemo(() => {
-    if (!skillSearch.trim()) return skillOptions;
-    return skillOptions.filter((skill: SkillOption) =>
+    if (!skillSearch.trim()) return normalizedSkills;
+    return normalizedSkills.filter((skill) =>
       skill.name.toLowerCase().includes(skillSearch.toLowerCase()),
     );
-  }, [skillOptions, skillSearch]);
+  }, [normalizedSkills, skillSearch]);
 
   return (
     <div className="space-y-3">
       <Label className="flex items-center gap-2 text-sm font-medium">
         <Tag className="h-4 w-4" />
         Skills
-        {skillOptions.length > 0 && (
-          <span className="text-muted-foreground text-xs font-normal">({skillOptions.length})</span>
+        {normalizedSkills.length > 0 && (
+          <span className="text-muted-foreground text-xs font-normal">
+            ({normalizedSkills.length})
+          </span>
         )}
       </Label>
 
@@ -89,7 +95,7 @@ const FilterBySkill = ({
       ) : (
         /* Available Skills */
         <div className="grid max-h-48 grid-cols-1 gap-2 overflow-y-auto">
-          {filteredSkills.map((skill: SkillOption) => (
+          {filteredSkills.map((skill) => (
             <div key={skill.name} className="flex items-center justify-between space-x-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -101,7 +107,9 @@ const FilterBySkill = ({
                   {skill.name}
                 </Label>
               </div>
-              <span className="text-muted-foreground text-xs tabular-nums">{skill.count}</span>
+              {skill.count !== undefined && (
+                <span className="text-muted-foreground text-xs tabular-nums">{skill.count}</span>
+              )}
             </div>
           ))}
         </div>
